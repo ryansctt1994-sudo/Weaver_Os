@@ -236,6 +236,8 @@ class CryptoVerifier:
         registry_valid, registry_failure = validate_registry_freshness(self.registry, now_ts)
         if not registry_valid:
             return VerificationResult(False, "SIGNATURE_VERIFICATION_FAILED", [registry_failure or "REGISTRY_EXPIRED"], [], now_iso, verified_keys=[], failure_details="Key registry failed temporal validation.")
+        if envelope.get("payload_hash_alg") != "sha256":
+            return VerificationResult(False, "SIGNATURE_VERIFICATION_FAILED", ["UNSUPPORTED_ALGORITHM"], [], now_iso, verified_keys=[], failure_details=f"Unsupported payload hash algorithm: {envelope.get('payload_hash_alg')}. Expected: sha256.")
         if inner_payload is not None:
             payload_valid, payload_failure = validate_payload_hash(inner_payload, envelope.get("payload_hash", ""))
             if not payload_valid:
@@ -269,6 +271,12 @@ class CryptoVerifier:
             lifecycle_valid, lifecycle_failure = validate_key_lifecycle(issuer_record, sig_block["signed_at"])
             if not lifecycle_valid:
                 failure_codes.append(lifecycle_failure or "KEY_EXPIRED")
+                continue
+            if sig_block.get("algorithm") != "ed25519":
+                failure_codes.append("UNSUPPORTED_ALGORITHM")
+                continue
+            if sig_block.get("signature_encoding") != "base64url":
+                failure_codes.append("INVALID_SIGNATURE")
                 continue
             replay_key = generate_replay_key(issuer_id, key_id, nonce, payload_type, replay_domain["system_id"], replay_domain["scope_hash"])
             if not self.replay_cache.check_and_record(replay_key, expires_at=cache_expiry):
