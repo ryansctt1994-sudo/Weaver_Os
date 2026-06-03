@@ -6,7 +6,11 @@ from cryptography.hazmat.primitives import serialization
 from cryptography.hazmat.primitives.asymmetric import ed25519
 
 from triadic_controls.crypto.replay import InMemoryReplayCache
-from triadic_controls.crypto.verifier import CryptoVerifier, build_signing_object
+from triadic_controls.crypto.verifier import (
+    CryptoVerifier,
+    build_signing_object,
+    compute_payload_hash,
+)
 
 
 def b64url_nopad(data: bytes) -> str:
@@ -62,11 +66,21 @@ def mock_registry(keypair):
     }
 
 
+def authority_payload(level: int = 3) -> dict:
+    return {
+        "token_id": "33333333-3333-4333-8333-333333333333",
+        "system_id": "rover-7",
+        "authority_level": level,
+        "scope": {"task": "navigate", "region": "sector-7"},
+    }
+
+
 def signed_envelope(
     signing_key,
     *,
     nonce: str,
-    payload_hash: str = "a" * 64,
+    inner_payload: dict | None = None,
+    payload_hash: str | None = None,
     scope_hash: str = "b" * 64,
     valid_from: str | None = None,
     valid_until: str | None = None,
@@ -74,11 +88,12 @@ def signed_envelope(
 ):
     issuer_id = "11111111-1111-4111-8111-111111111111"
     key_id = "22222222-2222-4222-8222-222222222222"
+    effective_hash = payload_hash or compute_payload_hash(inner_payload or authority_payload())
     envelope = {
         "payload_type": "AUTHORITY_TOKEN",
         "payload_schema_version": "0.4.0",
         "payload_hash_alg": "sha256",
-        "payload_hash": payload_hash,
+        "payload_hash": effective_hash,
         "signing_domain": "triadic-controls:v0.4.0:authority-token",
         "replay_domain": {
             "system_id": "rover-7",
@@ -115,14 +130,14 @@ def test_valid_envelope_then_replay_detected(keypair, mock_registry):
     signing_key, _ = keypair
     cache = InMemoryReplayCache()
     verifier = CryptoVerifier(key_registry=mock_registry, replay_cache=cache)
+    payload = authority_payload(level=4)
+    envelope = signed_envelope(signing_key, nonce="seq-0001", inner_payload=payload)
 
-    envelope = signed_envelope(signing_key, nonce="seq-0001")
-
-    result_1 = verifier.verify_authority_token(envelope, requested_level=4)
+    result_1 = verifier.verify_authority_token(envelope, requested_level=4, inner_payload=payload)
     assert result_1.is_valid is False
     assert "INSUFFICIENT_QUORUM" in result_1.failure_codes
 
-    result_2 = verifier.verify_authority_token(envelope, requested_level=4)
+    result_2 = verifier.verify_authority_token(envelope, requested_level=4, inner_payload=payload)
     assert result_2.is_valid is False
     assert "REPLAY_DETECTED" in result_2.failure_codes
 
@@ -131,22 +146,51 @@ def test_valid_level_3_envelope_then_replay_detected(keypair, mock_registry):
     signing_key, _ = keypair
     cache = InMemoryReplayCache()
     verifier = CryptoVerifier(key_registry=mock_registry, replay_cache=cache)
-
+    payload = authority_payload(level=3)
     envelope = signed_envelope(
         signing_key,
         nonce="seq-0002",
-        payload_hash="c" * 64,
+        inner_payload=payload,
         scope_hash="d" * 64,
     )
 
-    result_1 = verifier.verify_authority_token(envelope, requested_level=3)
+    result_1 = verifier.verify_authority_token(envelope, requested_level=3, inner_payload=payload)
     assert result_1.is_valid is True
     assert result_1.ledger_event_type == "TOKEN_SIGNATURE_VALIDATED"
     assert result_1.effective_max_authority_level == 3
 
-    result_2 = verifier.verify_authority_token(envelope, requested_level=3)
+    result_2 = verifier.verify_authority_token(envelope, requested_level=3, inner_payload=payload)
     assert result_2.is_valid is False
     assert "REPLAY_DETECTED" in result_2.failure_codes
+
+
+def test_tampered_payload_hash_mismatch_fails_closed(keypair, mock_registry):
+    signing_key, _ = keypair
+    verifier = CryptoVerifier(key_registry=mock_registry, replay_cache=InMemoryReplayCache())
+    original_payload = authority_payload(level=3)
+    tampered_payload = authority_payload(level=5)
+    envelope = signed_envelope(signing_key, nonce="seq-tampered", inner_payload=original_payload)
+
+    result = verifier.verify_authority_token(envelope, requested_level=3, inner_payload=tampered_payload)
+    assert result.is_valid is False
+    assert result.failure_codes == ["PAYLOAD_HASH_MISMATCH"]
+
+
+def test_key_case_change_payload_hash_mismatch_fails_closed(keypair, mock_registry):
+    signing_key, _ = keypair
+    verifier = CryptoVerifier(key_registry=mock_registry, replay_cache=InMemoryReplayCache())
+    original_payload = authority_payload(level=3)
+    case_changed_payload = {
+        "Token_id": original_payload["token_id"],
+        "system_id": original_payload["system_id"],
+        "authority_level": original_payload["authority_level"],
+        "scope": original_payload["scope"],
+    }
+    envelope = signed_envelope(signing_key, nonce="seq-case", inner_payload=original_payload)
+
+    result = verifier.verify_authority_token(envelope, requested_level=3, inner_payload=case_changed_payload)
+    assert result.is_valid is False
+    assert result.failure_codes == ["PAYLOAD_HASH_MISMATCH"]
 
 
 def test_expired_replay_domain_rejected_before_signature_acceptance(keypair, mock_registry):
