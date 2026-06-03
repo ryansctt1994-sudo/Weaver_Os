@@ -36,6 +36,8 @@ def keypair():
 def mock_registry(keypair):
     _, public_key_b64url = keypair
     return {
+        "valid_from": iso_offset(-3600),
+        "valid_until": iso_offset(3600),
         "issuers": [
             {
                 "issuer_id": "11111111-1111-4111-8111-111111111111",
@@ -215,3 +217,38 @@ def test_malformed_signed_at_rejected(keypair, mock_registry):
     result = verifier.verify_authority_token(envelope, requested_level=3)
     assert result.is_valid is False
     assert "TIME_WINDOW_INVALID" in result.failure_codes
+
+
+def test_future_registry_rejected(keypair, mock_registry):
+    signing_key, _ = keypair
+    mock_registry["valid_from"] = iso_offset(3600)
+    mock_registry["valid_until"] = iso_offset(7200)
+    verifier = CryptoVerifier(key_registry=mock_registry, replay_cache=InMemoryReplayCache())
+    envelope = signed_envelope(signing_key, nonce="seq-future-registry")
+
+    result = verifier.verify_authority_token(envelope, requested_level=3)
+    assert result.is_valid is False
+    assert result.failure_codes == ["REGISTRY_EXPIRED"]
+
+
+def test_stale_registry_rejected(keypair, mock_registry):
+    signing_key, _ = keypair
+    mock_registry["valid_from"] = iso_offset(-7200)
+    mock_registry["valid_until"] = iso_offset(-3600)
+    verifier = CryptoVerifier(key_registry=mock_registry, replay_cache=InMemoryReplayCache())
+    envelope = signed_envelope(signing_key, nonce="seq-stale-registry")
+
+    result = verifier.verify_authority_token(envelope, requested_level=3)
+    assert result.is_valid is False
+    assert result.failure_codes == ["REGISTRY_EXPIRED"]
+
+
+def test_malformed_registry_time_rejected(keypair, mock_registry):
+    signing_key, _ = keypair
+    mock_registry["valid_from"] = "INVALID_DATE"
+    verifier = CryptoVerifier(key_registry=mock_registry, replay_cache=InMemoryReplayCache())
+    envelope = signed_envelope(signing_key, nonce="seq-malformed-registry")
+
+    result = verifier.verify_authority_token(envelope, requested_level=3)
+    assert result.is_valid is False
+    assert result.failure_codes == ["TIME_WINDOW_INVALID"]
