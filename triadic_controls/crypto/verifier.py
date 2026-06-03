@@ -279,7 +279,7 @@ class CryptoVerifier:
                 failure_codes.append("INVALID_SIGNATURE")
                 continue
             replay_key = generate_replay_key(issuer_id, key_id, nonce, payload_type, replay_domain["system_id"], replay_domain["scope_hash"])
-            if not self.replay_cache.check_and_record(replay_key, expires_at=cache_expiry):
+            if self.replay_cache.seen(replay_key, now=now_ts):
                 failure_codes.append("REPLAY_DETECTED")
                 continue
             signing_message = build_signing_object(signing_domain, payload_type, payload_schema_version, payload_hash, replay_domain, nonce)
@@ -289,6 +289,9 @@ class CryptoVerifier:
             is_authorized, separation_group = verify_role(issuer_record, self._roles, requested_level, is_refusal)
             if not is_authorized:
                 failure_codes.append("ISSUER_ROLE_UNAUTHORIZED")
+                continue
+            if not self.replay_cache.check_and_record(replay_key, expires_at=cache_expiry, now=now_ts):
+                failure_codes.append("REPLAY_DETECTED")
                 continue
             verified_issuers.append(issuer_id)
             verified_keys.append(key_id)
