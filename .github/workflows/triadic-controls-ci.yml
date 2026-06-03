@@ -2,17 +2,12 @@ name: triadic-controls CI
 
 on:
   push:
-    paths:
-      - "triadic_controls/**"
-      - "tests/triadic_controls/**"
-      - "pyproject.toml"
-      - ".github/workflows/triadic-controls-ci.yml"
+    branches:
+      - main
   pull_request:
-    paths:
-      - "triadic_controls/**"
-      - "tests/triadic_controls/**"
-      - "pyproject.toml"
-      - ".github/workflows/triadic-controls-ci.yml"
+    branches:
+      - main
+  workflow_dispatch:
 
 jobs:
   test:
