@@ -12,6 +12,7 @@ Important boundary: this module proves cryptographic authorization claims. It
 from __future__ import annotations
 
 import base64
+import copy
 import hashlib
 import json
 import time
@@ -154,6 +155,15 @@ def verify_signature(public_key_b64url: str, signature_b64url: str, message: byt
         return False
 
 
+def verify_registry_root_signature(registry: Dict[str, Any], root_public_key_b64url: str) -> bool:
+    claimed_signature = registry.get("registry_signature")
+    if not claimed_signature:
+        return False
+    canonical_target = copy.deepcopy(registry)
+    canonical_target.pop("registry_signature", None)
+    return verify_signature(root_public_key_b64url, claimed_signature, canonicalize_json(canonical_target))
+
+
 def verify_role(issuer_record: Dict[str, Any], role_policies: Dict[str, Dict[str, Any]], requested_level: int, is_refusal: bool) -> Tuple[bool, Optional[str]]:
     for role_id in issuer_record.get("assigned_roles", []):
         policy = role_policies.get(role_id)
@@ -175,13 +185,20 @@ def build_schema_registry(schemas: Dict[str, Dict[str, Any]]) -> Registry:
     registry = Registry()
     for name, schema in schemas.items():
         schema_id = schema.get("$id") or f"https://triadic.controls/schemas/{name}.schema.json"
-        registry = registry.with_resource(schema_id, Resource.from_contents(schema, default_specification=DRAFT202012))
-        registry = registry.with_resource(f"{name}.schema.json", Resource.from_contents(schema, default_specification=DRAFT202012))
+        resource = Resource.from_contents(schema, default_specification=DRAFT202012)
+        registry = registry.with_resource(schema_id, resource)
+        registry = registry.with_resource(f"{name}.schema.json", resource)
     return registry
 
 
 class CryptoVerifier:
-    def __init__(self, key_registry: Dict[str, Any], replay_cache: ReplayCacheProtocol, schemas: Optional[Dict[str, Dict[str, Any]]] = None):
+    def __init__(
+        self,
+        key_registry: Dict[str, Any],
+        replay_cache: ReplayCacheProtocol,
+        schemas: Optional[Dict[str, Dict[str, Any]]] = None,
+        root_public_key_b64url: Optional[str] = None,
+    ):
         self.schemas = schemas or {}
         self.schema_registry = build_schema_registry(self.schemas) if self.schemas else None
         if "key_registry" in self.schemas:
@@ -189,6 +206,8 @@ class CryptoVerifier:
                 jsonschema.Draft202012Validator(self.schemas["key_registry"], registry=self.schema_registry).validate(key_registry)
             except ValidationError as exc:
                 raise ValueError(f"CRITICAL: Key registry failed schema validation: {exc.message}") from exc
+        if root_public_key_b64url is not None and not verify_registry_root_signature(key_registry, root_public_key_b64url):
+            raise ValueError("CRITICAL: Key registry failed root signature verification. Trust boundary compromised.")
         self.registry = key_registry
         self.replay_cache = replay_cache
         self._issuers = {f"{issuer['issuer_id']}|{issuer['key_id']}": issuer for issuer in self.registry.get("issuers", [])}
