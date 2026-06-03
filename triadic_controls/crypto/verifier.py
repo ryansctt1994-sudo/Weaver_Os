@@ -169,6 +169,8 @@ def verify_role(issuer_record: Dict[str, Any], role_policies: Dict[str, Dict[str
         policy = role_policies.get(role_id)
         if not policy:
             continue
+        if not policy.get("can_participate_in_quorum", False):
+            continue
         if is_refusal:
             if policy.get("may_revoke_or_refuse", False):
                 return True, policy.get("separation_group")
