@@ -1,3 +1,7 @@
+[build-system]
+requires = ["setuptools>=68", "wheel"]
+build-backend = "setuptools.build_meta"
+
 [project]
 name = "weaver-os"
 version = "0.1.0"
@@ -12,6 +16,10 @@ dependencies = [
 dev = [
   "pytest>=7.0.0"
 ]
+
+[tool.setuptools.packages.find]
+where = ["."]
+include = ["triadic_controls*"]
 
 [tool.pytest.ini_options]
 testpaths = ["tests"]
