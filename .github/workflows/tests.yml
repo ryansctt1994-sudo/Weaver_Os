@@ -30,3 +30,12 @@ jobs:
 
       - name: Run tests
         run: pytest
+
+      - name: Build wheel and sdist
+        run: python -m build
+
+      - name: Run CLI smoke checks
+        run: |
+          weaver-release-guard --help
+          weaver-release-guard generate --help
+          weaver-release-guard verify --help
