@@ -9,7 +9,8 @@ description = "Deterministic verification and replay substrate for bounded proba
 requires-python = ">=3.10"
 dependencies = [
   "cryptography>=42.0.0",
-  "jsonschema>=4.0.0"
+  "jsonschema>=4.0.0",
+  "PyJWT>=2.8"
 ]
 
 [project.optional-dependencies]
@@ -17,10 +18,13 @@ dev = [
   "pytest>=7.0.0"
 ]
 
+[project.scripts]
+weaver-release-guard = "weaver_release_guard.cli:main"
+
 [tool.setuptools.packages.find]
-where = ["."]
-include = ["triadic_controls*"]
+where = [".", "src"]
+include = ["triadic_controls*", "weaver_release_guard*"]
 
 [tool.pytest.ini_options]
 testpaths = ["tests"]
-pythonpath = ["."]
+pythonpath = [".", "src"]
