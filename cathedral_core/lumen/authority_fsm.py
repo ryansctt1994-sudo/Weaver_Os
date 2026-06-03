@@ -7,10 +7,10 @@ than interpreted.
 
 from __future__ import annotations
 
-from enum import StrEnum
+from enum import Enum
 
 
-class AuthorityState(StrEnum):
+class AuthorityState(str, Enum):
     SIMULATION_ONLY = "SIMULATION_ONLY"
     PROPOSAL = "PROPOSAL"
     NEEDS_REVIEW = "NEEDS_REVIEW"
@@ -39,5 +39,5 @@ def transition(current: AuthorityState, requested: AuthorityState) -> AuthorityS
     """Return ``requested`` if the transition is legal; otherwise fail closed."""
 
     if requested not in LEGAL_TRANSITIONS[current]:
-        raise AuthorityTransitionError(f"Illegal authority transition: {current} -> {requested}")
+        raise AuthorityTransitionError(f"Illegal authority transition: {current.value} -> {requested.value}")
     return requested
