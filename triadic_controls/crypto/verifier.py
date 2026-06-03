@@ -89,6 +89,51 @@ def build_signing_object(
     return canonicalize_json(signing_obj)
 
 
+def parse_iso8601_utc(value: str) -> float:
+    """Parse an ISO-8601 UTC timestamp into a Unix timestamp.
+
+    Accepts the common trailing Z form and timezone-aware ISO strings. Naive
+    timestamps are rejected because authority windows must be unambiguous.
+    """
+
+    try:
+        parsed = datetime.fromisoformat(value.replace("Z", "+00:00"))
+    except (TypeError, ValueError) as exc:
+        raise ValueError(f"invalid timestamp: {value!r}") from exc
+
+    if parsed.tzinfo is None:
+        raise ValueError(f"timestamp must include timezone: {value!r}")
+
+    return parsed.astimezone(timezone.utc).timestamp()
+
+
+def validate_time_window(
+    valid_from: str,
+    valid_until: str,
+    now_ts: Optional[float] = None,
+) -> Tuple[bool, Optional[float]]:
+    """Validate a replay/authority time window.
+
+    Returns (is_valid, expires_at_ts). The window is valid only when
+    valid_from <= now < valid_until.
+    """
+
+    now = now_ts if now_ts is not None else time.time()
+    try:
+        start_ts = parse_iso8601_utc(valid_from)
+        end_ts = parse_iso8601_utc(valid_until)
+    except ValueError:
+        return False, None
+
+    if start_ts >= end_ts:
+        return False, None
+
+    if not (start_ts <= now < end_ts):
+        return False, None
+
+    return True, end_ts
+
+
 def _decode_base64url_nopad(data: str) -> bytes:
     """Decode base64url without padding by restoring required padding."""
 
@@ -187,6 +232,23 @@ class CryptoVerifier:
         payload_hash = envelope["payload_hash"]
         replay_domain = envelope["replay_domain"]
 
+        window_valid, cache_expiry = validate_time_window(
+            replay_domain["valid_from"],
+            replay_domain["valid_until"],
+            now_ts=now_ts,
+        )
+        if not window_valid or cache_expiry is None:
+            return VerificationResult(
+                is_valid=False,
+                effective_max_authority_level=None,
+                ledger_event_type="TIME_ATTESTATION_FAILED",
+                failure_codes=["TIME_WINDOW_INVALID"],
+                verified_issuers=[],
+                verified_keys=[],
+                verification_time=now_iso,
+                failure_details="Replay domain time window is malformed, expired, or not yet valid.",
+            )
+
         for sig_block in envelope.get("signatures", []):
             issuer_id = sig_block["issuer_id"]
             key_id = sig_block["key_id"]
@@ -217,10 +279,6 @@ class CryptoVerifier:
                 system_id=replay_domain["system_id"],
                 scope_hash=replay_domain["scope_hash"],
             )
-
-            # Pilot default. A full implementation must parse replay_domain.valid_until
-            # and reject malformed or expired windows before this point.
-            cache_expiry = now_ts + 3600
 
             if not self.replay_cache.check_and_record(replay_key, expires_at=cache_expiry):
                 failure_codes.append("REPLAY_DETECTED")
