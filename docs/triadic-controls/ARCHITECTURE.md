@@ -1,8 +1,8 @@
 # triadic-controls Architectural Layout
 
-Status: v0.3.1 baseline accepted; v0.4.0 cryptographic verification target.
+Status: v0.5.0 persistent, root-trusted cryptographic baseline.
 
-This document captures the corrected final architecture for `triadic-controls`, aligned with Weaver OS as a deterministic verification and replay substrate for bounded authority claims.
+This document captures the corrected architecture for `triadic-controls`, aligned with Weaver OS as a deterministic verification and replay substrate for bounded authority claims.
 
 ## Core invariant
 
@@ -10,13 +10,13 @@ A system may be capable of acting, but it may only act inside valid, current, co
 
 ## Corrected cryptographic invariant
 
-Cryptography does not prove human legitimacy. Cryptography proves that a specific key signed a specific canonical payload in a specific protocol context at a specific time.
+Cryptography does not prove human legitimacy. Cryptography proves that a specific key signed a specific canonical payload in a specific protocol context at a specific time, under a registry authenticated by a pinned root key.
 
 Legitimacy remains a governance-layer responsibility.
 
 ## Layer 0 — Governance Layer
 
-This layer remains outside the cryptographic boundary. It answers who should be allowed to authorize, who issued keys, who reviews abuse, and who is accountable when a technically valid authorization is morally or institutionally wrong.
+This layer remains outside the cryptographic boundary. It answers who should be allowed to authorize, who issued keys, who reviews abuse, who controls root-key custody, and who is accountable when a technically valid authorization is morally or institutionally wrong.
 
 The Trust Ledger records two forms of truth:
 
@@ -44,7 +44,7 @@ The resolver applies caps from valid token level, requested level, refusal signa
 
 ## Layer 2 — Cryptographic Verification Layer
 
-TSC-001C introduces:
+TSC-001C v0.5.0 includes:
 
 ```text
 IssuerRecord
@@ -53,21 +53,49 @@ KeyRegistry
 SignatureEnvelope
 SigningObject
 ReplayCache
+SQLiteReplayCache
 CryptoVerifier
 VerificationResult
+Root registry signature verification
 ```
 
-No authority grant or refusal cap is valid unless the system can prove which key signed it, which issuer claims that key, whether that key was active at signing time, whether the issuer role authorized the requested action, whether the payload was unaltered, whether quorum independence was satisfied, and whether the token or refusal signal is fresh and non-replayed.
+No authority grant or refusal cap is valid unless the system can prove which root key authenticated the registry, which key signed the envelope, which issuer claims that key, whether that key was active at signing time, whether the issuer role authorized the requested action, whether the payload was unaltered, whether quorum independence was satisfied, and whether the token or refusal signal is fresh and non-replayed.
 
 This still does not prove moral legitimacy.
+
+## Root Trust Chain
+
+The v0.5.0 trust chain is:
+
+```text
+Pinned offline root public key
+  -> verifies registry_signature over canonical KeyRegistry without registry_signature
+    -> authenticates IssuerRecord and RolePolicy set
+      -> validates issuer key and role scope
+        -> verifies SignatureEnvelope
+          -> binds envelope to canonical inner payload hash
+            -> admits authority only after replay, lifecycle, role, and quorum checks
+```
+
+If the root registry signature is invalid, `CryptoVerifier` construction halts before issuer indexing. This prevents host-provided forged registry dictionaries from becoming authority material.
+
+Root-key custody remains a governance and operations problem. Cryptographic verification can prove that a registry was signed by the pinned key; it cannot prove that the root key was governed responsibly.
+
+## Persistent Replay Boundary
+
+`InMemoryReplayCache` remains suitable for simulation and local pilot tests only.
+
+Production-like deployments require `SQLiteReplayCache` or a stronger external replay store. `SQLiteReplayCache` persists replay state across process restarts and relies on SQLite primary-key uniqueness with `INSERT ... ON CONFLICT DO NOTHING` to make `check_and_record` atomic.
+
+SQLite WAL mode and a busy timeout are enabled to improve behavior under concurrent verification load. Larger distributed deployments should replace SQLite with an operationally appropriate consensus-backed or transactional replay store.
 
 ## Layer 3 — Trust Ledger Layer
 
 The Trust Ledger is append-only and hash-chained. It records authority changes, token validation events, refusal validation events, signature failures, quorum failures, replay detections, key lifecycle events, handoffs, dissent, fallback tests, noncomputable flags, TOCTOU revalidation failures, and authority-window reservations.
 
-Every cryptographic authority event should log both `issuer_id` and `key_id`.
+Every cryptographic authority event should log both `issuer_id` and `key_id`, and root-registry events should log the root key identifier or pinned root fingerprint used for verification.
 
-The ledger is evidence, not absolution. v0.3.1 is tamper-evident, not tamper-proof. Future hardening should include WORM storage, transparency logs, distributed witness signatures, regulator-held checkpoint hashes, or HSM-sealed checkpoints.
+The ledger is evidence, not absolution. The current implementation is tamper-evident, not tamper-proof. Future hardening should include WORM storage, transparency logs, distributed witness signatures, regulator-held checkpoint hashes, or HSM-sealed checkpoints.
 
 ## Layer 4 — Execution Gate Layer
 
@@ -114,11 +142,22 @@ canonicalize SigningObject with RFC 8785
 sign SigningObject bytes with Ed25519
 ```
 
+The registry signing flow is:
+
+```text
+construct KeyRegistry without registry_signature
+validate registry schema
+canonicalize registry with RFC 8785-compatible canonical JSON
+sign canonical registry bytes with offline root Ed25519 key
+attach registry_signature
+verify before CryptoVerifier indexes issuers or roles
+```
+
 ## Correct final system claim
 
 Do not say: TSC-001C proves authority.
 
-Say: TSC-001C proves cryptographic authorization claims.
+Say: TSC-001C proves cryptographic authorization claims under a pinned, signed key registry.
 
 Do not say: The Trust Ledger records who acted.
 
@@ -129,6 +168,7 @@ Final architecture statement:
 ```text
 TSC-001B establishes deterministic authority decay.
 TSC-001C establishes cryptographic authenticity of authority claims.
-Neither establishes human legitimacy.
+v0.5.0 adds persistent replay protection and root-authenticated registries.
+None of these establishes human legitimacy.
 Legitimacy remains a governance-layer responsibility.
 ```
