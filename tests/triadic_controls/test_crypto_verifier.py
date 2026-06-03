@@ -164,6 +164,24 @@ def test_valid_level_3_envelope_then_replay_detected(keypair, mock_registry):
     assert "REPLAY_DETECTED" in result_2.failure_codes
 
 
+def test_role_excluded_from_quorum_cannot_authorize(keypair, mock_registry):
+    signing_key, _ = keypair
+    mock_registry["roles"][0]["can_participate_in_quorum"] = False
+    verifier = CryptoVerifier(key_registry=mock_registry, replay_cache=InMemoryReplayCache())
+    payload = authority_payload(level=3)
+    envelope = signed_envelope(
+        signing_key,
+        nonce="seq-no-quorum-participation",
+        inner_payload=payload,
+        scope_hash="f" * 64,
+    )
+
+    result = verifier.verify_authority_token(envelope, requested_level=3, inner_payload=payload)
+
+    assert result.is_valid is False
+    assert result.failure_codes == ["ISSUER_ROLE_UNAUTHORIZED"]
+
+
 def test_invalid_signature_does_not_poison_replay_cache(keypair, mock_registry):
     signing_key, _ = keypair
     cache = InMemoryReplayCache()
