@@ -3,10 +3,11 @@
 This module is the pilot mathematical gatekeeper for cryptographic authority
 claims. It verifies domain-separated Ed25519 signatures over canonical JSON
 signing objects, checks issuer role authorization, enforces separation-group
-quorum, and applies replay protection through ReplayCacheProtocol.
+quorum, applies role scope and duration policy, and applies replay protection
+through ReplayCacheProtocol.
 
 Important boundary: this module proves cryptographic authorization claims. It
- does not prove human legitimacy.
+does not prove human legitimacy.
 """
 
 from __future__ import annotations
@@ -139,6 +140,50 @@ def validate_key_lifecycle(issuer_record: Dict[str, Any], signed_at: str) -> Tup
     return True, None
 
 
+def validate_key_material(issuer_record: Dict[str, Any]) -> Tuple[bool, Optional[str]]:
+    if issuer_record.get("public_key_encoding", "base64url") != "base64url":
+        return False, "INVALID_KEY_ENCODING"
+    if issuer_record.get("key_type", "ed25519") != "ed25519":
+        return False, "KEY_TYPE_MISMATCH"
+    return True, None
+
+
+def validate_scope(policy: Dict[str, Any], inner_payload: Optional[Dict[str, Any]], replay_domain: Dict[str, str]) -> Tuple[bool, Optional[str]]:
+    allowed = policy.get("allowed_scopes") or {}
+    if not allowed:
+        return True, None
+
+    system_id = replay_domain.get("system_id")
+    if allowed.get("systems") and system_id not in allowed["systems"]:
+        return False, "SCOPE_NOT_ALLOWED"
+
+    if inner_payload is None:
+        return True, None
+
+    payload_scope = inner_payload.get("scope", {})
+    region = payload_scope.get("region")
+    task = payload_scope.get("task")
+    if allowed.get("regions") and region not in allowed["regions"]:
+        return False, "SCOPE_NOT_ALLOWED"
+    if allowed.get("tasks") and task not in allowed["tasks"]:
+        return False, "SCOPE_NOT_ALLOWED"
+    return True, None
+
+
+def validate_authority_duration(policy: Dict[str, Any], replay_domain: Dict[str, str]) -> Tuple[bool, Optional[str]]:
+    limit = (policy.get("allowed_scopes") or {}).get("max_authority_duration_sec")
+    if limit is None:
+        return True, None
+    try:
+        start_ts = parse_iso8601_utc(replay_domain["valid_from"])
+        end_ts = parse_iso8601_utc(replay_domain["valid_until"])
+    except (KeyError, ValueError):
+        return False, "TIME_WINDOW_INVALID"
+    if end_ts - start_ts > float(limit):
+        return False, "AUTHORITY_DURATION_EXCEEDED"
+    return True, None
+
+
 def _decode_base64url_nopad(data: str) -> bytes:
     padding = "=" * (-len(data) % 4)
     return base64.urlsafe_b64decode(data + padding)
@@ -164,19 +209,32 @@ def verify_registry_root_signature(registry: Dict[str, Any], root_public_key_b64
     return verify_signature(root_public_key_b64url, claimed_signature, canonicalize_json(canonical_target))
 
 
-def verify_role(issuer_record: Dict[str, Any], role_policies: Dict[str, Dict[str, Any]], requested_level: int, is_refusal: bool) -> Tuple[bool, Optional[str]]:
+def verify_role(
+    issuer_record: Dict[str, Any],
+    role_policies: Dict[str, Dict[str, Any]],
+    requested_level: int,
+    is_refusal: bool,
+    replay_domain: Dict[str, str],
+    inner_payload: Optional[Dict[str, Any]] = None,
+) -> Tuple[bool, Optional[str], Optional[str]]:
     for role_id in issuer_record.get("assigned_roles", []):
         policy = role_policies.get(role_id)
         if not policy:
             continue
         if not policy.get("can_participate_in_quorum", False):
             continue
+        scope_valid, scope_failure = validate_scope(policy, inner_payload, replay_domain)
+        if not scope_valid:
+            return False, None, scope_failure
+        duration_valid, duration_failure = validate_authority_duration(policy, replay_domain)
+        if not duration_valid:
+            return False, None, duration_failure
         if is_refusal:
             if policy.get("may_revoke_or_refuse", False):
-                return True, policy.get("separation_group")
+                return True, policy.get("separation_group"), None
         elif policy.get("may_grant_authority", False) and policy.get("max_grant_level", 0) >= requested_level:
-            return True, policy.get("separation_group")
-    return False, None
+            return True, policy.get("separation_group"), None
+    return False, None, "ISSUER_ROLE_UNAUTHORIZED"
 
 
 def verify_quorum(verified_separation_groups: Set[str], requested_level: int) -> bool:
@@ -270,6 +328,10 @@ class CryptoVerifier:
             if issuer_record.get("status") != "ACTIVE":
                 failure_codes.append("KEY_NOT_ACTIVE")
                 continue
+            key_material_valid, key_material_failure = validate_key_material(issuer_record)
+            if not key_material_valid:
+                failure_codes.append(key_material_failure or "INVALID_KEY_ENCODING")
+                continue
             lifecycle_valid, lifecycle_failure = validate_key_lifecycle(issuer_record, sig_block["signed_at"])
             if not lifecycle_valid:
                 failure_codes.append(lifecycle_failure or "KEY_EXPIRED")
@@ -288,9 +350,9 @@ class CryptoVerifier:
             if not verify_signature(issuer_record["public_key"], sig_block["signature"], signing_message):
                 failure_codes.append("INVALID_SIGNATURE")
                 continue
-            is_authorized, separation_group = verify_role(issuer_record, self._roles, requested_level, is_refusal)
+            is_authorized, separation_group, role_failure = verify_role(issuer_record, self._roles, requested_level, is_refusal, replay_domain, inner_payload)
             if not is_authorized:
-                failure_codes.append("ISSUER_ROLE_UNAUTHORIZED")
+                failure_codes.append(role_failure or "ISSUER_ROLE_UNAUTHORIZED")
                 continue
             if not self.replay_cache.check_and_record(replay_key, expires_at=cache_expiry, now=now_ts):
                 failure_codes.append("REPLAY_DETECTED")
