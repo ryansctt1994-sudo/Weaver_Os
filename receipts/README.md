@@ -26,6 +26,8 @@ sha256sum \
   cathedral_core/witness/qgs.py \
   cathedral_core/witness/governance_debt.py \
   cathedral_core/witness/receipt.py \
+  cathedral_core/witness/evidence_registry.py \
+  cathedral_core/witness/evidence_promotion.py \
   cathedral_core/constitution_loader.py \
   constitution/negative_invariants.yaml \
   >> receipts/mvp0_cathedral_core_tests_001.txt
