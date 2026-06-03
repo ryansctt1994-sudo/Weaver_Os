@@ -18,9 +18,9 @@ dev = [
 ]
 
 [tool.setuptools.packages.find]
-where = ["."]
+where = [".", "src"]
 include = ["triadic_controls*", "cathedral_core*", "weaver_release_guard*"]
 
 [tool.pytest.ini_options]
 testpaths = ["tests"]
-pythonpath = ["."]
+pythonpath = [".", "src"]
