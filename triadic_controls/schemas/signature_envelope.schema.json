@@ -1,0 +1,70 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://triadic.controls/schemas/signature_envelope.schema.json",
+  "title": "Signature Envelope",
+  "description": "Standardized cryptographic wrapper defining protocol domain context and anti-replay scope.",
+  "type": "object",
+  "properties": {
+    "payload_type": { "type": "string", "enum": ["AUTHORITY_TOKEN", "REFUSAL_SIGNAL"] },
+    "payload_schema_version": { "type": "string" },
+    "payload_hash_alg": { "type": "string", "enum": ["sha256"] },
+    "payload_hash": { "type": "string", "pattern": "^[a-f0-9]{64}$" },
+    "signing_domain": {
+      "type": "string",
+      "description": "Context string, e.g. triadic-controls:v0.4.0:authority-token."
+    },
+    "replay_domain": {
+      "type": "object",
+      "properties": {
+        "system_id": { "type": "string" },
+        "scope_hash": { "type": "string", "pattern": "^[a-f0-9]{64}$" },
+        "valid_from": { "type": "string", "format": "date-time" },
+        "valid_until": { "type": "string", "format": "date-time" }
+      },
+      "required": ["system_id", "scope_hash", "valid_from", "valid_until"],
+      "additionalProperties": false
+    },
+    "signatures": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "properties": {
+          "issuer_id": {
+            "type": "string",
+            "pattern": "^[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-5][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}$"
+          },
+          "key_id": {
+            "type": "string",
+            "pattern": "^[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-5][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}$"
+          },
+          "algorithm": { "type": "string", "enum": ["ed25519"] },
+          "signature_encoding": { "type": "string", "enum": ["base64url"] },
+          "signature": { "type": "string" },
+          "nonce_or_sequence": { "type": "string" },
+          "signed_at": { "type": "string", "format": "date-time" }
+        },
+        "required": [
+          "issuer_id",
+          "key_id",
+          "algorithm",
+          "signature_encoding",
+          "signature",
+          "nonce_or_sequence",
+          "signed_at"
+        ],
+        "additionalProperties": false
+      },
+      "minItems": 1
+    }
+  },
+  "required": [
+    "payload_type",
+    "payload_schema_version",
+    "payload_hash_alg",
+    "payload_hash",
+    "signing_domain",
+    "replay_domain",
+    "signatures"
+  ],
+  "additionalProperties": false
+}
