@@ -8,13 +8,13 @@ a complete proof bundle to close.
 from __future__ import annotations
 
 from dataclasses import dataclass
-from enum import StrEnum
+from enum import Enum
 from typing import Optional
 
 from .receipt import ProofBundle
 
 
-class DebtType(StrEnum):
+class DebtType(str, Enum):
     REPLAY_DEBT = "REPLAY_DEBT"
     VERIFICATION_DEBT = "VERIFICATION_DEBT"
     WITNESS_DEBT = "WITNESS_DEBT"
