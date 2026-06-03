@@ -8,15 +8,11 @@ Weaver OS is a verifiable execution and release-governance substrate for bounded
 
 Cognition may propose, but it cannot authorize itself. Weaver OS turns authority claims into signed, replay-checked, schema-validated artifacts so rejected or invalid claims cannot silently become trusted state.
 
-The current MVP supports:
+## LABYRINTH OS v9.0 Handoff
 
-- **Cryptographic authority verification** with domain-separated Ed25519 signatures.
-- **Payload binding** through canonical JSON and SHA-256 payload hashes.
-- **Replay protection** with nonce/scope/system-bound replay keys.
-- **Key lifecycle enforcement** for active, revoked, expired, suspended, and rotated keys.
-- **Separation-group quorum enforcement** for high-authority operations.
-- **Production JSON Schema alignment** for issuer records, key registries, role policies, signature envelopes, and verification results.
-- **Release provenance verification** through the `weaver-release-guard` CLI.
+This repository is the Weaver OS verification spine within the broader LABYRINTH OS / Cathedral-Sentinel-Weaver canon. The terminal handoff is preserved in [`HANDOFF_LABYRINTH_OS_v9_FINAL.md`](HANDOFF_LABYRINTH_OS_v9_FINAL.md).
+
+The handoff records the evidence boundary for this repository: architectural inventory is not proof of implementation, and production readiness is not demonstrated until independent MVP-0 replay produces receipts.
 
 ## Current Repository Layout
 
@@ -87,7 +83,7 @@ This package verifies cryptographic authorization claims. It does not prove huma
 
 ## Status
 
-MVP / verification spine. Suitable for local development, CI, and protocol hardening. Production deployment still requires persistent replay-cache storage with atomic multi-process semantics, operational key management, and deployment-specific governance policy.
+MVP / verification spine. Suitable for local development, CI, and protocol hardening. Production deployment still requires persistent replay-cache storage with atomic multi-process semantics, operational key management, deployment-specific governance policy, and independent MVP-0 replay.
 
 ## License
 
