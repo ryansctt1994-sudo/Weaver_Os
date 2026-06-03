@@ -12,6 +12,7 @@ Important boundary: this module proves cryptographic authorization claims. It
 from __future__ import annotations
 
 import base64
+import hashlib
 import json
 import time
 from dataclasses import dataclass
@@ -60,6 +61,23 @@ def canonicalize_json(data: Dict[str, Any]) -> bytes:
         sort_keys=True,
         separators=(",", ":"),
     ).encode("utf-8")
+
+
+def compute_payload_hash(inner_payload: Dict[str, Any]) -> str:
+    """Compute SHA-256 over canonicalized inner payload JSON."""
+
+    return hashlib.sha256(canonicalize_json(inner_payload)).hexdigest()
+
+
+def validate_payload_hash(
+    inner_payload: Dict[str, Any],
+    claimed_hash: str,
+) -> Tuple[bool, Optional[str]]:
+    """Validate that an operational payload matches envelope.payload_hash."""
+
+    if compute_payload_hash(inner_payload) != claimed_hash:
+        return False, "PAYLOAD_HASH_MISMATCH"
+    return True, None
 
 
 def build_signing_object(
@@ -242,6 +260,7 @@ class CryptoVerifier:
         envelope: Dict[str, Any],
         requested_level: int,
         is_refusal: bool,
+        inner_payload: Optional[Dict[str, Any]] = None,
     ) -> VerificationResult:
         now_ts = time.time()
         now_iso = self._get_iso_now()
@@ -258,6 +277,23 @@ class CryptoVerifier:
                 verification_time=now_iso,
                 failure_details="Key registry failed temporal validation.",
             )
+
+        if inner_payload is not None:
+            payload_valid, payload_failure = validate_payload_hash(
+                inner_payload=inner_payload,
+                claimed_hash=envelope.get("payload_hash", ""),
+            )
+            if not payload_valid:
+                return VerificationResult(
+                    is_valid=False,
+                    effective_max_authority_level=None,
+                    ledger_event_type="SIGNATURE_VERIFICATION_FAILED",
+                    failure_codes=[payload_failure or "PAYLOAD_HASH_MISMATCH"],
+                    verified_issuers=[],
+                    verified_keys=[],
+                    verification_time=now_iso,
+                    failure_details="Cryptographic binding failed: computed payload hash does not match envelope payload_hash.",
+                )
 
         verified_issuers: List[str] = []
         verified_keys: List[str] = []
@@ -403,6 +439,7 @@ class CryptoVerifier:
         self,
         envelope: Dict[str, Any],
         requested_level: int,
+        inner_payload: Optional[Dict[str, Any]] = None,
     ) -> VerificationResult:
         """Validate an AuthorityToken signature envelope."""
 
@@ -415,12 +452,18 @@ class CryptoVerifier:
                 self._get_iso_now(),
                 verified_keys=[],
             )
-        return self._verify_envelope(envelope, requested_level, is_refusal=False)
+        return self._verify_envelope(
+            envelope,
+            requested_level,
+            is_refusal=False,
+            inner_payload=inner_payload,
+        )
 
     def verify_refusal_signal(
         self,
         envelope: Dict[str, Any],
         requested_cap_level: int,
+        inner_payload: Optional[Dict[str, Any]] = None,
     ) -> VerificationResult:
         """Validate a RefusalSignal signature envelope."""
 
@@ -433,4 +476,9 @@ class CryptoVerifier:
                 self._get_iso_now(),
                 verified_keys=[],
             )
-        return self._verify_envelope(envelope, requested_cap_level, is_refusal=True)
+        return self._verify_envelope(
+            envelope,
+            requested_cap_level,
+            is_refusal=True,
+            inner_payload=inner_payload,
+        )
