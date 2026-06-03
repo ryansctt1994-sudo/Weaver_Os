@@ -164,6 +164,36 @@ def test_valid_level_3_envelope_then_replay_detected(keypair, mock_registry):
     assert "REPLAY_DETECTED" in result_2.failure_codes
 
 
+def test_invalid_signature_does_not_poison_replay_cache(keypair, mock_registry):
+    signing_key, _ = keypair
+    cache = InMemoryReplayCache()
+    verifier = CryptoVerifier(key_registry=mock_registry, replay_cache=cache)
+    payload = authority_payload(level=3)
+    envelope = signed_envelope(
+        signing_key,
+        nonce="seq-invalid-first",
+        inner_payload=payload,
+        scope_hash="e" * 64,
+    )
+    poisoned_attempt = {
+        **envelope,
+        "signatures": [
+            {
+                **envelope["signatures"][0],
+                "signature": "A" + envelope["signatures"][0]["signature"][1:],
+            }
+        ],
+    }
+
+    result_1 = verifier.verify_authority_token(poisoned_attempt, requested_level=3, inner_payload=payload)
+    assert result_1.is_valid is False
+    assert result_1.failure_codes == ["INVALID_SIGNATURE"]
+
+    result_2 = verifier.verify_authority_token(envelope, requested_level=3, inner_payload=payload)
+    assert result_2.is_valid is True
+    assert result_2.ledger_event_type == "TOKEN_SIGNATURE_VALIDATED"
+
+
 def test_tampered_payload_hash_mismatch_fails_closed(keypair, mock_registry):
     signing_key, _ = keypair
     verifier = CryptoVerifier(key_registry=mock_registry, replay_cache=InMemoryReplayCache())
