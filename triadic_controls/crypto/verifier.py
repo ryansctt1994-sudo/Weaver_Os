@@ -120,6 +120,28 @@ def validate_time_window(
     return True, end_ts
 
 
+def validate_registry_freshness(
+    registry: Dict[str, Any],
+    now_ts: Optional[float] = None,
+) -> Tuple[bool, Optional[str]]:
+    """Validate the temporal sovereign boundary of the key registry."""
+
+    now = now_ts if now_ts is not None else time.time()
+    try:
+        valid_from_ts = parse_iso8601_utc(registry["valid_from"])
+        valid_until_ts = parse_iso8601_utc(registry["valid_until"])
+    except (KeyError, ValueError):
+        return False, "TIME_WINDOW_INVALID"
+
+    if valid_from_ts >= valid_until_ts:
+        return False, "TIME_WINDOW_INVALID"
+
+    if now < valid_from_ts or now >= valid_until_ts:
+        return False, "REGISTRY_EXPIRED"
+
+    return True, None
+
+
 def validate_key_lifecycle(
     issuer_record: Dict[str, Any],
     signed_at: str,
@@ -223,6 +245,19 @@ class CryptoVerifier:
     ) -> VerificationResult:
         now_ts = time.time()
         now_iso = self._get_iso_now()
+
+        registry_valid, registry_failure = validate_registry_freshness(self.registry, now_ts)
+        if not registry_valid:
+            return VerificationResult(
+                is_valid=False,
+                effective_max_authority_level=None,
+                ledger_event_type="SIGNATURE_VERIFICATION_FAILED",
+                failure_codes=[registry_failure or "REGISTRY_EXPIRED"],
+                verified_issuers=[],
+                verified_keys=[],
+                verification_time=now_iso,
+                failure_details="Key registry failed temporal validation.",
+            )
 
         verified_issuers: List[str] = []
         verified_keys: List[str] = []
