@@ -15,6 +15,7 @@ dependencies = [
 
 [project.optional-dependencies]
 dev = [
+  "build>=1.2.0",
   "pytest>=7.0.0"
 ]
 
@@ -24,6 +25,9 @@ weaver-release-guard = "weaver_release_guard.cli:main"
 [tool.setuptools.packages.find]
 where = [".", "src"]
 include = ["triadic_controls*", "weaver_release_guard*"]
+
+[tool.setuptools.package-data]
+triadic_controls = ["schemas/*.json"]
 
 [tool.pytest.ini_options]
 testpaths = ["tests"]
