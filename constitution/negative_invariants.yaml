@@ -1,0 +1,30 @@
+# Cathedral-Sentinel-Weaver negative invariants.
+#
+# These entries are read-only constitutional constraints for MVP-0 tooling.
+# They are intentionally phrased as prohibitions: code paths should be checked
+# against them before claims are promoted into authority-bearing state.
+
+negative_invariants:
+  - id: NoSilentConversionOfUncertaintyIntoAuthority
+    statement: "No mechanism may silently convert uncertainty into authority."
+    severity: fail_closed
+
+  - id: ProposalIsNotAuthority
+    statement: "Proposal generation cannot authorize execution."
+    severity: fail_closed
+
+  - id: ObservationIsNotParticipation
+    statement: "Observation or witness visibility does not create quorum or execution authority."
+    severity: fail_closed
+
+  - id: PaperIsNotEvidence
+    statement: "Document labels do not determine evidence level; only receipt class does."
+    severity: fail_closed
+
+  - id: AuthorityOutsideScopeIsNoAuthority
+    statement: "Actor, action, target, and duration must be bounded before authority is admitted."
+    severity: fail_closed
+
+  - id: MythicContentIsQuarantined
+    statement: "Symbolic or mythic content is metadata/routing context only and cannot enter trusted kernels as authority."
+    severity: fail_closed
