@@ -1,0 +1,35 @@
+name: triadic-controls CI
+
+on:
+  push:
+    paths:
+      - "triadic_controls/**"
+      - "tests/triadic_controls/**"
+      - "pyproject.toml"
+      - ".github/workflows/triadic-controls-ci.yml"
+  pull_request:
+    paths:
+      - "triadic_controls/**"
+      - "tests/triadic_controls/**"
+      - "pyproject.toml"
+      - ".github/workflows/triadic-controls-ci.yml"
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+
+      - name: Install package and test dependencies
+        run: |
+          python -m pip install --upgrade pip
+          python -m pip install -e ".[dev]"
+
+      - name: Run triadic-controls tests
+        run: pytest tests/triadic_controls -q
