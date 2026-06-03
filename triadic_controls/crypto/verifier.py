@@ -51,13 +51,7 @@ class VerificationResult:
 
 
 def canonicalize_json(data: Dict[str, Any]) -> bytes:
-    """RFC 8785-compatible canonical JSON serialization boundary.
-
-    This pilot implementation enforces UTF-8 output, lexicographic key sorting,
-    no insignificant whitespace, and no NaN/Infinity values. Full RFC 8785
-    parity across languages should be validated with independent test vectors
-    before production use.
-    """
+    """RFC 8785-compatible canonical JSON serialization boundary."""
 
     return json.dumps(
         data,
@@ -90,11 +84,7 @@ def build_signing_object(
 
 
 def parse_iso8601_utc(value: str) -> float:
-    """Parse an ISO-8601 UTC timestamp into a Unix timestamp.
-
-    Accepts the common trailing Z form and timezone-aware ISO strings. Naive
-    timestamps are rejected because authority windows must be unambiguous.
-    """
+    """Parse an ISO-8601 UTC timestamp into a Unix timestamp."""
 
     try:
         parsed = datetime.fromisoformat(value.replace("Z", "+00:00"))
@@ -112,11 +102,7 @@ def validate_time_window(
     valid_until: str,
     now_ts: Optional[float] = None,
 ) -> Tuple[bool, Optional[float]]:
-    """Validate a replay/authority time window.
-
-    Returns (is_valid, expires_at_ts). The window is valid only when
-    valid_from <= now < valid_until.
-    """
+    """Validate a replay/authority time window."""
 
     now = now_ts if now_ts is not None else time.time()
     try:
@@ -132,6 +118,28 @@ def validate_time_window(
         return False, None
 
     return True, end_ts
+
+
+def validate_key_lifecycle(
+    issuer_record: Dict[str, Any],
+    signed_at: str,
+) -> Tuple[bool, Optional[str]]:
+    """Validate key lifecycle state at signature time."""
+
+    try:
+        signed_at_ts = parse_iso8601_utc(signed_at)
+        issued_at_ts = parse_iso8601_utc(issuer_record["issued_at"])
+        expires_at_ts = parse_iso8601_utc(issuer_record["expires_at"])
+    except (KeyError, ValueError):
+        return False, "TIME_WINDOW_INVALID"
+
+    if issued_at_ts >= expires_at_ts:
+        return False, "KEY_EXPIRED"
+
+    if signed_at_ts < issued_at_ts or signed_at_ts >= expires_at_ts:
+        return False, "KEY_EXPIRED"
+
+    return True, None
 
 
 def _decode_base64url_nopad(data: str) -> bytes:
@@ -185,12 +193,7 @@ def verify_role(
 
 
 def verify_quorum(verified_separation_groups: Set[str], requested_level: int) -> bool:
-    """Enforce independent multi-signature requirements.
-
-    Level 3 requires one independent entity. Levels 4 and 5 require two
-    independent separation groups. Levels 1 and 2 require one validated issuer
-    when cryptographic authorization is requested.
-    """
+    """Enforce independent multi-signature requirements."""
 
     required_independent_groups = 2 if requested_level >= 4 else 1
     return len(verified_separation_groups) >= required_independent_groups
@@ -269,6 +272,14 @@ class CryptoVerifier:
 
             if issuer_record.get("status") != "ACTIVE":
                 failure_codes.append("KEY_NOT_ACTIVE")
+                continue
+
+            lifecycle_valid, lifecycle_failure = validate_key_lifecycle(
+                issuer_record=issuer_record,
+                signed_at=sig_block["signed_at"],
+            )
+            if not lifecycle_valid:
+                failure_codes.append(lifecycle_failure or "KEY_EXPIRED")
                 continue
 
             replay_key = generate_replay_key(
