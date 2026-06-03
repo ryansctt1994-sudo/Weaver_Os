@@ -1,4 +1,5 @@
 import base64
+import copy
 import json
 from datetime import datetime, timedelta, timezone
 from pathlib import Path
@@ -11,6 +12,7 @@ from triadic_controls.crypto.replay import InMemoryReplayCache
 from triadic_controls.crypto.verifier import (
     CryptoVerifier,
     build_signing_object,
+    canonicalize_json,
     compute_payload_hash,
 )
 
@@ -23,6 +25,22 @@ def iso_offset(seconds: int) -> str:
     return (
         datetime.now(timezone.utc) + timedelta(seconds=seconds)
     ).isoformat(timespec="seconds").replace("+00:00", "Z")
+
+
+def sign_registry(registry: dict, root_signing_key) -> dict:
+    signed_registry = copy.deepcopy(registry)
+    signature = root_signing_key.sign(canonicalize_json(signed_registry))
+    signed_registry["registry_signature"] = b64url_nopad(signature)
+    return signed_registry
+
+
+def schema_bundle(production_schemas):
+    return {
+        "key_registry": production_schemas["key_registry"],
+        "issuer_record": production_schemas["issuer_record"],
+        "role_policy": production_schemas["role_policy"],
+        "signature_envelope": production_schemas["signature_envelope"],
+    }
 
 
 @pytest.fixture(scope="session")
@@ -42,7 +60,7 @@ def production_schemas():
 
 
 @pytest.fixture
-def keypair():
+def root_keypair():
     signing_key = ed25519.Ed25519PrivateKey.generate()
     public_key = signing_key.public_key()
     public_key_bytes = public_key.public_bytes(
@@ -53,22 +71,33 @@ def keypair():
 
 
 @pytest.fixture
-def production_registry(keypair):
-    _, public_key_b64url = keypair
-    return {
+def issuer_keypair():
+    signing_key = ed25519.Ed25519PrivateKey.generate()
+    public_key = signing_key.public_key()
+    public_key_bytes = public_key.public_bytes(
+        encoding=serialization.Encoding.Raw,
+        format=serialization.PublicFormat.Raw,
+    )
+    return signing_key, b64url_nopad(public_key_bytes)
+
+
+@pytest.fixture
+def production_registry(issuer_keypair, root_keypair):
+    _, issuer_public_key_b64url = issuer_keypair
+    root_signing_key, _ = root_keypair
+    unsigned = {
         "registry_id": "00000000-0000-4000-8000-000000000000",
-        "registry_version": "0.4.1",
+        "registry_version": "0.5.0",
         "registry_sequence": 1,
         "valid_from": iso_offset(-3600),
         "valid_until": iso_offset(3600),
         "last_updated": iso_offset(-60),
-        "registry_signature": "mock-offline-root-signature-b64url",
         "issuers": [
             {
                 "issuer_id": "11111111-1111-4111-8111-111111111111",
                 "key_id": "22222222-2222-4222-8222-222222222222",
                 "public_key_encoding": "base64url",
-                "public_key": public_key_b64url,
+                "public_key": issuer_public_key_b64url,
                 "key_type": "ed25519",
                 "status": "ACTIVE",
                 "issued_at": iso_offset(-3600),
@@ -94,6 +123,7 @@ def production_registry(keypair):
             }
         ],
     }
+    return sign_registry(unsigned, root_signing_key)
 
 
 def authority_payload(level: int = 3) -> dict:
@@ -115,10 +145,10 @@ def signed_production_envelope(signing_key, inner_payload: dict, nonce: str = "s
     }
     envelope = {
         "payload_type": "AUTHORITY_TOKEN",
-        "payload_schema_version": "0.4.1",
+        "payload_schema_version": "0.5.0",
         "payload_hash_alg": "sha256",
         "payload_hash": payload_hash,
-        "signing_domain": "triadic-controls:v0.4.1:authority-token",
+        "signing_domain": "triadic-controls:v0.5.0:authority-token",
         "replay_domain": replay_domain,
         "signatures": [],
     }
@@ -145,24 +175,26 @@ def signed_production_envelope(signing_key, inner_payload: dict, nonce: str = "s
     return envelope
 
 
+def make_verifier(production_registry, production_schemas, root_keypair):
+    _, root_public_key_b64url = root_keypair
+    return CryptoVerifier(
+        key_registry=production_registry,
+        replay_cache=InMemoryReplayCache(),
+        schemas=schema_bundle(production_schemas),
+        root_public_key_b64url=root_public_key_b64url,
+    )
+
+
 def test_production_schemas_accept_valid_registry_and_envelope(
-    keypair,
+    issuer_keypair,
+    root_keypair,
     production_registry,
     production_schemas,
 ):
-    signing_key, _ = keypair
+    signing_key, _ = issuer_keypair
     payload = authority_payload(level=3)
     envelope = signed_production_envelope(signing_key, payload)
-    verifier = CryptoVerifier(
-        key_registry=production_registry,
-        replay_cache=InMemoryReplayCache(),
-        schemas={
-            "key_registry": production_schemas["key_registry"],
-            "issuer_record": production_schemas["issuer_record"],
-            "role_policy": production_schemas["role_policy"],
-            "signature_envelope": production_schemas["signature_envelope"],
-        },
-    )
+    verifier = make_verifier(production_registry, production_schemas, root_keypair)
 
     result = verifier.verify_authority_token(envelope, requested_level=3, inner_payload=payload)
 
@@ -171,24 +203,16 @@ def test_production_schemas_accept_valid_registry_and_envelope(
 
 
 def test_production_schema_rejects_invalid_envelope_uuid(
-    keypair,
+    issuer_keypair,
+    root_keypair,
     production_registry,
     production_schemas,
 ):
-    signing_key, _ = keypair
+    signing_key, _ = issuer_keypair
     payload = authority_payload(level=3)
     envelope = signed_production_envelope(signing_key, payload)
     envelope["signatures"][0]["issuer_id"] = "not-a-uuid"
-    verifier = CryptoVerifier(
-        key_registry=production_registry,
-        replay_cache=InMemoryReplayCache(),
-        schemas={
-            "key_registry": production_schemas["key_registry"],
-            "issuer_record": production_schemas["issuer_record"],
-            "role_policy": production_schemas["role_policy"],
-            "signature_envelope": production_schemas["signature_envelope"],
-        },
-    )
+    verifier = make_verifier(production_registry, production_schemas, root_keypair)
 
     result = verifier.verify_authority_token(envelope, requested_level=3, inner_payload=payload)
 
@@ -197,24 +221,16 @@ def test_production_schema_rejects_invalid_envelope_uuid(
 
 
 def test_production_schema_rejects_missing_replay_domain(
-    keypair,
+    issuer_keypair,
+    root_keypair,
     production_registry,
     production_schemas,
 ):
-    signing_key, _ = keypair
+    signing_key, _ = issuer_keypair
     payload = authority_payload(level=3)
     envelope = signed_production_envelope(signing_key, payload)
     del envelope["replay_domain"]
-    verifier = CryptoVerifier(
-        key_registry=production_registry,
-        replay_cache=InMemoryReplayCache(),
-        schemas={
-            "key_registry": production_schemas["key_registry"],
-            "issuer_record": production_schemas["issuer_record"],
-            "role_policy": production_schemas["role_policy"],
-            "signature_envelope": production_schemas["signature_envelope"],
-        },
-    )
+    verifier = make_verifier(production_registry, production_schemas, root_keypair)
 
     result = verifier.verify_authority_token(envelope, requested_level=3, inner_payload=payload)
 
@@ -223,24 +239,16 @@ def test_production_schema_rejects_missing_replay_domain(
 
 
 def test_production_schema_rejects_invalid_nonce_type(
-    keypair,
+    issuer_keypair,
+    root_keypair,
     production_registry,
     production_schemas,
 ):
-    signing_key, _ = keypair
+    signing_key, _ = issuer_keypair
     payload = authority_payload(level=3)
     envelope = signed_production_envelope(signing_key, payload)
     envelope["signatures"][0]["nonce_or_sequence"] = 12345
-    verifier = CryptoVerifier(
-        key_registry=production_registry,
-        replay_cache=InMemoryReplayCache(),
-        schemas={
-            "key_registry": production_schemas["key_registry"],
-            "issuer_record": production_schemas["issuer_record"],
-            "role_policy": production_schemas["role_policy"],
-            "signature_envelope": production_schemas["signature_envelope"],
-        },
-    )
+    verifier = make_verifier(production_registry, production_schemas, root_keypair)
 
     result = verifier.verify_authority_token(envelope, requested_level=3, inner_payload=payload)
 
@@ -249,19 +257,40 @@ def test_production_schema_rejects_invalid_nonce_type(
 
 
 def test_production_schema_rejects_registry_missing_signature(
-    production_registry,
+    issuer_keypair,
     production_schemas,
+    root_keypair,
 ):
-    del production_registry["registry_signature"]
+    _, issuer_public_key_b64url = issuer_keypair
+    _, root_public_key_b64url = root_keypair
+    registry = {
+        "registry_id": "00000000-0000-4000-8000-000000000000",
+        "registry_version": "0.5.0",
+        "registry_sequence": 1,
+        "valid_from": iso_offset(-3600),
+        "valid_until": iso_offset(3600),
+        "last_updated": iso_offset(-60),
+        "issuers": [],
+        "roles": [],
+    }
+    registry["issuers"].append(
+        {
+            "issuer_id": "11111111-1111-4111-8111-111111111111",
+            "key_id": "22222222-2222-4222-8222-222222222222",
+            "public_key_encoding": "base64url",
+            "public_key": issuer_public_key_b64url,
+            "key_type": "ed25519",
+            "status": "ACTIVE",
+            "issued_at": iso_offset(-3600),
+            "expires_at": iso_offset(3600),
+            "assigned_roles": ["role-level-4-grant"],
+        }
+    )
 
     with pytest.raises(ValueError, match="Key registry failed schema validation"):
         CryptoVerifier(
-            key_registry=production_registry,
+            key_registry=registry,
             replay_cache=InMemoryReplayCache(),
-            schemas={
-                "key_registry": production_schemas["key_registry"],
-                "issuer_record": production_schemas["issuer_record"],
-                "role_policy": production_schemas["role_policy"],
-                "signature_envelope": production_schemas["signature_envelope"],
-            },
+            schemas=schema_bundle(production_schemas),
+            root_public_key_b64url=root_public_key_b64url,
         )
