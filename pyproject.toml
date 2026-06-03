@@ -19,7 +19,7 @@ dev = [
 
 [tool.setuptools.packages.find]
 where = ["."]
-include = ["triadic_controls*"]
+include = ["triadic_controls*", "cathedral_core*", "weaver_release_guard*"]
 
 [tool.pytest.ini_options]
 testpaths = ["tests"]
