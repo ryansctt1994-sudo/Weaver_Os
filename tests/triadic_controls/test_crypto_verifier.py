@@ -46,7 +46,9 @@ def mock_registry(keypair):
             {
                 "issuer_id": "11111111-1111-4111-8111-111111111111",
                 "key_id": "22222222-2222-4222-8222-222222222222",
+                "public_key_encoding": "base64url",
                 "public_key": public_key_b64url,
+                "key_type": "ed25519",
                 "status": "ACTIVE",
                 "issued_at": iso_offset(-3600),
                 "expires_at": iso_offset(3600),
@@ -61,6 +63,12 @@ def mock_registry(keypair):
                 "may_revoke_or_refuse": False,
                 "max_grant_level": 4,
                 "can_participate_in_quorum": True,
+                "allowed_scopes": {
+                    "systems": ["rover-7"],
+                    "regions": ["sector-7"],
+                    "tasks": ["navigate"],
+                    "max_authority_duration_sec": 7200,
+                },
             }
         ],
     }
@@ -82,6 +90,7 @@ def signed_envelope(
     inner_payload: dict | None = None,
     payload_hash: str | None = None,
     scope_hash: str = "b" * 64,
+    system_id: str = "rover-7",
     valid_from: str | None = None,
     valid_until: str | None = None,
     signed_at: str | None = None,
@@ -96,7 +105,7 @@ def signed_envelope(
         "payload_hash": effective_hash,
         "signing_domain": "triadic-controls:v0.4.0:authority-token",
         "replay_domain": {
-            "system_id": "rover-7",
+            "system_id": system_id,
             "scope_hash": scope_hash,
             "valid_from": valid_from or iso_offset(-60),
             "valid_until": valid_until or iso_offset(3600),
@@ -182,6 +191,116 @@ def test_role_excluded_from_quorum_cannot_authorize(keypair, mock_registry):
     assert result.failure_codes == ["ISSUER_ROLE_UNAUTHORIZED"]
 
 
+def test_role_scope_rejects_disallowed_system(keypair, mock_registry):
+    signing_key, _ = keypair
+    verifier = CryptoVerifier(key_registry=mock_registry, replay_cache=InMemoryReplayCache())
+    payload = authority_payload(level=3)
+    envelope = signed_envelope(
+        signing_key,
+        nonce="seq-scope-system",
+        inner_payload=payload,
+        system_id="rover-8",
+        scope_hash="a" * 64,
+    )
+
+    result = verifier.verify_authority_token(envelope, requested_level=3, inner_payload=payload)
+
+    assert result.is_valid is False
+    assert result.failure_codes == ["SCOPE_NOT_ALLOWED"]
+
+
+def test_role_scope_rejects_disallowed_region(keypair, mock_registry):
+    signing_key, _ = keypair
+    verifier = CryptoVerifier(key_registry=mock_registry, replay_cache=InMemoryReplayCache())
+    payload = authority_payload(level=3)
+    payload["scope"]["region"] = "sector-9"
+    envelope = signed_envelope(
+        signing_key,
+        nonce="seq-scope-region",
+        inner_payload=payload,
+        scope_hash="c" * 64,
+    )
+
+    result = verifier.verify_authority_token(envelope, requested_level=3, inner_payload=payload)
+
+    assert result.is_valid is False
+    assert result.failure_codes == ["SCOPE_NOT_ALLOWED"]
+
+
+def test_role_scope_rejects_disallowed_task(keypair, mock_registry):
+    signing_key, _ = keypair
+    verifier = CryptoVerifier(key_registry=mock_registry, replay_cache=InMemoryReplayCache())
+    payload = authority_payload(level=3)
+    payload["scope"]["task"] = "drill"
+    envelope = signed_envelope(
+        signing_key,
+        nonce="seq-scope-task",
+        inner_payload=payload,
+        scope_hash="e" * 64,
+    )
+
+    result = verifier.verify_authority_token(envelope, requested_level=3, inner_payload=payload)
+
+    assert result.is_valid is False
+    assert result.failure_codes == ["SCOPE_NOT_ALLOWED"]
+
+
+def test_role_duration_limit_rejects_excessive_authority_window(keypair, mock_registry):
+    signing_key, _ = keypair
+    mock_registry["roles"][0]["allowed_scopes"]["max_authority_duration_sec"] = 60
+    verifier = CryptoVerifier(key_registry=mock_registry, replay_cache=InMemoryReplayCache())
+    payload = authority_payload(level=3)
+    envelope = signed_envelope(
+        signing_key,
+        nonce="seq-duration-exceeded",
+        inner_payload=payload,
+        valid_from=iso_offset(-60),
+        valid_until=iso_offset(3600),
+        scope_hash="1" * 64,
+    )
+
+    result = verifier.verify_authority_token(envelope, requested_level=3, inner_payload=payload)
+
+    assert result.is_valid is False
+    assert result.failure_codes == ["AUTHORITY_DURATION_EXCEEDED"]
+
+
+def test_invalid_public_key_encoding_rejected(keypair, mock_registry):
+    signing_key, _ = keypair
+    mock_registry["issuers"][0]["public_key_encoding"] = "pem"
+    verifier = CryptoVerifier(key_registry=mock_registry, replay_cache=InMemoryReplayCache())
+    payload = authority_payload(level=3)
+    envelope = signed_envelope(
+        signing_key,
+        nonce="seq-invalid-key-encoding",
+        inner_payload=payload,
+        scope_hash="2" * 64,
+    )
+
+    result = verifier.verify_authority_token(envelope, requested_level=3, inner_payload=payload)
+
+    assert result.is_valid is False
+    assert result.failure_codes == ["INVALID_KEY_ENCODING"]
+
+
+def test_key_type_mismatch_rejected(keypair, mock_registry):
+    signing_key, _ = keypair
+    mock_registry["issuers"][0]["key_type"] = "rsa"
+    verifier = CryptoVerifier(key_registry=mock_registry, replay_cache=InMemoryReplayCache())
+    payload = authority_payload(level=3)
+    envelope = signed_envelope(
+        signing_key,
+        nonce="seq-key-type-mismatch",
+        inner_payload=payload,
+        scope_hash="3" * 64,
+    )
+
+    result = verifier.verify_authority_token(envelope, requested_level=3, inner_payload=payload)
+
+    assert result.is_valid is False
+    assert result.failure_codes == ["KEY_TYPE_MISMATCH"]
+
+
 def test_invalid_signature_does_not_poison_replay_cache(keypair, mock_registry):
     signing_key, _ = keypair
     cache = InMemoryReplayCache()
@@ -191,7 +310,7 @@ def test_invalid_signature_does_not_poison_replay_cache(keypair, mock_registry):
         signing_key,
         nonce="seq-invalid-first",
         inner_payload=payload,
-        scope_hash="e" * 64,
+        scope_hash="4" * 64,
     )
     poisoned_attempt = {
         **envelope,
