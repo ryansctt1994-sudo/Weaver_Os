@@ -1,0 +1,79 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://triadic.controls/schemas/verification_result.schema.json",
+  "title": "Verification Result",
+  "description": "Deterministic output of a cryptographic verification attempt dictating ledger behavior.",
+  "type": "object",
+  "properties": {
+    "is_valid": { "type": "boolean" },
+    "effective_max_authority_level": { "type": ["integer", "null"], "minimum": 0, "maximum": 5 },
+    "ledger_event_type": {
+      "type": "string",
+      "enum": [
+        "TOKEN_SIGNATURE_VALIDATED",
+        "REFUSAL_SIGNATURE_VALIDATED",
+        "SIGNATURE_VERIFICATION_FAILED",
+        "QUORUM_VALIDATED",
+        "QUORUM_FAILED",
+        "KEY_REVOKED",
+        "KEY_ROTATED",
+        "REPLAY_DETECTED",
+        "TIME_ATTESTATION_FAILED",
+        "ISSUER_ROLE_UNAUTHORIZED",
+        "REGISTRY_SIGNATURE_INVALID",
+        "REFUSAL_INVALID",
+        "REFUSAL_ANOMALY_THRESHOLD_BREACHED"
+      ]
+    },
+    "failure_codes": {
+      "type": "array",
+      "items": {
+        "type": "string",
+        "enum": [
+          "PAYLOAD_HASH_MISMATCH",
+          "UNKNOWN_ISSUER",
+          "UNKNOWN_KEY",
+          "UNSUPPORTED_ALGORITHM",
+          "INVALID_SIGNATURE",
+          "KEY_NOT_ACTIVE",
+          "KEY_EXPIRED",
+          "KEY_REVOKED",
+          "ISSUER_ROLE_UNAUTHORIZED",
+          "INSUFFICIENT_QUORUM",
+          "QUORUM_NOT_INDEPENDENT",
+          "REPLAY_DETECTED",
+          "TIME_WINDOW_INVALID",
+          "SYSTEM_SCOPE_MISMATCH",
+          "REGISTRY_EXPIRED",
+          "REGISTRY_SIGNATURE_INVALID"
+        ]
+      }
+    },
+    "verified_issuers": {
+      "type": "array",
+      "items": {
+        "type": "string",
+        "pattern": "^[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-5][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}$"
+      }
+    },
+    "verified_keys": {
+      "type": "array",
+      "items": {
+        "type": "string",
+        "pattern": "^[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-5][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}$"
+      }
+    },
+    "verification_time": { "type": "string", "format": "date-time" },
+    "failure_details": { "type": ["string", "null"] }
+  },
+  "required": [
+    "is_valid",
+    "effective_max_authority_level",
+    "ledger_event_type",
+    "failure_codes",
+    "verified_issuers",
+    "verified_keys",
+    "verification_time"
+  ],
+  "additionalProperties": false
+}
