@@ -23,13 +23,13 @@ def iso_offset(seconds: int) -> str:
 
 @pytest.fixture
 def keypair():
-    private_key = ed25519.Ed25519PrivateKey.generate()
-    public_key = private_key.public_key()
+    signing_key = ed25519.Ed25519PrivateKey.generate()
+    public_key = signing_key.public_key()
     public_key_bytes = public_key.public_bytes(
         encoding=serialization.Encoding.Raw,
         format=serialization.PublicFormat.Raw,
     )
-    return private_key, b64url_nopad(public_key_bytes)
+    return signing_key, b64url_nopad(public_key_bytes)
 
 
 @pytest.fixture
@@ -42,6 +42,8 @@ def mock_registry(keypair):
                 "key_id": "22222222-2222-4222-8222-222222222222",
                 "public_key": public_key_b64url,
                 "status": "ACTIVE",
+                "issued_at": iso_offset(-3600),
+                "expires_at": iso_offset(3600),
                 "assigned_roles": ["role-level-4-grant"],
             }
         ],
@@ -59,13 +61,14 @@ def mock_registry(keypair):
 
 
 def signed_envelope(
-    private_key,
+    signing_key,
     *,
     nonce: str,
     payload_hash: str = "a" * 64,
     scope_hash: str = "b" * 64,
     valid_from: str | None = None,
     valid_until: str | None = None,
+    signed_at: str | None = None,
 ):
     issuer_id = "11111111-1111-4111-8111-111111111111"
     key_id = "22222222-2222-4222-8222-222222222222"
@@ -91,7 +94,7 @@ def signed_envelope(
         replay_domain=envelope["replay_domain"],
         nonce_or_sequence=nonce,
     )
-    signature_bytes = private_key.sign(signing_message)
+    signature_bytes = signing_key.sign(signing_message)
     envelope["signatures"].append(
         {
             "issuer_id": issuer_id,
@@ -100,37 +103,35 @@ def signed_envelope(
             "signature_encoding": "base64url",
             "signature": b64url_nopad(signature_bytes),
             "nonce_or_sequence": nonce,
-            "signed_at": iso_offset(0),
+            "signed_at": signed_at or iso_offset(0),
         }
     )
     return envelope
 
 
 def test_valid_envelope_then_replay_detected(keypair, mock_registry):
-    private_key, _ = keypair
+    signing_key, _ = keypair
     cache = InMemoryReplayCache()
     verifier = CryptoVerifier(key_registry=mock_registry, replay_cache=cache)
 
-    envelope = signed_envelope(private_key, nonce="seq-0001")
+    envelope = signed_envelope(signing_key, nonce="seq-0001")
 
     result_1 = verifier.verify_authority_token(envelope, requested_level=4)
     assert result_1.is_valid is False
     assert "INSUFFICIENT_QUORUM" in result_1.failure_codes
 
-    # Level 4 requires two independent separation groups. Reusing the same
-    # one-signature envelope should still be rejected, preserving quorum safety.
     result_2 = verifier.verify_authority_token(envelope, requested_level=4)
     assert result_2.is_valid is False
     assert "REPLAY_DETECTED" in result_2.failure_codes
 
 
 def test_valid_level_3_envelope_then_replay_detected(keypair, mock_registry):
-    private_key, _ = keypair
+    signing_key, _ = keypair
     cache = InMemoryReplayCache()
     verifier = CryptoVerifier(key_registry=mock_registry, replay_cache=cache)
 
     envelope = signed_envelope(
-        private_key,
+        signing_key,
         nonce="seq-0002",
         payload_hash="c" * 64,
         scope_hash="d" * 64,
@@ -147,10 +148,10 @@ def test_valid_level_3_envelope_then_replay_detected(keypair, mock_registry):
 
 
 def test_expired_replay_domain_rejected_before_signature_acceptance(keypair, mock_registry):
-    private_key, _ = keypair
+    signing_key, _ = keypair
     verifier = CryptoVerifier(key_registry=mock_registry, replay_cache=InMemoryReplayCache())
     envelope = signed_envelope(
-        private_key,
+        signing_key,
         nonce="seq-expired",
         valid_from=iso_offset(-7200),
         valid_until=iso_offset(-3600),
@@ -163,10 +164,10 @@ def test_expired_replay_domain_rejected_before_signature_acceptance(keypair, moc
 
 
 def test_future_replay_domain_rejected_before_signature_acceptance(keypair, mock_registry):
-    private_key, _ = keypair
+    signing_key, _ = keypair
     verifier = CryptoVerifier(key_registry=mock_registry, replay_cache=InMemoryReplayCache())
     envelope = signed_envelope(
-        private_key,
+        signing_key,
         nonce="seq-future",
         valid_from=iso_offset(3600),
         valid_until=iso_offset(7200),
@@ -176,3 +177,41 @@ def test_future_replay_domain_rejected_before_signature_acceptance(keypair, mock
     assert result.is_valid is False
     assert result.ledger_event_type == "TIME_ATTESTATION_FAILED"
     assert result.failure_codes == ["TIME_WINDOW_INVALID"]
+
+
+def test_expired_key_rejected(keypair, mock_registry):
+    signing_key, _ = keypair
+    mock_registry["issuers"][0]["issued_at"] = iso_offset(-7200)
+    mock_registry["issuers"][0]["expires_at"] = iso_offset(-3600)
+    verifier = CryptoVerifier(key_registry=mock_registry, replay_cache=InMemoryReplayCache())
+    envelope = signed_envelope(signing_key, nonce="seq-expired-key")
+
+    result = verifier.verify_authority_token(envelope, requested_level=3)
+    assert result.is_valid is False
+    assert "KEY_EXPIRED" in result.failure_codes
+
+
+def test_not_yet_issued_key_rejected(keypair, mock_registry):
+    signing_key, _ = keypair
+    mock_registry["issuers"][0]["issued_at"] = iso_offset(3600)
+    mock_registry["issuers"][0]["expires_at"] = iso_offset(7200)
+    verifier = CryptoVerifier(key_registry=mock_registry, replay_cache=InMemoryReplayCache())
+    envelope = signed_envelope(signing_key, nonce="seq-future-key")
+
+    result = verifier.verify_authority_token(envelope, requested_level=3)
+    assert result.is_valid is False
+    assert "KEY_EXPIRED" in result.failure_codes
+
+
+def test_malformed_signed_at_rejected(keypair, mock_registry):
+    signing_key, _ = keypair
+    verifier = CryptoVerifier(key_registry=mock_registry, replay_cache=InMemoryReplayCache())
+    envelope = signed_envelope(
+        signing_key,
+        nonce="seq-malformed-time",
+        signed_at="not-a-timestamp",
+    )
+
+    result = verifier.verify_authority_token(envelope, requested_level=3)
+    assert result.is_valid is False
+    assert "TIME_WINDOW_INVALID" in result.failure_codes
