@@ -11,7 +11,7 @@ REQUIRED_PROMOTION_BASIS: dict[QGSLevel, tuple[str, ...]] = {
     QGSLevel.E2_IMPLEMENTED: ("source", "code", "implementation"),
     QGSLevel.E3_RECEIPTED: ("receipt", "pytest", "test", "hash", "ci"),
     QGSLevel.E4_REPLICATED: ("replicated", "independent", "replay"),
-    QGSLevel.E5_PRODUCTION_BOUND: ("production", "deployment", "audit", "monitoring"),
+    QGSLevel.E5_AUDITED: ("audit", "audited", "production", "deployment", "monitoring"),
 }
 
 
