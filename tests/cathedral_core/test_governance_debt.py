@@ -4,6 +4,18 @@ from cathedral_core.witness.governance_debt import DebtType, GovernanceDebt
 from cathedral_core.witness.receipt import ProofBundle
 
 
+RATIFIED_DEBT_TYPES = {
+    DebtType.VERIFICATION_DEBT,
+    DebtType.REPLAY_DEBT,
+    DebtType.ATTESTATION_DEBT,
+    DebtType.AUTHORITY_DEBT,
+    DebtType.SCOPE_DEBT,
+    DebtType.SIGNAL_DEBT,
+    DebtType.OUTCOME_DEBT,
+    DebtType.EGRESS_DEBT,
+}
+
+
 def complete_bundle() -> ProofBundle:
     return ProofBundle(
         proposal_receipt="proposal:001",
@@ -20,6 +32,14 @@ def incomplete_bundle() -> ProofBundle:
         witness_receipt="witness:001",
         execution_receipt="execution:001",
     )
+
+
+def test_governance_debt_taxonomy_contains_ratified_types():
+    assert RATIFIED_DEBT_TYPES <= set(DebtType)
+
+
+def test_witness_debt_alias_maps_to_attestation_debt():
+    assert DebtType.WITNESS_DEBT is DebtType.ATTESTATION_DEBT
 
 
 def test_governance_debt_is_unresolved_by_default():
@@ -42,7 +62,7 @@ def test_governance_debt_rejects_incomplete_receipt_when_required():
 
 
 def test_governance_debt_resolves_with_complete_receipt():
-    debt = GovernanceDebt(DebtType.WITNESS_DEBT, "witness receipt pending")
+    debt = GovernanceDebt(DebtType.ATTESTATION_DEBT, "witness receipt pending")
     bundle = complete_bundle()
 
     debt.resolve(bundle)
