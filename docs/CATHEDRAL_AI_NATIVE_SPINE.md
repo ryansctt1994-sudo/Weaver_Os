@@ -83,8 +83,11 @@ E1_SPEC
 E2_IMPLEMENTED
 E3_RECEIPTED
 E4_REPLICATED
-E5_PRODUCTION_BOUND
+E5_AUDITED
 ```
+
+`E5_PRODUCTION_BOUND` may exist as a backward-compatible code alias, but the
+ratified semantic name is `E5_AUDITED`.
 
 Canonical files:
 
@@ -283,8 +286,8 @@ cathedral_core/
 │   ├── debt_registry.py                # future
 │   ├── debt_receipt.py                 # future
 │   ├── qgs.py
-│   ├── evidence_registry.py            # current roadmap target
-│   ├── evidence_promotion.py           # current roadmap target
+│   ├── evidence_registry.py
+│   ├── evidence_promotion.py
 │   ├── replay_service.py               # future
 │   ├── state_snapshot.py               # future
 │   ├── replay_assert.py                # future
