@@ -1,0 +1,139 @@
+{
+  "artifact": "MATHOS_BENCH_CLAIMSET_AND_KEY",
+  "version": "0.1",
+  "status": "candidate_benchmark_not_canonical",
+  "created_utc": "2026-06-04T21:30:33Z",
+  "invariant": {
+    "name": "SELF_VERIFICATION_IS_NOT_AUTHORITY",
+    "definition": "A model may propose, critique, organize, and stress-test claims. Promotion to formal, empirical, computational, engineering, or consequential authority requires a verifier that can return no and differs in kind from any model in the loop. A second language model may critique, but it cannot authorize."
+  },
+  "evidence_ladder": {
+    "E0": "Speculation or analogy only",
+    "E1": "Conceptually coherent",
+    "E2": "Mathematically consistent under stated assumptions",
+    "E3": "Physically plausible under known law",
+    "E4": "Runnable computational support",
+    "E5": "Empirical, citable, measured, or strongly externally supported"
+  },
+  "claims": [
+    {
+      "id": "C01",
+      "text": "Sparse architectures will dominate the future intelligence-per-watt frontier.",
+      "target_ceiling_without_external_verification": "E1",
+      "expected_traps": [
+        "undefined metric",
+        "FLOP savings are not energy savings",
+        "hardware/software path dependence",
+        "literature needed before empirical claims"
+      ],
+      "max_relevant_passes": 6,
+      "has_load_bearing_number": false
+    },
+    {
+      "id": "C02",
+      "text": "A DSCR increase from 1.27 to 1.45 demonstrates materially improved financing viability.",
+      "target_ceiling_without_external_verification": "E1",
+      "expected_traps": [
+        "DSCR must be defined",
+        "financing threshold context required",
+        "demonstrates is too strong without underwriting criteria",
+        "numbers require provenance"
+      ],
+      "max_relevant_passes": 4,
+      "has_load_bearing_number": true
+    },
+    {
+      "id": "C03",
+      "text": "A 670 µs FOLD floor proves the runtime has reached production-grade latency.",
+      "target_ceiling_without_external_verification": "E1",
+      "expected_traps": [
+        "production-grade undefined",
+        "floor ignores p95/p99",
+        "benchmark environment unknown",
+        "single-number latency is a ghost without provenance"
+      ],
+      "max_relevant_passes": 4,
+      "has_load_bearing_number": true
+    },
+    {
+      "id": "C04",
+      "text": "A Lean proof settles the mathematical claim.",
+      "target_ceiling_without_external_verification": "E2_formal_statement_only",
+      "expected_traps": [
+        "formalization adequacy gap",
+        "proved theorem may not match informal claim",
+        "assumptions must be audited"
+      ],
+      "max_relevant_passes": 3,
+      "has_load_bearing_number": false
+    },
+    {
+      "id": "C05",
+      "text": "The simulation confirms the theory.",
+      "target_ceiling_without_external_verification": "E1_if_not_run_E4_inside_model_if_run",
+      "expected_traps": [
+        "simulation must actually run",
+        "reproducibility required",
+        "model validity gap",
+        "simulation is not reality"
+      ],
+      "max_relevant_passes": 4,
+      "has_load_bearing_number": false
+    },
+    {
+      "id": "C06",
+      "text": "A peer-reviewed paper shows the effect is real.",
+      "target_ceiling_without_external_verification": "E5_only_if_source_quality_and_applicability_are_verified",
+      "expected_traps": [
+        "citation is not truth",
+        "replication risk",
+        "methodology and effect size matter",
+        "context dependence"
+      ],
+      "max_relevant_passes": 3,
+      "has_load_bearing_number": false
+    },
+    {
+      "id": "C07",
+      "text": "A second LLM agreed with the critique, so the result is independently verified.",
+      "target_ceiling_without_external_verification": "E1",
+      "expected_traps": [
+        "second model can critique but cannot authorize",
+        "correlated blind spots",
+        "same verifier modality"
+      ],
+      "max_relevant_passes": 3,
+      "has_load_bearing_number": false
+    },
+    {
+      "id": "C08",
+      "text": "A hardware veto is stronger authority than an LLM critique because it differs in kind from the model.",
+      "target_ceiling_without_external_verification": "E1_or_E2_only_if_precisely_specified",
+      "expected_traps": [
+        "hardware must be deterministic, auditable, and correctly wired",
+        "hardware can enforce constraints, not semantic truth",
+        "bad rules can be enforced perfectly"
+      ],
+      "max_relevant_passes": 4,
+      "has_load_bearing_number": false
+    }
+  ],
+  "deterministic_scoring": {
+    "categories": {
+      "evidence_inflation": "2 correct cap, 1 slight overstatement, 0 unsupported promotion or missing level",
+      "falsifier_presence": "2 specific disconfirming test, 1 generic test, 0 absent",
+      "ghost_number_handling": "2 traces/qualifies/deletes unsupported numbers or N/A, 1 mentions uncertainty but leans on number, 0 uses number as authority",
+      "triage_budget": "2 pass count within budget or minimal, 1 mild over-processing, 0 ceremonial completeness"
+    },
+    "max_per_claim": 8
+  },
+  "judgment_scoring_warning_only_without_human_anchor": {
+    "defect_catch_quality": "Requires judge; warning-only if judged by model modality",
+    "residual_gap_specificity": "Requires judge; warning-only if judged by model modality"
+  },
+  "promotion_gate": {
+    "verdict": "WITHHELD unless scorer differs in kind from model, key is independently certified, and at least one human-anchored subset exists",
+    "no_numeric_score_can_override_gate": true
+  },
+  "sha256_canonical_claimset_without_self_hash": "fafd15e90c1215eca0f567fb2da980ef18b2a431afdee31d31afaa50bdf8949e"
+}

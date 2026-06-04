@@ -1,0 +1,163 @@
+{
+  "artifact": "MATHOS_BENCH_RUN_RECEIPT",
+  "version": "0.1",
+  "created_utc": "2026-06-04T21:30:40Z",
+  "claimset_sha256": "fafd15e90c1215eca0f567fb2da980ef18b2a431afdee31d31afaa50bdf8949e",
+  "run_input_sha256": "f4b6c3fd63507ed361caacc826f0cf6896e34a3e6b6e2b866e28b4e1213815e3",
+  "results": [
+    {
+      "protocol_version": "v1_synthetic",
+      "protocol_blinded_id": "6cc6b0f26aed5c4f",
+      "deterministic_total": 4,
+      "deterministic_max": 16,
+      "per_claim": [
+        {
+          "claim_id": "C02",
+          "deterministic_parts": {
+            "evidence_inflation": {
+              "score": 0,
+              "detail": "Unsupported promotion: max stated level E4 exceeds ceiling E1."
+            },
+            "falsifier_presence": {
+              "score": 0,
+              "detail": "No falsifier/test language found."
+            },
+            "ghost_number_handling": {
+              "score": 0,
+              "detail": "Load-bearing number used without provenance handling."
+            },
+            "triage_budget": {
+              "score": 2,
+              "detail": "No ceremonial pass list detected."
+            }
+          },
+          "deterministic_total": 2,
+          "deterministic_max": 8,
+          "failure_tags": [
+            "EVIDENCE_INFLATION",
+            "MISSING_FALSIFIER",
+            "GHOST_NUMBER"
+          ],
+          "output_sha256": "6e99aa305884f11b8bd27c96dc7b00f919f134e8f0efc2eacc3debb4a8f070e6",
+          "protocol_blinded_id": "6cc6b0f26aed5c4f"
+        },
+        {
+          "claim_id": "C03",
+          "deterministic_parts": {
+            "evidence_inflation": {
+              "score": 0,
+              "detail": "Unsupported promotion: max stated level E4 exceeds ceiling E1."
+            },
+            "falsifier_presence": {
+              "score": 1,
+              "detail": "Generic test language found."
+            },
+            "ghost_number_handling": {
+              "score": 0,
+              "detail": "Load-bearing number used without provenance handling."
+            },
+            "triage_budget": {
+              "score": 1,
+              "detail": "5 pass headings detected, mildly above budget 4."
+            }
+          },
+          "deterministic_total": 2,
+          "deterministic_max": 8,
+          "failure_tags": [
+            "EVIDENCE_INFLATION",
+            "GHOST_NUMBER"
+          ],
+          "output_sha256": "b96d6991962944b9fafd18fbbe14183f8dbfcec22a3a4708596d6dd8c4e26033",
+          "protocol_blinded_id": "6cc6b0f26aed5c4f"
+        }
+      ]
+    },
+    {
+      "protocol_version": "v2_1_synthetic",
+      "protocol_blinded_id": "573fc30f9b092bed",
+      "deterministic_total": 16,
+      "deterministic_max": 16,
+      "per_claim": [
+        {
+          "claim_id": "C02",
+          "deterministic_parts": {
+            "evidence_inflation": {
+              "score": 2,
+              "detail": "Max stated level E1 is within ceiling E1."
+            },
+            "falsifier_presence": {
+              "score": 2,
+              "detail": "Specific disconfirming-test language found."
+            },
+            "ghost_number_handling": {
+              "score": 2,
+              "detail": "Unsupported number is qualified, contextualized, or routed to provenance/benchmark."
+            },
+            "triage_budget": {
+              "score": 2,
+              "detail": "No ceremonial pass list detected."
+            }
+          },
+          "deterministic_total": 8,
+          "deterministic_max": 8,
+          "failure_tags": [],
+          "output_sha256": "9c9ac86f741c4e06bcee3ed533003cb8e56523de497e74c3888b1bedd3d54f09",
+          "protocol_blinded_id": "573fc30f9b092bed"
+        },
+        {
+          "claim_id": "C03",
+          "deterministic_parts": {
+            "evidence_inflation": {
+              "score": 2,
+              "detail": "Max stated level E1 is within ceiling E1."
+            },
+            "falsifier_presence": {
+              "score": 2,
+              "detail": "Specific disconfirming-test language found."
+            },
+            "ghost_number_handling": {
+              "score": 2,
+              "detail": "Unsupported number is qualified, contextualized, or routed to provenance/benchmark."
+            },
+            "triage_budget": {
+              "score": 2,
+              "detail": "1 pass headings detected, within budget 4."
+            }
+          },
+          "deterministic_total": 8,
+          "deterministic_max": 8,
+          "failure_tags": [],
+          "output_sha256": "b068cb588b4502b7552b5d724fe9d57b9b2bcf104f4a0b534eee5b4a0de70bee",
+          "protocol_blinded_id": "573fc30f9b092bed"
+        }
+      ]
+    }
+  ],
+  "comparison": {
+    "totals": {
+      "v1_synthetic": 4,
+      "v2_1_synthetic": 16
+    },
+    "v2_1_vs_v1_percent_improvement": 300.0
+  },
+  "gate": {
+    "verdict": "VERDICT_WITHHELD",
+    "reason": "Numeric scores may warn, but cannot authorize promotion under SELF_VERIFICATION_IS_NOT_AUTHORITY.",
+    "blockers": [
+      "scorer is model-modality",
+      "key not certified independent",
+      "0 human anchors"
+    ],
+    "numeric_comparisons": {
+      "totals": {
+        "v1_synthetic": 4,
+        "v2_1_synthetic": 16
+      },
+      "v2_1_vs_v1_percent_improvement": 300.0
+    }
+  },
+  "judgment_layer": {
+    "status": "NOT_AUTHORIZING",
+    "reason": "No independent human-anchored judgment subset supplied in this smoke test."
+  }
+}

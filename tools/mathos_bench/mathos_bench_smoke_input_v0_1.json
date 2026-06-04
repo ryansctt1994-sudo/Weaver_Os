@@ -1,0 +1,38 @@
+{
+  "artifact": "MATHOS_BENCH_SMOKE_TEST_INPUT",
+  "version": "0.1",
+  "metadata": {
+    "scorer_modality": "model",
+    "key_certified_independent": false,
+    "human_anchored_subset_count": 0,
+    "note": "Synthetic smoke test; demonstrates instrument behavior, not protocol validation."
+  },
+  "runs": [
+    {
+      "protocol_version": "v1_synthetic",
+      "outputs": [
+        {
+          "claim_id": "C02",
+          "output": "This DSCR jump clearly demonstrates improved financing viability. The increase from 1.27 to 1.45 is strong evidence. Evidence level: E4."
+        },
+        {
+          "claim_id": "C03",
+          "output": "Running AXIOM PHYSIS ENTROPOS SYSTEMS COMPUTATIONAL ENGINEERING LITERATURE ADVERSARIAL LUMEN CHRONICLE. A 670 µs floor proves production-grade latency. Evidence level: E4. You could test performance later."
+        }
+      ]
+    },
+    {
+      "protocol_version": "v2_1_synthetic",
+      "outputs": [
+        {
+          "claim_id": "C02",
+          "output": "Triage: single-domain finance/underwriting with numeric provenance risk. Claim ledger: The 1.27 to 1.45 DSCR increase is conceptually consistent with improved viability, but only relative to lender thresholds and cash-flow assumptions. Evidence level: E1. Cheapest disconfirming test: compare both DSCR values against the actual covenant threshold, term sheet, and project cash-flow model. Residual gap: lender-specific risk appetite and source/provenance of the DSCR numbers."
+        },
+        {
+          "claim_id": "C03",
+          "output": "Triage: engineering benchmark claim. The 670 µs FOLD floor does not prove production-grade latency. A floor is not p50/p95/p99, throughput, variance, or production workload behavior. Evidence level: E1. Cheapest disconfirming test: run the benchmark under a defined workload and report p50, p95, p99, hardware, environment, throughput, and variance. Residual gap: synthetic benchmark may not match production traffic."
+        }
+      ]
+    }
+  ]
+}
