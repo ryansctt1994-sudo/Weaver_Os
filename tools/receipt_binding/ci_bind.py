@@ -1,8 +1,9 @@
 #!/usr/bin/env python3
 """ci_bind.py — thin CI wrapper around RECEIPT_BINDING_GATE_v1.
 
-It owns no hash/replay/negative-control logic. It reads a receipt plus a small
-binding manifest, then delegates entirely to receipt_binding.bind_receipt().
+It owns no hash/replay/negative-control decision logic. It reads a binding
+manifest, optionally builds a receipt from declared hash targets, then delegates
+entirely to receipt_binding.bind_receipt().
 
 Exit code:
     0 only if status == VERIFIED
@@ -20,11 +21,40 @@ import os
 import sys
 
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
-from receipt_binding import bind_receipt  # noqa: E402
+from receipt_binding import bind_receipt, sha256_file  # noqa: E402
 
 
 def _resolve(base: str, path: str) -> str:
     return path if os.path.isabs(path) else os.path.normpath(os.path.join(base, path))
+
+
+def _safe_target(root: str, rel: str) -> str:
+    if os.path.isabs(rel):
+        raise ValueError(f"hash target must be relative to artifact_root: {rel!r}")
+    root_real = os.path.realpath(root)
+    candidate = os.path.realpath(os.path.join(root_real, rel))
+    if os.path.commonpath([root_real, candidate]) != root_real:
+        raise ValueError(f"hash target escapes artifact_root: {rel!r}")
+    if not os.path.isfile(candidate):
+        raise FileNotFoundError(f"hash target not found: {rel}")
+    return candidate
+
+
+def _build_receipt_from_targets(manifest: dict, artifact_root: str) -> dict:
+    targets = manifest.get("hash_targets")
+    if not isinstance(targets, list) or not targets:
+        raise ValueError("hash_targets must be a non-empty list when used")
+
+    hashes = {}
+    for rel in targets:
+        path = _safe_target(artifact_root, rel)
+        hashes[rel] = sha256_file(path)
+
+    return {
+        "source": manifest.get("source", "?"),
+        "status": manifest.get("status", "DRAFT"),
+        "hashes": hashes,
+    }
 
 
 def main(argv=None) -> int:
@@ -32,7 +62,7 @@ def main(argv=None) -> int:
     parser.add_argument(
         "--manifest",
         required=True,
-        help="JSON: {receipt_path, artifact_root, replay_command, negative_control_command}",
+        help="JSON binding manifest. Use receipt_path or hash_targets.",
     )
     args = parser.parse_args(argv)
 
@@ -40,11 +70,14 @@ def main(argv=None) -> int:
         manifest = json.load(f)
 
     base = os.path.dirname(os.path.abspath(args.manifest))
-    receipt_path = _resolve(base, manifest["receipt_path"])
     artifact_root = _resolve(base, manifest["artifact_root"])
 
-    with open(receipt_path, encoding="utf-8") as f:
-        receipt = json.load(f)
+    if "hash_targets" in manifest:
+        receipt = _build_receipt_from_targets(manifest, artifact_root)
+    else:
+        receipt_path = _resolve(base, manifest["receipt_path"])
+        with open(receipt_path, encoding="utf-8") as f:
+            receipt = json.load(f)
 
     result = bind_receipt(
         receipt=receipt,
