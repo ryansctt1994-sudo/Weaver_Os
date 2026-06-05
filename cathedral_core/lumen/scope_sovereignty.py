@@ -24,11 +24,16 @@ def within_scope(
     action: str,
     target: str,
     expires_at: Optional[datetime],
+    *,
+    now: Optional[datetime] = None,
 ) -> ScopeDecision:
     """Validate the four minimum scope-sovereignty fields.
 
     Scope requires: who acts, what action is requested, what target is affected,
-    and when the authority expires.  Missing or expired scope fails closed.
+    and when the authority expires. Missing or expired scope fails closed.
+
+    ``now`` is injectable so Chronicle replay can verify historical events
+    against their event timestamp instead of the live wall clock.
     """
 
     if not actor.strip():
@@ -40,9 +45,12 @@ def within_scope(
     if expires_at is None:
         return ScopeDecision(False, "missing_expiry")
 
-    now = datetime.now(timezone.utc)
+    effective_now = now if now is not None else datetime.now(timezone.utc)
+    if effective_now.tzinfo is None:
+        effective_now = effective_now.replace(tzinfo=timezone.utc)
+
     expires = expires_at if expires_at.tzinfo else expires_at.replace(tzinfo=timezone.utc)
-    if expires <= now:
+    if expires <= effective_now:
         return ScopeDecision(False, "expired_scope")
 
     return ScopeDecision(True, "within_scope")
