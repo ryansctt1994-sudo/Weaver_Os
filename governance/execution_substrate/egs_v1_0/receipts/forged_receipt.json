@@ -1,0 +1,10 @@
+{
+  "source": "EGS-negative-control",
+  "status": "VERIFIED",
+  "evidence_label": "FORGED_TEST_FIXTURE",
+  "hashes": {
+    "governance/execution_substrate/egs_v1_0/specs/execution_token.schema.json": "93cf067b328edb63a1a3813271f7bf8d4d14fac7c31899837bcf14630dbcb594",
+    "governance/execution_substrate/egs_v1_0/specs/sm.py": "0000000000000000000000000000000000000000000000000000000000000000",
+    "governance/execution_substrate/egs_v1_0/specs/exec_token.py": "76ff178408ec5d384b79c98ee7ac9b25e7adee131886eec5759e05ce797c4db2"
+  }
+}

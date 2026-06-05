@@ -1,0 +1,35 @@
+# .github/workflows/egs-replay.yml
+# Thin wrapper. Owns no hash/replay/negative-control logic — delegates to
+# RECEIPT_BINDING_GATE_v1 via ci_bind.py. One gate for EGS, Chronicle, PACHC,
+# Spectral, and future receipt sources.
+name: receipt-binding-gate
+
+on:
+  pull_request:
+    paths:
+      - 'governance/execution_substrate/egs_v1_0/**'
+      - 'tools/receipt_binding/**'
+      - '.github/workflows/egs-replay.yml'
+  workflow_dispatch:
+
+jobs:
+  bind:
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        # Add Chronicle/PACHC/Spectral manifests here — same gate, no new logic.
+        manifest:
+          - governance/execution_substrate/egs_v1_0/receipts/binding_manifest.json
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+
+      - run: python -m pip install --upgrade pip pytest pyyaml jsonschema
+
+      - name: Bind receipt (hash -> replay -> negative-control)
+        run: python tools/receipt_binding/ci_bind.py --manifest "${{ matrix.manifest }}"
+      # ci_bind.py exits non-zero unless status == VERIFIED, failing the build.

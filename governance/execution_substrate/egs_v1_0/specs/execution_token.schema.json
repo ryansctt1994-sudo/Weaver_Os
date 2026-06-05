@@ -1,0 +1,46 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://weaver-os.local/schemas/egs/execution_token.schema.json",
+  "title": "EGS Context-Bound Execution Token",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "token_id",
+    "issuer",
+    "subject_user",
+    "institution",
+    "project",
+    "facility",
+    "device_id",
+    "design_digest",
+    "reagent_lot",
+    "scope",
+    "valid_from",
+    "valid_until",
+    "revoked"
+  ],
+  "properties": {
+    "token_id": {"type": "string", "minLength": 8},
+    "issuer": {"type": "string", "minLength": 3},
+    "subject_user": {"type": "string", "minLength": 3},
+    "institution": {"type": "string", "minLength": 2},
+    "project": {"type": "string", "minLength": 2},
+    "facility": {"type": "string", "minLength": 2},
+    "device_id": {"type": "string", "minLength": 3},
+    "design_digest": {"type": "string", "pattern": "^sha256:[a-fA-F0-9]{64}$"},
+    "reagent_lot": {"type": "string", "minLength": 3},
+    "scope": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["tier", "max_batch_size", "execution_environment"],
+      "properties": {
+        "tier": {"type": "string", "enum": ["T0", "T1", "T2", "T3", "T4"]},
+        "max_batch_size": {"type": "number", "exclusiveMinimum": 0},
+        "execution_environment": {"type": "string", "enum": ["local", "institutional_sandbox", "contained_facility", "national_review"]}
+      }
+    },
+    "valid_from": {"type": "string", "format": "date-time"},
+    "valid_until": {"type": "string", "format": "date-time"},
+    "revoked": {"type": "boolean"}
+  }
+}

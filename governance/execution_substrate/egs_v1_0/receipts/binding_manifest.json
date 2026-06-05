@@ -1,0 +1,26 @@
+{
+  "source": "EGS",
+  "artifact_root": "../../../..",
+  "status": "DRAFT",
+  "hash_targets": [
+    "governance/execution_substrate/egs_v1_0/specs/execution_token.schema.json",
+    "governance/execution_substrate/egs_v1_0/specs/sm.py",
+    "governance/execution_substrate/egs_v1_0/specs/exec_token.py"
+  ],
+  "replay_command": [
+    "python",
+    "-m",
+    "pytest",
+    "governance/execution_substrate/egs_v1_0/tests",
+    "tools/receipt_binding/tests",
+    "-q"
+  ],
+  "negative_control_command": [
+    "python",
+    "tools/receipt_binding/reject_forged_receipt.py",
+    "--receipt",
+    "governance/execution_substrate/egs_v1_0/receipts/forged_receipt.json",
+    "--artifact-root",
+    "."
+  ]
+}
