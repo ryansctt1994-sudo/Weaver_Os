@@ -1,7 +1,12 @@
 {
   "source": "EGS",
-  "receipt_path": "egs_receipt.json",
   "artifact_root": "../../../..",
+  "status": "DRAFT",
+  "hash_targets": [
+    "governance/execution_substrate/egs_v1_0/specs/execution_token.schema.json",
+    "governance/execution_substrate/egs_v1_0/specs/sm.py",
+    "governance/execution_substrate/egs_v1_0/specs/exec_token.py"
+  ],
   "replay_command": [
     "python",
     "-m",
