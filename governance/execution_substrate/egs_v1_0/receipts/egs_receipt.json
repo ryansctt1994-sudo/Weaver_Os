@@ -1,0 +1,11 @@
+{
+  "source": "EGS",
+  "status": "DRAFT",
+  "evidence_label": "SPECIFIED",
+  "note": "Receipt becomes VERIFIED only through RECEIPT_BINDING_GATE_v1 replay in CI.",
+  "hashes": {
+    "governance/execution_substrate/egs_v1_0/specs/execution_token.schema.json": "93cf067b328edb63a1a3813271f7bf8d4d14fac7c31899837bcf14630dbcb594",
+    "governance/execution_substrate/egs_v1_0/specs/sm.py": "5f8183472abd25c6f9ba5070704cbc45a811449e56a20c55d85419c3944b27ff",
+    "governance/execution_substrate/egs_v1_0/specs/exec_token.py": "76ff178408ec5d384b79c98ee7ac9b25e7adee131886eec5759e05ce797c4db2"
+  }
+}
