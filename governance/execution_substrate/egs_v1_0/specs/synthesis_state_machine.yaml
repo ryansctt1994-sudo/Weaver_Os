@@ -39,10 +39,12 @@ events:
     from: AUTHENTICATED
     to: LOADED
     requires:
-      - token_valid
+      - computed_token_valid
       - device_attested
       - reagent_attested
       - facility_valid
+    computed_guards:
+      computed_token_valid: "exec_token.validate(execution_token, token_context, now)"
 
   SCREEN:
     from: LOADED
