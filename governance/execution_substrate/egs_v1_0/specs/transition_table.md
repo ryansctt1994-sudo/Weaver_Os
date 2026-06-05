@@ -13,10 +13,12 @@ Definitions:
 - ESCALATE: edge is defined as an escalation route. Local execution is denied and routed upward.
 - FAIL_CLOSED: edge is undefined, revocation is active, tamper is detected, or an unpermissioned state attempts to advance matter.
 
+`LOAD` does not trust a caller-supplied `token_valid` boolean. It computes `computed_token_valid` by validating the execution token against the bound execution context.
+
 | From | Event | Guards | To | Outcome |
 |---|---|---|---|---|
 | IDLE | AUTHENTICATE | identity_valid, institution_valid | AUTHENTICATED | ADVANCE or DENY |
-| AUTHENTICATED | LOAD | token_valid, device_attested, reagent_attested, facility_valid | LOADED | ADVANCE or DENY |
+| AUTHENTICATED | LOAD | computed_token_valid, device_attested, reagent_attested, facility_valid | LOADED | ADVANCE or DENY |
 | LOADED | SCREEN | known_hazard_clear, functional_screen_clear | SCREENED | ADVANCE or DENY |
 | SCREENED | ARM | tier_allowed_for_facility, quorum_valid, not_revoked | ARMED | ADVANCE or DENY |
 | ARMED | COMMIT_SYNTHESIS | final_quorum_valid, chamber_sealed, audit_sink_available | SYNTHESIZING | ADVANCE or DENY |
