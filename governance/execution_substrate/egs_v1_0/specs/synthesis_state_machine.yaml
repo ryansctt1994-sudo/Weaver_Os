@@ -1,0 +1,101 @@
+id: EGS-SM-001
+version: 1.0
+status: draft_not_production_load_bearing
+invariant: "No unpermissioned state may advance matter toward a recoverable hazardous product."
+
+states:
+  - IDLE
+  - AUTHENTICATED
+  - LOADED
+  - SCREENED
+  - ARMED
+  - SYNTHESIZING
+  - VERIFIED
+  - RELEASED
+  - LOCKOUT
+  - NEUTRALIZED
+  - PURGED
+  - SEALED
+  - AUDITED
+  - RECERTIFICATION_REQUIRED
+
+fail_closed_chain:
+  - LOCKOUT
+  - NEUTRALIZED
+  - PURGED
+  - SEALED
+  - AUDITED
+  - RECERTIFICATION_REQUIRED
+
+events:
+  AUTHENTICATE:
+    from: IDLE
+    to: AUTHENTICATED
+    requires:
+      - identity_valid
+      - institution_valid
+
+  LOAD:
+    from: AUTHENTICATED
+    to: LOADED
+    requires:
+      - token_valid
+      - device_attested
+      - reagent_attested
+      - facility_valid
+
+  SCREEN:
+    from: LOADED
+    to: SCREENED
+    requires:
+      - known_hazard_clear
+      - functional_screen_clear
+
+  ARM:
+    from: SCREENED
+    to: ARMED
+    requires:
+      - tier_allowed_for_facility
+      - quorum_valid
+      - not_revoked
+
+  COMMIT_SYNTHESIS:
+    from: ARMED
+    to: SYNTHESIZING
+    requires:
+      - final_quorum_valid
+      - chamber_sealed
+      - audit_sink_available
+
+  VERIFY:
+    from: SYNTHESIZING
+    to: VERIFIED
+    requires:
+      - product_verified
+      - hazard_recheck_clear
+
+  RELEASE:
+    from: VERIFIED
+    to: RELEASED
+    requires:
+      - release_authorized
+      - custody_receipt_written
+
+  ESCALATE:
+    from:
+      - LOADED
+      - SCREENED
+      - ARMED
+    to: RECERTIFICATION_REQUIRED
+    outcome: ESCALATE
+    requires:
+      - escalation_quorum_required
+
+invalid_transition_outcome: FAIL_CLOSED
+missing_guard_outcome: DENY
+revocation_outcome: FAIL_CLOSED
+
+denial_semantics:
+  DENY: "Defined edge, but at least one required guard is false. State does not advance."
+  ESCALATE: "Defined escalation edge. Local execution is denied and routed upward."
+  FAIL_CLOSED: "Undefined edge, revocation, or tamper state. Enter physical interruption chain."
