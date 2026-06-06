@@ -1,0 +1,36 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "Triad Receipt (Lightweight)",
+  "type": "object",
+  "required": [
+    "receipt_id",
+    "proposal_hash",
+    "event_hash",
+    "replay_root",
+    "timestamp",
+    "receipt_hash"
+  ],
+  "properties": {
+    "receipt_id": { "type": "string" },
+    "proposal_hash": { "type": "string" },
+    "event_hash": { "type": "string" },
+    "replay_root": {
+      "type": "string",
+      "description": "Hash of latest Chronicle entry at issuance"
+    },
+    "timestamp": { "type": "string", "format": "date-time" },
+    "witness_summary": {
+      "type": "object",
+      "properties": {
+        "composite_flags": {
+          "type": "array",
+          "items": { "type": "string" }
+        },
+        "dissent_count": { "type": "integer" }
+      },
+      "additionalProperties": false
+    },
+    "receipt_hash": { "type": "string" }
+  },
+  "additionalProperties": false
+}
