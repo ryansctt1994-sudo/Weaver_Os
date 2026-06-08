@@ -16,7 +16,9 @@ dependencies = [
 [project.optional-dependencies]
 dev = [
   "build>=1.2.0",
-  "pytest>=7.0.0"
+  "mypy>=1.8.0",
+  "pytest>=7.0.0",
+  "ruff>=0.6.0"
 ]
 
 [project.scripts]
@@ -32,3 +34,16 @@ triadic_controls = ["schemas/*.json"]
 [tool.pytest.ini_options]
 testpaths = ["tests"]
 pythonpath = [".", "src"]
+
+[tool.ruff]
+line-length = 100
+target-version = "py310"
+
+[tool.ruff.lint]
+select = ["E", "F", "I", "UP", "B"]
+ignore = []
+
+[tool.mypy]
+python_version = "3.10"
+warn_unused_configs = true
+ignore_missing_imports = true
