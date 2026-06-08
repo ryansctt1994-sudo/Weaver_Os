@@ -2,19 +2,15 @@
 
 **Deterministic verification and replay substrate for bounded probabilistic cognition.**
 
-Weaver OS is a verifiable execution and release-governance substrate for bounded AI systems. Its current public spine focuses on cryptographic authority verification, replay protection, production schema alignment, and release provenance checks.
+Weaver OS is a compact verification spine for checking authority claims, replay protection, schema alignment, and release provenance. The repository is intentionally kept small: useful code, tests, schemas, and promotion rules stay; speculative or non-executable material belongs in external research notes until it has implementation evidence.
 
 ## Core Thesis
 
 Cognition may propose, but it cannot authorize itself. Weaver OS turns authority claims into signed, replay-checked, schema-validated artifacts so rejected or invalid claims cannot silently become trusted state.
 
-## LABYRINTH OS v9.0 Handoff
+## Current Scope
 
-This repository is the Weaver OS verification spine within the broader LABYRINTH OS / Cathedral-Sentinel-Weaver canon. The terminal handoff is preserved in [`HANDOFF_LABYRINTH_OS_v9_FINAL.md`](HANDOFF_LABYRINTH_OS_v9_FINAL.md).
-
-The handoff records the evidence boundary for this repository: architectural inventory is not proof of implementation, and production readiness is not demonstrated until independent MVP-0 replay produces receipts.
-
-## Current Repository Layout
+This repo currently contains:
 
 ```text
 triadic_controls/
@@ -30,13 +26,24 @@ triadic_controls/
 
 src/weaver_release_guard/
   cli.py               # CLI entry point
-  provenance.py        # Weaver release provenance generation/verification
+  provenance.py        # Release provenance generation and verification
   oidc.py              # Optional OIDC token verification
   utils.py             # Shared hashing, JSON, and encoding helpers
 
 tests/
   triadic_controls/    # Crypto verifier and schema-alignment tests
 ```
+
+## Repository Policy
+
+```text
+architecture != authority
+specification != implementation
+declared_success != replay_verified_success
+capability != authorization
+```
+
+Promotion requires passing tests, reproducible commands, and explicit receipts. See [`docs/PROMOTION_RULES.md`](docs/PROMOTION_RULES.md).
 
 ## Install
 
@@ -47,7 +54,13 @@ python -m pip install -e ".[dev]"
 ## Run Tests
 
 ```bash
-pytest
+pytest -q
+```
+
+## Build
+
+```bash
+python -m build
 ```
 
 ## CLI
@@ -79,11 +92,18 @@ weaver-release-guard verify \
 
 ## Security Boundary
 
-This package verifies cryptographic authorization claims. It does not prove human legitimacy, moral legitimacy, or operational safety. Those must be enforced by higher-level governance, Chronicle/replay evidence, and deployment-specific policy.
+This package verifies cryptographic authorization claims. It does not prove human legitimacy, moral legitimacy, operational safety, or production readiness. Those require higher-level governance, Chronicle/replay evidence, deployment policy, and independent receipts.
 
 ## Status
 
-MVP / verification spine. Suitable for local development, CI, and protocol hardening. Production deployment still requires persistent replay-cache storage with atomic multi-process semantics, operational key management, deployment-specific governance policy, and independent MVP-0 replay.
+```text
+MVP_VERIFICATION_SPINE
+ARCHITECTURE_FROZEN
+EVIDENCE_NOT_FROZEN
+AUTHORITY_NOT_EARNED
+```
+
+Production deployment still requires persistent replay-cache storage with atomic multi-process semantics, operational key management, deployment-specific governance policy, and independent replay receipts.
 
 ## License
 
