@@ -6,6 +6,10 @@ on:
     paths:
       - "demo/**"
       - ".github/workflows/boundary-integrity-demo.yml"
+  pull_request:
+    paths:
+      - "demo/**"
+      - ".github/workflows/boundary-integrity-demo.yml"
 
 permissions:
   contents: read
