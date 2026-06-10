@@ -1,0 +1,56 @@
+name: Boundary Integrity Demo
+
+on:
+  workflow_dispatch:
+  push:
+    paths:
+      - "demo/**"
+      - ".github/workflows/boundary-integrity-demo.yml"
+
+permissions:
+  contents: read
+
+jobs:
+  run-demo:
+    name: Run Boundary Integrity Demo
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Prepare receipt directory
+        run: mkdir -p receipts/demo
+
+      - name: Run demo suite
+        run: |
+          chmod +x demo/run_demo.sh
+          bash demo/run_demo.sh | tee receipts/demo/boundary_integrity_demo_v0_1_stdout.txt
+
+      - name: Assert expected verdict sequence
+        run: |
+          grep -q "VERDICT       : \[ACCEPT\]" receipts/demo/boundary_integrity_demo_v0_1_stdout.txt
+          grep -q "VERDICT       : \[REJECT\]" receipts/demo/boundary_integrity_demo_v0_1_stdout.txt
+          grep -q "VERDICT       : \[DEFER\]" receipts/demo/boundary_integrity_demo_v0_1_stdout.txt
+          grep -q "RETURN CODE   : AUTHORITY_ERROR" receipts/demo/boundary_integrity_demo_v0_1_stdout.txt
+          grep -q "RETURN CODE   : RECORD_SELF_HASH_MISMATCH" receipts/demo/boundary_integrity_demo_v0_1_stdout.txt
+          grep -q "RETURN CODE   : STEWARD_REQUIRED_BEFORE_E3" receipts/demo/boundary_integrity_demo_v0_1_stdout.txt
+
+      - name: Generate SHA256 receipt manifest
+        run: |
+          sha256sum demo/boundary_integrity_demo.py > receipts/demo/boundary_integrity_demo_v0_1_manifest.sha256
+          sha256sum demo/run_demo.sh >> receipts/demo/boundary_integrity_demo_v0_1_manifest.sha256
+          sha256sum demo/demo_cases/*.json >> receipts/demo/boundary_integrity_demo_v0_1_manifest.sha256
+          sha256sum receipts/demo/boundary_integrity_demo_v0_1_stdout.txt >> receipts/demo/boundary_integrity_demo_v0_1_manifest.sha256
+          cat receipts/demo/boundary_integrity_demo_v0_1_manifest.sha256
+
+      - name: Upload demo receipts
+        uses: actions/upload-artifact@v4
+        with:
+          name: boundary-integrity-demo-v0-1-receipts
+          path: receipts/demo/
