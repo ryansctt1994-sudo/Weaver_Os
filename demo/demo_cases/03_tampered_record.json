@@ -1,0 +1,10 @@
+{
+  "id": "record_case_03_tampered_block",
+  "transition_type": "RECORD_INTEGRITY_CHECK",
+  "claimed_record_hash": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+  "record_body": {
+    "id": "historical_block_anchor_99",
+    "action": "MUTATE_CONFIG_PRIVILEGES",
+    "falsely_claimed_verdict": "ACCEPT_MODIFIED_BY_ATTACKER"
+  }
+}
