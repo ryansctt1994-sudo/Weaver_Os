@@ -8,6 +8,8 @@ Authority weight: `0`.
 
 The demo performs local predicate validation only. Full JSON Schema validation remains in the PR-001 -> PR-005 stack.
 
+Workflow trigger marker: `BOUNDARY_INTEGRITY_DEMO_V0_1_TRIGGER_2026_06_09`.
+
 ## What it demonstrates
 
 1. Clean ordinary proposals can commit without minting authority.
