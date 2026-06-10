@@ -20,6 +20,25 @@ SHA256:
 73d8128c221d23e709239bb098efeaa4c5faae98aa9efbbafb44a02e8adf931a  audit_package_v1.0_technical.tar.gz
 ```
 
+## Debug / CI Status
+
+```yaml
+repo: ryansctt1994-sudo/Weaver_Os
+candidate_pr: 23
+debug_trigger_pr: 22
+boundary_integrity_workflow:
+  workflow_name: Boundary Integrity Demo
+  workflow_run: 27254223950
+  job: Run Boundary Integrity Demo
+  conclusion: success
+  artifact: boundary-integrity-demo-v0-1-receipts
+  artifact_id: 7526881742
+  artifact_digest: sha256:9c1493bc34d6650901e0a9846b214da96c59d7a1c2243ffc9047e0269388dbd4
+  artifact_expires_at: 2026-09-08T04:57:17Z
+```
+
+The workflow debug issue was trigger visibility. The initial push/manual workflow was not visible through the available connector. A `pull_request` trigger was added, PR #22 was opened as an inspection trigger, and the PR-associated run completed successfully.
+
 ## Admissible Evidence Included
 
 ```yaml
@@ -64,7 +83,7 @@ If no signing key exists yet, create and register an SSH signing key with GitHub
 ## Registry Seal
 
 ```yaml
-event: TECHNICAL_AUDIT_PACKAGE_V1_0_CANDIDATE_RECORD_COMMITTED
+event: TECHNICAL_AUDIT_PACKAGE_V1_0_CANDIDATE_RECORD_UPDATED
 status: CANDIDATE_READY_FOR_USER_SIGNATURE
 external_delivery_ready: false
 authority: NONE
