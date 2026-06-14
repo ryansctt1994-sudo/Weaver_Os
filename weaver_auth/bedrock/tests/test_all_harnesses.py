@@ -66,7 +66,7 @@ def replay_verify(chronicle_path: Path) -> bool:
 
 def generate_receipt(tests_passed: bool, replay_passed: bool) -> dict[str, Any]:
     return {
-        "timestamp": datetime.datetime.now(datetime.UTC).isoformat(),
+        "timestamp": datetime.datetime.now(datetime.timezone.utc).isoformat(),
         "gate": 1,
         "tests_passed": tests_passed,
         "replay_passed": replay_passed,
