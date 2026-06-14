@@ -1,9 +1,7 @@
-import sys
-sys.path.append("..")
-from admission.admission_kernel import evaluate_case, AdjudicationCase
+from weaver_auth.bedrock.admission.admission_kernel import AdjudicationCase, evaluate_case
 
 
-def test_valid_case_admitted():
+def test_valid_case_admitted() -> None:
     case = AdjudicationCase(
         case_id="test-1",
         evidence_hash="abc123",
@@ -14,7 +12,7 @@ def test_valid_case_admitted():
     assert decision.status == "admit"
 
 
-def test_empty_case_rejected():
+def test_empty_case_rejected() -> None:
     case = AdjudicationCase(
         case_id="",
         evidence_hash="",
@@ -25,7 +23,7 @@ def test_empty_case_rejected():
     assert decision.status == "reject"
 
 
-def test_no_evidence_deferred():
+def test_no_evidence_deferred() -> None:
     case = AdjudicationCase(
         case_id="test-2",
         evidence_hash="",
@@ -33,4 +31,4 @@ def test_no_evidence_deferred():
         proposal="Claim without evidence",
     )
     decision = evaluate_case(case)
-    assert decision.status in ("defer", "reject")
+    assert decision.status in {"defer", "reject"}
