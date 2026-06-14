@@ -1,0 +1,36 @@
+name: Gate 1 Harness
+
+on:
+  workflow_dispatch:
+  push:
+    paths:
+      - "weaver_auth/**"
+      - ".github/workflows/gate1.yml"
+
+jobs:
+  gate1:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+
+      - name: Install pytest
+        run: python -m pip install --upgrade pip pytest
+
+      - name: Run Gate 1 harness
+        working-directory: weaver_auth/bedrock/tests
+        run: python test_all_harnesses.py
+
+      - name: Upload execution receipt
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: gate1-execution-receipt
+          path: weaver_auth/receipts/execution_receipt.json
+          if-no-files-found: warn
