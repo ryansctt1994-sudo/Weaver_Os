@@ -1,10 +1,11 @@
 """
-Admission Kernel – Minimal Gate 1 Stub
+Admission Kernel – Minimal Gate 1 Stub.
 
 This module provides the smallest executable admission surface needed by the
 Gate 1 harness. It is intentionally conservative: complete cases with evidence
 are admitted, empty cases are rejected, and claims without evidence are deferred.
 """
+
 from dataclasses import dataclass
 
 
@@ -23,7 +24,7 @@ class AdmissionDecision:
 
 
 def evaluate_case(case: AdjudicationCase) -> AdmissionDecision:
-    if not case.case_id and not case.evidence_hash and not case.submitter and not case.proposal:
+    if not any((case.case_id, case.evidence_hash, case.submitter, case.proposal)):
         return AdmissionDecision(status="reject", reason="empty_case")
 
     if not case.case_id or not case.submitter or not case.proposal:
