@@ -1,10 +1,8 @@
-import sys
-sys.path.append("..")
-from admission.admission_kernel import AdjudicationCase
-from admission.pathology_scanner import scan_case
+from weaver_auth.bedrock.admission.admission_kernel import AdjudicationCase
+from weaver_auth.bedrock.admission.pathology_scanner import scan_case
 
 
-def test_scan_returns_flags():
+def test_scan_returns_flags() -> None:
     case = AdjudicationCase(
         case_id="scan-1",
         evidence_hash="hash",
@@ -17,14 +15,11 @@ def test_scan_returns_flags():
         assert flag.startswith("GP-")
 
 
-def test_flags_are_non_blocking():
+def test_flags_are_non_blocking() -> None:
     case = AdjudicationCase(
         case_id="scan-2",
         evidence_hash="hash2",
         submitter="user-4",
         proposal="Another case",
     )
-    try:
-        scan_case(case)
-    except Exception:
-        assert False, "Scanner should not raise"
+    scan_case(case)
