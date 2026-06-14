@@ -4,16 +4,14 @@ Pathology Scanner – Minimal Gate 1 Observer Stub
 GP flags are observational only. The scanner records possible governance
 pathologies without blocking or mutating admission decisions.
 """
-from typing import List
-from .admission_kernel import AdjudicationCase
+
+from weaver_auth.bedrock.admission.admission_kernel import AdjudicationCase
+
+KNOWN_FLAGS = frozenset({"GP-001", "GP-002", "GP-003", "GP-004", "GP-005", "GP-006"})
 
 
-KNOWN_FLAGS = ("GP-001", "GP-002", "GP-003", "GP-004", "GP-005", "GP-006")
-
-
-def scan_case(case: AdjudicationCase) -> List[str]:
-    flags: List[str] = []
-
+def scan_case(case: AdjudicationCase) -> list[str]:
+    flags: list[str] = []
     proposal = case.proposal.lower() if case.proposal else ""
 
     if not case.evidence_hash:
