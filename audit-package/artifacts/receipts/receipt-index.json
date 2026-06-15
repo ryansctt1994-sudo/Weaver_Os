@@ -1,0 +1,7 @@
+{
+  "package": "weaver-covenant-deek-canon-os-audit-package",
+  "evidence_level_target": "E3.1",
+  "status": "receipts_pending",
+  "receipts": [],
+  "note": "Add receipt JSON files here when runtime receipts are generated. This index is intentionally empty until executable evidence is attached."
+}
