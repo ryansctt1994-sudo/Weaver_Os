@@ -29,7 +29,7 @@ jobs:
 
       - name: Upload execution receipt
         if: always()
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v7
         with:
           name: gate1-execution-receipt
           path: weaver_auth/receipts/execution_receipt.json
