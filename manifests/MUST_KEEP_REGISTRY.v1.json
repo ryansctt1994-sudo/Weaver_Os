@@ -1,0 +1,48 @@
+{
+  "freeze_id": "WEAVER_BOOTSTRAP_2026_06_16",
+  "version": "1.0-rc1",
+  "classification": "RESEARCH_PROTOTYPE_GOVERNANCE_RUNTIME",
+  "evidence_ceiling": "E2_READY_FOR_E3",
+  "authority_earned": false,
+  "production_allowed": false,
+  "clinical_allowed": false,
+  "legal_authority_allowed": false,
+  "artifacts": [
+    {
+      "artifact_id": "readme",
+      "path": "README.md",
+      "status": "preserved_pending_receipts",
+      "evidence_level": "E2",
+      "hash": null,
+      "production_allowed": false,
+      "clinical_allowed": false
+    },
+    {
+      "artifact_id": "governance",
+      "path": "GOVERNANCE.md",
+      "status": "preserved_pending_receipts",
+      "evidence_level": "E1",
+      "hash": null,
+      "production_allowed": false,
+      "clinical_allowed": false
+    },
+    {
+      "artifact_id": "constitutional_invariants",
+      "path": "constitution/CONSTITUTIONAL_INVARIANTS.md",
+      "status": "preserved_pending_receipts",
+      "evidence_level": "E1",
+      "hash": null,
+      "production_allowed": false,
+      "clinical_allowed": false
+    },
+    {
+      "artifact_id": "receipt_schema",
+      "path": "schemas/receipt.schema.json",
+      "status": "preserved_pending_validation",
+      "evidence_level": "E1",
+      "hash": null,
+      "production_allowed": false,
+      "clinical_allowed": false
+    }
+  ]
+}
