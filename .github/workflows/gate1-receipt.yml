@@ -29,13 +29,36 @@ jobs:
         run: |
           python tooling/generate_gate1_receipt.py --command python -m pytest -q
 
+      - name: Validate Gate 1 receipt authority boundary
+        if: always()
+        run: |
+          python - <<'PY'
+          import json
+          from pathlib import Path
+
+          receipt_path = Path("receipts/gate1/gate1_execution_receipt.json")
+          if not receipt_path.exists():
+              raise SystemExit("Gate 1 receipt was not generated")
+
+          receipt = json.loads(receipt_path.read_text(encoding="utf-8"))
+          assert receipt["authority_earned"] is False
+          assert receipt["production_allowed"] is False
+          assert receipt["clinical_allowed"] is False
+          print(json.dumps(receipt, indent=2, sort_keys=True))
+          PY
+
+      - name: Debug evidence tree
+        if: always()
+        run: |
+          find logs receipts manifests -maxdepth 4 -type f -print -exec sha256sum {} \; || true
+
       - name: Upload Gate 1 evidence
         uses: actions/upload-artifact@v4
         if: always()
         with:
           name: gate1-evidence
+          if-no-files-found: warn
           path: |
-            receipts/gate1/gate1_execution_receipt.json
-            logs/gate1_stdout.log
-            logs/gate1_stderr.log
-            manifests/PRE_GATE_HASH_MANIFEST.csv
+            receipts/**
+            logs/**
+            manifests/**
