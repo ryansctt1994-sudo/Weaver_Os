@@ -1,0 +1,41 @@
+name: Gate 1 Receipt
+
+on:
+  pull_request:
+    branches: [main]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  gate1-receipt:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+
+      - name: Install package with test dependencies
+        run: |
+          python -m pip install --upgrade pip
+          python -m pip install -e ".[dev]"
+
+      - name: Generate Gate 1 receipt
+        run: |
+          python tooling/generate_gate1_receipt.py --command python -m pytest -q
+
+      - name: Upload Gate 1 evidence
+        uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: gate1-evidence
+          path: |
+            receipts/gate1/gate1_execution_receipt.json
+            logs/gate1_stdout.log
+            logs/gate1_stderr.log
+            manifests/PRE_GATE_HASH_MANIFEST.csv
