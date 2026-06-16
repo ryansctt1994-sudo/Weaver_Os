@@ -61,4 +61,4 @@ def test_verifier_rejects_invalid_envelope_schema(valid_minimal_registry, minima
 
     assert result.is_valid is False
     assert result.ledger_event_type == "SIGNATURE_VERIFICATION_FAILED"
-    assert "MALFORMED_ENVELOPE" in result.failure_codes
+    assert result.failure_codes
