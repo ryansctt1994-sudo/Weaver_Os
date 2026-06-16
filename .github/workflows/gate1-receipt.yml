@@ -27,7 +27,84 @@ jobs:
 
       - name: Generate Gate 1 receipt
         run: |
-          python tooling/generate_gate1_receipt.py --command python -m pytest -q
+          mkdir -p receipts/gate1 logs manifests
+          set +e
+          python -m py_compile tooling/generate_gate1_receipt.py > logs/gate1_pycompile_stdout.log 2> logs/gate1_pycompile_stderr.log
+          PYCOMPILE_EXIT=$?
+          if [ "$PYCOMPILE_EXIT" -eq 0 ]; then
+            python tooling/generate_gate1_receipt.py --command python -m pytest -q > logs/gate1_generator_stdout.log 2> logs/gate1_generator_stderr.log
+            GENERATOR_EXIT=$?
+          else
+            GENERATOR_EXIT=$PYCOMPILE_EXIT
+            echo "Skipping generator execution because py_compile failed." > logs/gate1_generator_stdout.log
+            cat logs/gate1_pycompile_stderr.log > logs/gate1_generator_stderr.log
+          fi
+          echo "$GENERATOR_EXIT" > logs/gate1_generator_exit_code.txt
+          if [ ! -f receipts/gate1/gate1_execution_receipt.json ]; then
+            python - <<'PY'
+          import hashlib
+          import json
+          import platform
+          import sys
+          from datetime import datetime, timezone
+          from pathlib import Path
+
+          def sha256_file(path: Path) -> str:
+              digest = hashlib.sha256()
+              if not path.exists():
+                  return hashlib.sha256(b"").hexdigest()
+              with path.open("rb") as handle:
+                  for chunk in iter(lambda: handle.read(1024 * 1024), b""):
+                      digest.update(chunk)
+              return digest.hexdigest()
+
+          def now_iso() -> str:
+              return datetime.now(timezone.utc).isoformat().replace("+00:00", "Z")
+
+          receipt_path = Path("receipts/gate1/gate1_execution_receipt.json")
+          manifest_path = Path("manifests/PRE_GATE_HASH_MANIFEST.csv")
+          manifest_path.parent.mkdir(parents=True, exist_ok=True)
+          if not manifest_path.exists():
+              manifest_path.write_text("sha256,path\n", encoding="utf-8")
+
+          stdout_path = Path("logs/gate1_generator_stdout.log")
+          stderr_path = Path("logs/gate1_generator_stderr.log")
+          exit_code_path = Path("logs/gate1_generator_exit_code.txt")
+          try:
+              exit_code = int(exit_code_path.read_text(encoding="utf-8").strip())
+          except Exception:
+              exit_code = 99
+
+          receipt = {
+              "receipt_id": "gate1_execution_receipt",
+              "receipt_type": "execution",
+              "gate": "gate1",
+              "command": "python tooling/generate_gate1_receipt.py --command python -m pytest -q",
+              "status": "FAIL",
+              "exit_code": exit_code,
+              "timestamp_start": now_iso(),
+              "timestamp_end": now_iso(),
+              "stdout_path": stdout_path.as_posix(),
+              "stderr_path": stderr_path.as_posix(),
+              "stdout_hash": sha256_file(stdout_path),
+              "stderr_hash": sha256_file(stderr_path),
+              "source_manifest": manifest_path.as_posix(),
+              "source_manifest_hash": sha256_file(manifest_path),
+              "output_manifest": None,
+              "environment": {
+                  "python": sys.version,
+                  "platform": platform.platform(),
+                  "cwd": str(Path.cwd()),
+              },
+              "authority_earned": False,
+              "production_allowed": False,
+              "clinical_allowed": False,
+              "setup_error": "Gate 1 generator did not emit a receipt; shell fallback preserved diagnostic FAIL receipt.",
+          }
+          receipt_path.write_text(json.dumps(receipt, indent=2, sort_keys=True) + "\n", encoding="utf-8")
+          PY
+          fi
+          exit "$GENERATOR_EXIT"
 
       - name: Validate Gate 1 receipt authority boundary
         if: always()
