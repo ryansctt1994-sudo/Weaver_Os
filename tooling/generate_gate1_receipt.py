@@ -12,7 +12,6 @@ import argparse
 import csv
 import hashlib
 import json
-import os
 import platform
 import subprocess
 import sys
@@ -29,7 +28,7 @@ SOURCE_SUFFIXES = {
     ".yaml",
 }
 
-EXCLUDED_DIRS = {
+EXCLUDED_DIR_NAMES = {
     ".git",
     ".venv",
     "venv",
@@ -59,7 +58,8 @@ def iter_source_files(root: Path) -> Iterable[Path]:
     for path in sorted(root.rglob("*")):
         if not path.is_file():
             continue
-        if any(part in EXCLUDED_DIRS for part in path.parts):
+        relative_parts = path.relative_to(root).parts
+        if any(part in EXCLUDED_DIR_NAMES for part in relative_parts):
             continue
         if path.suffix in SOURCE_SUFFIXES:
             yield path
@@ -72,6 +72,15 @@ def write_manifest(root: Path, out_path: Path) -> None:
         writer.writerow(["sha256", "path"])
         for path in iter_source_files(root):
             writer.writerow([sha256_file(path), path.relative_to(root).as_posix()])
+
+
+def validate_authority_boundary(receipt: dict) -> None:
+    if receipt.get("authority_earned") is not False:
+        raise ValueError("receipt authority_earned must be false")
+    if receipt.get("production_allowed") is not False:
+        raise ValueError("receipt production_allowed must be false")
+    if receipt.get("clinical_allowed") is not False:
+        raise ValueError("receipt clinical_allowed must be false")
 
 
 def main() -> int:
@@ -94,28 +103,39 @@ def main() -> int:
     stderr_path.parent.mkdir(parents=True, exist_ok=True)
     manifest_path.parent.mkdir(parents=True, exist_ok=True)
 
-    write_manifest(root, manifest_path)
-
     started = now_iso()
-    completed_process = subprocess.run(
-        args.command,
-        cwd=root,
-        text=True,
-        capture_output=True,
-        check=False,
-    )
-    ended = now_iso()
+    setup_error = None
+    completed_process: subprocess.CompletedProcess[str] | None = None
 
-    stdout_path.write_text(completed_process.stdout, encoding="utf-8")
-    stderr_path.write_text(completed_process.stderr, encoding="utf-8")
+    try:
+        write_manifest(root, manifest_path)
+        completed_process = subprocess.run(
+            args.command,
+            cwd=root,
+            text=True,
+            capture_output=True,
+            check=False,
+        )
+        stdout_path.write_text(completed_process.stdout, encoding="utf-8")
+        stderr_path.write_text(completed_process.stderr, encoding="utf-8")
+        exit_code = completed_process.returncode
+    except Exception as exc:  # pragma: no cover - defensive receipt preservation path
+        setup_error = f"{type(exc).__name__}: {exc}"
+        stdout_path.write_text("", encoding="utf-8")
+        stderr_path.write_text(setup_error + "\n", encoding="utf-8")
+        exit_code = 99
+        if not manifest_path.exists():
+            manifest_path.write_text("sha256,path\n", encoding="utf-8")
+
+    ended = now_iso()
 
     receipt = {
         "receipt_id": "gate1_execution_receipt",
         "receipt_type": "execution",
         "gate": "gate1",
         "command": " ".join(args.command),
-        "status": "PASS" if completed_process.returncode == 0 else "FAIL",
-        "exit_code": completed_process.returncode,
+        "status": "PASS" if exit_code == 0 else "FAIL",
+        "exit_code": exit_code,
         "timestamp_start": started,
         "timestamp_end": ended,
         "stdout_path": stdout_path.as_posix(),
@@ -134,11 +154,14 @@ def main() -> int:
         "production_allowed": False,
         "clinical_allowed": False,
     }
+    if setup_error:
+        receipt["setup_error"] = setup_error
 
+    validate_authority_boundary(receipt)
     receipt_path.write_text(json.dumps(receipt, indent=2, sort_keys=True) + "\n", encoding="utf-8")
 
     print(json.dumps(receipt, indent=2, sort_keys=True))
-    return completed_process.returncode
+    return exit_code
 
 
 if __name__ == "__main__":
