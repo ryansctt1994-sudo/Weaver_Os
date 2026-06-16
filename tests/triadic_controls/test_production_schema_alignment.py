@@ -141,7 +141,7 @@ def signed_production_envelope(signing_key, inner_payload: dict, nonce: str = "s
         "system_id": "rover-7",
         "scope_hash": "b" * 64,
         "valid_from": iso_offset(-60),
-        "valid_until": iso_offset(3600),
+        "valid_until": iso_offset(3540),
     }
     envelope = {
         "payload_type": "AUTHORITY_TOKEN",
