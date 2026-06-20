@@ -1,0 +1,16 @@
+{
+  "manifest_version": "1.0",
+  "git_commit": "a1b2c3d4e5f67890",
+  "docker_image": "chronicle-raft:e5-locked",
+  "environment": {
+    "os": "linux",
+    "architecture": "amd64",
+    "go_version": "1.23",
+    "python_version": "3.9"
+  },
+  "authority_ledger_hash": "82713cf5a2d9d294c80ba912d51fc4e29bd460c680686ed2f71f74415addb0c9",
+  "expected_head_hash": "beefcafe1234567890abcdef1234567890abcdef1234567890abcdef12345678",
+  "expected_state_digest": "aea9fb035a1860be0ee39206f3c14042c4fbca3c030e534e92e2124713fc4e3d",
+  "timestamp": "2026-06-20T16:45:00Z",
+  "manifest_hash": "be8c302cb1202ba07932f520e08ad501fadfe6be82db89467c513cc9c9441714"
+}
