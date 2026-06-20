@@ -1,0 +1,41 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "type": "object",
+  "required": [
+    "manifest_version",
+    "git_commit",
+    "docker_image",
+    "environment",
+    "authority_ledger_hash",
+    "expected_head_hash",
+    "expected_state_digest",
+    "timestamp",
+    "manifest_hash"
+  ],
+  "properties": {
+    "manifest_version": {"type": "string", "const": "1.0"},
+    "git_commit": {"type": "string"},
+    "docker_image": {"type": "string"},
+    "environment": {
+      "type": "object",
+      "required": ["os", "architecture", "go_version", "python_version"],
+      "properties": {
+        "os": {"type": "string"},
+        "architecture": {"type": "string"},
+        "go_version": {"type": "string"},
+        "python_version": {"type": "string"}
+      },
+      "additionalProperties": false
+    },
+    "authority_ledger_hash": {"type": "string", "pattern": "^[a-f0-9]{64}$"},
+    "expected_head_hash": {"type": "string", "pattern": "^[a-f0-9]{64}$"},
+    "expected_state_digest": {"type": "string", "pattern": "^[a-f0-9]{64}$"},
+    "timestamp": {"type": "string", "format": "date-time"},
+    "manifest_hash": {
+      "type": "string",
+      "pattern": "^[a-f0-9]{64}$",
+      "description": "SHA-256 of the canonical manifest JSON excluding this field."
+    }
+  },
+  "additionalProperties": false
+}
