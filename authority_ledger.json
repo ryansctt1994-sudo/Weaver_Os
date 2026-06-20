@@ -1,0 +1,32 @@
+[
+  {
+    "sequence_number": 1,
+    "event_type": "STATE_TRANSITION",
+    "payload": "{\"current_state\":\"DRAFT\",\"receipt_id\":\"AL-ADOC-2026-001\",\"target_state\":\"EVIDENCED\"}"
+  },
+  {
+    "sequence_number": 2,
+    "event_type": "STATE_TRANSITION",
+    "payload": "{\"current_state\":\"EVIDENCED\",\"receipt_id\":\"AL-ADOC-2026-001\",\"target_state\":\"RECOMMENDED\"}"
+  },
+  {
+    "sequence_number": 3,
+    "event_type": "STATE_TRANSITION",
+    "payload": "{\"current_state\":\"RECOMMENDED\",\"receipt_id\":\"AL-ADOC-2026-001\",\"target_state\":\"RECEIPTED\"}"
+  },
+  {
+    "sequence_number": 4,
+    "event_type": "STATE_TRANSITION",
+    "payload": "{\"current_state\":\"RECEIPTED\",\"receipt_id\":\"AL-ADOC-2026-001\",\"target_state\":\"APPROVED\",\"signature_hash\":\"sha256:sig\"}"
+  },
+  {
+    "sequence_number": 5,
+    "event_type": "STATE_TRANSITION",
+    "payload": "{\"current_state\":\"APPROVED\",\"receipt_id\":\"AL-ADOC-2026-001\",\"target_state\":\"CAPACITY_VERIFIED\"}"
+  },
+  {
+    "sequence_number": 6,
+    "event_type": "STATE_TRANSITION",
+    "payload": "{\"current_state\":\"CAPACITY_VERIFIED\",\"receipt_id\":\"AL-ADOC-2026-001\",\"target_state\":\"EXECUTED\"}"
+  }
+]
