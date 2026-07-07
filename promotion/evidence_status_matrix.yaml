@@ -14,7 +14,7 @@ components:
   weaver_os:
     S: true
     I: true
-    T: "existing_triatic_controls_tests"
+    T: "existing_triadic_controls_tests"
     R: false
     F: false
     evidence_level: "E2"
