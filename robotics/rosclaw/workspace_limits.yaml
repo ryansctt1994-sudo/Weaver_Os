@@ -1,0 +1,26 @@
+schema_version: "0.1"
+default: "deny"
+mode: "simulation_only"
+
+frames:
+  allowed:
+    - "map"
+    - "odom"
+    - "base_link"
+
+bounds:
+  x_min: -2.0
+  x_max: 2.0
+  y_min: -2.0
+  y_max: 2.0
+  z_min: 0.0
+  z_max: 1.0
+
+navigation_goals:
+  allowed: []
+  denied:
+    - "*"
+
+notes:
+  - "Placeholder simulation bounds only."
+  - "Physical workspace authority is not granted."
