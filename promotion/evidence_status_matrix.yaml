@@ -1,0 +1,54 @@
+schema_version: "0.1"
+build_id: "B_MASTER_BUILD_V0_1_TINYCLAW_FIRST_RUNTIME"
+claim_ceiling: "E2"
+promotion_gate: "HOLD"
+
+axes:
+  S: "specification"
+  I: "implementation"
+  T: "testing"
+  R: "reproduction"
+  F: "formal_verification"
+
+components:
+  weaver_os:
+    S: true
+    I: true
+    T: "existing_triatic_controls_tests"
+    R: false
+    F: false
+    evidence_level: "E2"
+
+  tinyclaw:
+    S: true
+    I: "external_repo_intake_only"
+    T: false
+    R: false
+    F: false
+    evidence_level: "E1_intake"
+    promotion_gate: "HOLD"
+
+  strix:
+    S: true
+    I: "external_repo_intake_only"
+    T: false
+    R: false
+    F: false
+    evidence_level: "E1_intake"
+    promotion_gate: "HOLD"
+
+  rosclaw:
+    S: true
+    I: "external_repo_intake_only"
+    T: false
+    R: false
+    F: false
+    evidence_level: "E1_SIM"
+    promotion_gate: "HOLD"
+
+blocking_rules:
+  - "No E3 without sealed CI receipts."
+  - "No E4 without independent witness reproduction."
+  - "No physical actuation without explicit promotion receipt."
+  - "No external skill install without SkillIntakeReceipt."
+  - "No runtime authority while unresolved critical/high Strix findings remain open."
