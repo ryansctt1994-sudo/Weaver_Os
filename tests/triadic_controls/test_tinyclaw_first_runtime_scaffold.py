@@ -20,6 +20,8 @@ REQUIRED_PATHS = [
     "security/strix/STRIX_REPORT_MAPPING.md",
     "security/strix/schemas/security_scan_receipt.schema.json",
     "security/strix/schemas/vulnerability_finding.schema.json",
+    "security/strix/schemas/poc_validation_receipt.schema.json",
+    "security/strix/schemas/fix_verification_receipt.schema.json",
     "robotics/rosclaw/SIMULATION_FIRST_POLICY.md",
     "robotics/rosclaw/ACTUATION_GATE.md",
     "robotics/rosclaw/ROSCLAW_TRANSPORT_POLICY.md",
