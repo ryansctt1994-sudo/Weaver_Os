@@ -1,0 +1,28 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://weaver-os.local/schemas/poc_validation_receipt.schema.json",
+  "title": "PocValidationReceipt",
+  "type": "object",
+  "required": [
+    "receipt_version",
+    "receipt_type",
+    "scanner",
+    "target",
+    "finding_id",
+    "validation_result",
+    "safe_reproduction",
+    "receipt_hash"
+  ],
+  "properties": {
+    "receipt_version": { "const": "0.1" },
+    "receipt_type": { "const": "PocValidationReceipt" },
+    "scanner": { "const": "strix" },
+    "target": { "type": "string", "minLength": 1 },
+    "finding_id": { "type": "string", "minLength": 1 },
+    "validation_result": { "enum": ["validated", "not_reproduced", "unsafe_to_reproduce", "inconclusive"] },
+    "safe_reproduction": { "type": "boolean" },
+    "poc_hash": { "type": ["string", "null"] },
+    "receipt_hash": { "type": "string" }
+  },
+  "additionalProperties": false
+}
