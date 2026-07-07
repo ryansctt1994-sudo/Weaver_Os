@@ -28,6 +28,7 @@ REQUIRED_PATHS = [
     "robotics/rosclaw/allowed_topics.yaml",
     "robotics/rosclaw/workspace_limits.yaml",
     "robotics/rosclaw/estop_policy.md",
+    "robotics/rosclaw/robot_command_receipt.schema.json",
     "receipts/README_B_MASTER_BUILD_V0_1_TINYCLAW_FIRST_RUNTIME.md",
 ]
 
