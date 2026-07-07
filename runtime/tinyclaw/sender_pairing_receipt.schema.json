@@ -1,0 +1,30 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://weaver-os.local/schemas/sender_pairing_receipt.schema.json",
+  "title": "SenderPairingReceipt",
+  "type": "object",
+  "required": [
+    "receipt_version",
+    "receipt_type",
+    "runtime",
+    "channel",
+    "sender_id_hash",
+    "previous_state",
+    "new_state",
+    "authority_id",
+    "receipt_hash"
+  ],
+  "properties": {
+    "receipt_version": { "const": "0.1" },
+    "receipt_type": { "const": "SenderPairingReceipt" },
+    "runtime": { "const": "tinyclaw" },
+    "channel": { "enum": ["discord", "telegram", "whatsapp", "tinyoffice", "api"] },
+    "sender_id_hash": { "type": "string" },
+    "previous_state": { "enum": ["unknown", "pending", "approved", "denied", "unpaired", "revoked"] },
+    "new_state": { "enum": ["pending", "approved", "denied", "unpaired", "revoked"] },
+    "authority_id": { "type": "string", "minLength": 1 },
+    "operator": { "type": "string" },
+    "receipt_hash": { "type": "string" }
+  },
+  "additionalProperties": false
+}
