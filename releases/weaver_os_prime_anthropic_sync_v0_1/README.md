@@ -5,13 +5,18 @@ Status: sealed local v0.1 governance architecture.
 Promotion verdict: **HOLD**.
 Authority default: **NONE**.
 
-This release bundle contains base64-encoded ZIP packages for the sealed Weaver OS Prime v0.1 modules. Decode each package before use.
+This release bundle contains the sealed Weaver OS Prime v0.1 release record and the terminal Weaver-Cathedral master handoff.
 
-## Boundary
+## Included documents
 
-This is local executable governance infrastructure with local build receipts and local tests. It is not E4 independent reproduction, production readiness, clinical authorization, hardware validation, legal certification, security certification, formal proof, or deployment approval.
+- `releases/weaver_os_prime_anthropic_sync_v0_1/README.md`
+- `releases/weaver_os_prime_anthropic_sync_v0_1/MANIFEST.json`
+- `releases/weaver_os_prime_anthropic_sync_v0_1/DECODE.md`
+- `docs/master_handoff/WEAVER-CATHEDRAL-MASTER-HANDOFF-v2.1.md`
 
-## Modules
+## Module packages
+
+The manifest records all eight sealed local v0.1 module packages and their SHA-256 hashes:
 
 1. `weaver_artifact_evidence_card_v0_1.zip`
 2. `weaver_responsible_promotion_policy_v0_1.zip`
@@ -22,16 +27,13 @@ This is local executable governance infrastructure with local build receipts and
 7. `weaver_academy_v0_1.zip`
 8. `weaver_public_evidence_portal_v0_1.zip`
 
+## Boundary
+
+This is local executable governance infrastructure with local build receipts and local tests. It is not E4 independent reproduction, production readiness, clinical authorization, hardware validation, legal certification, security certification, formal proof, or deployment approval.
+
 ## Decode
 
-```bash
-cd releases/weaver_os_prime_anthropic_sync_v0_1
-for f in packages/*.zip.b64; do base64 -d "$f" > "${f%.b64}"; done
-```
-
-## Verify
-
-Use the SHA-256 values in `MANIFEST.json` after decoding.
+The connector write path supports UTF-8 text files. Binary ZIP bundles were not directly committed in this PR. Use the SHA-256 values in `MANIFEST.json` against the local sealed build artifacts.
 
 ## Canonical statement
 
