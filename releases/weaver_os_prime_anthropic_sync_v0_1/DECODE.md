@@ -1,14 +1,9 @@
-# Decode Instructions
+# Decode / Package Boundary
 
-The ZIP packages are stored as `.zip.b64` files because this connector push path writes UTF-8 text files.
+The ZIP packages are represented in `MANIFEST.json` with SHA-256 hashes from the local sealed build artifacts.
 
-Decode all packages:
+This connector write path supports UTF-8 text files. The binary ZIP bundles were not directly committed in this PR.
 
-```bash
-cd releases/weaver_os_prime_anthropic_sync_v0_1
-for f in packages/*.zip.b64; do base64 -d "$f" > "${f%.b64}"; done
-```
+Use the manifest hashes to verify the local sealed build artifacts generated in the build environment.
 
-Verify checksums using `MANIFEST.json`.
-
-Boundary: decoding packages does not grant authority, promotion, E4 status, production approval, or deployment approval.
+Boundary: package retrieval, decoding, or checksum verification does not grant authority, promotion, E4 status, production approval, or deployment approval.
