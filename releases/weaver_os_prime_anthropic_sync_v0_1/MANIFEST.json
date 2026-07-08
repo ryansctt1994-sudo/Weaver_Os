@@ -3,65 +3,50 @@
   "status": "SEALED_LOCAL_BUILD_HOLD",
   "authority_default": "NONE",
   "promotion_default": "HOLD",
+  "terminal_handoff": "docs/master_handoff/WEAVER-CATHEDRAL-MASTER-HANDOFF-v2.1.md",
   "evidence_boundary": "Local build receipts and local tests only. Not E4, not independent reproduction, not production authorization.",
   "target_repository": "ryansctt1994-sudo/Weaver_Os",
   "branch": "weaver-os-prime-anthropic-sync-v0.1",
   "packages": [
     {
       "package": "weaver_artifact_evidence_card_v0_1.zip",
-      "base64_file": "packages/weaver_artifact_evidence_card_v0_1.zip.b64",
       "sha256": "34e1b91dd30d0b95ed3684485eb36d84a53ff51cf122cf804202de304ccc73d6",
-      "bytes": 17865,
-      "decode_command": "base64 -d packages/weaver_artifact_evidence_card_v0_1.zip.b64 > weaver_artifact_evidence_card_v0_1.zip"
+      "bytes": 17865
     },
     {
       "package": "weaver_responsible_promotion_policy_v0_1.zip",
-      "base64_file": "packages/weaver_responsible_promotion_policy_v0_1.zip.b64",
       "sha256": "965caa74411603866caa1345aa6af819a395abb10de29574ee3767b0871282a3",
-      "bytes": 24051,
-      "decode_command": "base64 -d packages/weaver_responsible_promotion_policy_v0_1.zip.b64 > weaver_responsible_promotion_policy_v0_1.zip"
+      "bytes": 24051
     },
     {
       "package": "weaver_behavioral_constitution_v0_1.zip",
-      "base64_file": "packages/weaver_behavioral_constitution_v0_1.zip.b64",
       "sha256": "3427e6098de8a7becdae2a78a67bb78a47d7b804438a267ad0ad23f80aa270c7",
-      "bytes": 25866,
-      "decode_command": "base64 -d packages/weaver_behavioral_constitution_v0_1.zip.b64 > weaver_behavioral_constitution_v0_1.zip"
+      "bytes": 25866
     },
     {
       "package": "weaver_scenario_ledger_v0_1.zip",
-      "base64_file": "packages/weaver_scenario_ledger_v0_1.zip.b64",
       "sha256": "0e22fcfb18420cb86311fa6c4cfb1c149677c6a0200aff812eadf5a5a5b0160b",
-      "bytes": 22668,
-      "decode_command": "base64 -d packages/weaver_scenario_ledger_v0_1.zip.b64 > weaver_scenario_ledger_v0_1.zip"
+      "bytes": 22668
     },
     {
       "package": "weaver_authority_passport_v0_1.zip",
-      "base64_file": "packages/weaver_authority_passport_v0_1.zip.b64",
       "sha256": "2a3f073f688d2353780e759691794354566a0cb7aa9a15f4c3c5c485e989ef9d",
-      "bytes": 24748,
-      "decode_command": "base64 -d packages/weaver_authority_passport_v0_1.zip.b64 > weaver_authority_passport_v0_1.zip"
+      "bytes": 24748
     },
     {
       "package": "weaver_domain_authority_packs_v0_1.zip",
-      "base64_file": "packages/weaver_domain_authority_packs_v0_1.zip.b64",
       "sha256": "325d2f96e7c8cc34a4352d94d2403be4d81256b135e9e4d108e8cf39b2254021",
-      "bytes": 30929,
-      "decode_command": "base64 -d packages/weaver_domain_authority_packs_v0_1.zip.b64 > weaver_domain_authority_packs_v0_1.zip"
+      "bytes": 30929
     },
     {
       "package": "weaver_academy_v0_1.zip",
-      "base64_file": "packages/weaver_academy_v0_1.zip.b64",
       "sha256": "b910555395accd50dbf105736a0ad9813339ac80d651616204b01aa5b59c082d",
-      "bytes": 27210,
-      "decode_command": "base64 -d packages/weaver_academy_v0_1.zip.b64 > weaver_academy_v0_1.zip"
+      "bytes": 27210
     },
     {
       "package": "weaver_public_evidence_portal_v0_1.zip",
-      "base64_file": "packages/weaver_public_evidence_portal_v0_1.zip.b64",
       "sha256": "6f329f32548e73eb09aa888e87a03855269e501be1d132ff3160313e7e748dfe",
-      "bytes": 28219,
-      "decode_command": "base64 -d packages/weaver_public_evidence_portal_v0_1.zip.b64 > weaver_public_evidence_portal_v0_1.zip"
+      "bytes": 28219
     }
   ],
   "canonical_invariants": [
