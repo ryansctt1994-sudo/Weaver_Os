@@ -12,6 +12,7 @@ This release bundle contains the sealed Weaver OS Prime v0.1 release record and 
 - `releases/weaver_os_prime_anthropic_sync_v0_1/README.md`
 - `releases/weaver_os_prime_anthropic_sync_v0_1/MANIFEST.json`
 - `releases/weaver_os_prime_anthropic_sync_v0_1/DECODE.md`
+- `docs/master_handoff/README.md`
 - `docs/master_handoff/WEAVER-CATHEDRAL-MASTER-HANDOFF-v2.1.md`
 
 ## Module packages
@@ -31,7 +32,7 @@ The manifest records all eight sealed local v0.1 module packages and their SHA-2
 
 This is local executable governance infrastructure with local build receipts and local tests. It is not E4 independent reproduction, production readiness, clinical authorization, hardware validation, legal certification, security certification, formal proof, or deployment approval.
 
-## Decode
+## Package boundary
 
 The connector write path supports UTF-8 text files. Binary ZIP bundles were not directly committed in this PR. Use the SHA-256 values in `MANIFEST.json` against the local sealed build artifacts.
 
