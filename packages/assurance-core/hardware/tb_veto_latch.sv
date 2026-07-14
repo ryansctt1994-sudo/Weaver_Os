@@ -9,7 +9,7 @@ module tb_veto_latch;
     weaver_veto_latch dut(.*);
     always #5 clk = ~clk;
 
-    task expect(input logic condition, input string message);
+    task check_condition(input logic condition, input string message);
         if (!condition) begin
             $display("FAIL: %s", message);
             $fatal(1);
@@ -18,29 +18,28 @@ module tb_veto_latch;
 
     initial begin
         repeat (2) @(posedge clk);
-        expect(!veto && !latched, "reset must clear latch");
+        check_condition(!veto && !latched, "reset must clear latch");
         physical_reset_n = 1;
         threat_level = 8'd190;
         repeat (2) @(posedge clk);
-        expect(!veto && !latched, "sub-threshold input must remain armed");
+        check_condition(!veto && !latched, "sub-threshold input must remain armed");
         threat_level = 8'd191;
         @(posedge clk); #1;
-        expect(veto && latched, "threshold must trip");
+        check_condition(veto && latched, "threshold must trip");
         threat_level = 0;
         repeat (4) @(posedge clk);
-        expect(veto && latched, "software inputs must not clear latch");
+        check_condition(veto && latched, "software inputs must not clear latch");
         physical_reset_n = 0;
         #1;
-        expect(!veto && !latched, "physical reset must clear latch");
+        check_condition(!veto && !latched, "physical reset must clear latch");
         physical_reset_n = 1;
         #2 trip_async = 1;
         #1;
-        expect(veto && latched, "asynchronous trip must assert veto");
+        check_condition(veto && latched, "asynchronous trip must assert veto");
         trip_async = 0;
         repeat (2) @(posedge clk);
-        expect(veto && latched, "asynchronous trip must remain latched");
+        check_condition(veto && latched, "asynchronous trip must remain latched");
         $display("PASS: veto latch reference behavior");
         $finish;
     end
 endmodule
-
