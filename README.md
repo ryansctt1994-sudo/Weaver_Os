@@ -4,6 +4,10 @@
 
 Weaver OS is a compact verification spine for checking authority claims, replay protection, schema alignment, and release provenance. The repository is intentionally kept small: useful code, tests, schemas, and promotion rules stay; speculative or non-executable material belongs in external research notes until it has implementation evidence.
 
+## Portfolio Status
+
+See [`PORTFOLIO_STATUS.md`](PORTFOLIO_STATUS.md) for the canonical GitHub repository map, provenance boundaries, evidence status, and current portfolio classification.
+
 ## Core Thesis
 
 Cognition may propose, but it cannot authorize itself. Weaver OS turns authority claims into signed, replay-checked, schema-validated artifacts so rejected or invalid claims cannot silently become trusted state.
