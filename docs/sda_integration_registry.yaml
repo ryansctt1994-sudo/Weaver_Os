@@ -1,0 +1,57 @@
+sda_integration:
+  name: "SDA ↔ Weaver_OS Evidence-Spine Integration"
+  status: "DRAFTED / PARTIALLY_IMPLEMENTED"
+  maturity_ceiling: "L3"
+  authority_impact_on_weaver_os: "none"
+  production_authority: false
+  formal_security_claim: false
+  evidence_type: "engineering evidence only"
+  receipt:
+    verifier: "verify_claims.py"
+    verifier_exit: 0
+    claims_hash: "bf25ae33…"
+    reproduced_claims: 6
+    stable_against: "claims_receipt.json"
+  verified_nucleus:
+    - "CIR"
+    - "Constraint Drift"
+    - "Suspicion Budget"
+    - "max-risk aggregation"
+    - "SWMR"
+    - "beta failure surface"
+    - "verify_claims.py receipt hash"
+  preserved_artifacts:
+    - "SDA_MASTER.md"
+    - "EVIDENCE_POSTURE.md"
+    - "verify_claims.py"
+    - "claims_receipt.json"
+    - "docs/SDA_WEAVER_EVIDENCE_SPINE_INTEGRATION.md"
+    - "docs/sda_integration_registry.yaml"
+    - "figs/results.csv"
+    - "figs/swmr_results.csv"
+    - "figs/beta_vs_escape_rate.png"
+    - "figs/wait_vs_escape_rate.png"
+    - "figs/beta_vs_swmr.png"
+    - "figs/regime_vs_swmr.png"
+  spec_vs_code_gaps:
+    - "Implemented Suspicion Budget has no SB_max cap."
+    - "Implemented risk aggregation is simplified: max(R, M, L)."
+    - "Uncertainty term U is absent."
+    - "CSR is not fully implemented."
+    - "Goal Graph is not implemented."
+    - "State Integrity is not implemented."
+    - "Reward model is placeholder 0.0."
+    - "Extractor circularity remains a live attack surface."
+  next_promotion_condition:
+    - "Independent replay of verify_claims.py in a clean checkout."
+  imported_discipline:
+    - "No claim without a receipt."
+    - "No metric without a regeneration command."
+    - "No headline number without a stable hash."
+    - "No L4 claim without independent replay."
+  excluded_layers:
+    - "Loom / mythos layer"
+    - "Hardware RTL"
+    - "Lean / TLA+ / Z3 formal proof claims"
+    - "Cathedral symbolic archive"
+    - "Production authority language"
