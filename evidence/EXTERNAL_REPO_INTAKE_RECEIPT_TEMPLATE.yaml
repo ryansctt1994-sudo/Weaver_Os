@@ -1,0 +1,11 @@
+schema_version: "0.1"
+receipt_type: "ExternalRepoIntakeReceipt"
+build_id: "B_MASTER_BUILD_V0_1_TINYCLAW_FIRST_RUNTIME"
+repo: "owner/name"
+commit: "sha"
+role: "role_name"
+observed_version: "version_or_unknown"
+evidence_status: "E1_intake"
+authority: "none"
+promotion_gate: "HOLD"
+notes: []

@@ -1,0 +1,28 @@
+{
+  "schema_version": "0.1",
+  "leases": [
+    {
+      "authority_id": "tinyclaw.local_runtime.v0_1",
+      "scope": "local_research_team_demo",
+      "status": "proposed",
+      "allowed_actions": [
+        "receive_message",
+        "enqueue_message",
+        "route_to_agent",
+        "team_handoff",
+        "return_response"
+      ],
+      "denied_actions": [
+        "physical_actuation",
+        "cloud_spend",
+        "external_skill_install",
+        "unsafe_provider_bypass",
+        "public_network_exposure"
+      ],
+      "evidence_level": "E1_intake",
+      "open_challenges": [],
+      "promotion_gate": "HOLD",
+      "expires_at": null
+    }
+  ]
+}
