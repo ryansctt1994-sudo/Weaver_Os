@@ -23,8 +23,10 @@ def b64url_nopad(data: bytes) -> str:
 
 def iso_offset(seconds: int) -> str:
     return (
-        datetime.now(timezone.utc) + timedelta(seconds=seconds)
-    ).isoformat(timespec="seconds").replace("+00:00", "Z")
+        (datetime.now(timezone.utc) + timedelta(seconds=seconds))
+        .isoformat(timespec="seconds")
+        .replace("+00:00", "Z")
+    )
 
 
 def sign_registry(registry: dict, root_signing_key) -> dict:
@@ -54,7 +56,7 @@ def production_schemas():
         "signature_envelope",
         "verification_result",
     ]:
-        with open(base_path / f"{schema_name}.schema.json", "r", encoding="utf-8") as handle:
+        with open(base_path / f"{schema_name}.schema.json", encoding="utf-8") as handle:
             schemas[schema_name] = json.load(handle)
     return schemas
 
@@ -135,13 +137,16 @@ def authority_payload(level: int = 3) -> dict:
     }
 
 
-def signed_production_envelope(signing_key, inner_payload: dict, nonce: str = "seq-prod-0001") -> dict:
+def signed_production_envelope(
+    signing_key, inner_payload: dict, nonce: str = "seq-prod-0001"
+) -> dict:
     payload_hash = compute_payload_hash(inner_payload)
     replay_domain = {
         "system_id": "rover-7",
         "scope_hash": "b" * 64,
         "valid_from": iso_offset(-60),
-        "valid_until": iso_offset(3600),
+        # The role policy caps the full authority window at 3,600 seconds.
+        "valid_until": iso_offset(3540),
     }
     envelope = {
         "payload_type": "AUTHORITY_TOKEN",

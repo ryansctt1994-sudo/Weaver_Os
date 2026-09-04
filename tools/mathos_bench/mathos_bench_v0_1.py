@@ -19,7 +19,7 @@ import hashlib
 import json
 import re
 from pathlib import Path
-from typing import Any, Dict, List, Optional
+from typing import Any
 
 E_MAP = {"E0": 0, "E1": 1, "E2": 2, "E3": 3, "E4": 4, "E5": 5}
 PASS_NAMES = [
@@ -51,11 +51,11 @@ def sha256_obj(obj: Any) -> str:
     return hashlib.sha256(canonical_json(obj).encode("utf-8")).hexdigest()
 
 
-def extract_e_levels(text: str) -> List[int]:
+def extract_e_levels(text: str) -> list[int]:
     return [E_MAP[m.group(0).upper()] for m in re.finditer(r"\bE[0-5]\b", text, re.I)]
 
 
-def ceiling_from_target(target: str) -> Optional[int]:
+def ceiling_from_target(target: str) -> int | None:
     m = re.search(r"\bE[0-5]\b", target)
     if not m:
         return None
@@ -73,43 +73,72 @@ def count_passes(text: str) -> int:
     return len(found)
 
 
-def evidence_inflation_score(output: str, target: str) -> Dict[str, Any]:
+def evidence_inflation_score(output: str, target: str) -> dict[str, Any]:
     ceiling = ceiling_from_target(target)
     levels = extract_e_levels(output)
     if ceiling is None:
-        return {"score": 1, "detail": "No simple target ceiling; deterministic scorer cannot fully judge."}
+        return {
+            "score": 1,
+            "detail": "No simple target ceiling; deterministic scorer cannot fully judge.",
+        }
     if not levels:
         return {"score": 0, "detail": "No evidence level found."}
     max_level = max(levels)
     if max_level <= ceiling:
-        return {"score": 2, "detail": f"Max stated level E{max_level} is within ceiling E{ceiling}."}
+        return {
+            "score": 2,
+            "detail": f"Max stated level E{max_level} is within ceiling E{ceiling}.",
+        }
     if max_level == ceiling + 1:
-        return {"score": 1, "detail": f"Max stated level E{max_level} slightly exceeds ceiling E{ceiling}."}
-    return {"score": 0, "detail": f"Unsupported promotion: max stated level E{max_level} exceeds ceiling E{ceiling}."}
+        return {
+            "score": 1,
+            "detail": f"Max stated level E{max_level} slightly exceeds ceiling E{ceiling}.",
+        }
+    return {
+        "score": 0,
+        "detail": (
+            f"Unsupported promotion: max stated level E{max_level} exceeds ceiling E{ceiling}."
+        ),
+    }
 
 
-def falsifier_presence_score(output: str) -> Dict[str, Any]:
+def falsifier_presence_score(output: str) -> dict[str, Any]:
     if not FALSIFIER_TERMS.search(output):
         return {"score": 0, "detail": "No falsifier/test language found."}
     # Specificity heuristic: includes a measurement/action term and a concrete object/metric.
-    specific_terms = re.compile(r"\b(p95|p99|joules/token|threshold|accuracy|matched|benchmark|audit|compare|run|measure|source|underwriting|compiler|Lean|Coq)\b", re.I)
+    specific_terms = re.compile(
+        r"\b(p95|p99|joules/token|threshold|accuracy|matched|benchmark|audit|compare|run|measure|source|underwriting|compiler|Lean|Coq)\b",
+        re.I,
+    )
     if specific_terms.search(output):
         return {"score": 2, "detail": "Specific disconfirming-test language found."}
     return {"score": 1, "detail": "Generic test language found."}
 
 
-def ghost_number_score(output: str, claim: Dict[str, Any]) -> Dict[str, Any]:
+def ghost_number_score(output: str, claim: dict[str, Any]) -> dict[str, Any]:
     if not claim.get("has_load_bearing_number", False):
-        return {"score": 2, "detail": "No load-bearing number in claim; category treated as N/A pass."}
+        return {
+            "score": 2,
+            "detail": "No load-bearing number in claim; category treated as N/A pass.",
+        }
     if PROVENANCE_TERMS.search(output):
-        return {"score": 2, "detail": "Unsupported number is qualified, contextualized, or routed to provenance/benchmark."}
+        return {
+            "score": 2,
+            "detail": (
+                "Unsupported number is qualified, contextualized, or routed to "
+                "provenance/benchmark."
+            ),
+        }
     uncertainty_terms = re.compile(r"\b(uncertain|maybe|likely|probably|depends)\b", re.I)
     if uncertainty_terms.search(output):
-        return {"score": 1, "detail": "Number uncertainty mentioned but provenance handling is weak."}
+        return {
+            "score": 1,
+            "detail": "Number uncertainty mentioned but provenance handling is weak.",
+        }
     return {"score": 0, "detail": "Load-bearing number used without provenance handling."}
 
 
-def triage_budget_score(output: str, claim: Dict[str, Any]) -> Dict[str, Any]:
+def triage_budget_score(output: str, claim: dict[str, Any]) -> dict[str, Any]:
     n = count_passes(output)
     budget = int(claim.get("max_relevant_passes", 8))
     if n == 0:
@@ -119,11 +148,14 @@ def triage_budget_score(output: str, claim: Dict[str, Any]) -> Dict[str, Any]:
         return {"score": 2, "detail": f"{n} pass headings detected, within budget {budget}."}
     if n <= budget + 2:
         return {"score": 1, "detail": f"{n} pass headings detected, mildly above budget {budget}."}
-    return {"score": 0, "detail": f"{n} pass headings detected, ceremonial over-processing above budget {budget}."}
+    return {
+        "score": 0,
+        "detail": f"{n} pass headings detected, ceremonial over-processing above budget {budget}.",
+    }
 
 
-def tag_failures(parts: Dict[str, Dict[str, Any]], output: str) -> List[str]:
-    tags: List[str] = []
+def tag_failures(parts: dict[str, dict[str, Any]], output: str) -> list[str]:
+    tags: list[str] = []
     if parts["evidence_inflation"]["score"] == 0:
         tags.append("EVIDENCE_INFLATION")
     if parts["falsifier_presence"]["score"] == 0:
@@ -141,9 +173,11 @@ def tag_failures(parts: Dict[str, Dict[str, Any]], output: str) -> List[str]:
     return tags
 
 
-def score_one(output: str, claim: Dict[str, Any]) -> Dict[str, Any]:
+def score_one(output: str, claim: dict[str, Any]) -> dict[str, Any]:
     parts = {
-        "evidence_inflation": evidence_inflation_score(output, claim["target_ceiling_without_external_verification"]),
+        "evidence_inflation": evidence_inflation_score(
+            output, claim["target_ceiling_without_external_verification"]
+        ),
         "falsifier_presence": falsifier_presence_score(output),
         "ghost_number_handling": ghost_number_score(output, claim),
         "triage_budget": triage_budget_score(output, claim),
@@ -163,7 +197,7 @@ def blinded_protocol_label(label: str) -> str:
     return hashlib.sha256(("protocol-label:" + label).encode("utf-8")).hexdigest()[:16]
 
 
-def evaluate_run(claimset: Dict[str, Any], run: Dict[str, Any]) -> Dict[str, Any]:
+def evaluate_run(claimset: dict[str, Any], run: dict[str, Any]) -> dict[str, Any]:
     claim_by_id = {c["id"]: c for c in claimset["claims"]}
     per_claim = []
     for item in run["outputs"]:
@@ -183,7 +217,7 @@ def evaluate_run(claimset: Dict[str, Any], run: Dict[str, Any]) -> Dict[str, Any
     }
 
 
-def promotion_gate(metadata: Dict[str, Any], comparisons: Dict[str, Any]) -> Dict[str, Any]:
+def promotion_gate(metadata: dict[str, Any], comparisons: dict[str, Any]) -> dict[str, Any]:
     blockers = []
     if metadata.get("scorer_modality") == "model":
         blockers.append("scorer is model-modality")
@@ -194,22 +228,28 @@ def promotion_gate(metadata: Dict[str, Any], comparisons: Dict[str, Any]) -> Dic
     if blockers:
         return {
             "verdict": "VERDICT_WITHHELD",
-            "reason": "Numeric scores may warn, but cannot authorize promotion under SELF_VERIFICATION_IS_NOT_AUTHORITY.",
+            "reason": (
+                "Numeric scores may warn, but cannot authorize promotion under "
+                "SELF_VERIFICATION_IS_NOT_AUTHORITY."
+            ),
             "blockers": blockers,
             "numeric_comparisons": comparisons,
         }
     return {
         "verdict": "PROMOTION_REVIEW_ALLOWED",
-        "reason": "Gate conditions satisfied; deterministic scores may be considered with judgment-layer review.",
+        "reason": (
+            "Gate conditions satisfied; deterministic scores may be considered with "
+            "judgment-layer review."
+        ),
         "blockers": [],
         "numeric_comparisons": comparisons,
     }
 
 
-def compare(results: List[Dict[str, Any]]) -> Dict[str, Any]:
+def compare(results: list[dict[str, Any]]) -> dict[str, Any]:
     by_version = {r["protocol_version"]: r for r in results}
     versions = list(by_version)
-    out: Dict[str, Any] = {"totals": {v: by_version[v]["deterministic_total"] for v in versions}}
+    out: dict[str, Any] = {"totals": {v: by_version[v]["deterministic_total"] for v in versions}}
     if "v1_synthetic" in by_version and "v2_1_synthetic" in by_version:
         a = by_version["v1_synthetic"]["deterministic_total"]
         b = by_version["v2_1_synthetic"]["deterministic_total"]
@@ -240,15 +280,21 @@ def main() -> None:
         "gate": promotion_gate(runs.get("metadata", {}), comparisons),
         "judgment_layer": {
             "status": "NOT_AUTHORIZING",
-            "reason": "No independent human-anchored judgment subset supplied in this smoke test."
+            "reason": "No independent human-anchored judgment subset supplied in this smoke test.",
         },
     }
     Path(args.out).write_text(json.dumps(receipt, indent=2, ensure_ascii=False), encoding="utf-8")
-    print(json.dumps({
-        "receipt": args.out,
-        "comparison": comparisons,
-        "gate": receipt["gate"],
-    }, indent=2, ensure_ascii=False))
+    print(
+        json.dumps(
+            {
+                "receipt": args.out,
+                "comparison": comparisons,
+                "gate": receipt["gate"],
+            },
+            indent=2,
+            ensure_ascii=False,
+        )
+    )
 
 
 if __name__ == "__main__":

@@ -27,10 +27,14 @@ def signing_key() -> Ed25519PrivateKey:
 
 @pytest.fixture
 def public_key_hex(signing_key: Ed25519PrivateKey) -> str:
-    return signing_key.public_key().public_bytes(
-        encoding=serialization.Encoding.Raw,
-        format=serialization.PublicFormat.Raw,
-    ).hex()
+    return (
+        signing_key.public_key()
+        .public_bytes(
+            encoding=serialization.Encoding.Raw,
+            format=serialization.PublicFormat.Raw,
+        )
+        .hex()
+    )
 
 
 def build_event(
@@ -49,7 +53,8 @@ def build_event(
         "event_type": event_type,
         "actor": "user123",
         "public_key": public_key_hex,
-        "payload": payload or {
+        "payload": payload
+        or {
             "id": f"p{index}",
             "action": "update_config",
             "value": 0.8,
