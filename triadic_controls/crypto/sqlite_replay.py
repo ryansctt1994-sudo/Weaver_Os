@@ -10,7 +10,6 @@ from __future__ import annotations
 import sqlite3
 import time
 from pathlib import Path
-from typing import Optional, Union
 
 from .replay import ReplayCacheProtocol
 
@@ -23,7 +22,7 @@ class SQLiteReplayCache(ReplayCacheProtocol):
     atomically by SQLite rather than by a separate read-then-write sequence.
     """
 
-    def __init__(self, db_path: Union[str, Path] = "triadic_replay.db") -> None:
+    def __init__(self, db_path: str | Path = "triadic_replay.db") -> None:
         self.db_path = str(db_path)
         self._init_db()
 
@@ -50,7 +49,7 @@ class SQLiteReplayCache(ReplayCacheProtocol):
                 """
             )
 
-    def seen(self, replay_key: str, now: Optional[float] = None) -> bool:
+    def seen(self, replay_key: str, now: float | None = None) -> bool:
         current_time = now if now is not None else time.time()
         self._prune(current_time)
         with self._get_connection() as conn:
@@ -74,7 +73,7 @@ class SQLiteReplayCache(ReplayCacheProtocol):
         self,
         replay_key: str,
         expires_at: float,
-        now: Optional[float] = None,
+        now: float | None = None,
     ) -> bool:
         current_time = now if now is not None else time.time()
         self._prune(current_time)

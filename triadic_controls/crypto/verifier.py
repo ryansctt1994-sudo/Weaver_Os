@@ -19,14 +19,14 @@ import json
 import time
 from dataclasses import dataclass
 from datetime import datetime, timezone
-from typing import Any, Dict, List, Optional, Set, Tuple
+from typing import Any
 
 import jsonschema
+from cryptography.exceptions import InvalidSignature
+from cryptography.hazmat.primitives.asymmetric.ed25519 import Ed25519PublicKey
 from jsonschema.exceptions import ValidationError
 from referencing import Registry, Resource
 from referencing.jsonschema import DRAFT202012
-from cryptography.exceptions import InvalidSignature
-from cryptography.hazmat.primitives.asymmetric.ed25519 import Ed25519PublicKey
 
 from .replay import ReplayCacheProtocol, generate_replay_key
 
@@ -35,14 +35,14 @@ from .replay import ReplayCacheProtocol, generate_replay_key
 class VerificationResult:
     is_valid: bool
     ledger_event_type: str
-    failure_codes: List[str]
-    verified_issuers: List[str]
+    failure_codes: list[str]
+    verified_issuers: list[str]
     verification_time: str
-    effective_max_authority_level: Optional[int] = None
-    failure_details: Optional[str] = None
-    verified_keys: Optional[List[str]] = None
+    effective_max_authority_level: int | None = None
+    failure_details: str | None = None
+    verified_keys: list[str] | None = None
 
-    def to_dict(self) -> Dict[str, Any]:
+    def to_dict(self) -> dict[str, Any]:
         return {
             "is_valid": self.is_valid,
             "effective_max_authority_level": self.effective_max_authority_level,
@@ -55,15 +55,19 @@ class VerificationResult:
         }
 
 
-def canonicalize_json(data: Dict[str, Any]) -> bytes:
-    return json.dumps(data, ensure_ascii=False, allow_nan=False, sort_keys=True, separators=(",", ":")).encode("utf-8")
+def canonicalize_json(data: dict[str, Any]) -> bytes:
+    return json.dumps(
+        data, ensure_ascii=False, allow_nan=False, sort_keys=True, separators=(",", ":")
+    ).encode("utf-8")
 
 
-def compute_payload_hash(inner_payload: Dict[str, Any]) -> str:
+def compute_payload_hash(inner_payload: dict[str, Any]) -> str:
     return hashlib.sha256(canonicalize_json(inner_payload)).hexdigest()
 
 
-def validate_payload_hash(inner_payload: Dict[str, Any], claimed_hash: str) -> Tuple[bool, Optional[str]]:
+def validate_payload_hash(
+    inner_payload: dict[str, Any], claimed_hash: str
+) -> tuple[bool, str | None]:
     if compute_payload_hash(inner_payload) != claimed_hash:
         return False, "PAYLOAD_HASH_MISMATCH"
     return True, None
@@ -74,7 +78,7 @@ def build_signing_object(
     payload_type: str,
     payload_schema_version: str,
     payload_hash: str,
-    replay_domain: Dict[str, str],
+    replay_domain: dict[str, str],
     nonce_or_sequence: str,
 ) -> bytes:
     signing_obj = {
@@ -98,7 +102,9 @@ def parse_iso8601_utc(value: str) -> float:
     return parsed.astimezone(timezone.utc).timestamp()
 
 
-def validate_time_window(valid_from: str, valid_until: str, now_ts: Optional[float] = None) -> Tuple[bool, Optional[float]]:
+def validate_time_window(
+    valid_from: str, valid_until: str, now_ts: float | None = None
+) -> tuple[bool, float | None]:
     now = now_ts if now_ts is not None else time.time()
     try:
         start_ts = parse_iso8601_utc(valid_from)
@@ -112,7 +118,9 @@ def validate_time_window(valid_from: str, valid_until: str, now_ts: Optional[flo
     return True, end_ts
 
 
-def validate_registry_freshness(registry: Dict[str, Any], now_ts: Optional[float] = None) -> Tuple[bool, Optional[str]]:
+def validate_registry_freshness(
+    registry: dict[str, Any], now_ts: float | None = None
+) -> tuple[bool, str | None]:
     now = now_ts if now_ts is not None else time.time()
     try:
         valid_from_ts = parse_iso8601_utc(registry["valid_from"])
@@ -126,7 +134,9 @@ def validate_registry_freshness(registry: Dict[str, Any], now_ts: Optional[float
     return True, None
 
 
-def validate_key_lifecycle(issuer_record: Dict[str, Any], signed_at: str) -> Tuple[bool, Optional[str]]:
+def validate_key_lifecycle(
+    issuer_record: dict[str, Any], signed_at: str
+) -> tuple[bool, str | None]:
     try:
         signed_at_ts = parse_iso8601_utc(signed_at)
         issued_at_ts = parse_iso8601_utc(issuer_record["issued_at"])
@@ -140,7 +150,7 @@ def validate_key_lifecycle(issuer_record: Dict[str, Any], signed_at: str) -> Tup
     return True, None
 
 
-def validate_key_material(issuer_record: Dict[str, Any]) -> Tuple[bool, Optional[str]]:
+def validate_key_material(issuer_record: dict[str, Any]) -> tuple[bool, str | None]:
     if issuer_record.get("public_key_encoding", "base64url") != "base64url":
         return False, "INVALID_KEY_ENCODING"
     if issuer_record.get("key_type", "ed25519") != "ed25519":
@@ -148,7 +158,9 @@ def validate_key_material(issuer_record: Dict[str, Any]) -> Tuple[bool, Optional
     return True, None
 
 
-def validate_scope(policy: Dict[str, Any], inner_payload: Optional[Dict[str, Any]], replay_domain: Dict[str, str]) -> Tuple[bool, Optional[str]]:
+def validate_scope(
+    policy: dict[str, Any], inner_payload: dict[str, Any] | None, replay_domain: dict[str, str]
+) -> tuple[bool, str | None]:
     allowed = policy.get("allowed_scopes") or {}
     if not allowed:
         return True, None
@@ -170,7 +182,9 @@ def validate_scope(policy: Dict[str, Any], inner_payload: Optional[Dict[str, Any
     return True, None
 
 
-def validate_authority_duration(policy: Dict[str, Any], replay_domain: Dict[str, str]) -> Tuple[bool, Optional[str]]:
+def validate_authority_duration(
+    policy: dict[str, Any], replay_domain: dict[str, str]
+) -> tuple[bool, str | None]:
     limit = (policy.get("allowed_scopes") or {}).get("max_authority_duration_sec")
     if limit is None:
         return True, None
@@ -200,23 +214,25 @@ def verify_signature(public_key_b64url: str, signature_b64url: str, message: byt
         return False
 
 
-def verify_registry_root_signature(registry: Dict[str, Any], root_public_key_b64url: str) -> bool:
+def verify_registry_root_signature(registry: dict[str, Any], root_public_key_b64url: str) -> bool:
     claimed_signature = registry.get("registry_signature")
     if not claimed_signature:
         return False
     canonical_target = copy.deepcopy(registry)
     canonical_target.pop("registry_signature", None)
-    return verify_signature(root_public_key_b64url, claimed_signature, canonicalize_json(canonical_target))
+    return verify_signature(
+        root_public_key_b64url, claimed_signature, canonicalize_json(canonical_target)
+    )
 
 
 def verify_role(
-    issuer_record: Dict[str, Any],
-    role_policies: Dict[str, Dict[str, Any]],
+    issuer_record: dict[str, Any],
+    role_policies: dict[str, dict[str, Any]],
     requested_level: int,
     is_refusal: bool,
-    replay_domain: Dict[str, str],
-    inner_payload: Optional[Dict[str, Any]] = None,
-) -> Tuple[bool, Optional[str], Optional[str]]:
+    replay_domain: dict[str, str],
+    inner_payload: dict[str, Any] | None = None,
+) -> tuple[bool, str | None, str | None]:
     for role_id in issuer_record.get("assigned_roles", []):
         policy = role_policies.get(role_id)
         if not policy:
@@ -232,16 +248,19 @@ def verify_role(
         if is_refusal:
             if policy.get("may_revoke_or_refuse", False):
                 return True, policy.get("separation_group"), None
-        elif policy.get("may_grant_authority", False) and policy.get("max_grant_level", 0) >= requested_level:
+        elif (
+            policy.get("may_grant_authority", False)
+            and policy.get("max_grant_level", 0) >= requested_level
+        ):
             return True, policy.get("separation_group"), None
     return False, None, "ISSUER_ROLE_UNAUTHORIZED"
 
 
-def verify_quorum(verified_separation_groups: Set[str], requested_level: int) -> bool:
+def verify_quorum(verified_separation_groups: set[str], requested_level: int) -> bool:
     return len(verified_separation_groups) >= (2 if requested_level >= 4 else 1)
 
 
-def build_schema_registry(schemas: Dict[str, Dict[str, Any]]) -> Registry:
+def build_schema_registry(schemas: dict[str, dict[str, Any]]) -> Registry:
     registry = Registry()
     for name, schema in schemas.items():
         schema_id = schema.get("$id") or f"https://triadic.controls/schemas/{name}.schema.json"
@@ -254,73 +273,147 @@ def build_schema_registry(schemas: Dict[str, Dict[str, Any]]) -> Registry:
 class CryptoVerifier:
     def __init__(
         self,
-        key_registry: Dict[str, Any],
+        key_registry: dict[str, Any],
         replay_cache: ReplayCacheProtocol,
-        schemas: Optional[Dict[str, Dict[str, Any]]] = None,
-        root_public_key_b64url: Optional[str] = None,
+        schemas: dict[str, dict[str, Any]] | None = None,
+        root_public_key_b64url: str | None = None,
     ):
         self.schemas = schemas or {}
         self.schema_registry = build_schema_registry(self.schemas) if self.schemas else None
         if "key_registry" in self.schemas:
             try:
-                jsonschema.Draft202012Validator(self.schemas["key_registry"], registry=self.schema_registry).validate(key_registry)
+                jsonschema.Draft202012Validator(
+                    self.schemas["key_registry"], registry=self.schema_registry
+                ).validate(key_registry)
             except ValidationError as exc:
-                raise ValueError(f"CRITICAL: Key registry failed schema validation: {exc.message}") from exc
-        if root_public_key_b64url is not None and not verify_registry_root_signature(key_registry, root_public_key_b64url):
-            raise ValueError("CRITICAL: Key registry failed root signature verification. Trust boundary compromised.")
+                raise ValueError(
+                    f"CRITICAL: Key registry failed schema validation: {exc.message}"
+                ) from exc
+        if root_public_key_b64url is not None and not verify_registry_root_signature(
+            key_registry, root_public_key_b64url
+        ):
+            raise ValueError(
+                "CRITICAL: Key registry failed root signature verification. "
+                "Trust boundary compromised."
+            )
         self.registry = key_registry
         self.replay_cache = replay_cache
-        self._issuers = {f"{issuer['issuer_id']}|{issuer['key_id']}": issuer for issuer in self.registry.get("issuers", [])}
+        self._issuers = {
+            f"{issuer['issuer_id']}|{issuer['key_id']}": issuer
+            for issuer in self.registry.get("issuers", [])
+        }
         self._issuer_ids = {issuer.get("issuer_id") for issuer in self.registry.get("issuers", [])}
         self._roles = {role["role_id"]: role for role in self.registry.get("roles", [])}
 
     def _get_iso_now(self) -> str:
         return datetime.now(timezone.utc).isoformat(timespec="seconds")
 
-    def _validate_envelope_schema(self, envelope: Dict[str, Any]) -> Tuple[bool, Optional[str]]:
+    def _validate_envelope_schema(self, envelope: dict[str, Any]) -> tuple[bool, str | None]:
         schema = self.schemas.get("signature_envelope")
         if not schema:
             return True, None
         try:
-            jsonschema.Draft202012Validator(schema, registry=self.schema_registry).validate(envelope)
+            jsonschema.Draft202012Validator(schema, registry=self.schema_registry).validate(
+                envelope
+            )
             return True, None
         except ValidationError as exc:
             return False, f"MALFORMED_ENVELOPE: {exc.message}"
 
-    def _verify_envelope(self, envelope: Dict[str, Any], requested_level: int, is_refusal: bool, inner_payload: Optional[Dict[str, Any]] = None) -> VerificationResult:
+    def _verify_envelope(
+        self,
+        envelope: dict[str, Any],
+        requested_level: int,
+        is_refusal: bool,
+        inner_payload: dict[str, Any] | None = None,
+    ) -> VerificationResult:
         now_ts = time.time()
         now_iso = self._get_iso_now()
         schema_valid, schema_error = self._validate_envelope_schema(envelope)
         if not schema_valid:
-            return VerificationResult(False, "SIGNATURE_VERIFICATION_FAILED", ["MALFORMED_ENVELOPE"], [], now_iso, verified_keys=[], failure_details=schema_error)
+            return VerificationResult(
+                False,
+                "SIGNATURE_VERIFICATION_FAILED",
+                ["MALFORMED_ENVELOPE"],
+                [],
+                now_iso,
+                verified_keys=[],
+                failure_details=schema_error,
+            )
         registry_valid, registry_failure = validate_registry_freshness(self.registry, now_ts)
         if not registry_valid:
-            return VerificationResult(False, "SIGNATURE_VERIFICATION_FAILED", [registry_failure or "REGISTRY_EXPIRED"], [], now_iso, verified_keys=[], failure_details="Key registry failed temporal validation.")
+            return VerificationResult(
+                False,
+                "SIGNATURE_VERIFICATION_FAILED",
+                [registry_failure or "REGISTRY_EXPIRED"],
+                [],
+                now_iso,
+                verified_keys=[],
+                failure_details="Key registry failed temporal validation.",
+            )
         if envelope.get("payload_hash_alg") != "sha256":
-            return VerificationResult(False, "SIGNATURE_VERIFICATION_FAILED", ["UNSUPPORTED_ALGORITHM"], [], now_iso, verified_keys=[], failure_details=f"Unsupported payload hash algorithm: {envelope.get('payload_hash_alg')}. Expected: sha256.")
+            return VerificationResult(
+                False,
+                "SIGNATURE_VERIFICATION_FAILED",
+                ["UNSUPPORTED_ALGORITHM"],
+                [],
+                now_iso,
+                verified_keys=[],
+                failure_details=(
+                    "Unsupported payload hash algorithm: "
+                    f"{envelope.get('payload_hash_alg')}. Expected: sha256."
+                ),
+            )
         if inner_payload is not None:
-            payload_valid, payload_failure = validate_payload_hash(inner_payload, envelope.get("payload_hash", ""))
+            payload_valid, payload_failure = validate_payload_hash(
+                inner_payload, envelope.get("payload_hash", "")
+            )
             if not payload_valid:
-                return VerificationResult(False, "SIGNATURE_VERIFICATION_FAILED", [payload_failure or "PAYLOAD_HASH_MISMATCH"], [], now_iso, verified_keys=[], failure_details="Cryptographic binding failed: computed payload hash does not match envelope payload_hash.")
-        verified_issuers: List[str] = []
-        verified_keys: List[str] = []
-        verified_groups: Set[str] = set()
-        failure_codes: List[str] = []
+                return VerificationResult(
+                    False,
+                    "SIGNATURE_VERIFICATION_FAILED",
+                    [payload_failure or "PAYLOAD_HASH_MISMATCH"],
+                    [],
+                    now_iso,
+                    verified_keys=[],
+                    failure_details=(
+                        "Cryptographic binding failed: computed payload hash does not "
+                        "match envelope payload_hash."
+                    ),
+                )
+        verified_issuers: list[str] = []
+        verified_keys: list[str] = []
+        verified_groups: set[str] = set()
+        failure_codes: list[str] = []
         signing_domain = envelope["signing_domain"]
         payload_type = envelope["payload_type"]
         payload_schema_version = envelope["payload_schema_version"]
         payload_hash = envelope["payload_hash"]
         replay_domain = envelope["replay_domain"]
-        window_valid, cache_expiry = validate_time_window(replay_domain["valid_from"], replay_domain["valid_until"], now_ts=now_ts)
+        window_valid, cache_expiry = validate_time_window(
+            replay_domain["valid_from"], replay_domain["valid_until"], now_ts=now_ts
+        )
         if not window_valid or cache_expiry is None:
-            return VerificationResult(False, "TIME_ATTESTATION_FAILED", ["TIME_WINDOW_INVALID"], [], now_iso, verified_keys=[], failure_details="Replay domain time window is malformed, expired, or not yet valid.")
+            return VerificationResult(
+                False,
+                "TIME_ATTESTATION_FAILED",
+                ["TIME_WINDOW_INVALID"],
+                [],
+                now_iso,
+                verified_keys=[],
+                failure_details=(
+                    "Replay domain time window is malformed, expired, or not yet valid."
+                ),
+            )
         for sig_block in envelope.get("signatures", []):
             issuer_id = sig_block["issuer_id"]
             key_id = sig_block["key_id"]
             nonce = sig_block["nonce_or_sequence"]
             issuer_record = self._issuers.get(f"{issuer_id}|{key_id}")
             if not issuer_record:
-                failure_codes.append("UNKNOWN_ISSUER" if issuer_id not in self._issuer_ids else "UNKNOWN_KEY")
+                failure_codes.append(
+                    "UNKNOWN_ISSUER" if issuer_id not in self._issuer_ids else "UNKNOWN_KEY"
+                )
                 continue
             if issuer_record.get("status") == "REVOKED":
                 failure_codes.append("KEY_REVOKED")
@@ -332,7 +425,9 @@ class CryptoVerifier:
             if not key_material_valid:
                 failure_codes.append(key_material_failure or "INVALID_KEY_ENCODING")
                 continue
-            lifecycle_valid, lifecycle_failure = validate_key_lifecycle(issuer_record, sig_block["signed_at"])
+            lifecycle_valid, lifecycle_failure = validate_key_lifecycle(
+                issuer_record, sig_block["signed_at"]
+            )
             if not lifecycle_valid:
                 failure_codes.append(lifecycle_failure or "KEY_EXPIRED")
                 continue
@@ -342,19 +437,44 @@ class CryptoVerifier:
             if sig_block.get("signature_encoding") != "base64url":
                 failure_codes.append("INVALID_SIGNATURE")
                 continue
-            replay_key = generate_replay_key(issuer_id, key_id, nonce, payload_type, replay_domain["system_id"], replay_domain["scope_hash"])
+            replay_key = generate_replay_key(
+                issuer_id,
+                key_id,
+                nonce,
+                payload_type,
+                replay_domain["system_id"],
+                replay_domain["scope_hash"],
+            )
             if self.replay_cache.seen(replay_key, now=now_ts):
                 failure_codes.append("REPLAY_DETECTED")
                 continue
-            signing_message = build_signing_object(signing_domain, payload_type, payload_schema_version, payload_hash, replay_domain, nonce)
-            if not verify_signature(issuer_record["public_key"], sig_block["signature"], signing_message):
+            signing_message = build_signing_object(
+                signing_domain,
+                payload_type,
+                payload_schema_version,
+                payload_hash,
+                replay_domain,
+                nonce,
+            )
+            if not verify_signature(
+                issuer_record["public_key"], sig_block["signature"], signing_message
+            ):
                 failure_codes.append("INVALID_SIGNATURE")
                 continue
-            is_authorized, separation_group, role_failure = verify_role(issuer_record, self._roles, requested_level, is_refusal, replay_domain, inner_payload)
+            is_authorized, separation_group, role_failure = verify_role(
+                issuer_record,
+                self._roles,
+                requested_level,
+                is_refusal,
+                replay_domain,
+                inner_payload,
+            )
             if not is_authorized:
                 failure_codes.append(role_failure or "ISSUER_ROLE_UNAUTHORIZED")
                 continue
-            if not self.replay_cache.check_and_record(replay_key, expires_at=cache_expiry, now=now_ts):
+            if not self.replay_cache.check_and_record(
+                replay_key, expires_at=cache_expiry, now=now_ts
+            ):
                 failure_codes.append("REPLAY_DETECTED")
                 continue
             verified_issuers.append(issuer_id)
@@ -362,17 +482,89 @@ class CryptoVerifier:
             if separation_group:
                 verified_groups.add(separation_group)
         if failure_codes:
-            return VerificationResult(False, "SIGNATURE_VERIFICATION_FAILED", sorted(set(failure_codes)), verified_issuers, now_iso, verified_keys=verified_keys, failure_details="One or more signature blocks failed validation.")
+            return VerificationResult(
+                False,
+                "SIGNATURE_VERIFICATION_FAILED",
+                sorted(set(failure_codes)),
+                verified_issuers,
+                now_iso,
+                verified_keys=verified_keys,
+                failure_details="One or more signature blocks failed validation.",
+            )
         if not verify_quorum(verified_groups, requested_level):
-            return VerificationResult(False, "QUORUM_FAILED", ["INSUFFICIENT_QUORUM", "QUORUM_NOT_INDEPENDENT"], verified_issuers, now_iso, verified_keys=verified_keys, failure_details="Insufficient independent organizational signatures for requested level.")
-        return VerificationResult(True, "REFUSAL_SIGNATURE_VALIDATED" if is_refusal else "TOKEN_SIGNATURE_VALIDATED", [], verified_issuers, now_iso, requested_level, verified_keys=verified_keys)
+            return VerificationResult(
+                False,
+                "QUORUM_FAILED",
+                ["INSUFFICIENT_QUORUM", "QUORUM_NOT_INDEPENDENT"],
+                verified_issuers,
+                now_iso,
+                verified_keys=verified_keys,
+                failure_details=(
+                    "Insufficient independent organizational signatures for requested level."
+                ),
+            )
+        return VerificationResult(
+            True,
+            "REFUSAL_SIGNATURE_VALIDATED" if is_refusal else "TOKEN_SIGNATURE_VALIDATED",
+            [],
+            verified_issuers,
+            now_iso,
+            requested_level,
+            verified_keys=verified_keys,
+        )
 
-    def verify_authority_token(self, envelope: Dict[str, Any], requested_level: int, inner_payload: Optional[Dict[str, Any]] = None) -> VerificationResult:
+    def verify_authority_token(
+        self,
+        envelope: dict[str, Any],
+        requested_level: int,
+        inner_payload: dict[str, Any] | None = None,
+    ) -> VerificationResult:
+        schema_valid, schema_error = self._validate_envelope_schema(envelope)
+        if not schema_valid:
+            return VerificationResult(
+                False,
+                "SIGNATURE_VERIFICATION_FAILED",
+                ["MALFORMED_ENVELOPE"],
+                [],
+                self._get_iso_now(),
+                verified_keys=[],
+                failure_details=schema_error,
+            )
         if envelope.get("payload_type") != "AUTHORITY_TOKEN":
-            return VerificationResult(False, "SIGNATURE_VERIFICATION_FAILED", ["SYSTEM_SCOPE_MISMATCH"], [], self._get_iso_now(), verified_keys=[])
+            return VerificationResult(
+                False,
+                "SIGNATURE_VERIFICATION_FAILED",
+                ["SYSTEM_SCOPE_MISMATCH"],
+                [],
+                self._get_iso_now(),
+                verified_keys=[],
+            )
         return self._verify_envelope(envelope, requested_level, False, inner_payload)
 
-    def verify_refusal_signal(self, envelope: Dict[str, Any], requested_cap_level: int, inner_payload: Optional[Dict[str, Any]] = None) -> VerificationResult:
+    def verify_refusal_signal(
+        self,
+        envelope: dict[str, Any],
+        requested_cap_level: int,
+        inner_payload: dict[str, Any] | None = None,
+    ) -> VerificationResult:
+        schema_valid, schema_error = self._validate_envelope_schema(envelope)
+        if not schema_valid:
+            return VerificationResult(
+                False,
+                "SIGNATURE_VERIFICATION_FAILED",
+                ["MALFORMED_ENVELOPE"],
+                [],
+                self._get_iso_now(),
+                verified_keys=[],
+                failure_details=schema_error,
+            )
         if envelope.get("payload_type") != "REFUSAL_SIGNAL":
-            return VerificationResult(False, "SIGNATURE_VERIFICATION_FAILED", ["SYSTEM_SCOPE_MISMATCH"], [], self._get_iso_now(), verified_keys=[])
+            return VerificationResult(
+                False,
+                "SIGNATURE_VERIFICATION_FAILED",
+                ["SYSTEM_SCOPE_MISMATCH"],
+                [],
+                self._get_iso_now(),
+                verified_keys=[],
+            )
         return self._verify_envelope(envelope, requested_cap_level, True, inner_payload)

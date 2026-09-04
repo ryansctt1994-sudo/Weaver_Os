@@ -39,8 +39,15 @@ def generate_weaver_provenance(args) -> dict[str, Any]:
             "predicate_type": slsa.get("predicateType", ""),
             "statement_digest": sha256_file(slsa_path),
             "builder_id": slsa.get("predicate", {}).get("builder", {}).get("id", ""),
-            "source_uri": slsa.get("predicate", {}).get("invocation", {}).get("configSource", {}).get("uri", ""),
-            "source_commit": slsa.get("predicate", {}).get("invocation", {}).get("configSource", {}).get("digest", {}).get("sha1", ""),
+            "source_uri": slsa.get("predicate", {})
+            .get("invocation", {})
+            .get("configSource", {})
+            .get("uri", ""),
+            "source_commit": slsa.get("predicate", {})
+            .get("invocation", {})
+            .get("configSource", {})
+            .get("digest", {})
+            .get("sha1", ""),
         },
         "build": {
             "build_id": args.build_id,
@@ -73,7 +80,9 @@ def generate_weaver_provenance(args) -> dict[str, Any]:
     }
 
 
-def verify_weaver_provenance(artifact: Path, manifest: Path, weaver: Path, slsa: Path | None) -> None:
+def verify_weaver_provenance(
+    artifact: Path, manifest: Path, weaver: Path, slsa: Path | None
+) -> None:
     manifest_obj = load_json(manifest)
     weaver_obj = load_json(weaver)
 

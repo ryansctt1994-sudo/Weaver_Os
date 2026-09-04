@@ -11,9 +11,7 @@ def minimal_schemas():
     return {
         "key_registry": {
             "type": "object",
-            "properties": {
-                "registry_version": {"type": "string"}
-            },
+            "properties": {"registry_version": {"type": "string"}},
             "required": ["registry_version"],
         },
         "signature_envelope": {

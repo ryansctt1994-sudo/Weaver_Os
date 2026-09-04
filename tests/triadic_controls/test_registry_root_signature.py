@@ -16,8 +16,10 @@ def b64url_nopad(data: bytes) -> str:
 
 def iso_offset(seconds: int) -> str:
     return (
-        datetime.now(timezone.utc) + timedelta(seconds=seconds)
-    ).isoformat(timespec="seconds").replace("+00:00", "Z")
+        (datetime.now(timezone.utc) + timedelta(seconds=seconds))
+        .isoformat(timespec="seconds")
+        .replace("+00:00", "Z")
+    )
 
 
 def generate_keypair():

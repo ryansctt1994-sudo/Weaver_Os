@@ -15,7 +15,6 @@ import urllib.error
 import urllib.request
 from pathlib import Path
 
-
 DEFAULT_EVENTS_URL = "http://localhost:8080/events"
 
 
@@ -50,7 +49,10 @@ def main() -> int:
             post_json(events_url, event)
             print(f"injected sequence_number={event.get('sequence_number')}")
         except (urllib.error.URLError, RuntimeError) as exc:
-            print(f"ERROR: failed to inject event {event.get('sequence_number')}: {exc}", file=sys.stderr)
+            print(
+                f"ERROR: failed to inject event {event.get('sequence_number')}: {exc}",
+                file=sys.stderr,
+            )
             return 1
 
     print("ledger injection complete")

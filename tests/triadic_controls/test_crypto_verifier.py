@@ -21,8 +21,10 @@ def b64url_nopad(data: bytes) -> str:
 
 def iso_offset(seconds: int) -> str:
     return (
-        datetime.now(timezone.utc) + timedelta(seconds=seconds)
-    ).isoformat(timespec="seconds").replace("+00:00", "Z")
+        (datetime.now(timezone.utc) + timedelta(seconds=seconds))
+        .isoformat(timespec="seconds")
+        .replace("+00:00", "Z")
+    )
 
 
 @pytest.fixture
@@ -322,7 +324,9 @@ def test_invalid_signature_does_not_poison_replay_cache(keypair, mock_registry):
         ],
     }
 
-    result_1 = verifier.verify_authority_token(poisoned_attempt, requested_level=3, inner_payload=payload)
+    result_1 = verifier.verify_authority_token(
+        poisoned_attempt, requested_level=3, inner_payload=payload
+    )
     assert result_1.is_valid is False
     assert result_1.failure_codes == ["INVALID_SIGNATURE"]
 
@@ -338,7 +342,9 @@ def test_tampered_payload_hash_mismatch_fails_closed(keypair, mock_registry):
     tampered_payload = authority_payload(level=5)
     envelope = signed_envelope(signing_key, nonce="seq-tampered", inner_payload=original_payload)
 
-    result = verifier.verify_authority_token(envelope, requested_level=3, inner_payload=tampered_payload)
+    result = verifier.verify_authority_token(
+        envelope, requested_level=3, inner_payload=tampered_payload
+    )
     assert result.is_valid is False
     assert result.failure_codes == ["PAYLOAD_HASH_MISMATCH"]
 
@@ -355,7 +361,9 @@ def test_key_case_change_payload_hash_mismatch_fails_closed(keypair, mock_regist
     }
     envelope = signed_envelope(signing_key, nonce="seq-case", inner_payload=original_payload)
 
-    result = verifier.verify_authority_token(envelope, requested_level=3, inner_payload=case_changed_payload)
+    result = verifier.verify_authority_token(
+        envelope, requested_level=3, inner_payload=case_changed_payload
+    )
     assert result.is_valid is False
     assert result.failure_codes == ["PAYLOAD_HASH_MISMATCH"]
 
