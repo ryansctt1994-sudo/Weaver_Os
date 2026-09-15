@@ -1,0 +1,122 @@
+{
+  "schema_version": "1.0.0",
+  "decision_date": "2026-07-14",
+  "portfolio": "Weaver Nexus Systems",
+  "inventory_count": 61,
+  "maximum_active_canonical_repositories": 3,
+  "authority": "NONE",
+  "promotion": "HOLD",
+  "masters": {
+    "Weaver_Os": "constitutional control plane and verification spine",
+    "Lumen": "executable evidence, Chronicle, receipt, replay, and bounded integration runtime",
+    "Math_Build1994": "formal methods, Auto Scientist, benchmarks, RTL, and proof receipts"
+  },
+  "selected_integration": {
+    "Weaver_Os": [
+      "cathedral-verified",
+      "Delta-717",
+      "Weaver--Cathedral-",
+      "zorel-kernel"
+    ],
+    "Lumen": [
+      "agency-agents6"
+    ],
+    "Math_Build1994": [
+      "AutoProof",
+      "LogOS",
+      "t81-benchmarks",
+      "t81-hardware",
+      "t81lib",
+      "ternary",
+      "ternary-tools",
+      "trinity-pow"
+    ]
+  },
+  "candidate_integration": {
+    "Math_Build1994": [
+      "duotronic-computing",
+      "trinity"
+    ]
+  },
+  "donor_reference": {
+    "Weaver_Os": [
+      "astryx",
+      "NexusGate"
+    ],
+    "Lumen": [
+      "ai-agent-terraform",
+      "AI-Research-SKILLs",
+      "ai-ticket",
+      "awesome-agent-skills",
+      "Cortex",
+      "FreeLattice",
+      "Gbrain-Reinforced",
+      "hermes-agent-self-evolution",
+      "owl",
+      "rosclaw",
+      "ruflo",
+      "skills",
+      "strix",
+      "SuperAGI",
+      "swarms",
+      "tinyclaw"
+    ],
+    "Math_Build1994": [
+      "t81-docs",
+      "t81-foundation",
+      "t81-roadmap"
+    ],
+    "reference_only": [
+      "claude-code-best-practice-Codex-",
+      "system-prompts-and-models-of-ai-tools"
+    ]
+  },
+  "research_archive": [
+    "A.G.I-Seed-",
+    "ANGELA",
+    "Delta-RPM-Protocol",
+    "Echo-Root-Ve-Protocol",
+    "Lumen-Elpis",
+    "OpenMythos",
+    "Ouroboros",
+    "Pandora",
+    "Quillan-",
+    "Quillan-v4.2-repo",
+    "reson8-Labs",
+    "SpiralSafe",
+    "Sym-Chaos-",
+    "Weavers-Forge-"
+  ],
+  "domain_archive": [
+    "SynthaMed"
+  ],
+  "quarantine": [
+    "AGI-to-ASI-TRANSITION-PROOF-LAYER",
+    "meta-meme",
+    "n00b",
+    "solfunmeme",
+    "spiralsafe-mono"
+  ],
+  "migration_requirements": [
+    "immutable_source_pin",
+    "upstream_and_author_identity",
+    "license_compatibility_review",
+    "file_level_provenance",
+    "exact_build_or_test_command",
+    "clean_environment_transcript",
+    "positive_and_negative_path_fixtures",
+    "artifact_hashes",
+    "explicit_non_claims",
+    "supersession_pointer"
+  ],
+  "rules": [
+    "capability_is_not_authority",
+    "architecture_is_not_execution_evidence",
+    "no_receipt_no_promotion",
+    "local_run_is_not_independent_reproduction",
+    "missing_evidence_fails_closed",
+    "no_wholesale_donor_import",
+    "supersede_never_silently_rewrite",
+    "no_irreversible_deletion_in_this_phase"
+  ]
+}
