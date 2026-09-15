@@ -3,8 +3,42 @@ name: CI
 on:
   push:
     branches: [main]
+    paths:
+      - "canonical/**"
+      - "chronicle/**"
+      - "chronicle-raft/**"
+      - "compression/**"
+      - "kernel/**"
+      - "policy/**"
+      - "receipt/**"
+      - "schemas/**"
+      - "src/**"
+      - "tests/**"
+      - "tools/**"
+      - "triadic_controls/**"
+      - "weaver_auth/**"
+      - "witness_py/**"
+      - "pyproject.toml"
+      - "requirements.txt"
   pull_request:
     branches: [main]
+    paths:
+      - "canonical/**"
+      - "chronicle/**"
+      - "chronicle-raft/**"
+      - "compression/**"
+      - "kernel/**"
+      - "policy/**"
+      - "receipt/**"
+      - "schemas/**"
+      - "src/**"
+      - "tests/**"
+      - "tools/**"
+      - "triadic_controls/**"
+      - "weaver_auth/**"
+      - "witness_py/**"
+      - "pyproject.toml"
+      - "requirements.txt"
 
 jobs:
   test:
