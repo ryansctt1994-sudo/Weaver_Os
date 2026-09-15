@@ -1,0 +1,26 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://weaver-os.local/schemas/challenge_gate.schema.json",
+  "title": "ChallengeGateDocket",
+  "type": "object",
+  "required": [
+    "schema_version",
+    "docket_id",
+    "source",
+    "target_authority_id",
+    "severity",
+    "status",
+    "authority_effect"
+  ],
+  "properties": {
+    "schema_version": { "const": "0.1" },
+    "docket_id": { "type": "string", "minLength": 1 },
+    "source": { "enum": ["strix", "replay", "human_review", "ci", "witness"] },
+    "target_authority_id": { "type": "string", "minLength": 1 },
+    "severity": { "enum": ["low", "medium", "high", "critical"] },
+    "status": { "enum": ["open", "restricted", "suspended", "revoked", "resolved", "superseded"] },
+    "authority_effect": { "enum": ["none", "challenge", "restrict", "suspend", "revoke", "reinstate_candidate"] },
+    "evidence_receipts": { "type": "array", "items": { "type": "string" } }
+  },
+  "additionalProperties": false
+}

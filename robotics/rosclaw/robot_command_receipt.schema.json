@@ -1,0 +1,31 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://weaver-os.local/schemas/robot_command_receipt.schema.json",
+  "title": "RobotCommandReceipt",
+  "type": "object",
+  "required": [
+    "receipt_version",
+    "receipt_type",
+    "mode",
+    "authority_id",
+    "command_type",
+    "target",
+    "decision",
+    "simulation_only",
+    "receipt_hash"
+  ],
+  "properties": {
+    "receipt_version": { "const": "0.1" },
+    "receipt_type": { "const": "RobotCommandReceipt" },
+    "mode": { "enum": ["simulation_only"] },
+    "authority_id": { "type": "string", "minLength": 1 },
+    "command_type": { "enum": ["topic_publish", "topic_subscribe", "service_call", "action_goal", "estop"] },
+    "target": { "type": "string", "minLength": 1 },
+    "decision": { "enum": ["allow", "block", "escalate"] },
+    "simulation_only": { "const": true },
+    "input_hash": { "type": "string" },
+    "output_hash": { "type": ["string", "null"] },
+    "receipt_hash": { "type": "string" }
+  },
+  "additionalProperties": false
+}

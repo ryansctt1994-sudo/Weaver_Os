@@ -1,0 +1,43 @@
+schema_version: "0.1"
+build_id: "B_MASTER_BUILD_V0_1_TINYCLAW_FIRST_RUNTIME"
+status: "provisional_intake"
+authority: "none"
+promotion_gate: "HOLD"
+
+repos:
+  weaver_os:
+    repo: "ryansctt1994-sudo/Weaver_Os"
+    commit: "0823452e63d13bae5f1945fced2f5d01370e7a34"
+    role: "authority_runtime_seed"
+    observed_version: "0.5.0"
+    evidence_status: "E2"
+    notes:
+      - "Deterministic verification and replay substrate."
+      - "Existing triadic-controls workflow uses actions/checkout@v4."
+
+  tinyclaw:
+    repo: "ryansctt1994-sudo/tinyclaw"
+    commit: "e912fd4d782e439238ce12c45f7ae924669388e9"
+    role: "operations_runtime"
+    observed_version: "0.0.6"
+    evidence_status: "E1_intake"
+    allowed_posture: "wrapped_only"
+    denied_posture: "standalone_authority"
+
+  strix:
+    repo: "ryansctt1994-sudo/strix"
+    commit: "5d91500564e4a3436df1be54a85eb250cc331df8"
+    role: "security_witness"
+    observed_version: "0.8.2"
+    evidence_status: "E1_intake"
+    allowed_posture: "scoped_adversarial_scan"
+    denied_posture: "authority_granting"
+
+  rosclaw:
+    repo: "ryansctt1994-sudo/rosclaw"
+    commit: "109ffabd9775208bed6f983715f3212790237cd7"
+    role: "simulation_first_physical_adapter"
+    observed_version: "0.0.1"
+    evidence_status: "E1_SIM"
+    allowed_posture: "simulation_only"
+    denied_posture: "physical_actuation"

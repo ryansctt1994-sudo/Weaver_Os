@@ -1,0 +1,40 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://weaver-os.local/schemas/security_scan_receipt.schema.json",
+  "title": "SecurityScanReceipt",
+  "type": "object",
+  "required": [
+    "receipt_version",
+    "receipt_type",
+    "timestamp",
+    "scanner",
+    "target",
+    "scope_hash",
+    "result",
+    "findings_summary",
+    "receipt_hash"
+  ],
+  "properties": {
+    "receipt_version": { "const": "0.1" },
+    "receipt_type": { "const": "SecurityScanReceipt" },
+    "timestamp": { "type": "string", "format": "date-time" },
+    "scanner": { "const": "strix" },
+    "target": { "type": "string" },
+    "scope_hash": { "type": "string" },
+    "result": { "enum": ["pass", "findings", "failed", "blocked"] },
+    "findings_summary": {
+      "type": "object",
+      "properties": {
+        "critical": { "type": "integer", "minimum": 0 },
+        "high": { "type": "integer", "minimum": 0 },
+        "medium": { "type": "integer", "minimum": 0 },
+        "low": { "type": "integer", "minimum": 0 },
+        "info": { "type": "integer", "minimum": 0 }
+      },
+      "required": ["critical", "high", "medium", "low", "info"],
+      "additionalProperties": false
+    },
+    "receipt_hash": { "type": "string" }
+  },
+  "additionalProperties": false
+}
