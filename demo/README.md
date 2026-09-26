@@ -1,5 +1,8 @@
 # Boundary Integrity Demo: The Throne Remains Empty
 
+For the composed transaction, protected-state hashing, fresh-process replay,
+and tamper probes, see [WN-E2E-001](WN-E2E-001.md).
+
 This dependency-free demo illustrates the Validation Algebra boundary rules for the Delta-717 / Cathedral-OS / Weaver architecture.
 
 Status: `ACCEPTED_AS_DEMO_DESIGN` until executed and receipted.
