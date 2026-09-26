@@ -1,0 +1,34 @@
+name: WN-E2E-001 Lean denial formalization
+
+on:
+  pull_request:
+    paths:
+      - "formal/wn-e2e-denial/**"
+      - ".github/workflows/wn-e2e-denial.yml"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  check-lean:
+    runs-on: ubuntu-22.04
+    steps:
+      - uses: actions/checkout@v4
+      - name: Install pinned official Lean 4.19.0
+        run: |
+          curl --fail --location --silent --show-error \
+            https://github.com/leanprover/lean4/releases/download/v4.19.0/lean-4.19.0-linux.tar.zst \
+            --output "$RUNNER_TEMP/lean-4.19.0-linux.tar.zst"
+          tar --no-same-owner --zstd --extract \
+            --file "$RUNNER_TEMP/lean-4.19.0-linux.tar.zst" \
+            --directory "$RUNNER_TEMP"
+          echo "$RUNNER_TEMP/lean-4.19.0-linux/bin" >> "$GITHUB_PATH"
+      - name: Compile original core and denial extension
+        run: python3 formal/wn-e2e-denial/verify.py
+      - name: Retain Lean compiler output
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: wn-e2e-denial-lean-check
+          path: formal/wn-e2e-denial/CHECK_RESULT.json
