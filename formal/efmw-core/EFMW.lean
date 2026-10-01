@@ -5,6 +5,8 @@ import WNSKernel.Core
    Matthew Chenoweth Wright's physical interpretation is not assumed. -/
 namespace WNSKernel.EFMW
 
+noncomputable section
+
 def update (λ m r : ℝ) : ℝ := λ * m + (1 - λ) * r
 
 def track (λ initial : ℝ) (residual : ℕ → ℝ) : ℕ → ℝ
