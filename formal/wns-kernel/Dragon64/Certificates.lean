@@ -422,9 +422,26 @@ def pairRepresentatives : List Nat := [0, 1, 2, 4, 64, 65, 66, 67, 68, 69, 70, 7
 def pairPartition := pairRepresentatives.map pairOrbit
 
 theorem pair_representatives_count : pairRepresentatives.length = 44 := by decide
+/-- Structural merge/sort keeps the certificate reducible in the kernel. -/
+def mergeFuel : Nat → List Nat → List Nat → List Nat
+  | 0, xs, ys => xs ++ ys
+  | _ + 1, [], ys => ys
+  | _ + 1, xs, [] => xs
+  | fuel + 1, x :: xs, y :: ys =>
+    if x ≤ y then x :: mergeFuel fuel xs (y :: ys)
+    else y :: mergeFuel fuel (x :: xs) ys
+
+def sortFuel : Nat → List Nat → List Nat
+  | 0, xs => xs
+  | fuel + 1, xs =>
+    if xs.length ≤ 1 then xs
+    else
+      let n := xs.length / 2
+      mergeFuel xs.length (sortFuel fuel (xs.take n)) (sortFuel fuel (xs.drop n))
+
 /-- Sorted equality establishes coverage and multiplicity one simultaneously. -/
 theorem pair_partition_exact :
-    pairPartition.flatten.mergeSort (fun x y => x ≤ y) = List.range 4096 := by decide
+    sortFuel 13 pairPartition.flatten = List.range 4096 := by decide
 
 
 def generatorClosureCheck (g : Nat) : Bool :=
