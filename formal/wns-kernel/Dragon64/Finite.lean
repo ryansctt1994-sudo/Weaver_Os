@@ -33,17 +33,22 @@ theorem identity_determinant_one : determinantOne identity = true := by decide
 theorem s_determinant_one : determinantOne generatorS = true := by decide
 theorem t_determinant_one : determinantOne generatorT = true := by decide
 
-theorem identity_action (v : Fin 64) : act identity v.val = v.val := by decide
+theorem identity_action (v : Fin 64) : act identity v.val = v.val := by
+  revert v
+  decide
 
 theorem s_fourth_power (v : Fin 64) :
     act generatorS (act generatorS (act generatorS (act generatorS v.val))) = v.val := by
+  revert v
   decide
 
 def iterate (m : Nat) : Nat → Nat → Nat
   | 0, v => v
   | n + 1, v => act m (iterate m n v)
 
-theorem t_eighth_power (v : Fin 64) : iterate generatorT 8 v.val = v.val := by decide
+theorem t_eighth_power (v : Fin 64) : iterate generatorT 8 v.val = v.val := by
+  revert v
+  decide
 
 theorem zero_orbit_size : (pointOrbit 0).length = 1 := by decide
 theorem four_orbit_size : (pointOrbit 4).length = 3 := by decide
