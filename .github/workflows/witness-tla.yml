@@ -1,0 +1,20 @@
+name: Witness TLA model
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+
+jobs:
+  tlc:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Download pinned TLC
+        run: |
+          curl -fL --retry 3 -o /tmp/tla2tools.jar https://github.com/tlaplus/tlaplus/releases/download/v1.8.0/tla2tools.jar
+          echo 'e3f5f648b75d68c14176b961ec7bfc1e94ab4c14de57f251b8c40a0fbf916e27  /tmp/tla2tools.jar' | sha256sum -c -
+      - name: Check bounded invariants
+        working-directory: audit-package/formal/tla+
+        run: java -cp /tmp/tla2tools.jar tlc2.TLC -deadlock -config WitnessBoundary.cfg WitnessBoundary.tla
