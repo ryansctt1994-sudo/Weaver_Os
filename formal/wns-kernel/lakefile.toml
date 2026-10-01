@@ -7,3 +7,4 @@ name = "WNSKernel"
 
 [[lean_lib]]
 name = "Dragon64"
+moreLeanArgs = ["-K65536"]
