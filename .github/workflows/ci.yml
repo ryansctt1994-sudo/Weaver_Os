@@ -33,6 +33,11 @@ jobs:
       - name: Lint
         run: ruff check .
 
+      - name: Verify signed witness release
+        run: |
+          python releases/weaver-witness-signed-rc1/tools/verify_release.py
+          (cd releases/weaver-witness-signed-rc1/src && python witness.py)
+
       - name: Type check
         run: mypy triadic_controls src
 

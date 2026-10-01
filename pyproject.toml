@@ -38,6 +38,7 @@ pythonpath = [".", "src"]
 [tool.ruff]
 line-length = 100
 target-version = "py310"
+exclude = ["releases/weaver-witness-signed-rc1"]
 
 [tool.ruff.lint]
 select = ["E", "F", "I", "UP", "B"]
