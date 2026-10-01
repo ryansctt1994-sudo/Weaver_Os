@@ -227,4 +227,34 @@ theorem failure_rejection_example :
     (governedStep (fun n _ => n + 1) [0] demoState demoProposal [⟨3, 1⟩]
       (fun _ => 1) (recordFailure demoInsight 42) demoLeaf [demoRoot] 2).2.verdict = .reject := by decide
 
+section Acceptance
+variable {P : Type} {apply : P → Nat → P} {roots : List Nat} {s : State P}
+  {p : Proposal} {ds : List Dependency} {revision : Nat → Nat} {i : Insight}
+  {g : BoundedGrant} {ancestors : List BoundedGrant} {now : Nat}
+
+theorem accepted_requires_live_chain
+    (h : (governedStep apply roots s p ds revision i g ancestors now).2.verdict = .accept) :
+    chainValid roots s.grants now (g :: ancestors) = true := by
+  have eligible := accepted_requires_eligibility h
+  exact ((both_true _ _).mp eligible.2.2.2.2).2
+
+theorem accepted_requires_insight
+    (h : (governedStep apply roots s p ds revision i g ancestors now).2.verdict = .accept) :
+    insightEligible i = true := by
+  have eligible := accepted_requires_eligibility h
+  exact ((both_true _ _).mp ((both_true _ _).mp eligible.2.2.2.2).1).2
+
+theorem accepted_requires_current_dependencies
+    (h : (governedStep apply roots s p ds revision i g ancestors now).2.verdict = .accept) :
+    current ds revision = true := by
+  have eligible := accepted_requires_eligibility h
+  exact ((both_true _ _).mp eligible.2.2.2.1).2
+
+theorem accepted_has_trusted_origin
+    (h : (governedStep apply roots s p ds revision i g ancestors now).2.verdict = .accept) :
+    ∃ origin ∈ g :: ancestors, origin.grant.issuer ∈ roots := by
+  exact chain_has_trusted_root roots s.grants now (g :: ancestors)
+    (accepted_requires_live_chain h)
+end Acceptance
+
 end WNSKernel.Portfolio

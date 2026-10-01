@@ -69,3 +69,7 @@ import WNSKernel
 #print axioms WNSKernel.Portfolio.revoked_ancestor_denies
 #print axioms WNSKernel.Portfolio.delegated_acceptance_example
 #print axioms WNSKernel.Portfolio.failure_rejection_example
+#print axioms WNSKernel.Portfolio.accepted_requires_live_chain
+#print axioms WNSKernel.Portfolio.accepted_requires_insight
+#print axioms WNSKernel.Portfolio.accepted_requires_current_dependencies
+#print axioms WNSKernel.Portfolio.accepted_has_trusted_origin
