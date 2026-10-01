@@ -7,7 +7,7 @@ Real arithmetic, fixed coefficient λ, arbitrary residual stream:
 m(n+1) = λ m(n) + (1−λ) r(n).
 For boundedness and disturbance bounds, 0 ≤ λ ≤ 1.
 
-## Checked obligations
+## Proof obligations
 - update_difference
 - update_constant_error
 - update_interval
@@ -17,6 +17,8 @@ For boundedness and disturbance bounds, 0 ≤ λ ≤ 1.
 - initial_distance
 - constant_error
 - constant_distance
+- constant_converges
+- initial_difference_converges
 - disturbance_bound
 - monitor_preserves_protected
 - monitor_preserves_grants
@@ -37,6 +39,6 @@ lake env lean Audit.lean
 ```
 
 ## Boundaries
-No physical law, detector superiority, warning-period formula, calibration, empirical performance or runtime refinement is proved. The geometric error formula is proved; an analytic limit theorem is deferred. Real arithmetic does not establish floating-point behavior. The monitor boundary covers the defined operation, not arbitrary programs.
+No physical law, detector superiority, warning-period formula, calibration, empirical performance or runtime refinement is proved. The geometric error formula and analytic convergence for 0 ≤ λ < 1 are proved. Real arithmetic does not establish floating-point behavior. The monitor boundary covers the defined operation, not arbitrary programs.
 The recorded WNS EFMW v0.2 pilot failed its validation gate; its holdout stayed sealed. These proofs do not change that result.
 This branch is stacked on integrated formal closure commit 44bbfd1af4c687e5f9780f5247051a11e24a5d6e.

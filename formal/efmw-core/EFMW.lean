@@ -71,6 +71,30 @@ theorem constant_distance (weight initial r : ℝ) (n : ℕ) (h0 : 0 ≤ weight)
     |track weight initial (fun _ => r) n - r| = weight ^ n * |initial - r| := by
   rw [constant_error, abs_mul, abs_of_nonneg (pow_nonneg h0 n)]
 
+
+theorem constant_converges (weight initial r : ℝ)
+    (h0 : 0 ≤ weight) (h1 : weight < 1) :
+    Filter.Tendsto (track weight initial (fun _ => r)) Filter.atTop (nhds r) := by
+  have formula : track weight initial (fun _ => r) =
+      (fun n => weight^n * (initial-r) + r) := by
+    funext n
+    have h := constant_error weight initial r n
+    linarith
+  rw [formula]
+  simpa using ((tendsto_pow_atTop_nhds_zero_of_lt_one h0 h1).mul_const
+    (initial-r)).add_const r
+
+theorem initial_difference_converges (weight a b : ℝ) (r : ℕ → ℝ)
+    (h0 : 0 ≤ weight) (h1 : weight < 1) :
+    Filter.Tendsto (fun n => track weight a r n-track weight b r n)
+      Filter.atTop (nhds 0) := by
+  have formula : (fun n => track weight a r n-track weight b r n) =
+      (fun n => weight^n * (a-b)) := by
+    funext n
+    exact initial_difference weight a b r n
+  rw [formula]
+  simpa using (tendsto_pow_atTop_nhds_zero_of_lt_one h0 h1).mul_const (a-b)
+
 /-- A finite-horizon disturbance bound; both streams may vary arbitrarily. -/
 theorem disturbance_bound (weight a b D E : ℝ) (r s : ℕ → ℝ)
     (h0 : 0 ≤ weight) (h1 : weight ≤ 1) (hi : |a-b| ≤ D)

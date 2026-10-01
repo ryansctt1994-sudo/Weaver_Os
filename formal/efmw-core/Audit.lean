@@ -9,6 +9,8 @@ import EFMW
 #print axioms WNSKernel.EFMW.initial_distance
 #print axioms WNSKernel.EFMW.constant_error
 #print axioms WNSKernel.EFMW.constant_distance
+#print axioms WNSKernel.EFMW.constant_converges
+#print axioms WNSKernel.EFMW.initial_difference_converges
 #print axioms WNSKernel.EFMW.disturbance_bound
 #print axioms WNSKernel.EFMW.monitor_preserves_protected
 #print axioms WNSKernel.EFMW.monitor_preserves_grants
