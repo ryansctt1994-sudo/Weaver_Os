@@ -63,6 +63,20 @@ python -m pip install -e ".[dev]"
 pytest -q
 ```
 
+## Short witness demonstration
+
+After installation, run:
+
+```sh
+python -m tools.reproduce_witness --operator YOUR_IDENTITY --output ../witness-result
+```
+
+This checks authorized acceptance, unauthorized rejection with unchanged state,
+fresh-process replay, and tamper rejection. It preserves a timed outcome and raw
+runner logs. See the [independent reproduction runbook](docs/releases/independent-reproduction.md)
+for the sealed target, operator signing, and review procedure. The output directory
+must be new. An author-side or CI run does not establish witness independence.
+
 ## Build
 
 ```bash

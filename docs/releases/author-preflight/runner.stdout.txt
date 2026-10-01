@@ -1,0 +1,10 @@
+{
+  "schema": "weaver-bound-witness-run-1",
+  "archive_sha256": "9d77db86e83482ee208c645c7db48ae43daf592f147e28b9d6fc5d3a3237d6f0",
+  "manifest_sha256": "1f955409e8c8882d6a6c4909a1e22c07d72b3bfe025c178d0caf84cac902c0bf",
+  "public_key_sha256": "5ac8e9d25de8d37cd9165d4a7458c34634aeded53c1709573ddf4cc122bcefb9",
+  "returncode": 0,
+  "stdout": "AUTHORIZED...............PASS\nUNAUTHORIZED.............PASS\nSTATE PRESERVED..........PASS\nREPLAY REJECTED..........PASS\nFRESH REPLAY.............PASS\nRECEIPT BASELINE.........PASS\nRECEIPT TAMPER...........PASS\nCHRONICLE TAMPER.........PASS\nIDENTITY SWAP............PASS\n\nWITNESS: PASS\nFINAL_STATE_HASH: 55459e863d1c8fcdaff7ac18549f96db4495ea3a74c4d659e410cd554d65ff43\nCHRONICLE_HEAD: 70df017aa8a910c4c3c2969548b3c36ee6bd76a0c2d26697bb384aba1138613e\n",
+  "stderr": "",
+  "timed_out": false
+}
