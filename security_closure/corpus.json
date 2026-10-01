@@ -1,0 +1,13 @@
+[
+ {"id":"valid","expected":"ACCEPT"},
+ {"id":"forged_grant","expected":"REJECT"},
+ {"id":"revoked_parent","expected":"REJECT"},
+ {"id":"poisoned_memory","expected":"REJECT"},
+ {"id":"request_substitution","expected":"REJECT"},
+ {"id":"stolen_token","expected":"REJECT"},
+ {"id":"expired_approval","expected":"REJECT"},
+ {"id":"restart_replay","expected":"REJECT"},
+ {"id":"scope_escalation","expected":"REJECT"},
+ {"id":"crash_before_commit","expected":"ACCEPT"},
+ {"id":"crash_after_commit","expected":"REJECT"}
+]
