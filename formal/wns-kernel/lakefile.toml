@@ -1,6 +1,9 @@
 name = "wns-kernel"
 version = "0.1.0"
-defaultTargets = ["WNSKernel"]
+defaultTargets = ["WNSKernel", "Dragon64"]
 
 [[lean_lib]]
 name = "WNSKernel"
+
+[[lean_lib]]
+name = "Dragon64"
