@@ -62,12 +62,12 @@ def step (apply : P → Nat → P) (roots : List Nat) (s : State P)
   (⟨after, s.grants, s.history ++ [r]⟩, r)
 
 theorem rejection_preserves (h : ¬ Eligible roots s p g now) :
-    (step apply roots s p g now).1.protectedState = s.protectedStateState := by
+    (step apply roots s p g now).1.protectedState = s.protectedState := by
   simp [step, h]
 
 theorem rejected_verdict_preserves
     (h : (step apply roots s p g now).2.verdict = .reject) :
-    (step apply roots s p g now).1.protectedState = s.protectedStateState := by
+    (step apply roots s p g now).1.protectedState = s.protectedState := by
   by_cases eligible : Eligible roots s p g now
   · simp [step, eligible] at h
   · exact rejection_preserves eligible
@@ -82,11 +82,11 @@ theorem accepted_requires_eligibility
 theorem grants_preserved : (step apply roots s p g now).1.grants = s.grants := by
   rfl
 
-theorem receipt_binds_before : (step apply roots s p g now).2.before = s.protectedStateState := by
+theorem receipt_binds_before : (step apply roots s p g now).2.before = s.protectedState := by
   rfl
 
 theorem receipt_binds_after :
-    (step apply roots s p g now).2.after = (step apply roots s p g now).1.protectedStateState := by
+    (step apply roots s p g now).2.after = (step apply roots s p g now).1.protectedState := by
   rfl
 
 theorem receipt_binds_action : (step apply roots s p g now).2.action = p.action := by
