@@ -45,3 +45,22 @@ import WNSKernel
 #print axioms WNSKernel.commons_route_without_authority
 #print axioms WNSKernel.copied_state_requires_regrant
 #print axioms WNSKernel.evidence_without_grant_denied
+
+#print axioms WNSKernel.Portfolio.changed_dependency_not_current
+#print axioms WNSKernel.Portfolio.matching_dependencies_current
+#print axioms WNSKernel.Portfolio.unresolved_failure_denies
+#print axioms WNSKernel.Portfolio.recorded_failure_denies
+#print axioms WNSKernel.Portfolio.correction_preserves_history
+#print axioms WNSKernel.Portfolio.recording_preserves_history
+#print axioms WNSKernel.Portfolio.recorded_failure_survives_correction
+#print axioms WNSKernel.Portfolio.empty_chain_denies
+#print axioms WNSKernel.Portfolio.revoked_node_not_live
+#print axioms WNSKernel.Portfolio.absent_node_not_live
+#print axioms WNSKernel.Portfolio.expired_node_not_live
+#print axioms WNSKernel.Portfolio.invalid_parent_chain_denies
+#print axioms WNSKernel.Portfolio.live_head_required
+#print axioms WNSKernel.Portfolio.chain_has_trusted_root
+#print axioms WNSKernel.Portfolio.preconditions_false_denies
+#print axioms WNSKernel.Portfolio.stale_dependency_preserves
+#print axioms WNSKernel.Portfolio.failed_insight_preserves
+#print axioms WNSKernel.Portfolio.invalid_chain_preserves
