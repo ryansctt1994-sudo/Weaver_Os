@@ -1,0 +1,24 @@
+name: EFMW Residual Core
+on:
+  pull_request:
+    branches: [main, codex/integrated-formal-closure]
+jobs:
+  efmw:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: leanprover/lean-action@v1
+        with:
+          lake-package-directory: formal/efmw-core
+          use-mathlib-cache: true
+      - name: Audit proof dependencies
+        working-directory: formal/efmw-core
+        run: |
+          set -o pipefail
+          lake env lean Audit.lean 2>&1 | tee axioms.log
+          if grep -E 'sorryAx|^axiom ' axioms.log; then exit 1; fi
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: efmw-proof-evidence
+          path: formal/efmw-core/axioms.log
