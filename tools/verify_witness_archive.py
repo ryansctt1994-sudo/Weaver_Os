@@ -3,6 +3,7 @@
 import argparse
 import base64
 import hashlib
+import io
 import json
 import re
 import stat
@@ -16,7 +17,8 @@ def verify_archive(archive: Path, expected_fingerprint: str) -> dict[str, str]:
     if not re.fullmatch(r"[0-9a-f]{64}", expected_fingerprint):
         raise ValueError("expected fingerprint must be 64 lowercase hex characters")
 
-    with zipfile.ZipFile(archive) as bundle:
+    raw = archive.read_bytes()
+    with zipfile.ZipFile(io.BytesIO(raw)) as bundle:
         names = bundle.namelist()
         if len(names) != len(set(names)):
             raise ValueError("duplicate ZIP entry")
@@ -61,7 +63,7 @@ def verify_archive(archive: Path, expected_fingerprint: str) -> dict[str, str]:
                 raise ValueError(f"payload hash mismatch: {name}")
 
     return {
-        "archive_sha256": hashlib.sha256(archive.read_bytes()).hexdigest(),
+        "archive_sha256": hashlib.sha256(raw).hexdigest(),
         "manifest_sha256": hashlib.sha256(manifest_bytes).hexdigest(),
         "public_key_sha256": fingerprint,
     }

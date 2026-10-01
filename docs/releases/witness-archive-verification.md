@@ -9,3 +9,5 @@ python tools/verify_witness_archive.py \
 ```
 
 The pinned fingerprint prevents an archive replacement that includes a newly generated key and matching signature from passing this check. A reviewer seeking publisher authentication must obtain the fingerprint from an independently trusted channel; the repository and its CI are controlled by the same publisher. Neither this check nor a passing CI run is an independent operator receipt. The witnessed claim remains the narrow constructed command scenario described in the RC1 README.
+
+The verifier reads the archive once and parses, verifies, and hashes that byte snapshot. Tests cover replacement at capture and replacement after capture. Its result describes the captured archive, not later contents at the same path. Extraction and execution performed afterwards must use that verified artifact; this read-only verifier does not make a separate extraction step atomic.
