@@ -31,7 +31,7 @@ theorem checker_complete (n : Nat) (path : List Nat) (h : Valid n path) :
     check n path = true := by simp [check,h]
 
 theorem invalid_preserves (n : Nat) (old candidate : List Nat)
-    (seal : Bool) (h : ¬ Valid n candidate) : commit n old candidate seal = old := by
+    (sealOk : Bool) (h : ¬ Valid n candidate) : commit n old candidate sealOk = old := by
   simp [commit,check,h]
 
 theorem invalid_seal_preserves (n : Nat) (old candidate : List Nat) :
