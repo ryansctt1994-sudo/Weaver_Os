@@ -3,7 +3,7 @@ on:
   push:
     branches: [main]
   pull_request:
-    branches: [main]
+    branches: [main, codex/wns-formal-kernel]
 jobs:
   lean:
     runs-on: ubuntu-latest
@@ -21,7 +21,8 @@ jobs:
           lean --version
           lake build 2>&1 | tee build.log
           lake env lean Audit.lean 2>&1 | tee axioms.log
-          if grep -E 'sorryAx|^axiom ' axioms.log; then exit 1; fi
+          lake env lean DragonAudit.lean 2>&1 | tee dragon-axioms.log
+          if grep -E 'sorryAx|^axiom ' axioms.log dragon-axioms.log; then exit 1; fi
       - name: Preserve formal logs
         if: always()
         uses: actions/upload-artifact@v4
@@ -30,3 +31,4 @@ jobs:
           path: |
             formal/wns-kernel/build.log
             formal/wns-kernel/axioms.log
+            formal/wns-kernel/dragon-axioms.log
