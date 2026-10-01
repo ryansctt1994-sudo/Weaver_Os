@@ -73,3 +73,27 @@ import WNSKernel
 #print axioms WNSKernel.Portfolio.accepted_requires_insight
 #print axioms WNSKernel.Portfolio.accepted_requires_current_dependencies
 #print axioms WNSKernel.Portfolio.accepted_has_trusted_origin
+
+#print axioms WNSKernel.Durable.ineligible_preserves
+#print axioms WNSKernel.Durable.substitution_denies
+#print axioms WNSKernel.Durable.spent_denies
+#print axioms WNSKernel.Durable.accepted_request_bound
+#print axioms WNSKernel.Durable.eligible_consumes_approval
+#print axioms WNSKernel.Durable.spent_preserved
+#print axioms WNSKernel.Durable.retry_no_second_effect
+#print axioms WNSKernel.Durable.effect_receipt_consistency
+#print axioms WNSKernel.Durable.approvals_preserved
+#print axioms WNSKernel.Durable.recovery_atomic_cases
+#print axioms WNSKernel.Durable.postcommit_retry_preserves
+#print axioms WNSKernel.Durable.run_preserves_spent
+#print axioms WNSKernel.Durable.historical_replay_denies
+#print axioms WNSKernel.Durable.positive_commit_example
+#print axioms WNSKernel.Durable.changed_parameters_example
+
+#print axioms WNSKernel.Drift.transitive_changed_source_denies
+#print axioms WNSKernel.Drift.two_edge_drift
+#print axioms WNSKernel.Drift.closed_stale_set_propagates
+#print axioms WNSKernel.Drift.expansion_preserves_stale
+#print axioms WNSKernel.Drift.propagation_preserves_stale
+#print axioms WNSKernel.Drift.two_hop_executable_example
+#print axioms WNSKernel.Drift.insufficient_fuel_counterexample
