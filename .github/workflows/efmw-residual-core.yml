@@ -7,18 +7,25 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
-      - uses: leanprover/lean-action@v1
-        with:
-          lake-package-directory: formal/efmw-core
-          use-mathlib-cache: true
-      - name: Audit proof dependencies
+      - name: Install pinned Lean
+        run: |
+          curl -fL --retry 3 https://github.com/leanprover/lean4/releases/download/v4.19.0/lean-4.19.0-linux.tar.zst -o /tmp/lean.tar.zst
+          tar --zstd -xf /tmp/lean.tar.zst -C /tmp
+          echo /tmp/lean-4.19.0-linux/bin >> "$GITHUB_PATH"
+      - name: Resolve dependencies and build proofs
         working-directory: formal/efmw-core
         run: |
           set -o pipefail
+          lean --version
+          lake update 2>&1 | tee dependencies.log
+          lake exe cache get 2>&1 | tee cache.log
+          lake build 2>&1 | tee build.log
           lake env lean Audit.lean 2>&1 | tee axioms.log
           if grep -E 'sorryAx|^axiom ' axioms.log; then exit 1; fi
       - uses: actions/upload-artifact@v4
         if: always()
         with:
           name: efmw-proof-evidence
-          path: formal/efmw-core/axioms.log
+          path: |
+            formal/efmw-core/*.log
+            formal/efmw-core/lake-manifest.json
