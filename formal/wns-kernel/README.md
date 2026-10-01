@@ -34,3 +34,25 @@ Build status must come from successful pinned compilation and axiom audit logs.
 No `sorry`, custom axiom, or `native_decide` is used. Standard Lean logical axioms
 may appear in the audit. Passing author-controlled CI remains project-side evidence.
 Runtime refinement and independent reproduction are separate work.
+
+## Temporal extension
+
+Execution runs preserve existing receipt membership and stored grants. Exact grant
+removal denies that grant through subsequent modeled executions. Minting, concurrent
+revocation propagation, equivalent replacement grants, and runtime races are outside
+this result. Copy/seam resets create a new history context; the preservation theorem
+does not cover seams or arbitrary administrative edits.
+
+Bounded delegation constrains scope, time window, budget, remaining depth, and issuer
+linkage. The lineage predicate requires a trusted origin. These are admission
+conditions, not proof of signed minting, live ancestor revocation, or budget spending.
+
+NEXUS-style invalidation covers recorded direct dependencies; unrecorded or transitive
+dependencies need an explicit expansion policy. A changed recorded source sets currency
+false and prevents the corresponding protected transition.
+
+Receipt replay checks before-state continuity and verdict-dependent after-state
+consistency. Valid modeled chains reconstruct their final state, and each kernel
+step emits a consistent replayable receipt. This does not authenticate receipts,
+prove eligibility from receipt fields, or establish history completeness. The receipts
+lack grants/evidence, so receipt replay is a consistency check, not authorization.
