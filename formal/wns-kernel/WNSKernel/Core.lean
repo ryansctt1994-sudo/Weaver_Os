@@ -30,9 +30,13 @@ structure Receipt (Protected : Type) where
   after : Protected
 
 structure State (Protected : Type) where
-  protected : Protected
+  protectedState : Protected
   grants : List Grant
   history : List (Receipt Protected)
+
+variable {P : Type} {g child parent : Grant} {roots : List Nat}
+  {s : State P} {p : Proposal} {now action : Nat} {r : Receipt P}
+  {apply : P → Nat → P} {ps xs ys : List Proposal}
 
 def Grant.valid (roots : List Nat) (g : Grant) (p : Proposal) (now : Nat) : Prop :=
   g.issuer ∈ roots ∧ g.subject = p.actor ∧ p.action ∈ g.scope ∧
@@ -52,18 +56,18 @@ instance (roots : List Nat) (s : State P) (p : Proposal) (g : Grant) (now : Nat)
 def step (apply : P → Nat → P) (roots : List Nat) (s : State P)
     (p : Proposal) (g : Grant) (now : Nat) : State P × Receipt P :=
   let accepted := decide (Eligible roots s p g now)
-  let after := if accepted then apply s.protected p.action else s.protected
+  let after := if accepted then apply s.protectedState p.action else s.protectedState
   let r : Receipt P := ⟨p.actor, p.action,
-    if accepted then .accept else .reject, s.protected, after⟩
+    if accepted then .accept else .reject, s.protectedState, after⟩
   (⟨after, s.grants, s.history ++ [r]⟩, r)
 
 theorem rejection_preserves (h : ¬ Eligible roots s p g now) :
-    (step apply roots s p g now).1.protected = s.protected := by
+    (step apply roots s p g now).1.protectedState = s.protectedStateState := by
   simp [step, h]
 
 theorem rejected_verdict_preserves
     (h : (step apply roots s p g now).2.verdict = .reject) :
-    (step apply roots s p g now).1.protected = s.protected := by
+    (step apply roots s p g now).1.protectedState = s.protectedStateState := by
   by_cases eligible : Eligible roots s p g now
   · simp [step, eligible] at h
   · exact rejection_preserves eligible
@@ -78,11 +82,11 @@ theorem accepted_requires_eligibility
 theorem grants_preserved : (step apply roots s p g now).1.grants = s.grants := by
   rfl
 
-theorem receipt_binds_before : (step apply roots s p g now).2.before = s.protected := by
+theorem receipt_binds_before : (step apply roots s p g now).2.before = s.protectedStateState := by
   rfl
 
 theorem receipt_binds_after :
-    (step apply roots s p g now).2.after = (step apply roots s p g now).1.protected := by
+    (step apply roots s p g now).2.after = (step apply roots s p g now).1.protectedStateState := by
   rfl
 
 theorem receipt_binds_action : (step apply roots s p g now).2.action = p.action := by
@@ -124,7 +128,7 @@ theorem delegated_scope_no_growth (h : Attenuates child parent)
     (a : action ∈ child.scope) : action ∈ parent.scope := h action a
 
 /-- A seam preserves protected data but starts a new authority and audit context. -/
-def seam (s : State P) : State P := ⟨s.protected, [], []⟩
+def seam (s : State P) : State P := ⟨s.protectedState, [], []⟩
 
 theorem seam_has_no_authority : (seam s).grants = [] := rfl
 

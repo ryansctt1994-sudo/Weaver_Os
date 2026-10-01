@@ -9,11 +9,11 @@ def initial : State Nat := ⟨0, [rootGrant], []⟩
 def increment (n _action : Nat) := n + 1
 
 theorem weaver_accepts :
-    (step increment [0] initial good rootGrant 1).1.protected = 1 := by
+    (step increment [0] initial good rootGrant 1).1.protectedState = 1 := by
   decide
 
 theorem weaver_rejects_self_proposal :
-    (step increment [0] initial selfProposal rootGrant 1).1.protected = 0 := by
+    (step increment [0] initial selfProposal rootGrant 1).1.protectedState = 0 := by
   decide
 
 /-- A routing edge is separate from the grant store. -/
@@ -25,7 +25,7 @@ theorem commons_route_without_authority :
   decide
 
 theorem copied_state_requires_regrant :
-    (step increment [0] (seam initial) good rootGrant 1).1.protected = 0 := by
+    (step increment [0] (seam initial) good rootGrant 1).1.protectedState = 0 := by
   decide
 
 theorem evidence_without_grant_denied :
