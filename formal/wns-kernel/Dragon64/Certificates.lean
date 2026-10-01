@@ -477,19 +477,23 @@ theorem pair_partition_covers (p : Nat) (h : p ∈ List.range 4096) :
   exact (sortFuel_mem 13 pairPartition.flatten p).mp h
 
 def generatorClosureCheck (g : Nat) : Bool :=
-  sl2.all (fun m => sl2.contains (multiply g m))
+  sl2.all (fun m => decide (multiply g m < 4096) && determinantOne (multiply g m))
 theorem s_closure_checked : generatorClosureCheck generatorS = true := by decide
 theorem t_closure_checked : generatorClosureCheck generatorT = true := by decide
 
 theorem s_preserves_enumeration (m : Nat) (h : m ∈ sl2) :
     multiply generatorS m ∈ sl2 := by
   have hc := (List.all_eq_true.mp s_closure_checked) m h
-  simpa using hc
+  have hb : multiply generatorS m < 4096 ∧ determinantOne (multiply generatorS m) = true := by
+    simpa [generatorClosureCheck] using hc
+  simpa [sl2] using hb
 
 theorem t_preserves_enumeration (m : Nat) (h : m ∈ sl2) :
     multiply generatorT m ∈ sl2 := by
   have hc := (List.all_eq_true.mp t_closure_checked) m h
-  simpa using hc
+  have hb : multiply generatorT m < 4096 ∧ determinantOne (multiply generatorT m) = true := by
+    simpa [generatorClosureCheck] using hc
+  simpa [sl2] using hb
 
 theorem word_in_enumeration (w : List Bool) : wordMatrix w ∈ sl2 := by
   induction w with
@@ -508,7 +512,8 @@ theorem generated_iff_enumerated (m : Nat) :
 
 /-- Each partition block is stable under both generating permutations. -/
 def partitionStable (g : Nat) : Bool :=
-  pairPartition.all (fun block => block.all (fun p => block.contains (pairAct g p)))
+  pairPartition.all (fun block =>
+    sortFuel 9 (block.map (pairAct g)) == sortFuel 9 block)
 theorem pair_partition_s_stable : partitionStable generatorS = true := by decide
 theorem pair_partition_t_stable : partitionStable generatorT = true := by decide
 
