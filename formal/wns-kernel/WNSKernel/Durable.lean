@@ -44,8 +44,7 @@ instance (s : DurableState) (a : Approval) (q : Request) (principal now : Nat)
 def commit (s : DurableState) (a : Approval) (q : Request) (principal now : Nat)
     (trustedPolicy : Bool) : DurableState :=
   if Eligible s a q principal now trustedPolicy then
-    { s with spent := s.spent ++ [a.id], effects := s.effects ++ [⟨a.id, q⟩],
-      receipts := s.receipts ++ [⟨a.id, q⟩] }
+    { s with spent := s.spent ++ [a.id], effects := s.effects ++ [⟨a.id, q⟩], receipts := s.receipts ++ [⟨a.id, q⟩] }
   else s
 
 theorem ineligible_preserves (s : DurableState) (a : Approval) (q : Request)
