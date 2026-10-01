@@ -16,27 +16,29 @@ Cognition may propose, but it cannot authorize itself. Weaver OS turns authority
 
 This repo currently contains:
 
-```text
-triadic_controls/
-  crypto/
-    replay.py          # Replay-cache protocol and in-memory implementation
-    verifier.py        # Authority/refusal signature verifier
-  schemas/
-    issuer_record.schema.json
-    key_registry.schema.json
-    role_policy.schema.json
-    signature_envelope.schema.json
-    verification_result.schema.json
+| Module or directory | Purpose |
+| --- | --- |
+| `triadic_controls/` | Signature verification, replay cache, and authority schemas |
+| `src/weaver_release_guard/` | Release provenance CLI, OIDC verification, and utilities |
+| `canonical/` | Canonical serialization |
+| `chronicle/` | Hash-chained event history |
+| `chronicle-raft/` | Go HTTP attestation snippet |
+| `compression/` | Residual monitoring |
+| `kernel/` | Deterministic state reduction |
+| `policy/` | Policy gate and signed-verifier adapter |
+| `receipt/` | Receipt construction and verification |
+| `weaver_auth/` | Identity resolution and bedrock admission/pathology checks |
+| `witness_py/` | Attestation signing helper |
+| `tools/` | Archive and ledger verification, verified witness runner, mutation checks, and MathOS benchmark |
+| `demo/` | Demonstration inputs and execution scripts |
+| `operator-kit/` | Operator runbook and receipt tooling |
+| `schemas/` | Shared artifact schemas |
+| `tests/` | Verification, policy, replay, and release tests |
 
-src/weaver_release_guard/
-  cli.py               # CLI entry point
-  provenance.py        # Release provenance generation and verification
-  oidc.py              # Optional OIDC token verification
-  utils.py             # Shared hashing, JSON, and encoding helpers
-
-tests/
-  triadic_controls/    # Crypto verifier and schema-alignment tests
-```
+Root scripts include `inject_ledger.py` and `verify_attestations.py`. Default
+`pytest -q` also collects the admission and pathology tests in
+`weaver_auth/bedrock/tests/`. These components have different validation scopes;
+being listed here does not imply certification or deployment authority.
 
 ## Repository Policy
 

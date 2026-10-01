@@ -32,7 +32,7 @@ include = ["triadic_controls*", "weaver_release_guard*"]
 triadic_controls = ["schemas/*.json"]
 
 [tool.pytest.ini_options]
-testpaths = ["tests"]
+testpaths = ["tests", "weaver_auth/bedrock/tests"]
 pythonpath = [".", "src"]
 
 [tool.ruff]
