@@ -31,3 +31,8 @@ import Dragon64
 #print axioms Dragon64.generated_iff_enumerated
 #print axioms Dragon64.pair_partition_s_stable
 #print axioms Dragon64.pair_partition_t_stable
+
+#print axioms Dragon64.mergeFuel_mem
+#print axioms Dragon64.sortFuel_mem
+#print axioms Dragon64.pair_partition_total_size
+#print axioms Dragon64.pair_partition_covers

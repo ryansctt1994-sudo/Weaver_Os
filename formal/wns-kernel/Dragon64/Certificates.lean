@@ -439,10 +439,42 @@ def sortFuel : Nat → List Nat → List Nat
       let n := xs.length / 2
       mergeFuel xs.length (sortFuel fuel (xs.take n)) (sortFuel fuel (xs.drop n))
 
+theorem mergeFuel_mem (fuel : Nat) (xs ys : List Nat) (p : Nat) :
+    p ∈ mergeFuel fuel xs ys ↔ p ∈ xs ++ ys := by
+  induction fuel generalizing xs ys with
+  | zero => rfl
+  | succ fuel ih =>
+    cases xs with
+    | nil => simp [mergeFuel]
+    | cons x xs =>
+      cases ys with
+      | nil => simp [mergeFuel]
+      | cons y ys =>
+        simp only [mergeFuel]
+        split <;> simp [ih, or_assoc, or_comm, or_left_comm]
+
+theorem sortFuel_mem (fuel : Nat) (xs : List Nat) (p : Nat) :
+    p ∈ sortFuel fuel xs ↔ p ∈ xs := by
+  induction fuel generalizing xs with
+  | zero => rfl
+  | succ fuel ih =>
+    simp only [sortFuel]
+    split
+    · rfl
+    · simp only [mergeFuel_mem, List.mem_append, ih]
+      rw [← List.mem_append, List.take_append_drop]
+
 /-- Sorted equality establishes coverage and multiplicity one simultaneously. -/
 theorem pair_partition_exact :
     sortFuel 13 pairPartition.flatten = List.range 4096 := by decide
 
+
+theorem pair_partition_total_size : pairPartition.flatten.length = 4096 := by decide
+
+theorem pair_partition_covers (p : Nat) (h : p ∈ List.range 4096) :
+    p ∈ pairPartition.flatten := by
+  rw [← pair_partition_exact] at h
+  exact (sortFuel_mem 13 pairPartition.flatten p).mp h
 
 def generatorClosureCheck (g : Nat) : Bool :=
   sl2.all (fun m => sl2.contains (multiply g m))
