@@ -15,3 +15,10 @@ import Dragon64
 #print axioms Dragon64.point_partition_no_overlap
 #print axioms Dragon64.fixed_pair_sum_exact
 #print axioms Dragon64.burnside_quotient_arithmetic
+
+#print axioms Dragon64.generator_words_complete
+#print axioms Dragon64.every_enumerated_matrix_generated
+#print axioms Dragon64.s_composition_checked
+#print axioms Dragon64.t_composition_checked
+#print axioms Dragon64.pair_representatives_count
+#print axioms Dragon64.pair_partition_exact
