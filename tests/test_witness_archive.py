@@ -6,6 +6,7 @@ import zipfile
 from pathlib import Path
 
 import pytest
+from cryptography.exceptions import InvalidSignature
 from cryptography.hazmat.primitives.asymmetric.ed25519 import Ed25519PrivateKey
 from cryptography.hazmat.primitives.serialization import Encoding, PublicFormat
 
@@ -36,6 +37,14 @@ def test_original_passes():
 def test_payload_mutation_is_rejected(tmp_path):
     archive = rewrite(tmp_path, lambda files: files.__setitem__("src/weaver_core.py", b"changed"))
     with pytest.raises(ValueError, match="payload hash mismatch"):
+        verify_archive(archive, EXPECTED)
+
+
+def test_invalid_signature_is_rejected(tmp_path):
+    archive = rewrite(
+        tmp_path, lambda files: files.__setitem__("MANIFEST.sig", base64.b64encode(b"\0" * 64))
+    )
+    with pytest.raises(InvalidSignature):
         verify_archive(archive, EXPECTED)
 
 

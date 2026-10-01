@@ -13,11 +13,10 @@ from pathlib import Path, PurePosixPath
 from cryptography.hazmat.primitives.asymmetric.ed25519 import Ed25519PublicKey
 
 
-def verify_archive(archive: Path, expected_fingerprint: str) -> dict[str, str]:
+def verify_archive_bytes(raw: bytes, expected_fingerprint: str) -> dict[str, str]:
     if not re.fullmatch(r"[0-9a-f]{64}", expected_fingerprint):
         raise ValueError("expected fingerprint must be 64 lowercase hex characters")
 
-    raw = archive.read_bytes()
     with zipfile.ZipFile(io.BytesIO(raw)) as bundle:
         names = bundle.namelist()
         if len(names) != len(set(names)):
@@ -67,6 +66,10 @@ def verify_archive(archive: Path, expected_fingerprint: str) -> dict[str, str]:
         "manifest_sha256": hashlib.sha256(manifest_bytes).hexdigest(),
         "public_key_sha256": fingerprint,
     }
+
+
+def verify_archive(archive: Path, expected_fingerprint: str) -> dict[str, str]:
+    return verify_archive_bytes(archive.read_bytes(), expected_fingerprint)
 
 
 def main() -> None:
