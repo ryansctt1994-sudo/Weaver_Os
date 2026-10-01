@@ -1,0 +1,12 @@
+{
+  "files": {
+    "OPERATOR_RECEIPT_TEMPLATE.md": "c5198749315397d15c1a539802568396f17b8db4a60c4f131b8f6dfd9ebbd48c",
+    "README.md": "d6f4e6d4432942ac8370db80ed3e75c78ae9bb101088fb4e8ba79135bec35eed",
+    "src/fresh_replay.py": "1d16b83c5fec423ebab474ca04110acbe5974ac763774d32b827d47c1f9f3eb9",
+    "src/weaver_core.py": "e6b713a7c138d369c59652493448e96ff93dfc4d37bce2cb49e912960608992c",
+    "src/witness.py": "75745fec81b1e4a0956c7c987aaca83f587fd4959f4383133200c126e56e25e6",
+    "tools/verify_release.py": "7515d3bea460b63f722f995b997c1314b768e320ff4578e32f7050a4c1a7960e"
+  },
+  "schema": "weaver-witness-release-1",
+  "source_archive_sha256": "948f8dbfa8453f792b5dc908ebdf241adab3f8bf870b83c62b2b625ae15f1665"
+}
