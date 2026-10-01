@@ -58,9 +58,14 @@ import WNSKernel
 #print axioms WNSKernel.Portfolio.absent_node_not_live
 #print axioms WNSKernel.Portfolio.expired_node_not_live
 #print axioms WNSKernel.Portfolio.invalid_parent_chain_denies
+#print axioms WNSKernel.Portfolio.both_true
 #print axioms WNSKernel.Portfolio.live_head_required
 #print axioms WNSKernel.Portfolio.chain_has_trusted_root
 #print axioms WNSKernel.Portfolio.preconditions_false_denies
 #print axioms WNSKernel.Portfolio.stale_dependency_preserves
 #print axioms WNSKernel.Portfolio.failed_insight_preserves
 #print axioms WNSKernel.Portfolio.invalid_chain_preserves
+#print axioms WNSKernel.Portfolio.every_chain_node_live
+#print axioms WNSKernel.Portfolio.revoked_ancestor_denies
+#print axioms WNSKernel.Portfolio.delegated_acceptance_example
+#print axioms WNSKernel.Portfolio.failure_rejection_example

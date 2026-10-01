@@ -43,12 +43,10 @@ def insightEligible (i : Insight) : Bool :=
     decide (i.unresolved = [])
 
 def recordFailure (i : Insight) (id : Nat) : Insight :=
-  { i with unresolved := id :: i.unresolved,
-    history := i.history ++ [⟨id, false⟩] }
+  { i with unresolved := id :: i.unresolved, history := i.history ++ [⟨id, false⟩] }
 
 def correctFailure (i : Insight) (id : Nat) : Insight :=
-  { i with unresolved := i.unresolved.filter (fun n => n != id),
-    history := i.history ++ [⟨id, true⟩] }
+  { i with unresolved := i.unresolved.filter (fun n => n != id), history := i.history ++ [⟨id, true⟩] }
 
 theorem unresolved_failure_denies (i : Insight) (id : Nat) (h : id ∈ i.unresolved) :
     insightEligible i = false := by
@@ -115,12 +113,15 @@ theorem invalid_parent_chain_denies (roots : List Nat) (store : List Grant) (now
     chainValid roots store now (child :: parent :: rest) = false := by
   simp [chainValid, h]
 
+theorem both_true (a b : Bool) : (a && b) = true ↔ a = true ∧ b = true := by
+  cases a <;> cases b <;> decide
+
 theorem live_head_required (roots : List Nat) (store : List Grant) (now : Nat)
     (g : BoundedGrant) (rest : List BoundedGrant)
     (h : chainValid roots store now (g :: rest) = true) : live store now g = true := by
   cases rest with
-  | nil => exact (Bool.and_eq_true.mp h).1
-  | cons parent tail => exact (Bool.and_eq_true.mp (Bool.and_eq_true.mp h).1).1
+  | nil => exact ((both_true _ _).mp h).1
+  | cons parent tail => exact ((both_true _ _).mp ((both_true _ _).mp h).1).1
 
 theorem chain_has_trusted_root (roots : List Nat) (store : List Grant) (now : Nat)
     (chain : List BoundedGrant) (h : chainValid roots store now chain = true) :
@@ -130,18 +131,17 @@ theorem chain_has_trusted_root (roots : List Nat) (store : List Grant) (now : Na
   | cons g rest ih =>
     cases rest with
     | nil =>
-      have hr := (Bool.and_eq_true.mp h).2
+      have hr := ((both_true _ _).mp h).2
       exact ⟨g, by simp, by simpa using hr⟩
     | cons parent tail =>
-      have hp := (Bool.and_eq_true.mp h).2
+      have hp := ((both_true _ _).mp h).2
       obtain ⟨origin, member, trusted⟩ := ih hp
       exact ⟨origin, List.mem_cons.mpr (Or.inr member), trusted⟩
 
 def governedProposal (p : Proposal) (ds : List Dependency) (revision : Nat → Nat)
     (i : Insight) (roots : List Nat) (store : List Grant) (now : Nat)
     (g : BoundedGrant) (ancestors : List BoundedGrant) : Proposal :=
-  { p with sourceCurrent := p.sourceCurrent && current ds revision,
-    preconditions := p.preconditions && insightEligible i &&
+  { p with sourceCurrent := p.sourceCurrent && current ds revision, preconditions := p.preconditions && insightEligible i &&
       chainValid roots store now (g :: ancestors) }
 
 /-- The chain supplies root provenance; the core checks the selected leaf's actor and scope.
@@ -188,5 +188,43 @@ theorem invalid_chain_preserves {P : Type} (apply : P → Nat → P)
   apply rejection_preserves
   apply preconditions_false_denies
   simp [governedProposal, invalid]
+
+theorem every_chain_node_live (roots : List Nat) (store : List Grant) (now : Nat)
+    (chain : List BoundedGrant) (valid : chainValid roots store now chain = true)
+    (node : BoundedGrant) (member : node ∈ chain) : live store now node = true := by
+  induction chain with
+  | nil => simp at member
+  | cons head rest ih =>
+    rcases List.mem_cons.mp member with same | tailMember
+    · subst node
+      exact live_head_required roots store now head rest valid
+    · cases rest with
+      | nil => simp at tailMember
+      | cons parent tail =>
+        exact ih ((both_true _ _).mp valid).2 tailMember
+
+theorem revoked_ancestor_denies (roots : List Nat) (store : List Grant) (now : Nat)
+    (chain : List BoundedGrant) (node : BoundedGrant) (member : node ∈ chain)
+    (revoked : node.grant.revoked = true) : chainValid roots store now chain = false := by
+  cases h : chainValid roots store now chain with
+  | false => rfl
+  | true =>
+    have hl := every_chain_node_live roots store now chain h node member
+    rw [revoked_node_not_live store now node revoked] at hl
+    contradiction
+
+def demoRoot : BoundedGrant := ⟨⟨0, 1, [7], 0, 10, false⟩, 10, 2⟩
+def demoLeaf : BoundedGrant := ⟨⟨1, 2, [7], 1, 9, false⟩, 5, 1⟩
+def demoState : State Nat := ⟨0, [demoRoot.grant, demoLeaf.grant], []⟩
+def demoInsight : Insight := ⟨true, true, 2, [], []⟩
+def demoProposal : Proposal := ⟨2, 7, true, true, true⟩
+
+theorem delegated_acceptance_example :
+    (governedStep (fun n _ => n + 1) [0] demoState demoProposal [⟨3, 1⟩]
+      (fun _ => 1) demoInsight demoLeaf [demoRoot] 2).2.verdict = .accept := by decide
+
+theorem failure_rejection_example :
+    (governedStep (fun n _ => n + 1) [0] demoState demoProposal [⟨3, 1⟩]
+      (fun _ => 1) (recordFailure demoInsight 42) demoLeaf [demoRoot] 2).2.verdict = .reject := by decide
 
 end WNSKernel.Portfolio
