@@ -35,6 +35,7 @@ jobs:
 
       - name: Verify signed witness release
         run: |
+          python tools/verify_witness_archive.py releases/weaver-witness-signed-rc1/WEAVER_WITNESS_SIGNED_RC1.zip --expected-key-sha256 5ac8e9d25de8d37cd9165d4a7458c34634aeded53c1709573ddf4cc122bcefb9
           mkdir -p /tmp/weaver-witness-release
           unzip -q releases/weaver-witness-signed-rc1/WEAVER_WITNESS_SIGNED_RC1.zip -d /tmp/weaver-witness-release
           python /tmp/weaver-witness-release/tools/verify_release.py
