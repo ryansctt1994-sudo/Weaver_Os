@@ -149,4 +149,6 @@ theorem warning_without_grant_preserves {P : Type} (state : State P)
       state.protectedState := by
   exact rejection_preserves (warning_without_grant_denied state roots p g now weight m r empty)
 
+end
+
 end WNSKernel.EFMW
