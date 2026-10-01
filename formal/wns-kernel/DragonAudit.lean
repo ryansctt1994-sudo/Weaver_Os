@@ -36,3 +36,5 @@ import Dragon64
 #print axioms Dragon64.sortFuel_mem
 #print axioms Dragon64.pair_partition_total_size
 #print axioms Dragon64.pair_partition_covers
+
+#print axioms Dragon64.pair_partition_evaluates
