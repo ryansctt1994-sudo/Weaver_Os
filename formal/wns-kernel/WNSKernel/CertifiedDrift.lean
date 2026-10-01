@@ -19,7 +19,7 @@ theorem checked_edge_closed (edges : List (Nat × Nat)) (stale : List Nat)
     (complete : closedCheck edges stale = true) (x y : Nat)
     (edge : (x, y) ∈ edges) (hx : x ∈ stale) : y ∈ stale := by
   have hc := (List.all_eq_true.mp complete) (x, y) edge
-  have implication : x ∈ stale → y ∈ stale := by simpa using hc
+  have implication : x ∈ stale → y ∈ stale := of_decide_eq_true hc
   exact implication hx
 
 theorem complete_report_covers_every_path (edges : List (Nat × Nat)) (fuel : Nat)
