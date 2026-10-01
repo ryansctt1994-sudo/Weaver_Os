@@ -1,6 +1,7 @@
 """Adversarial checks for the external archive verifier."""
 
 import base64
+import hashlib
 import zipfile
 from pathlib import Path
 
@@ -54,3 +55,42 @@ def test_zip_traversal_is_rejected(tmp_path):
     archive = rewrite(tmp_path, lambda files: files.__setitem__("../outside.txt", b"x"))
     with pytest.raises(ValueError, match="unsafe ZIP entry"):
         verify_archive(archive, EXPECTED)
+
+
+def test_archive_replacement_cannot_report_hash_of_unverified_bytes(tmp_path, monkeypatch):
+    original = ARCHIVE.read_bytes()
+    mutated = rewrite(
+        tmp_path, lambda files: files.__setitem__("src/weaver_core.py", b"changed")
+    ).read_bytes()
+    path = tmp_path / "replace.zip"
+    path.write_bytes(original)
+    original_read = Path.read_bytes
+    reads = []
+
+    def replace_at_read(source):
+        reads.append(source)
+        source.write_bytes(mutated)
+        return original_read(source)
+
+    monkeypatch.setattr(Path, "read_bytes", replace_at_read)
+    with pytest.raises(ValueError, match="payload hash mismatch"):
+        verify_archive(path, EXPECTED)
+    assert reads == [path]
+
+
+def test_reported_archive_digest_is_the_verified_snapshot(tmp_path, monkeypatch):
+    raw = ARCHIVE.read_bytes()
+    path = tmp_path / "snapshot.zip"
+    path.write_bytes(raw)
+    original_read = Path.read_bytes
+    reads = []
+
+    def replace_after_read(source):
+        captured = original_read(source)
+        reads.append(source)
+        source.write_bytes(b"changed after capture")
+        return captured
+
+    monkeypatch.setattr(Path, "read_bytes", replace_after_read)
+    assert verify_archive(path, EXPECTED)["archive_sha256"] == hashlib.sha256(raw).hexdigest()
+    assert reads == [path]
