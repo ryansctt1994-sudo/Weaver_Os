@@ -39,7 +39,7 @@ theorem cap_antitone (a b : ℝ) (ha : -1 ≤ a) (hab : a ≤ b) (hb : b ≤ 1) 
 theorem factor_bounds (angle : ℝ) :
     0 ≤ factor angle ∧ factor angle ≤ 1 :=
   cap_bounds _ (Real.neg_one_le_cos _) (Real.cos_le_one _)
-theorem factor_zero : factor 0 = 0 := by simp [factor, cap]
+theorem factor_zero : factor 0 = 0 := by norm_num [factor, cap]
 theorem factor_pi : factor Real.pi = 1 := by norm_num [factor, cap]
 theorem factor_half_pi : factor (Real.pi/2) = 1/2 := by
   norm_num [factor, cap]
