@@ -5,3 +5,5 @@ import WNSKernel.Temporal
 import WNSKernel.Delegation
 import WNSKernel.ReceiptReplay
 import WNSKernel.Portfolio
+import WNSKernel.Durable
+import WNSKernel.Drift

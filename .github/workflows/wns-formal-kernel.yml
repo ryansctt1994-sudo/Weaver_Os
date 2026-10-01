@@ -3,7 +3,7 @@ on:
   push:
     branches: [main]
   pull_request:
-    branches: [main, codex/wns-formal-kernel]
+    branches: [main, codex/wns-formal-kernel, codex/portfolio-formal-gates]
 jobs:
   lean:
     runs-on: ubuntu-latest
