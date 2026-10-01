@@ -1,0 +1,50 @@
+name: GOFB HYDRO Core
+on:
+  pull_request:
+    branches: [main, codex/efmw-residual-core]
+jobs:
+  numerical:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - name: Check corrected calculations
+        run: |
+          set -o pipefail
+          python -m unittest discover -s research/gofb-hydro -v 2>&1 | tee hydro-tests.log
+          python research/gofb-hydro/hydro.py > hydro-prediction.json
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: hydro-numerical-evidence
+          path: |
+            hydro-tests.log
+            hydro-prediction.json
+  formal:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Install pinned Lean
+        run: |
+          curl -fL --retry 3 https://github.com/leanprover/lean4/releases/download/v4.19.0/lean-4.19.0-linux.tar.zst -o /tmp/lean.tar.zst
+          tar --zstd -xf /tmp/lean.tar.zst -C /tmp
+          echo /tmp/lean-4.19.0-linux/bin >> "$GITHUB_PATH"
+      - name: Build and audit connected math libraries
+        working-directory: formal/efmw-core
+        run: |
+          set -o pipefail
+          lake update 2>&1 | tee hydro-dependencies.log
+          lake exe cache get
+          lake build 2>&1 | tee hydro-build.log
+          lake env lean Audit.lean 2>&1 | tee efmw-axioms.log
+          lake env lean HydroAudit.lean 2>&1 | tee hydro-axioms.log
+          if grep -E 'sorryAx|^axiom ' efmw-axioms.log hydro-axioms.log; then exit 1; fi
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: hydro-formal-evidence
+          path: |
+            formal/efmw-core/*log
+            formal/efmw-core/lake-manifest.json

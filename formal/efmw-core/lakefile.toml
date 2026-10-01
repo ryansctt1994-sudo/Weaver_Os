@@ -1,6 +1,6 @@
 name = "efmw-core"
 version = "0.1.0"
-defaultTargets = ["EFMW"]
+defaultTargets = ["EFMW", "Hydro"]
 
 [[require]]
 name = "mathlib"
@@ -13,3 +13,6 @@ path = "../wns-kernel"
 
 [[lean_lib]]
 name = "EFMW"
+
+[[lean_lib]]
+name = "Hydro"
