@@ -22,3 +22,12 @@ import Dragon64
 #print axioms Dragon64.t_composition_checked
 #print axioms Dragon64.pair_representatives_count
 #print axioms Dragon64.pair_partition_exact
+
+#print axioms Dragon64.s_closure_checked
+#print axioms Dragon64.t_closure_checked
+#print axioms Dragon64.s_preserves_enumeration
+#print axioms Dragon64.t_preserves_enumeration
+#print axioms Dragon64.word_in_enumeration
+#print axioms Dragon64.generated_iff_enumerated
+#print axioms Dragon64.pair_partition_s_stable
+#print axioms Dragon64.pair_partition_t_stable
