@@ -4,12 +4,11 @@ import base64
 import zipfile
 from pathlib import Path
 
+import pytest
 from cryptography.hazmat.primitives.asymmetric.ed25519 import Ed25519PrivateKey
 from cryptography.hazmat.primitives.serialization import Encoding, PublicFormat
-import pytest
 
 from tools.verify_witness_archive import verify_archive
-
 
 ARCHIVE = (
     Path(__file__).resolve().parents[1]
