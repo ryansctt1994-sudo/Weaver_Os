@@ -97,3 +97,15 @@ import WNSKernel
 #print axioms WNSKernel.Drift.propagation_preserves_stale
 #print axioms WNSKernel.Drift.two_hop_executable_example
 #print axioms WNSKernel.Drift.insufficient_fuel_counterexample
+
+#print axioms WNSKernel.CertifiedDrift.checked_edge_closed
+#print axioms WNSKernel.CertifiedDrift.complete_report_covers_every_path
+#print axioms WNSKernel.CertifiedDrift.seeds_preserved
+#print axioms WNSKernel.CertifiedDrift.incomplete_denies
+#print axioms WNSKernel.CertifiedDrift.reached_claim_denies
+#print axioms WNSKernel.CertifiedDrift.incomplete_preserves_protected
+#print axioms WNSKernel.CertifiedDrift.insufficient_fuel_reports_incomplete
+#print axioms WNSKernel.CertifiedDrift.sufficient_example_reports_complete
+#print axioms WNSKernel.CertifiedDrift.cyclic_example_complete
+#print axioms WNSKernel.CertifiedDrift.learning_correction_preserves_grants
+#print axioms WNSKernel.CertifiedDrift.learning_correction_preserves_protected

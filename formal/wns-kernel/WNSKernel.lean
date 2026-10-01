@@ -7,3 +7,4 @@ import WNSKernel.ReceiptReplay
 import WNSKernel.Portfolio
 import WNSKernel.Durable
 import WNSKernel.Drift
+import WNSKernel.CertifiedDrift

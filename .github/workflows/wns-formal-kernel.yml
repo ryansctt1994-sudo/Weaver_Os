@@ -3,9 +3,33 @@ on:
   push:
     branches: [main]
   pull_request:
-    branches: [main, codex/wns-formal-kernel, codex/portfolio-formal-gates]
+    branches: [main, codex/wns-formal-kernel, codex/portfolio-formal-gates, codex/durable-drift-proofs]
 jobs:
+  kernel:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Install pinned Lean distribution
+        run: |
+          curl -fL --retry 3 https://github.com/leanprover/lean4/releases/download/v4.19.0/lean-4.19.0-linux.tar.zst -o /tmp/lean.tar.zst
+          tar --zstd -xf /tmp/lean.tar.zst -C /tmp
+          echo /tmp/lean-4.19.0-linux/bin >> "$GITHUB_PATH"
+      - name: Build connected kernel and audit
+        working-directory: formal/wns-kernel
+        run: |
+          set -o pipefail
+          lake build WNSKernel 2>&1 | tee kernel-build.log
+          lake env lean Audit.lean 2>&1 | tee kernel-axioms.log
+          if grep -E 'sorryAx|^axiom ' kernel-axioms.log; then exit 1; fi
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: connected-kernel-logs
+          path: |
+            formal/wns-kernel/kernel-build.log
+            formal/wns-kernel/kernel-axioms.log
   lean:
+    needs: kernel
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
@@ -21,7 +45,8 @@ jobs:
           lean --version
           lake build 2>&1 | tee build.log
           lake env lean Audit.lean 2>&1 | tee axioms.log
-          if grep -E 'sorryAx|^axiom ' axioms.log; then exit 1; fi
+          lake env lean DragonAudit.lean 2>&1 | tee dragon-axioms.log
+          if grep -E 'sorryAx|^axiom ' axioms.log dragon-axioms.log; then exit 1; fi
       - name: Preserve formal logs
         if: always()
         uses: actions/upload-artifact@v4
@@ -30,3 +55,4 @@ jobs:
           path: |
             formal/wns-kernel/build.log
             formal/wns-kernel/axioms.log
+            formal/wns-kernel/dragon-axioms.log
