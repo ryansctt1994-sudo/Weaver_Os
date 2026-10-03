@@ -13,8 +13,8 @@ jobs:
       - uses: actions/checkout@v4
       - name: Download pinned TLC
         run: |
-          curl -fL --retry 3 -o /tmp/tla2tools.jar -H 'Accept: application/octet-stream' https://api.github.com/repos/tlaplus/tlaplus/releases/assets/602290600
-          echo '1d99ab9ad6cf6fb9839dcc7d4a04fd262e136d452edf2a4928c5c18dd4b3468f  /tmp/tla2tools.jar' | sha256sum -c -
+          curl -fL --retry 3 -o /tmp/tla2tools.jar https://github.com/tlaplus/tlaplus/releases/download/v1.7.4/tla2tools.jar
+          echo '936a262061c914694dfd669a543be24573c45d5aa0ff20a8b96b23d01e050e88  /tmp/tla2tools.jar' | sha256sum -c -
       - name: Check bounded invariants
         working-directory: audit-package/formal/tla+
         run: java -cp /tmp/tla2tools.jar tlc2.TLC -deadlock -config WitnessBoundary.cfg WitnessBoundary.tla

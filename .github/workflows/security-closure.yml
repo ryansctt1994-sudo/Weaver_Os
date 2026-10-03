@@ -1,0 +1,28 @@
+name: Security adversarial closure
+on:
+  pull_request:
+    branches: [main]
+  push:
+    branches: [main]
+jobs:
+  closure:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - run: python -m pip install pytest
+      - name: Frozen attacks and mutation gates
+        run: |
+          set -o pipefail
+          mkdir -p closure-evidence
+          python -m pytest tests/test_security_closure.py -q | tee closure-evidence/tests.log
+          python -m security_closure.run > closure-evidence/outcomes.json
+          python -m security_closure.mutations > closure-evidence/mutations.json
+          sha256sum security_closure/*.py security_closure/corpus.json tests/test_security_closure.py > closure-evidence/SHA256SUMS
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: security-closure-evidence
+          path: closure-evidence
