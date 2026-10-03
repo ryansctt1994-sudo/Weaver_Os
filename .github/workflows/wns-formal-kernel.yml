@@ -1,0 +1,32 @@
+name: WNS Formal Kernel
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+jobs:
+  lean:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Install pinned Lean distribution
+        run: |
+          curl -fL --retry 3 https://github.com/leanprover/lean4/releases/download/v4.19.0/lean-4.19.0-linux.tar.zst -o /tmp/lean.tar.zst
+          tar --zstd -xf /tmp/lean.tar.zst -C /tmp
+          echo /tmp/lean-4.19.0-linux/bin >> "$GITHUB_PATH"
+      - name: Build and audit
+        working-directory: formal/wns-kernel
+        run: |
+          set -o pipefail
+          lean --version
+          lake build 2>&1 | tee build.log
+          lake env lean Audit.lean 2>&1 | tee axioms.log
+          if grep -E 'sorryAx|^axiom ' axioms.log; then exit 1; fi
+      - name: Preserve formal logs
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: wns-formal-kernel-logs
+          path: |
+            formal/wns-kernel/build.log
+            formal/wns-kernel/axioms.log
