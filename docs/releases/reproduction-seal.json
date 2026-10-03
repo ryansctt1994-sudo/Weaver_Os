@@ -1,0 +1,11 @@
+{
+  "schema": "weaver-reproduction-seal-1",
+  "claim": "WN-WITNESS-001 constructed command checks",
+  "base_commit": "fc0b3e388911d9378fa25319a72fe3a46e66fa18",
+  "files": {
+    "tools/reproduce_witness.py": "3db8290bb55d5cc0a8d46bb3db9e4e515aa51c55f4842cca0d5b394d939a4d14",
+    "tools/run_verified_witness.py": "65af1ba79d7c03924835b4e7fbdb9d2251086aa5e8f8664610b428bb9ac54eaa",
+    "tools/verify_witness_archive.py": "e080307759324b5aff17058fc85d44724118b0ca822ba76e82dcb1fb2b21ba4a",
+    "releases/weaver-witness-signed-rc1/WEAVER_WITNESS_SIGNED_RC1.zip": "9d77db86e83482ee208c645c7db48ae43daf592f147e28b9d6fc5d3a3237d6f0"
+  }
+}
