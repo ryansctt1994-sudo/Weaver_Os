@@ -88,7 +88,8 @@ The current authority verifier exposes `ledger_event_type`, not a unique ledger-
 
 The in-process native seam now:
 - resolves and pins the requested shared-library path
-- fails closed when dynamic-loader influence variables such as `LD_PRELOAD`, `LD_LIBRARY_PATH`, or `LD_AUDIT` are present
+- always fails closed on direct interposition controls such as `LD_PRELOAD`, `LD_AUDIT`, and `DYLD_INSERT_LIBRARIES`
+- defaults to strict rejection when dependency search-path variables such as `LD_LIBRARY_PATH` are present; ABI conformance tests may explicitly relax that one policy when the CI runner injects a search path
 - requests local/immediate symbol resolution where the platform exposes it
 - on Linux, verifies that the target library is mapped from the expected path/device/inode
 - rejects deleted target mappings
@@ -96,4 +97,4 @@ The in-process native seam now:
 - repeats the mapping check after execution
 - retains file hashing before load, after load, and after execution
 
-These checks do not prove arbitrary process-memory integrity, do not hash relocated executable pages, and cannot undo a preload/interposer that entered before the current process started. Full loader-environment sanitization requires a fresh isolated worker process. Dependency closure/RPATH/RUNPATH attestation is also not yet claimed.
+These checks do not prove arbitrary process-memory integrity, do not hash relocated executable pages, and cannot undo a preload/interposer that entered before the current process started. Relaxing the search-path policy for an ABI conformance test is not a production qualification. Full loader-environment sanitization requires a fresh isolated worker process started with a controlled environment. Dependency closure/RPATH/RUNPATH attestation is also not yet claimed.
