@@ -8,12 +8,13 @@ receipt/Chronicle path.
 
 from __future__ import annotations
 
-from dataclasses import asdict, dataclass
-from enum import Enum
 import hashlib
 import json
 import re
-from typing import Any, Callable, Mapping, Protocol
+from collections.abc import Callable, Mapping
+from dataclasses import asdict, dataclass
+from enum import Enum
+from typing import Any, Protocol
 
 from triadic_controls.crypto.verifier import VerificationResult
 
