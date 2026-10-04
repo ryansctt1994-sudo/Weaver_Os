@@ -89,7 +89,7 @@ class ActivationReceipt:
         evidence: ActivationEvidence,
         *,
         authority_event_id: str | None = None,
-    ) -> "ActivationReceipt":
+    ) -> ActivationReceipt:
         metrics: list[tuple[str, float]] = []
         primary = _finite_metric(evidence.primary_metric)
         retention = _finite_metric(evidence.retention_metric)
