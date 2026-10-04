@@ -55,6 +55,7 @@ class NativeWeaverBackend:
     input_bytes: bytes
     symbol: str = _DEFAULT_SYMBOL
     max_response_bytes: int = _DEFAULT_MAX_RESPONSE_BYTES
+    require_clean_search_path: bool = True
 
     def __post_init__(self) -> None:
         object.__setattr__(self, "library_path", Path(self.library_path).resolve())
@@ -83,7 +84,9 @@ class NativeWeaverBackend:
             raise NativeWeaverProtocolError("input bytes do not match signed contract")
 
         try:
-            assert_clean_loader_environment()
+            assert_clean_loader_environment(
+                reject_search_paths=self.require_clean_search_path
+            )
             mode = getattr(os, "RTLD_LOCAL", 0) | getattr(os, "RTLD_NOW", 0)
             library = (
                 ctypes.CDLL(str(self.library_path), mode=mode)
