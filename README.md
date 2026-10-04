@@ -6,7 +6,7 @@ Weaver OS is a compact verification spine for checking authority claims, replay 
 
 ## Portfolio Status
 
-See [`PORTFOLIO_STATUS.md`](PORTFOLIO_STATUS.md) for the canonical GitHub repository map, provenance boundaries, evidence status, and current portfolio classification.
+See [`PORTFOLIO_STATUS.md`](PORTFOLIO_STATUS.md) for the canonical portfolio status and [`PORTFOLIO_REGISTRY.md`](PORTFOLIO_REGISTRY.md) for the complete repository/upstream provenance inventory.
 
 ## Core Thesis
 
