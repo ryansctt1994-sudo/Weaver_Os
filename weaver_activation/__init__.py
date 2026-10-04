@@ -12,6 +12,7 @@ from .activation import (
     build_activation_authority_payload,
 )
 from .native import NativeWeaverBackend, NativeWeaverProtocolError
+from .receipt import ActivationReceipt, RECEIPT_SCHEMA_VERSION
 
 __all__ = [
     "CONTRACT_VERSION",
@@ -21,6 +22,8 @@ __all__ = [
     "ActivationRejectCode",
     "ActivationStatus",
     "BackendActivationResult",
+    "ActivationReceipt",
+    "RECEIPT_SCHEMA_VERSION",
     "NativeWeaverBackend",
     "NativeWeaverProtocolError",
     "WeaverActivationAdapter",
