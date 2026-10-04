@@ -49,7 +49,13 @@ def _metric(value: object, name: str) -> float | None:
 
 @dataclass(frozen=True)
 class NativeWeaverBackend:
-    """Callable adapter for the frozen Weaver activation ABI v1.\n\n    ``require_clean_search_path`` defaults to True. Setting it False is intended\n    for controlled conformance environments and does not neutralize inherited\n    dynamic-linker search state.\n    """\n
+    """Callable adapter for the frozen Weaver activation ABI v1.
+
+    ``require_clean_search_path`` defaults to True. Setting it False is intended
+    for controlled conformance environments and does not neutralize inherited
+    dynamic-linker search state.
+    """
+
     library_path: Path
     input_bytes: bytes
     symbol: str = _DEFAULT_SYMBOL
