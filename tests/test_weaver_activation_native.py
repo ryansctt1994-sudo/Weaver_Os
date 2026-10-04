@@ -93,4 +93,8 @@ def test_native_abi_rejects_unsafe_loader_environment(
     intent = make_intent(native_library)
     monkeypatch.setenv("LD_PRELOAD", "/tmp/untrusted-interposer.so")
     with pytest.raises(NativeWeaverProtocolError, match="admission failed"):
-        NativeWeaverBackend(native_library, INPUT)(intent)
+        NativeWeaverBackend(
+            native_library,
+            INPUT,
+            require_clean_search_path=False,
+        )(intent)
