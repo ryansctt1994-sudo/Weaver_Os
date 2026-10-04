@@ -1,0 +1,53 @@
+name: Formal foundations
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+permissions:
+  contents: read
+
+jobs:
+  recovery-and-lattice:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 10
+    env:
+      WEAVER_SOURCE_HEAD_SHA: ${{ github.event.pull_request.head.sha || github.sha }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: '17'
+      - name: Check recovery model and controls
+        shell: bash
+        run: |
+          set -euo pipefail
+          mkdir -p verification-output/foundations
+          git rev-parse HEAD > verification-output/foundations/verified-commit.txt
+          python -m tools.fetch_tlc "$RUNNER_TEMP/tla2tools.jar" | tee verification-output/foundations/tlc-tool.log
+          python -m tools.check_recovery_model "$RUNNER_TEMP/tla2tools.jar" --output verification-output/foundations/recovery
+      - name: Acquire pinned Lean 4.22.0
+        shell: bash
+        run: |
+          set -euo pipefail
+          curl -fL --retry 3 -o "$RUNNER_TEMP/lean.tar.zst" https://github.com/leanprover/lean4/releases/download/v4.22.0/lean-4.22.0-linux.tar.zst
+          echo "85097a4d659fe388193a5efb0c413b880e101f1290cc41d00eb60847b18f064e  $RUNNER_TEMP/lean.tar.zst" | sha256sum -c - | tee verification-output/foundations/lean-tool.log
+          tar --no-same-owner --zstd -xf "$RUNNER_TEMP/lean.tar.zst" -C "$RUNNER_TEMP"
+          echo "$RUNNER_TEMP/lean-4.22.0-linux/bin" >> "$GITHUB_PATH"
+      - name: Compile lattice and inspect theorem axioms
+        shell: bash
+        run: |
+          set -euo pipefail
+          python -m tools.check_lattice_core --output verification-output/foundations/lattice
+      - name: Retain source-bound evidence
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: formal-foundations-${{ github.sha }}
+          path: verification-output/foundations/
+          if-no-files-found: error

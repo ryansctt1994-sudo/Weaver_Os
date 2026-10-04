@@ -1,0 +1,6 @@
+name = "weaverLatticeCore"
+version = "0.1.0"
+defaultTargets = ["LatticeCore"]
+
+[[lean_lib]]
+name = "LatticeCore"
