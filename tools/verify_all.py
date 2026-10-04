@@ -336,7 +336,18 @@ def build_evidence_manifest(output: Path, wheel: Path | None) -> tuple[dict[str,
         ROOT / "tools" / "check_activation_trace_conformance.py",
     ]
     candidates.extend(sorted((ROOT / "tests" / "fixtures" / "verification").glob("*")))
-    candidates.extend(sorted(path for path in output.glob("*") if path.is_file()))
+    excluded_generated = {
+        output / "evidence-manifest.json",
+        output / "verification-report.json",
+        output / "report.json",
+    }
+    candidates.extend(
+        sorted(
+            path
+            for path in output.rglob("*")
+            if path.is_file() and path not in excluded_generated
+        )
+    )
     if wheel is not None:
         candidates.append(wheel)
 
