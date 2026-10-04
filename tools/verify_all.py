@@ -293,6 +293,9 @@ def build_evidence_manifest(output: Path, wheel: Path | None) -> tuple[dict[str,
         ROOT / ARCHIVE,
         ROOT / "schemas" / "verification_run.schema.json",
         ROOT / "schemas" / "triad_receipt.schema.json",
+        ROOT / "schemas" / "activation_receipt.schema.json",
+        FORMAL_DIR / "WeaverActivation.tla",
+        FORMAL_DIR / "WeaverActivation.cfg",
     ]
     candidates.extend(sorted((ROOT / "tests" / "fixtures" / "verification").glob("*")))
     candidates.extend(sorted(path for path in output.glob("*") if path.is_file()))
