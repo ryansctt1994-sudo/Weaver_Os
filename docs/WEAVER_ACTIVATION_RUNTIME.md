@@ -53,3 +53,47 @@ Process-local duplicate suppression is defense in depth. Durable exactly-once be
 ## Non-claims
 
 This layer does not prove model quality, consciousness, autonomy, deployment safety, or production readiness. Capability does not imply authority; evidence does not imply authority.
+
+
+## Formal model
+
+`audit-package/formal/tla+/WeaverActivation.tla` models the activation lifecycle independently from the surrounding Witness model:
+
+```text
+Proposed -> Authorized -> ContractBound -> Executed -> ResultVerified -> Recorded
+      \-> Rejected
+```
+
+The bounded TLC model checks:
+- execution requires prior authorization plus contract/backend/checkpoint/input binding
+- `authorityDelta` remains zero
+- activation never mutates the modeled protected state
+- an execution counter prevents a request from executing more than once
+- every terminal rejection has rejection evidence
+- PASS Chronicle evidence is admitted only from `ResultVerified` and remains bound to the request artifacts and authority event
+
+The model intentionally uses an execution counter rather than treating membership in a consumed-request set as proof of single execution. It also models rejection evidence directly while keeping `Rejected` terminal.
+
+This is bounded model checking of an abstraction. It is not yet a refinement proof that the Python/C implementation implements every TLA+ transition exactly.
+
+## Canonical activation receipt
+
+`ActivationReceipt` and `schemas/activation_receipt.schema.json` define the runtime evidence envelope.
+
+A PASS receipt requires valid SHA-256 identities for the contract, backend artifact, checkpoint, input, and output. A REJECT receipt may contain null artifact fields when rejection occurred before those fields were structurally admitted; the raw attempted request remains bound by `intent_sha256` and the supplied authority material by `authority_payload_sha256`.
+
+The current authority verifier exposes `ledger_event_type`, not a unique ledger-event identifier. Therefore `authority_event_id` is explicitly nullable. The runtime does not invent a ledger identity from another hash.
+
+## Runtime-integrity tripwires
+
+The in-process native seam now:
+- resolves and pins the requested shared-library path
+- fails closed when dynamic-loader influence variables such as `LD_PRELOAD`, `LD_LIBRARY_PATH`, or `LD_AUDIT` are present
+- requests local/immediate symbol resolution where the platform exposes it
+- on Linux, verifies that the target library is mapped from the expected path/device/inode
+- rejects deleted target mappings
+- rejects writable+executable mappings for the target library
+- repeats the mapping check after execution
+- retains file hashing before load, after load, and after execution
+
+These checks do not prove arbitrary process-memory integrity, do not hash relocated executable pages, and cannot undo a preload/interposer that entered before the current process started. Full loader-environment sanitization requires a fresh isolated worker process. Dependency closure/RPATH/RUNPATH attestation is also not yet claimed.
