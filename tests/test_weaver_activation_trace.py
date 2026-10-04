@@ -10,7 +10,7 @@ from weaver_activation import (
     WeaverActivationAdapter,
     build_activation_authority_payload,
 )
-from weaver_activation.trace import ActivationTraceRecorder, TRACE_SCHEMA_VERSION
+from weaver_activation.trace import TRACE_SCHEMA_VERSION, ActivationTraceRecorder
 
 CP = "a" * 64
 INP = "b" * 64
