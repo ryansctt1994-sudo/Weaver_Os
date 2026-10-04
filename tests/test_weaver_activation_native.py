@@ -49,7 +49,11 @@ def test_native_abi_executes_with_binary_input_and_contract_binding(
     native_library: Path,
 ) -> None:
     intent = make_intent(native_library)
-    result = NativeWeaverBackend(native_library, INPUT)(intent)
+    result = NativeWeaverBackend(
+        native_library,
+        INPUT,
+        require_clean_search_path=False,
+    )(intent)
     assert result.request_id == intent.request_id
     assert result.checkpoint_sha256 == intent.checkpoint_sha256
     assert result.backend_sha256 == intent.backend_sha256
@@ -76,7 +80,11 @@ def test_native_abi_rejects_binary_substitution(native_library: Path) -> None:
 def test_native_abi_rejects_input_substitution(native_library: Path) -> None:
     intent = make_intent(native_library, input_sha256="e" * 64)
     with pytest.raises(NativeWeaverProtocolError, match="input bytes"):
-        NativeWeaverBackend(native_library, INPUT)(intent)
+        NativeWeaverBackend(
+            native_library,
+            INPUT,
+            require_clean_search_path=False,
+        )(intent)
 
 
 def test_native_abi_rejects_unsafe_loader_environment(
