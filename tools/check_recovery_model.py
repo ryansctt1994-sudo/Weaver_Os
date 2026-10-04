@@ -17,7 +17,7 @@ def check(jar: Path, output: Path) -> dict:
     output.mkdir(parents=True, exist_ok=True)
     source = (FORMAL / "WeaverRecovery.tla").read_text()
     config = (FORMAL / "WeaverRecovery.cfg").read_text()
-    probes = [("baseline", source, config, None)]
+    probes: list[tuple[str, str, str, str | None]] = [("baseline", source, config, None)]
     changes = [
         (
             "dispatch-before-fsync",
