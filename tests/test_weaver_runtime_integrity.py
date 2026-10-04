@@ -27,3 +27,15 @@ def test_mapping_check_rejects_unmapped_regular_file(tmp_path: Path) -> None:
     candidate.write_bytes(b"not an elf")
     with pytest.raises(RuntimeIntegrityError, match="not mapped"):
         assert_linux_library_mapping_integrity(candidate)
+
+
+def test_loader_search_path_rejected_in_strict_mode() -> None:
+    with pytest.raises(RuntimeIntegrityError, match="search path"):
+        assert_clean_loader_environment({"LD_LIBRARY_PATH": "/tmp/untrusted"})
+
+
+def test_loader_search_path_can_be_observed_in_non_strict_mode() -> None:
+    assert_clean_loader_environment(
+        {"LD_LIBRARY_PATH": "/tmp/runner-provided"},
+        reject_search_paths=False,
+    )
