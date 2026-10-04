@@ -153,6 +153,7 @@ def _run_tlc(jar: Path, generated: str) -> subprocess.CompletedProcess[str]:
 def _check_negative_controls(
     jar: Path,
     traces: dict[str, list[dict[str, Any]]],
+    output: Path,
 ) -> list[dict[str, Any]]:
     mutations: list[tuple[str, list[dict[str, Any]]]] = []
 
@@ -169,13 +170,27 @@ def _check_negative_controls(
     results: list[dict[str, Any]] = []
     for name, events in mutations:
         generated = _compile_trace(events, "negative-control")
+        generated_path = output / f"negative-{name}.tla"
+        generated_path.write_text(generated)
         result = _run_tlc(jar, generated)
+        log = (
+            f"$ TLC negative control {name}\n"
+            + result.stdout
+            + "\n--- stderr ---\n"
+            + result.stderr
+        ).encode()
+        log_path = output / f"negative-{name}-tlc.log"
+        log_path.write_bytes(log)
         detected = result.returncode != 0
         results.append(
             {
                 "mutation": name,
                 "detected": detected,
                 "returncode": result.returncode,
+                "generated_tla": generated_path.name,
+                "generated_tla_sha256": _sha256(generated.encode("utf-8")),
+                "tlc_log": log_path.name,
+                "tlc_log_sha256": _sha256(log),
             }
         )
     return results
@@ -193,6 +208,8 @@ def check_conformance(jar: Path, output: Path) -> dict[str, Any]:
         traces[case_id] = events
         generated = _compile_trace(events, str(runtime_case["trace_sha256"]))
         generated_bytes = generated.encode("utf-8")
+        generated_path = output / f"{case_id.lower()}-generated.tla"
+        generated_path.write_bytes(generated_bytes)
         result = _run_tlc(jar, generated)
         log = (
             "$ TLC WeaverActivationTrace\n"
@@ -207,6 +224,7 @@ def check_conformance(jar: Path, output: Path) -> dict[str, Any]:
                 "case_id": case_id,
                 "status": "PASS" if result.returncode == 0 else "FAIL",
                 "trace_sha256": runtime_case["trace_sha256"],
+                "generated_tla": generated_path.name,
                 "generated_tla_sha256": _sha256(generated_bytes),
                 "tlc_log": log_path.name,
                 "tlc_log_sha256": _sha256(log),
@@ -214,7 +232,7 @@ def check_conformance(jar: Path, output: Path) -> dict[str, Any]:
             }
         )
 
-    negative_controls = _check_negative_controls(jar, traces)
+    negative_controls = _check_negative_controls(jar, traces, output)
     report = {
         "schema": "weaver-activation-trace-conformance-1",
         "corpus_sha256": runtime_report["corpus_sha256"],
