@@ -77,3 +77,12 @@ def test_native_abi_rejects_input_substitution(native_library: Path) -> None:
     intent = make_intent(native_library, input_sha256="e" * 64)
     with pytest.raises(NativeWeaverProtocolError, match="input bytes"):
         NativeWeaverBackend(native_library, INPUT)(intent)
+
+
+def test_native_abi_rejects_unsafe_loader_environment(
+    native_library: Path, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    intent = make_intent(native_library)
+    monkeypatch.setenv("LD_PRELOAD", "/tmp/untrusted-interposer.so")
+    with pytest.raises(NativeWeaverProtocolError, match="admission failed"):
+        NativeWeaverBackend(native_library, INPUT)(intent)
