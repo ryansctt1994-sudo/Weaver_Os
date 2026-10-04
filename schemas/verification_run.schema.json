@@ -66,7 +66,8 @@
             "mutation_suite",
             "adversarial_corpus",
             "installed_wheel",
-            "formal_tlc"
+            "formal_tlc",
+            "static_analysis_strict"
           ]},
           "step": {"type": "string", "minLength": 1},
           "command": {
@@ -81,8 +82,8 @@
     },
     "verifiers": {
       "type": "array",
-      "minItems": 6,
-      "maxItems": 6,
+      "minItems": 7,
+      "maxItems": 7,
       "items": {"$ref": "#/$defs/verifier"},
       "allOf": [
         {"contains": {"properties": {"name": {"const": "unit_and_integration"}}, "required": ["name"]}, "minContains": 1, "maxContains": 1},
@@ -90,7 +91,8 @@
         {"contains": {"properties": {"name": {"const": "mutation_suite"}}, "required": ["name"]}, "minContains": 1, "maxContains": 1},
         {"contains": {"properties": {"name": {"const": "adversarial_corpus"}}, "required": ["name"]}, "minContains": 1, "maxContains": 1},
         {"contains": {"properties": {"name": {"const": "installed_wheel"}}, "required": ["name"]}, "minContains": 1, "maxContains": 1},
-        {"contains": {"properties": {"name": {"const": "formal_tlc"}}, "required": ["name"]}, "minContains": 1, "maxContains": 1}
+        {"contains": {"properties": {"name": {"const": "formal_tlc"}}, "required": ["name"]}, "minContains": 1, "maxContains": 1},
+        {"contains": {"properties": {"name": {"const": "static_analysis_strict"}}, "required": ["name"]}, "minContains": 1, "maxContains": 1}
       ]
     },
     "adversarial_results": {
@@ -157,7 +159,8 @@
           "mutation_suite",
           "adversarial_corpus",
           "installed_wheel",
-          "formal_tlc"
+          "formal_tlc",
+          "static_analysis_strict"
         ]},
         "status": {"enum": ["PASS", "FAIL"]},
         "exit_code": {"type": "integer"},
@@ -213,6 +216,7 @@
       "if": {"properties": {"overall_verdict": {"const": "PASS"}}, "required": ["overall_verdict"]},
       "then": {
         "properties": {
+          "dirty": {"const": false},
           "wheel_sha256": {"type": "string", "pattern": "^[0-9a-f]{64}$"},
           "verifiers": {"items": {"properties": {"status": {"const": "PASS"}}}},
           "adversarial_results": {"items": {"properties": {"status": {"const": "PASS"}}}}
