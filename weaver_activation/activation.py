@@ -79,7 +79,7 @@ def _sha256_evidence_json(value: object) -> str:
     return _sha256_json(_evidence_safe(value))
 
 
-def _try_contract_sha256(intent: "ActivationIntent") -> str | None:
+def _try_contract_sha256(intent: ActivationIntent) -> str | None:
     try:
         return intent.contract_sha256()
     except (TypeError, ValueError):
