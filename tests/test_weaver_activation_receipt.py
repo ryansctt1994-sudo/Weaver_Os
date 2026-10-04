@@ -8,10 +8,10 @@ import jsonschema
 import pytest
 
 from weaver_activation import (
+    RECEIPT_SCHEMA_VERSION,
     ActivationEvidence,
     ActivationReceipt,
     ActivationStatus,
-    RECEIPT_SCHEMA_VERSION,
 )
 
 D = "d" * 64
