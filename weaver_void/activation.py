@@ -52,6 +52,7 @@ class ActivationIntent:
     action: ActivationAction
     checkpoint_sha256: str
     input_sha256: str
+    backend_sha256: str | None = None
     retention_floor: float | None = None
 
     def authority_binding(self) -> dict[str, Any]:
@@ -59,6 +60,7 @@ class ActivationIntent:
             "request_id": self.request_id,
             "model_id": self.model_id,
             "backend_id": self.backend_id,
+            "backend_sha256": self.backend_sha256,
             "action": self.action.value,
             "checkpoint_sha256": self.checkpoint_sha256,
             "input_sha256": self.input_sha256,
@@ -74,6 +76,7 @@ class BackendActivationResult:
     output_sha256: str
     primary_metric: float | None = None
     retention_metric: float | None = None
+    backend_sha256: str | None = None
 
 
 @dataclass(frozen=True)
@@ -88,6 +91,7 @@ class ActivationEvidence:
     primary_metric: float | None
     retention_metric: float | None
     reject_code: str | None
+    backend_sha256: str | None = None
     authority_delta: int = 0
 
 
@@ -169,12 +173,16 @@ class VoidActivationAdapter:
         requested_level: int,
         backend: Callable[[ActivationIntent], BackendActivationResult],
     ) -> ActivationEvidence:
+        backend_digest_valid = intent.backend_sha256 is None or bool(
+            _SHA256_RE.fullmatch(intent.backend_sha256)
+        )
         malformed = not (
             intent.request_id
             and intent.model_id
             and intent.backend_id
             and _SHA256_RE.fullmatch(intent.checkpoint_sha256)
             and _SHA256_RE.fullmatch(intent.input_sha256)
+            and backend_digest_valid
         )
         if malformed:
             return self._reject(intent, authority_payload, ActivationRejectCode.MALFORMED_IDENTITY)
@@ -259,12 +267,16 @@ class VoidActivationAdapter:
     def _result_matches_intent(
         intent: ActivationIntent, result: BackendActivationResult
     ) -> bool:
+        backend_digest_matches = intent.backend_sha256 is None or (
+            result.backend_sha256 == intent.backend_sha256
+        )
         return (
             result.request_id == intent.request_id
             and result.model_id == intent.model_id
             and result.backend_id == intent.backend_id
             and result.checkpoint_sha256 == intent.checkpoint_sha256
             and bool(_SHA256_RE.fullmatch(result.output_sha256))
+            and backend_digest_matches
         )
 
     def _reject(
@@ -308,5 +320,8 @@ class VoidActivationAdapter:
             primary_metric=result.primary_metric if result is not None else None,
             retention_metric=result.retention_metric if result is not None else None,
             reject_code=reject_code,
+            backend_sha256=(
+                result.backend_sha256 if result is not None else intent.backend_sha256
+            ),
             authority_delta=0,
         )
