@@ -378,9 +378,8 @@ def main() -> int:
         )
     )
 
-    wheel_verifier, wheel = run_installed_wheel(args.output)
-    verifiers.append(wheel_verifier)
-    verifiers.append(run_formal_tlc(args.output))
+    # Static analysis runs before wheel construction so generated build/lib
+    # copies cannot masquerade as duplicate source modules.
     verifiers.append(
         verifier(
             "static_analysis_strict",
@@ -402,6 +401,9 @@ def main() -> int:
             ],
         )
     )
+    wheel_verifier, wheel = run_installed_wheel(args.output)
+    verifiers.append(wheel_verifier)
+    verifiers.append(run_formal_tlc(args.output))
 
     adversarial_results = load_adversarial_results(adversarial_path)
     wheel_sha256 = sha256_file(wheel) if wheel is not None and wheel.is_file() else None
