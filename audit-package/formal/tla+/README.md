@@ -25,4 +25,12 @@ cd audit-package/formal/tla+
 java -cp /path/to/tla2tools.jar tlc2.TLC -deadlock -config WeaverActivation.cfg WeaverActivation.tla
 ```
 
-The repository verification gate requires both `WitnessBoundary` and `WeaverActivation`. It also runs targeted `WeaverActivation` mutation probes: removing the exact authority/contract binding guard must violate `Inv_AuthorityExactBinding`, and removing the rejection-phase guard must violate `Inv_RejectionPhaseSound`. Neither model is a refinement proof of the Python/C implementation; runtime correspondence remains a separate obligation.
+The repository verification gate requires both `WitnessBoundary` and `WeaverActivation`. It also runs targeted `WeaverActivation` mutation probes: removing the exact authority/contract binding guard must violate `Inv_AuthorityExactBinding`, and removing the rejection-phase guard must violate `Inv_RejectionPhaseSound`.
+
+### WeaverActivation runtime-trace correspondence
+
+`WeaverActivationTrace.tla` replays canonical runtime observations emitted by `ActivationTraceRecorder`. The frozen first-attempt corpus is executed through the Python adapter, each NDJSON trace is SHA-256 bound, and the conformance checker deterministically generates a `GeneratedActivationTrace.tla` data module for TLC.
+
+`Inv_TraceCanAdvance` is the critical refinement-side guard: if an unconsumed runtime event remains, that exact abstract event must be enabled in the base model. This prevents impossible traces from passing by stuttering. CI also requires two negative controls to fail: `Execute` before `BindContract`, and an authority-phase rejection code after execution.
+
+This establishes mechanical correspondence for the frozen first-attempt adapter corpus. It is not a universal refinement proof. Duplicate-request behavior needs a persisted consumed-request pre-state before it can be represented faithfully, and native checkpoint execution/memory integrity remain separate lower-layer obligations.
