@@ -14,3 +14,7 @@ verify-e35:
 		echo "❌ E3.5 FAILED"; \
 	fi; \
 	exit $$RESULT
+
+.PHONY: verify
+verify:
+	python -m tools.verify_all

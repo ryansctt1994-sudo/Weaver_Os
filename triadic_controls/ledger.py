@@ -24,7 +24,7 @@ from jsonschema.exceptions import ValidationError
 
 GENESIS_PREV_HASH = "genesis"
 DEFAULT_EVENT_SCHEMA_PATH = (
-    Path(__file__).resolve().parents[1] / "schemas" / "triad_event.schema.json"
+    Path(__file__).resolve().parent / "schemas" / "triad_event.schema.json"
 )
 
 
