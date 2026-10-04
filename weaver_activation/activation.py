@@ -64,6 +64,21 @@ def _sha256_json(value: object) -> str:
     return hashlib.sha256(_canonical_json(value)).hexdigest()
 
 
+def _evidence_safe(value: object) -> object:
+    """Normalize malformed numeric values so rejection evidence is still hashable."""
+    if isinstance(value, float) and not math.isfinite(value):
+        return {"invalid_float": repr(value)}
+    if isinstance(value, dict):
+        return {str(key): _evidence_safe(item) for key, item in value.items()}
+    if isinstance(value, (list, tuple)):
+        return [_evidence_safe(item) for item in value]
+    return value
+
+
+def _sha256_evidence_json(value: object) -> str:
+    return _sha256_json(_evidence_safe(value))
+
+
 def _valid_digest(value: str | None, *, optional: bool = False) -> bool:
     if value is None:
         return optional
@@ -373,7 +388,9 @@ class WeaverActivationAdapter:
             authority_event_type=authority_event_type,
             authority_payload_sha256=_sha256_json(authority_payload),
             intent_sha256=_sha256_json(intent_data),
-            result_sha256=_sha256_json(asdict(result)) if result is not None else None,
+            result_sha256=(
+                _sha256_evidence_json(asdict(result)) if result is not None else None
+            ),
             checkpoint_sha256=intent.checkpoint_sha256,
             primary_metric=result.primary_metric if result is not None else None,
             retention_metric=result.retention_metric if result is not None else None,
