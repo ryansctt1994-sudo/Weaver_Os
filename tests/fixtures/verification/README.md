@@ -1,0 +1,1 @@
+Fixed three-event test corpus. Keys derive from public test seeds bytes(range(32)) and bytes(range(1,33)); NEVER use them for real signing. The key-substitution case pins its own head to isolate rejection of the untrusted key. Fixture hashes identify corpus bytes, not external trust.

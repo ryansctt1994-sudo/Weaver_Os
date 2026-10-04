@@ -32,3 +32,4 @@ ENV/
 *.swo
 *~
 .DS_Store
+verification-output/

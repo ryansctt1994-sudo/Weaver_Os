@@ -1,0 +1,54 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "Triad Event",
+  "type": "object",
+  "required": [
+    "index",
+    "timestamp",
+    "event_type",
+    "actor",
+    "public_key",
+    "payload",
+    "prev_hash",
+    "event_hash",
+    "policy_version"
+  ],
+  "properties": {
+    "index": { "type": "integer", "minimum": 0 },
+    "timestamp": { "type": "string", "format": "date-time" },
+    "event_type": {
+      "type": "string",
+      "enum": [
+        "proposal",
+        "witness_annotation",
+        "decided",
+        "rejected",
+        "amendment",
+        "witness_dissent"
+      ]
+    },
+    "actor": { "type": "string" },
+    "public_key": {
+      "type": "string",
+      "description": "Hex-encoded Ed25519 public key"
+    },
+    "payload": {
+      "type": "object",
+      "additionalProperties": true
+    },
+    "prev_hash": { "type": "string" },
+    "event_hash": {
+      "type": "string",
+      "description": "SHA-256 of hash_body()"
+    },
+    "signature": {
+      "type": "string",
+      "description": "Optional Ed25519 signature over event_hash"
+    },
+    "policy_version": {
+      "type": "string",
+      "description": "Policy bundle version at time of event"
+    }
+  },
+  "additionalProperties": false
+}
