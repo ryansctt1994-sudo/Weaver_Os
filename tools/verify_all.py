@@ -273,6 +273,23 @@ def run_formal_tlc(output: Path) -> dict[str, Any]:
                 timeout=180,
             )
         )
+        steps.append(
+            run_step(
+                name,
+                "activation-trace-conformance",
+                [
+                    sys.executable,
+                    "-m",
+                    "tools.check_activation_trace_conformance",
+                    str(jar),
+                    "--output",
+                    str(output / "activation-trace"),
+                ],
+                output,
+                cwd=ROOT,
+                timeout=300,
+            )
+        )
     return verifier(name, steps)
 
 
@@ -311,6 +328,12 @@ def build_evidence_manifest(output: Path, wheel: Path | None) -> tuple[dict[str,
         ROOT / "schemas" / "activation_receipt.schema.json",
         FORMAL_DIR / "WeaverActivation.tla",
         FORMAL_DIR / "WeaverActivation.cfg",
+        FORMAL_DIR / "WeaverActivationTrace.tla",
+        FORMAL_DIR / "WeaverActivationTrace.cfg",
+        ROOT / "tests" / "fixtures" / "activation_trace_corpus.json",
+        ROOT / "weaver_activation" / "trace.py",
+        ROOT / "tools" / "run_activation_trace_corpus.py",
+        ROOT / "tools" / "check_activation_trace_conformance.py",
     ]
     candidates.extend(sorted((ROOT / "tests" / "fixtures" / "verification").glob("*")))
     candidates.extend(sorted(path for path in output.glob("*") if path.is_file()))
