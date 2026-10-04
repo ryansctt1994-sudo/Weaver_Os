@@ -26,11 +26,11 @@ weaver-release-guard = "weaver_release_guard.cli:main"
 
 [tool.setuptools.packages.find]
 where = [".", "src"]
-include = ["triadic_controls*", "weaver_release_guard*", "weaver_void*"]
+include = ["triadic_controls*", "weaver_release_guard*", "weaver_activation*"]
 
 [tool.setuptools.package-data]
 triadic_controls = ["schemas/*.json"]
-weaver_void = ["include/*.h"]
+weaver_activation = ["include/*.h"]
 
 [tool.pytest.ini_options]
 testpaths = ["tests", "weaver_auth/bedrock/tests"]
