@@ -77,6 +77,22 @@ def _backend_ok(intent: ActivationIntent) -> BackendActivationResult:
     )
 
 
+def _backend_fail(_intent: ActivationIntent) -> BackendActivationResult:
+    raise RuntimeError("fixture backend failure")
+
+
+def _backend_result_mismatch(intent: ActivationIntent) -> BackendActivationResult:
+    return replace(_backend_ok(intent), checkpoint_sha256="e" * 64)
+
+
+def _backend_metric_invalid(intent: ActivationIntent) -> BackendActivationResult:
+    return replace(_backend_ok(intent), primary_metric=float("nan"))
+
+
+def _backend_retention_failed(intent: ActivationIntent) -> BackendActivationResult:
+    return replace(_backend_ok(intent), retention_metric=0.5)
+
+
 def _run_case(case: dict[str, Any], trace: ActivationTraceRecorder):
     scenario = case["scenario"]
     intent = _base_intent()
@@ -88,19 +104,14 @@ def _run_case(case: dict[str, Any], trace: ActivationTraceRecorder):
     elif scenario == "malformed_identity":
         intent = replace(intent, checkpoint_sha256="not-a-digest")
     elif scenario == "backend_failed":
-        def backend(_intent: ActivationIntent) -> BackendActivationResult:
-            raise RuntimeError("fixture backend failure")
+        backend = _backend_fail
     elif scenario == "result_identity_mismatch":
-        def backend(intent: ActivationIntent) -> BackendActivationResult:
-            return replace(_backend_ok(intent), checkpoint_sha256="e" * 64)
+        backend = _backend_result_mismatch
     elif scenario == "metric_invalid":
-        def backend(intent: ActivationIntent) -> BackendActivationResult:
-            return replace(_backend_ok(intent), primary_metric=float("nan"))
+        backend = _backend_metric_invalid
     elif scenario == "retention_gate_failed":
         intent = replace(intent, retention_floor=1.0)
-
-        def backend(intent: ActivationIntent) -> BackendActivationResult:
-            return replace(_backend_ok(intent), retention_metric=0.5)
+        backend = _backend_retention_failed
 
     payload = build_activation_authority_payload(intent, authority_level=3)
     if scenario == "authority_binding_mismatch":
