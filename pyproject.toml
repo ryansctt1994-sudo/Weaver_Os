@@ -26,7 +26,7 @@ weaver-release-guard = "weaver_release_guard.cli:main"
 
 [tool.setuptools.packages.find]
 where = [".", "src"]
-include = ["triadic_controls*", "weaver_release_guard*"]
+include = ["triadic_controls*", "weaver_release_guard*", "weaver_void*"]
 
 [tool.setuptools.package-data]
 triadic_controls = ["schemas/*.json"]
