@@ -30,6 +30,7 @@ include = ["triadic_controls*", "weaver_release_guard*", "weaver_void*"]
 
 [tool.setuptools.package-data]
 triadic_controls = ["schemas/*.json"]
+weaver_void = ["include/*.h"]
 
 [tool.pytest.ini_options]
 testpaths = ["tests", "weaver_auth/bedrock/tests"]
