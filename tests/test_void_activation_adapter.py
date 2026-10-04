@@ -198,3 +198,34 @@ def test_payload_builder_binds_exact_activation_tuple():
     assert payload["scope"]["activation"] == intent.authority_binding()
     assert payload["scope"]["task"] == "neural_activation"
     assert payload["scope"]["region"] == "m1"
+
+
+def test_backend_digest_is_bound_end_to_end():
+    adapter = VoidActivationAdapter(StubVerifier())
+    intent = make_intent(backend_sha256="d" * 64)
+
+    def backend(intent):
+        return replace(backend_ok(intent), backend_sha256=intent.backend_sha256)
+
+    evidence = execute(adapter, intent=intent, backend=backend)
+    assert evidence.status is ActivationStatus.PASS
+    assert evidence.backend_sha256 == "d" * 64
+
+
+def test_backend_binary_substitution_in_result_rejected():
+    adapter = VoidActivationAdapter(StubVerifier())
+    intent = make_intent(backend_sha256="d" * 64)
+
+    def backend(intent):
+        return replace(backend_ok(intent), backend_sha256="e" * 64)
+
+    evidence = execute(adapter, intent=intent, backend=backend)
+    assert evidence.reject_code == ActivationRejectCode.RESULT_IDENTITY_MISMATCH.value
+
+
+def test_malformed_backend_digest_rejected_before_authority_verifier():
+    verifier = StubVerifier()
+    adapter = VoidActivationAdapter(verifier)
+    evidence = execute(adapter, intent=make_intent(backend_sha256="not-a-digest"))
+    assert evidence.reject_code == ActivationRejectCode.MALFORMED_IDENTITY.value
+    assert verifier.calls == 0
