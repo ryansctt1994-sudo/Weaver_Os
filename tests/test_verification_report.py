@@ -169,6 +169,29 @@ def test_fail_report_is_schema_valid_when_a_required_verifier_fails(schema):
     Draft202012Validator(schema).validate(report)
 
 
+
+def test_dirty_tree_cannot_claim_pass(schema):
+    report = valid_report()
+    report["dirty"] = True
+    with pytest.raises(ValidationError):
+        Draft202012Validator(schema).validate(report)
+    assert not is_valid_verdict(
+        report["verifiers"],
+        report["adversarial_results"],
+        report["wheel_sha256"],
+        dirty=True,
+    )
+
+
+def test_non_hex_wheel_digest_cannot_claim_pass():
+    report = valid_report()
+    assert not is_valid_verdict(
+        report["verifiers"],
+        report["adversarial_results"],
+        "g" * 64,
+    )
+
+
 def test_unknown_top_level_field_rejected(schema):
     report = deepcopy(valid_report())
     report["authority"] = "production"
