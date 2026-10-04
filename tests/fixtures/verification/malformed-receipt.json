@@ -1,0 +1,7 @@
+{
+  "receipt_id": "receipt-test-001",
+  "proposal_hash": "proposal",
+  "event_hash": "event",
+  "replay_root": "root",
+  "timestamp": "2026-10-04T00:00:00Z"
+}

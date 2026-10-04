@@ -1,0 +1,41 @@
+name: Verification evidence
+on:
+  push:
+    branches: [main]
+  pull_request:
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  verify:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 20
+    env:
+      WEAVER_SOURCE_HEAD_SHA: ${{ github.event.pull_request.head.sha }}
+      WEAVER_BASE_SHA: ${{ github.event.pull_request.base.sha }}
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 2
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: '17'
+      - name: Install locked verification dependencies
+        shell: bash
+        run: |
+          mkdir -p verification-output
+          set -o pipefail
+          python -m pip install -r requirements-verification.lock 2>&1 | tee verification-output/install.log
+      - name: Run complete fail-closed verification gate
+        run: make verify
+      - name: Retain evidence even on failure
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: verification-${{ github.sha }}
+          path: verification-output/
+          if-no-files-found: error

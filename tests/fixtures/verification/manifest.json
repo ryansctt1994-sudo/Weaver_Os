@@ -1,0 +1,50 @@
+{
+  "head": "24186f65f87d312d6a52cbf0fa434e23b5cee7bef28f991c385d8bf811dd47e0",
+  "key_sha256": "56475aa75463474c0285df5dbf2bcab73da651358839e9b77481b2eab107708c",
+  "cases": [
+    {
+      "file": "valid.jsonl",
+      "sha256": "93b08500eb2f0e39fc45e056a5973263d518370d88b536bffc879e5776891fb6",
+      "accept": true
+    },
+    {
+      "file": "tampered.jsonl",
+      "sha256": "987a96a06d9dd25a09a80804eaae00d4df31e9d59f3dde6419033fe9d30e8ee6",
+      "accept": false,
+      "error": "event_hash mismatch"
+    },
+    {
+      "file": "truncated.jsonl",
+      "sha256": "6c64e46784940aff71d8e1b996aa251818e23f9f98c0b11829d90887bb5f19e9",
+      "accept": false,
+      "error": "head mismatch"
+    },
+    {
+      "file": "key-substitution.jsonl",
+      "sha256": "c0b91c6dc071b93b33c89916774b33d55072f24142cc1c47d4fdb8cfcf50c4f2",
+      "accept": false,
+      "error": "untrusted key",
+      "head": "1584d49cbe2c21c9a6b7eed709157e81092382dbb254fa1dc9758e6caa376296"
+    },
+    {
+      "file": "empty.jsonl",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "accept": false,
+      "error": "ledger is empty"
+    },
+    {
+      "file": "duplicate-key.jsonl",
+      "sha256": "13e33d08e930880b116bfd9c26759f17b1032d3a3c73a8992e911cf54a6deb11",
+      "accept": false,
+      "error": "duplicate JSON key"
+    }
+  ],
+  "receipt_cases": [
+    {
+      "file": "malformed-receipt.json",
+      "sha256": "1e0f62e22ee14d5de1c5e730fb68cb0c530127b27309ca95cff36a704d39fa6a",
+      "accept": false,
+      "error": "receipt_hash"
+    }
+  ]
+}

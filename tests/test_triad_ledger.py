@@ -2,6 +2,7 @@ from __future__ import annotations
 
 from copy import deepcopy
 from datetime import datetime, timezone
+from typing import Any
 
 import pytest
 from cryptography.hazmat.primitives import serialization
@@ -47,7 +48,7 @@ def build_event(
     payload: dict | None = None,
     policy_version: str = "policy-v1",
 ) -> dict:
-    event = {
+    event: dict[str, Any] = {
         "index": index,
         "timestamp": utc_now(),
         "event_type": event_type,

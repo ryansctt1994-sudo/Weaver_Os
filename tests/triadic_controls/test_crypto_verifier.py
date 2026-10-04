@@ -1,5 +1,6 @@
 import base64
 from datetime import datetime, timedelta, timezone
+from typing import Any
 
 import pytest
 from cryptography.hazmat.primitives import serialization
@@ -100,7 +101,7 @@ def signed_envelope(
     issuer_id = "11111111-1111-4111-8111-111111111111"
     key_id = "22222222-2222-4222-8222-222222222222"
     effective_hash = payload_hash or compute_payload_hash(inner_payload or authority_payload())
-    envelope = {
+    envelope: dict[str, Any] = {
         "payload_type": "AUTHORITY_TOKEN",
         "payload_schema_version": "0.4.0",
         "payload_hash_alg": "sha256",
