@@ -320,7 +320,10 @@ def test_invalid_signature_does_not_poison_replay_cache(keypair, mock_registry):
         "signatures": [
             {
                 **envelope["signatures"][0],
-                "signature": "A" + envelope["signatures"][0]["signature"][1:],
+                "signature": (
+                    ("A" if envelope["signatures"][0]["signature"][0] != "A" else "B")
+                    + envelope["signatures"][0]["signature"][1:]
+                ),
             }
         ],
     }
