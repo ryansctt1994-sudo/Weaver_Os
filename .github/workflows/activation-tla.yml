@@ -21,6 +21,13 @@ jobs:
           distribution: temurin
           java-version: '17'
 
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+
+      - name: Install runtime dependencies
+        run: python -m pip install -e .
+
       - name: Acquire pinned TLC
         shell: bash
         run: |
@@ -40,6 +47,12 @@ jobs:
         run: |
           set -euo pipefail
           python3 -m tools.check_activation_tla_mutations "$RUNNER_TEMP/tla2tools.jar" 2>&1 | tee verification-output/activation-tlc-mutations.log
+
+      - name: Check runtime-to-model trace conformance
+        shell: bash
+        run: |
+          set -euo pipefail
+          python3 -m tools.check_activation_trace_conformance "$RUNNER_TEMP/tla2tools.jar" --output verification-output/activation-trace 2>&1 | tee verification-output/activation-trace-conformance.log
 
       - name: Retain activation TLC evidence
         if: always()
