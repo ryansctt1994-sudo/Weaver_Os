@@ -6,11 +6,17 @@ import ctypes
 import hashlib
 import json
 import math
+import os
 import re
 from dataclasses import dataclass
 from pathlib import Path
 
 from .activation import CONTRACT_VERSION, ActivationIntent, BackendActivationResult
+from .runtime_integrity import (
+    RuntimeIntegrityError,
+    assert_clean_loader_environment,
+    assert_linux_library_mapping_integrity,
+)
 
 _SHA256_RE = re.compile(r"^[0-9a-f]{64}$")
 _SYMBOL_RE = re.compile(r"^[A-Za-z_][A-Za-z0-9_]*$")
@@ -51,7 +57,7 @@ class NativeWeaverBackend:
     max_response_bytes: int = _DEFAULT_MAX_RESPONSE_BYTES
 
     def __post_init__(self) -> None:
-        object.__setattr__(self, "library_path", Path(self.library_path))
+        object.__setattr__(self, "library_path", Path(self.library_path).resolve())
         object.__setattr__(self, "input_bytes", bytes(self.input_bytes))
         if not _SYMBOL_RE.fullmatch(self.symbol):
             raise ValueError("native symbol must be a C identifier")
@@ -77,10 +83,17 @@ class NativeWeaverBackend:
             raise NativeWeaverProtocolError("input bytes do not match signed contract")
 
         try:
-            library = ctypes.CDLL(str(self.library_path))
+            assert_clean_loader_environment()
+            mode = getattr(os, "RTLD_LOCAL", 0) | getattr(os, "RTLD_NOW", 0)
+            library = (
+                ctypes.CDLL(str(self.library_path), mode=mode)
+                if os.name == "posix"
+                else ctypes.CDLL(str(self.library_path))
+            )
+            assert_linux_library_mapping_integrity(self.library_path)
             entry = getattr(library, self.symbol)
-        except (OSError, AttributeError) as exc:
-            raise NativeWeaverProtocolError("native activation entry point unavailable") from exc
+        except (OSError, AttributeError, RuntimeIntegrityError) as exc:
+            raise NativeWeaverProtocolError("native activation admission failed") from exc
 
         library_digest_loaded = _sha256_file(self.library_path)
         if library_digest_loaded != library_digest_before:
@@ -137,6 +150,11 @@ class NativeWeaverBackend:
             raise NativeWeaverProtocolError(f"native backend returned status {code}")
         if response_length.value == 0 or response_length.value > self.max_response_bytes:
             raise NativeWeaverProtocolError("native backend returned invalid response length")
+
+        try:
+            assert_linux_library_mapping_integrity(self.library_path)
+        except RuntimeIntegrityError as exc:
+            raise NativeWeaverProtocolError("native runtime integrity check failed") from exc
 
         library_digest_after = _sha256_file(self.library_path)
         if library_digest_after != library_digest_before:
