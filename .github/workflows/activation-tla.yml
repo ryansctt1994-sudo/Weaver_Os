@@ -1,0 +1,45 @@
+name: Activation TLA model
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+
+permissions:
+  contents: read
+
+jobs:
+  tlc:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: '17'
+
+      - name: Download and verify TLC 1.7.4
+        shell: bash
+        run: |
+          set -euo pipefail
+          mkdir -p verification-output
+          curl -fL --retry 3 --max-time 120 -o "$RUNNER_TEMP/tla2tools.jar" https://github.com/tlaplus/tlaplus/releases/download/v1.7.4/tla2tools.jar
+          echo "936a262061c914694dfd669a543be24573c45d5aa0ff20a8b96b23d01e050e88  $RUNNER_TEMP/tla2tools.jar" | sha256sum -c - | tee verification-output/activation-tlc-download.log
+
+      - name: Check activation invariants
+        working-directory: audit-package/formal/tla+
+        shell: bash
+        run: |
+          set -euo pipefail
+          java -cp "$RUNNER_TEMP/tla2tools.jar" tlc2.TLC -deadlock -config WeaverActivation.cfg WeaverActivation.tla 2>&1 | tee "$GITHUB_WORKSPACE/verification-output/activation-tlc.log"
+
+      - name: Retain activation TLC evidence
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: activation-tla-${{ github.sha }}
+          path: verification-output/
+          if-no-files-found: warn
