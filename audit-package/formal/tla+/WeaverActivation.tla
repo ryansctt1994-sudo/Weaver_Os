@@ -29,6 +29,14 @@ RejectCodes ==
    "AUTHORITY_INVALID", "AUTHORITY_BINDING_MISMATCH", "BACKEND_FAILED",
    "RESULT_IDENTITY_MISMATCH", "METRIC_INVALID", "RETENTION_GATE_FAILED"}
 
+PreExecutionRejectCodes ==
+  {"CONTRACT_VERSION_MISMATCH", "MALFORMED_IDENTITY",
+   "AUTHORITY_INVALID", "AUTHORITY_BINDING_MISMATCH"}
+
+PostExecutionRejectCodes ==
+  {"BACKEND_FAILED", "RESULT_IDENTITY_MISMATCH",
+   "METRIC_INVALID", "RETENTION_GATE_FAILED"}
+
 AuthRequest(a) == IF a = A1 THEN R1 ELSE R2
 AuthContract(a) == IF a = A1 THEN C1 ELSE C2
 AuthBackend(a) == IF a = A1 THEN B1 ELSE B2
@@ -258,6 +266,15 @@ Inv_RejectedHasEvidence ==
     state[r] = "Rejected" =>
       \E rc \in recordedEvidence :
         rc.requestId = r /\ rc.verdict = "REJECT" /\ rc.authorityDelta = 0
+
+Inv_RejectionPhaseSound ==
+  \A rc \in recordedEvidence :
+    rc.verdict = "REJECT" =>
+      /\ rc.rejectionCode \in RejectCodes
+      /\ IF rc.rejectionCode \in PreExecutionRejectCodes
+            THEN executionCount[rc.requestId] = 0
+            ELSE /\ rc.rejectionCode \in PostExecutionRejectCodes
+                 /\ executionCount[rc.requestId] = 1
 
 Inv_ChronicleIntegrity ==
   \A rc \in recordedEvidence :
