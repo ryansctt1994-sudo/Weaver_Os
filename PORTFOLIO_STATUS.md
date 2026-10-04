@@ -115,6 +115,7 @@ The legacy `E3_RECEIPTED` wording in `zorel-kernel` refers to an authorship/prov
 5. Historical status files must identify themselves as snapshots.
 6. No README may use “verified” or “proven” for a scope broader than the tests or proof artifacts actually present.
 7. No evidence label may grant authority.
+8. Open, draft, or stacked pull requests are candidate work, not current portfolio state. Evidence/status changes count only after merge to the repository's canonical branch, unless a specific immutable PR head is explicitly being evaluated.
 
 ## Immediate portfolio priorities
 
