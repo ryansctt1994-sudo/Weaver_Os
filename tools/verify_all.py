@@ -223,7 +223,7 @@ def run_formal_tlc(output: Path) -> dict[str, Any]:
         steps.append(
             run_step(
                 name,
-                "bounded-invariants",
+                "witness-boundary-invariants",
                 [
                     "java",
                     "-cp",
@@ -233,6 +233,25 @@ def run_formal_tlc(output: Path) -> dict[str, Any]:
                     "-config",
                     "WitnessBoundary.cfg",
                     "WitnessBoundary.tla",
+                ],
+                output,
+                cwd=FORMAL_DIR,
+                timeout=180,
+            )
+        )
+        steps.append(
+            run_step(
+                name,
+                "activation-runtime-invariants",
+                [
+                    "java",
+                    "-cp",
+                    str(jar),
+                    "tlc2.TLC",
+                    "-deadlock",
+                    "-config",
+                    "WeaverActivation.cfg",
+                    "WeaverActivation.tla",
                 ],
                 output,
                 cwd=FORMAL_DIR,
