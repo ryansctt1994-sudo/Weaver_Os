@@ -9,7 +9,7 @@ python -m pip install -r requirements-verification.lock
 make verify
 ```
 
-`make verify` is now the complete fail-closed gate. It runs exactly six required
+`make verify` is now the complete fail-closed gate. It runs exactly seven required
 verifiers and emits one aggregate `verification-output/verification-report.json`:
 
 1. `unit_and_integration`
@@ -18,12 +18,15 @@ verifiers and emits one aggregate `verification-output/verification-report.json`
 4. `adversarial_corpus`
 5. `installed_wheel`
 6. `formal_tlc`
+7. `static_analysis_strict`
 
 A required verifier cannot be skipped, unavailable, or missing and still produce
 PASS. Missing executables, timeouts, failed downloads, digest mismatches, missing
 artifacts, failed wheel installation, and nonzero exit codes are recorded as FAIL.
 The overall verdict is derived mechanically from the complete required verifier
-set, the structured adversarial results, and the built-wheel digest.
+set, the structured adversarial results, the built-wheel digest, and a clean-tree
+provenance check. A dirty working tree cannot produce PASS because commit identity
+would not fully bind the verified source bytes.
 
 The report binds the result to the source-head SHA, the commit actually checked
 out and verified, the base SHA, dependency-lock digest, wheel digest, environment,
@@ -65,6 +68,13 @@ redundant CI evidence, but the aggregate report no longer depends on manually
 combining that workflow with another PASS.
 
 A bounded TLA+ model check is not proof that Python implements the specification.
+
+## Static-analysis boundary
+
+Strict static analysis is part of the mechanical closure rather than an informal
+side check. Both `ruff check .` and `mypy .` must exit successfully; either tool
+being missing, timing out, or reporting an error forces the aggregate verdict to
+FAIL.
 
 ## Deferred source-tree modules
 
