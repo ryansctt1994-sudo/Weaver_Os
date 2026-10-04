@@ -13,7 +13,6 @@ from triadic_controls.crypto.verifier import VerificationResult
 from weaver_activation import (
     ActivationAction,
     ActivationIntent,
-    ActivationStatus,
     BackendActivationResult,
     WeaverActivationAdapter,
     build_activation_authority_payload,
