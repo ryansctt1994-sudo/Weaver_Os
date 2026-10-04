@@ -1,0 +1,97 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://weaver.local/schemas/activation_receipt.schema.json",
+  "title": "Weaver Activation Receipt",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schema_version",
+    "request_id",
+    "model_id",
+    "backend_id",
+    "contract_version",
+    "contract_sha256",
+    "authority_event_id",
+    "authority_event_type",
+    "authority_payload_sha256",
+    "intent_sha256",
+    "result_sha256",
+    "backend_sha256",
+    "checkpoint_sha256",
+    "input_sha256",
+    "output_sha256",
+    "normalized_metrics",
+    "verdict",
+    "rejection_code",
+    "authority_delta"
+  ],
+  "properties": {
+    "schema_version": {"const": "weaver-activation-receipt-1"},
+    "request_id": {"type": "string", "minLength": 1},
+    "model_id": {"type": "string", "minLength": 1},
+    "backend_id": {"type": "string", "minLength": 1},
+    "contract_version": {"type": "string", "minLength": 1},
+    "contract_sha256": {"$ref": "#/$defs/nullableDigest"},
+    "authority_event_id": {
+      "oneOf": [
+        {"type": "string", "minLength": 1},
+        {"type": "null"}
+      ]
+    },
+    "authority_event_type": {"type": "string", "minLength": 1},
+    "authority_payload_sha256": {"$ref": "#/$defs/digest"},
+    "intent_sha256": {"$ref": "#/$defs/digest"},
+    "result_sha256": {"$ref": "#/$defs/nullableDigest"},
+    "backend_sha256": {"$ref": "#/$defs/nullableDigest"},
+    "checkpoint_sha256": {"$ref": "#/$defs/nullableDigest"},
+    "input_sha256": {"$ref": "#/$defs/nullableDigest"},
+    "output_sha256": {"$ref": "#/$defs/nullableDigest"},
+    "normalized_metrics": {
+      "type": "object",
+      "additionalProperties": {"type": "number"}
+    },
+    "verdict": {"enum": ["PASS", "REJECT"]},
+    "rejection_code": {
+      "oneOf": [
+        {"type": "string", "minLength": 1},
+        {"type": "null"}
+      ]
+    },
+    "authority_delta": {"const": 0}
+  },
+  "$defs": {
+    "digest": {
+      "type": "string",
+      "pattern": "^[0-9a-f]{64}$"
+    },
+    "nullableDigest": {
+      "oneOf": [
+        {"$ref": "#/$defs/digest"},
+        {"type": "null"}
+      ]
+    }
+  },
+  "allOf": [
+    {
+      "if": {
+        "properties": {"verdict": {"const": "PASS"}},
+        "required": ["verdict"]
+      },
+      "then": {
+        "properties": {
+          "rejection_code": {"type": "null"},
+          "contract_sha256": {"$ref": "#/$defs/digest"},
+          "backend_sha256": {"$ref": "#/$defs/digest"},
+          "checkpoint_sha256": {"$ref": "#/$defs/digest"},
+          "input_sha256": {"$ref": "#/$defs/digest"},
+          "output_sha256": {"$ref": "#/$defs/digest"}
+        }
+      },
+      "else": {
+        "properties": {
+          "rejection_code": {"type": "string", "minLength": 1}
+        }
+      }
+    }
+  ]
+}
