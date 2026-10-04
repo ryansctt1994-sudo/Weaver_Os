@@ -1,194 +1,125 @@
 # Weaver Nexus GitHub Portfolio Status
 
-**Baseline date:** 2026-08-05  
+**Baseline date:** 2026-10-04  
 **Canonical GitHub anchor:** `ryansctt1994-sudo/Weaver_Os`  
+**Accessible repository inventory:** 71 repositories  
+**GitHub-native split:** 15 non-fork repositories, 56 GitHub forks  
 **Operational authority:** `O0 — withheld`  
 **Prime invariant:** No mechanism may silently convert uncertainty into authority.
 
+## Source of truth
+
+This document is the current portfolio-level status. Repository-specific READMEs remain authoritative for their own implementation scope. Older portfolio snapshots are historical evidence and must not silently override this file.
+
+See [PORTFOLIO_REGISTRY.md](PORTFOLIO_REGISTRY.md) for the complete repository and upstream-parent inventory.
+
 ## Portfolio identity
 
-The GitHub account is best treated as a mixed-origin research portfolio rather than one product repository. It contains original bounded engineering, provenance packages, experimental agents, research mirrors, forks, imported frameworks, and historical branches.
+The account is a mixed-origin research portfolio. It contains original engineering, collaborative work, manually imported research material, experimental scaffolds, and upstream forks.
 
-The strongest defensible professional classification is:
+The defensible portfolio description is:
 
-> An independent constitutional AI assurance and systems-engineering portfolio focused on cryptographic authorization, replay protection, deterministic evidence, bounded execution, governance, formal-method research, and high-consequence system design.
+> An independent AI assurance and systems-engineering portfolio centered on deterministic evidence, replay, provenance, bounded execution, explicit authority boundaries, formal-method experiments, and governance-first agentic systems.
 
-## Canonical repository roles
+Presence under this account is not evidence of original authorship.
 
-### Tier 1 — Core original engineering
+## Canonical engineering spine
 
-#### `Weaver_Os`
-Canonical compact verification spine.
+### `Weaver_Os`
 
-Verified repository scope:
+Role: canonical verification and governance spine.
 
-- authority and refusal signature verification
-- replay-cache protocol
-- JSON-schema alignment
-- release-provenance generation and verification
-- promotion rules
-- bounded CLI and test surface
+Current mainline work includes cryptographic authorization checks, replay handling, canonicalization, Chronicle-style history, release provenance, archive binding, mutation checks, bounded TLA/TLC witness work, and a fail-closed ledger spine.
 
-Current status:
+At this baseline, `main` includes merged verification closure commit `9b86b059ee1673f866d9e1b124214da24a08a3bb` from PR #60. The PR head (`9eb5e33f0e2c27704f79e42f2b90f347ae6b8ad6`) passed normal CI, tests, triadic-controls CI, the bounded TLA model, and the aggregate verification-evidence workflow before merge. That is bounded self/CI evidence; it is not independent reproduction or production authorization.
+
+Allowed status:
 
 ```text
-MVP_VERIFICATION_SPINE
-ARCHITECTURE_FROZEN
-EVIDENCE_NOT_FROZEN
-AUTHORITY_NOT_EARNED
-```
-
-The repository explicitly does not claim moral legitimacy, operational safety, production readiness, or independent validation.
-
-#### `cathedral-verified`
-Canonical bounded demonstration companion.
-
-Repository claims are limited to:
-
-- Chronicle tamper-evidence and anchor logic: 15/15 adversarial checks reported
-- Lucifer Latch RTL behavior in Icarus simulation: 8/8 checks reported
-
-Important limits:
-
-- RTL is simulation-only, not silicon-validated
-- Chronicle is tamper-evident, not tamper-proof
-- external anchor storage and witness quorum remain absent
-- hardware-simulation CI is not yet fully integrated
-
-### Tier 2 — Original or portfolio-native candidates
-
-#### `zorel-kernel`
-Provenance and authorship receipt package.
-
-Correct classification:
-
-```text
-DETERMINISTIC_AUTHORSHIP_RECEIPT
-PROVENANCE_EVIDENCE
-NOT_INDEPENDENT_REPRODUCTION
-NOT_RUNTIME_VERIFICATION
-```
-
-Its `E3_RECEIPTED` language must not be interpreted as an independent E3/E4 witness result.
-
-#### `ANGELA`
-Custom-GPT constitutional and symbolic framework.
-
-Correct classification:
-
-```text
-PROMPT_AND_PERSONA_ARCHITECTURE
-SYMBOLIC_CONSTITUTIONAL_DESIGN
-E0_E1
+CANONICAL_VERIFICATION_SPINE
+SELECTED_LOCAL_E2_EVIDENCE
+INDEPENDENT_REPRODUCTION_NOT_ESTABLISHED_PORTFOLIO_WIDE
+PRODUCTION_AUTHORITY_NONE
 O0
 ```
 
-Its numerical coherence, sovereignty, drift, and SHA-2048 claims are not established engineering measurements unless separately receipt-bound.
+### `Lumen-Nexus`
 
-#### Small portfolio-native research repositories
-Examples include `Lumen`, `Lumen-Nexus`, `Delta-717`, `Weaver--Cathedral-`, `Weavers-Forge-`, `A.G.I-Seed-`, `AGI-to-ASI-TRANSITION-PROOF-LAYER`, and `AutoProof`.
+Role: governed evidence-first architecture and clean-room promotion-gate work.
 
-These remain candidates until each has:
+PG-001R is recorded as `R2[self]`; historical equivalence to the missing PG-001 artifact is not established. Production authority remains NONE.
 
-- a clear README boundary
-- source inventory
-- tests
-- CI
-- provenance
-- evidence ceiling
-- relationship to the canonical anchor
+### `cathedral-verified`
 
-### Tier 3 — External, mirrored, collaborative, or imported repositories
+Role: bounded evidence companion.
 
-These repositories must not be counted as original Weaver engineering without commit-level attribution evidence:
+The repository carries Chronicle tamper-evidence tests and Lucifer Latch RTL simulation. These are implementation/simulation results, not silicon validation or independent system certification.
 
-- `t81-foundation`, `t81-hardware`, `t81-benchmarks`, `t81-docs`, `t81-roadmap`, `t81lib`
-- `SpiralSafe`, `spiralsafe-mono`
-- `Delta-RPM-Protocol`
-- `SuperAGI`
-- `swarms`
-- `ruflo`
-- `agency-agents6`
-- `awesome-agent-skills`
-- `claude-code-best-practice-Codex-`
-- `system-prompts-and-models-of-ai-tools`
-- `AI-Research-SKILLs`
-- other repositories whose READMEs identify a different upstream owner, organization, creator, or clone URL
+## Other non-fork repositories
 
-These can be counted as:
+| Repository | Portfolio role | Current classification |
+| --- | --- | --- |
+| `zorel-kernel` | Provenance/authorship receipt package | Provenance evidence; legacy “E3” authorship label is not independent reproduction |
+| `Delta-RPM-Protocol` | Manually imported/collaborative physics research copy | External-origin research; claims require independent scientific review |
+| `Math_Build1994` | Lean/math practice and signed-artifact experiments | Narrow formal-method learning repo |
+| `reson8-Labs` | Collaborative software-quality/coherence experiments | Experimental toolkit; “resonance” is a project heuristic, not a physics measurement |
+| `SynthaMed` | Healthcare governance architecture | Research architecture only; no medical-device or autonomous clinical authority |
+| `Lumen-Elpis` | Incubator shell | No substantive implementation in repository at audit baseline |
+| `Sym-Chaos-` | Infrastructure/hardware scaffold | Partial scaffold; application/runtime pieces referenced by Makefile are not all present |
+| `Weavers-Forge-` | Builder-community evidence workflow | Community/process layer, not an authority source |
+| `LogOS` | Experimental distributed/topological systems research | Prototype with partial formal material; current checked-in build logs include failures |
+| `Weaver--Cathedral-` | Integration/staging blueprint | Secondary synthesis repo; not the canonical portfolio authority |
+| `A.G.I-Seed-` | Governed agentic-software research | Research prototype; Python tests exist; docs CI required repair at this audit |
+| `Weaver-Governed-RSI` | RSI governance incubator shell | No substantive implementation in repository at audit baseline |
 
-- research dependencies
-- comparative references
-- collaboration surfaces
-- forks or mirrors
-- integration candidates
+## Evidence vocabulary
 
-They cannot be counted as original authored systems merely because they exist under this GitHub account.
-
-## Evidence status
-
-### Established from GitHub
-
-- real repository presence
-- stable Git history
-- executable source in selected repositories
-- bounded tests and CI configuration in selected repositories
-- explicit security and scope limitations in the strongest READMEs
-- clear provenance signals for several external or mirrored repositories
-
-### Not established portfolio-wide
-
-- clean-room reproduction by an independent operator
-- complete cross-platform CI
-- independent signed witness receipts
-- physical FPGA validation
-- production deployment
-- system-level formal proof
-- AGI or ASI capability
-- consciousness or autonomous sovereignty
-- operational authority
-
-## Current maturity
-
-| Dimension | Status |
-|---|---|
-| Constitutional architecture | Mature E1 |
-| Compact verification implementation | E2-capable selected components |
-| Bounded simulation evidence | E2 selected artifacts |
-| Repository organization | Improving, still fragmented |
-| Formal methods | Partial and project-specific |
-| Hardware | RTL and simulation candidate only |
-| Independent reproduction | Not established |
-| Production readiness | Not established |
-| Operational authority | O0 |
-
-## Portfolio rule
-
-Repository presence does not propagate evidence.
+Portfolio evidence terms must be typed. A label in one repository cannot silently inherit the meaning of another ladder.
 
 ```text
-owned repo != original authorship
-fork != implementation achievement
-README claim != execution receipt
-local test != independent reproduction
+authorship receipt != independent reproduction
+local test != external witness
+CI success != production readiness
+formalized property != formally verified whole system
 simulation != hardware validation
-provenance receipt != correctness proof
+fork != original authorship
+repository presence != implementation achievement
 capability != authority
 ```
 
-## Canonical next action
+The legacy `E3_RECEIPTED` wording in `zorel-kernel` refers to an authorship/provenance receipt. It must not be read as earned E3 independent reproduction under the broader Weaver evidence ladder.
 
-Freeze one tagged release of `Weaver_Os` together with a bounded companion artifact from `cathedral-verified`, then provide an independent reviewer with:
+## Portfolio-wide claims currently supported
 
-- exact commit SHAs
-- dependency locks
-- test commands
-- raw logs
-- expected roots or hashes
-- negative controls
-- environment manifest
-- witness-signing instructions
+- The account contains real executable and testable software artifacts.
+- Selected components have local tests, CI, replay/tamper checks, bounded formal-model work, and provenance controls.
+- The strongest repositories explicitly separate architecture, evidence, and authority.
+- GitHub fork provenance is recoverable for 56 repositories and is cataloged in the registry.
 
-The reviewer must reproduce the result on non-originating hardware and emit a digest-bound signed receipt.
+## Portfolio-wide claims not established
 
-Until that occurs, the portfolio remains a substantial independent R&D and engineering portfolio with selected E2 implementation pockets and O0 authority.
+- Independent clean-room reproduction of the full system
+- Production readiness of the portfolio as a whole
+- Physical FPGA validation for the Lucifer Latch
+- Full-system formal verification
+- AGI or ASI capability
+- consciousness or autonomous sovereignty
+- medical, legal, financial, defense, or emergency authority
+
+## Coherence rules
+
+1. `Weaver_Os` is the canonical portfolio anchor unless a future governance decision explicitly changes that.
+2. Integration repos may synthesize ideas but do not inherit evidence from source repos.
+3. Forked repositories retain upstream attribution; local presence is not ownership.
+4. A manually copied external project must state its external provenance even if GitHub marks it as non-fork.
+5. Historical status files must identify themselves as snapshots.
+6. No README may use “verified” or “proven” for a scope broader than the tests or proof artifacts actually present.
+7. No evidence label may grant authority.
+
+## Immediate portfolio priorities
+
+1. Freeze/tag the merged `Weaver_Os` verification closure and preserve its exact green-run artifacts.
+2. Produce independent reproduction for one narrow, frozen artifact before widening claims.
+3. Keep `Lumen-Nexus` R-level terminology separate from Weaver E-level terminology unless a mapping is explicitly specified.
+4. Treat the 2026-10-04 native-repo README normalization as the new documentation baseline and keep future status changes evidence-bound.
+5. Keep upstream forks minimally modified; record local changes separately when they become portfolio work.
