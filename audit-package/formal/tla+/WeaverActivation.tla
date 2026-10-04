@@ -25,8 +25,15 @@ States ==
    "ResultVerified", "Recorded", "Rejected"}
 
 RejectCodes ==
-  {"AUTHORITY_INVALID", "AUTHORITY_BINDING_MISMATCH", "BACKEND_FAILED",
+  {"CONTRACT_VERSION_MISMATCH", "MALFORMED_IDENTITY",
+   "AUTHORITY_INVALID", "AUTHORITY_BINDING_MISMATCH", "BACKEND_FAILED",
    "RESULT_IDENTITY_MISMATCH", "METRIC_INVALID", "RETENTION_GATE_FAILED"}
+
+AuthRequest(a) == IF a = A1 THEN R1 ELSE R2
+AuthContract(a) == IF a = A1 THEN C1 ELSE C2
+AuthBackend(a) == IF a = A1 THEN B1 ELSE B2
+AuthCheckpoint(a) == IF a = A1 THEN CP1 ELSE CP2
+AuthInput(a) == IF a = A1 THEN I1 ELSE I2
 
 VARIABLES
   state,
@@ -77,6 +84,7 @@ Init ==
 Authorize(r, authEvent) ==
   /\ state[r] = "Proposed"
   /\ authEvent \in AuthorityEvents
+  /\ AuthRequest(authEvent) = r
   /\ state' = [state EXCEPT ![r] = "Authorized"]
   /\ boundAuthority' = [boundAuthority EXCEPT ![r] = authEvent]
   /\ UNCHANGED
@@ -90,6 +98,11 @@ BindContract(r, c, b, cp, inp) ==
   /\ b \in Backends
   /\ cp \in Checkpoints
   /\ inp \in Inputs
+  /\ boundAuthority[r] \in AuthorityEvents
+  /\ c = AuthContract(boundAuthority[r])
+  /\ b = AuthBackend(boundAuthority[r])
+  /\ cp = AuthCheckpoint(boundAuthority[r])
+  /\ inp = AuthInput(boundAuthority[r])
   /\ state' = [state EXCEPT ![r] = "ContractBound"]
   /\ boundContract' = [boundContract EXCEPT ![r] = c]
   /\ boundBackend' = [boundBackend EXCEPT ![r] = b]
@@ -148,9 +161,21 @@ RejectNonFinite(r) ==
          boundAuthority, consumedRequests, executionCount, resultOutput,
          authorityDelta, protectedState>>
 
+AllowedReject(s, code) ==
+  CASE s = "Proposed" ->
+         code \in {"CONTRACT_VERSION_MISMATCH", "MALFORMED_IDENTITY",
+                   "AUTHORITY_INVALID"}
+    [] s = "Authorized" ->
+         code = "AUTHORITY_BINDING_MISMATCH"
+    [] s = "Executed" ->
+         code \in {"BACKEND_FAILED", "RESULT_IDENTITY_MISMATCH",
+                   "METRIC_INVALID", "RETENTION_GATE_FAILED"}
+    [] OTHER -> FALSE
+
 Reject(r, code) ==
-  /\ state[r] \in {"Proposed", "Authorized", "ContractBound", "Executed"}
+  /\ state[r] \in {"Proposed", "Authorized", "Executed"}
   /\ code \in RejectCodes
+  /\ AllowedReject(state[r], code)
   /\ state' = [state EXCEPT ![r] = "Rejected"]
   /\ recordedEvidence' =
        recordedEvidence \cup {Receipt(r, "REJECT", code, NONE)}
@@ -206,6 +231,16 @@ Inv_ExecutionPrecondition ==
       /\ boundCheckpoint[r] \in Checkpoints
       /\ boundInput[r] \in Inputs
       /\ boundAuthority[r] \in AuthorityEvents
+
+Inv_AuthorityExactBinding ==
+  \A r \in Requests :
+    state[r] \in {"ContractBound", "Executed", "ResultVerified", "Recorded"} =>
+      /\ boundAuthority[r] \in AuthorityEvents
+      /\ AuthRequest(boundAuthority[r]) = r
+      /\ boundContract[r] = AuthContract(boundAuthority[r])
+      /\ boundBackend[r] = AuthBackend(boundAuthority[r])
+      /\ boundCheckpoint[r] = AuthCheckpoint(boundAuthority[r])
+      /\ boundInput[r] = AuthInput(boundAuthority[r])
 
 Inv_AuthorityDeltaZero ==
   \A r \in Requests : authorityDelta[r] = 0
