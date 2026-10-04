@@ -66,6 +66,8 @@ Proposed -> Authorized -> ContractBound -> Executed -> ResultVerified -> Recorde
 
 The bounded TLC model checks:
 - execution requires prior authorization plus contract/backend/checkpoint/input binding
+- the admitted authority event is mapped to one exact request/contract/backend/checkpoint/input tuple; a different tuple cannot reach `ContractBound`
+- rejection codes are phase constrained, so an authority failure cannot appear after execution and a backend/result failure cannot appear before execution
 - `authorityDelta` remains zero
 - activation never mutates the modeled protected state
 - an execution counter prevents a request from executing more than once
