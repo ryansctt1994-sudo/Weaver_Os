@@ -30,4 +30,400 @@ REQUIRED_VERIFIERS = (
     "installed_wheel",
     "formal_tlc",
 )
-IMPLEMENTATION_SUQUL€ôì(€€€€‰¡É½¹¥±”ˆè€‰II}Q=}	=U9}]%Q9MLˆ°(€€€€‰­•É¹•°ˆè€‰II}Q=}	=U9}]%Q9MLˆ°(€€€€‰É••¥ÁÐˆè€‰II}Q=}	=U9}]%Q9MLˆ°)ô(()‘•˜Í¡„ÈÔÙ}™¥±”¡Á…Ñ èA…Ñ ¤€´øÍÑÈè(€€€É•ÑÕÉ¸¡…Í¡±¥ˆ¹Í¡„ÈÔØ¡Á…Ñ ¹É•…‘}‰åÑ•Ì ¤¤¹¡•á‘¥•ÍÐ ¤(()‘•˜¥Ð ©…ÉÌèÍÑÈ°‘•™…Õ±ÐèÍÑÈð9½¹”€ô9½¹”¤€´øÍÑÈè(€€€ÑÉäè(€€€€€€€É•ÑÕÉ¸ÍÕ‰ÁÉ½•ÍÌ¹¡•­}½ÕÑÁÕÐ (€€€€€€€€€€€l‰¥Ðˆ°€©…ÉÍt°ÝõI==P°Ñ•áÐõQÉÕ”°ÍÑ‘•ÉÈõÍÕ‰ÁÉ½•ÍÌ¹Y9U10(€€€€€€€€¤¹ÍÑÉ¥À ¤(€€€•á•ÁÐ€¡=MÉÉ½È°ÍÕ‰ÁÉ½•ÍÌ¹…±±•‘AÉ½•ÍÍÉÉ½È¤è(€€€€€€€¥˜‘•™…Õ±Ð¥Ì9½¹”è(€€€€€€€€€€€É…¥Í”(€€€€€€€É•ÑÕÉ¸‘•™…Õ±Ð(()‘•˜É•Á½Í¥Ñ½Éå}¹…µ” ¤€´øÍÑÈè(€€€½¹™¥ÕÉ•€ô½Ì¹•¹Ù¥É½¸¹•Ð ‰%Q!U	}IA=M%Q=Idˆ¤(€€€¥˜½¹™¥ÕÉ•è(€€€€€€€É•ÑÕÉ¸½¹™¥ÕÉ•(€€€É•µ½Ñ”€ô¥Ð ‰½¹™¥œˆ°€ˆ´µ•Ðˆ°€‰É•µ½Ñ”¹½É¥¥¸¹ÕÉ°ˆ°‘•™…Õ±Ðô‰±½…°½Õ¹­¹½Ý¸ˆ¤(€€€¥˜É•µ½Ñ”¹•¹‘ÍÝ¥Ñ  ˆ¹¥Ðˆ¤è(€€€€€€€É•µ½Ñ”€ôÉ•µ½Ñ•lè´Ñt(€€€¥˜É•µ½Ñ”¹ÍÑ…ÉÑÍÝ¥Ñ  ‰¥Ñ¥Ñ¡Õˆ¹½´èˆ¤è(€€€€€€€É•ÑÕÉ¸É•µ½Ñ”¹ÍÁ±¥Ð ˆèˆ°€Ä¥lÅt(€€€µ…É­•È€ô€‰¥Ñ¡Õˆ¹½´¼ˆ(€€€¥˜µ…É­•È¥¸É•µ½Ñ”è(€€€€€€€É•ÑÕÉ¸É•µ½Ñ”¹ÍÁ±¥Ð¡µ…É­•È°€Ä¥lÅt(€€€É•ÑÕÉ¸É•µ½Ñ”(()‘•˜}±½}‰åÑ•Ì¡½µµ…¹è±¥ÍÑmÍÑÉt°ÍÑ‘½ÕÐè‰åÑ•Ì°ÍÑ‘•ÉÈè‰åÑ•Ì¤€´ø‰åÑ•Ìè(€€€ÁÉ•™¥à€ô€ ˆ€ˆ€¬€ˆ€ˆ¹©½¥¸¡½µµ…¹¤€¬€‰q¸ˆ¤¹•¹½‘” ¤(€€€É•ÑÕÉ¸ÁÉ•™¥à€¬ÍÑ‘½ÕÐ€¬ˆ‰q¸´´´ÍÑ‘•ÉÈ€´´µq¸ˆ€¬ÍÑ‘•ÉÈ(()‘•˜ÉÕ¹}ÍÑ•À (€€€Ù•É¥™¥•ÈèÍÑÈ°(€€€ÍÑ•ÀèÍÑÈ°(€€€½µµ…¹è±¥ÍÑmÍÑÉt°(€€€½ÕÑÁÕÐèA…Ñ °(€€€€¨°(€€€ÝèA…Ñ €ôI==P°(€€€Ñ¥µ•½ÕÐè¥¹Ð€ô€ÌÀÀ°(¤€ˆˆ‰á•ÕÑ”½¹”É•ÅÕ¥É•ÍÑ•Àìµ¥ÍÍ¥¹œÑ½½±Ì…¹Ñ¥µ•½ÕÑÌ…É”¡…É™…¥±ÕÉ•Ì¸ˆˆˆ(€€€ÑÉäè(€€€€€€€É•ÍÕ±Ð€ôÍÕ‰ÁÉ½•ÍÌ¹ÉÕ¸¡½µµ…¹°ÝõÝ°…ÁÑÕÉ•}½ÕÑÁÕÐõQÉÕ”°Ñ¥µ•½ÕÐõÑ¥µ•½ÕÐ¤(€€€€€€€½‘”€ôÉ•ÍÕ±Ð¹É•ÑÕÉ¹½‘”(€€€€€€€ÍÑ‘½ÕÐ°ÍÑ‘•ÉÈ€ôÉ•ÍÕ±Ð¹ÍÑ‘½ÕÐ°É•ÍÕ±Ð¹ÍÑ‘•ÉÈ(€€€•á•ÁÐ€¡=MÉÉ½È°ÍÕ‰ÁÉ½•ÍÌ¹Q¥µ•½ÕÑáÁ¥É•¤…Ì•áŒè(€€€€€€€½‘”€ô€´Ä(€€€€€€€É…Ý}ÍÑ‘½ÕÐ€ô•Ñ…ÑÑÈ¡•áŒ°€‰ÍÑ‘½ÕÐˆ°9½¹”¤½Èˆˆˆ(€€€€€€€É…Ý}ÍÑ‘•ÉÈ€ô•Ñ…ÑÑÈ¡•áŒ°€‰ÍÑ‘•ÉÈˆ°9½¹”¤½Èˆˆˆ(€€€€€€€ÍÑ‘½ÕÐ€ôÉ…Ý}ÍÑ‘½ÕÐ¹•¹½‘” ¤¥˜¥Í¥¹ÍÑ…¹”¡É…Ý}ÍÑ‘½ÕÐ°ÍÑÈ¤•±Í”É…Ý}ÍÑ‘½ÕÐ(€€€€€€€ÍÑ‘•ÉÈ€ôÉ…Ý}ÍÑ‘•ÉÈ¹•¹½‘” ¤¥˜¥Í¥¹ÍÑ…¹”¡É…Ý}ÍÑ‘•ÉÈ°ÍÑÈ¤•±Í”É…Ý}ÍÑ‘•ÉÈ(€€€€€€€ÍÑ‘•ÉÈ€¬ô€ ‰q¸ˆ€¬É•ÁÈ¡•áŒ¤¤¹•¹½‘” ¤((€€€±½œ€ô}±½}‰åÑ•Ì¡½µµ…¹°ÍÑ‘½ÕÐ°ÍÑ‘•ÉÈ¤(€€€™¥±•¹…µ”€ô˜‰íÙ•É¥™¥•Éô´µíÍÑ•Áô¹±½œˆ(€€€€¡½ÕÑÁÕÐ€¼™¥±•¹…µ”¤¹ÝÉ¥Ñ•}‰åÑ•Ì¡±½œ¤(€€€É•ÑÕÉ¸ì(€€€€€€€€‰ÍÑ•ÀˆèÍÑ•À°(€€€€€€€€‰½µµ…¹ˆè½µµ…¹°(€€€€€€€€‰•á¥Ñ}½‘”ˆè½‘”°(€€€€€€€€‰ÍÑ…ÑÕÌˆè€‰AMLˆ¥˜½‘”€ôô€À•±Í”€‰%0ˆ°(€€€€€€€€‰±½œˆè™¥±•¹…µ”°(€€€€€€€€‰±½}Í¡„ÈÔØˆè¡…Í¡±¥ˆ¹Í¡„ÈÔØ¡±½œ¤¹¡•á‘¥•ÍÐ ¤°(€€€ô(()‘•˜Ù•É¥™¥•È¡¹…µ”èÍÑÈ°ÍÑ•ÁÌè±¥ÍÑm‘¥ÑmÍÑÈ°¹åut¤€´ø‘¥ÑmÍÑÈ°¹åtè(€€€ÍÑ…ÑÕÌ€ô€‰AMLˆ¥˜ÍÑ•ÁÌ…¹…±°¡ÍÑ•Ál‰ÍÑ…ÑÕÌ‰t€ôô€‰AMLˆ™½ÈÍÑ•À¥¸ÍÑ•ÁÌ¤•±Í”€‰%0ˆ(€€€™¥ÉÍÑ}™…¥±ÕÉ”€ô¹•áÐ ¡ÍÑ•Ál‰•á¥Ñ}½‘”‰t™½ÈÍÑ•À¥¸ÍÑ•ÁÌ¥˜ÍÑ•Ál‰ÍÑ…ÑÕÌ‰t€ôô€‰%0ˆ¤°€À¤(€€€É•ÑÕÉ¸ì‰¹…µ”ˆè¹…µ”°€‰ÍÑ…ÑÕÌˆèÍÑ…ÑÕÌ°€‰•á¥Ñ}½‘”ˆè™¥ÉÍÑ}™…¥±ÕÉ”°€‰ÍÑ•ÁÌˆèÍÑ•ÁÍô(()‘•˜ÉÕ¹}Í¥µÁ±•}Ù•É¥™¥•È (€€€¹…µ”èÍÑÈ°½µµ…¹è±¥ÍÑmÍÑÉt°½ÕÑÁÕÐèA…Ñ °€¨°Ñ¥µ•½ÕÐè¥¹Ð€ô€ÌÀÀ(¤€´ø‘¥ÑmÍÑÈ°¹åtè(€€€É•ÑÕÉ¸Ù•É¥™¥•È¡¹…µ”°mÉÕ¹}ÍÑ•À¡¹…µ”°€‰ÉÕ¸ˆ°½µµ…¹°½ÕÑÁÕÐ°Ñ¥µ•½ÕÐõÑ¥µ•½ÕÐ¥t¤(()‘•˜ÉÕ¹}¥¹ÍÑ…±±•‘}Ý¡••°¡½ÕÑÁÕÐèA…Ñ ¤€´øÑÕÁ±•m‘¥ÑmÍÑÈ°¹åt°A…Ñ ð9½¹•tè(€€€¹…µ”€ô€‰¥¹ÍÑ…±±•‘}Ý¡••°ˆ(€€€ÍÑ•ÁÌè±¥ÍÑm‘¥ÑmÍÑÈ°¹åut€ômt(€€€‘¥ÍÐ€ôI==P€¼€‰‘¥ÍÐˆ(€€€Í¡ÕÑ¥°¹ÉµÑÉ•”¡‘¥ÍÐ°¥¹½É•}•ÉÉ½ÉÌõQÉÕ”¤((€€€ÍÑ•ÁÌ¹…ÁÁ•¹ (€€€€€€€ÉÕ¹}ÍÑ•À (€€€€€€€€€€€¹…µ”°(€€€€€€€€€€€€‰‰Õ¥±ˆ°(€€€€€€€€€€€mÍåÌ¹•á•ÕÑ…‰±”°€ˆµ´ˆ°€‰‰Õ¥±ˆ°€ˆ´µ¹¼µ¥Í½±…Ñ¥½¸ˆ°€ˆ´µÝ¡••°‰t°(€€€€€€€€€€€½ÕÑÁÕÐ°(€€€€€€€€€€€Ñ¥µ•½ÕÐôÄàÀ°(€€€€€€€€¤(€€€€¤(€€€Ý¡••±Ì€ôÍ½ÉÑ•¡‘¥ÍÐ¹±½ˆ ˆ¨¹Ý¡°ˆ¤¤¥˜‘¥ÍÐ¹•á¥ÍÑÌ ¤•±Í”mt(€€€¥˜±•¸¡Ý¡••±Ì¤€„ô€Äè(€€€€€€€µ•ÍÍ…”€ô˜‰•áÁ•Ñ••á…Ñ±ä½¹”‰Õ¥±ÐÝ¡••°°™½Õ¹í±•¸¡Ý¡••±Ì¥õq¸ˆ¹•¹½‘” ¤(€€€€€€€±½œ€ô}±½}‰åÑ•Ì¡l‰¥¹Ñ•É¹…°ˆ°€‰±½…Ñ”µÝ¡••°‰t°ˆˆˆ°µ•ÍÍ…”¤(€€€€€€€™¥±•¹…µ”€ô˜‰í¹…µ•ô´µ±½…Ñ”µÝ¡••°¹±½œˆ(€€€€€€€€¡½ÕÑÁÕÐ€¼™¥±•¹…µ”¤¹ÝÉ¥Ñ•}‰åÑ•Ì¡±½œ¤(€€€€€€€ÍÑ•ÁÌ¹…ÁÁ•¹ (€€€€€€€€€€€ì(€€€€€€€€€€€€€€€€‰ÍÑ•Àˆè€‰±½…Ñ”µÝ¡••°ˆ°(€€€€€€€€€€€€€€€€‰½µµ…¹ˆèl‰¥¹Ñ•É¹…°ˆ°€‰±½…Ñ”µÝ¡••°‰t°(€€€€€€€€€€€€€€€€‰•á¥Ñ}½‘”ˆè€´Ä°(€€€€€€€€€€€€€€€€‰ÍÑ…ÑÕÌˆè€‰%0ˆ°(€€€€€€€€€€€€€€€€‰±½œˆè™¥±•¹…µ”°(€€€€€€€€€€€€€€€€‰±½}Í¡„ÈÔØˆè¡…Í¡±¥ˆ¹Í¡„ÈÔØ¡±½œ¤¹¡•á‘¥•ÍÐ ¤°(€€€€€€€€€€€ô(€€€€€€€€¤(€€€€€€€É•ÑÕÉ¸Ù•É¥™¥•È¡¹…µ”°ÍÑ•ÁÌ¤°9½¹”((€€€Ý¡••°€ôÝ¡••±ÍlÁt(€€€Ý¥Ñ Ñ•µÁ™¥±”¹Q•µÁ½É…Éå¥É•Ñ½Éä¡ÁÉ•™¥àô‰Ý•…Ù•ÈµÝ¡••°´ˆ¤…Ì‘¥É•Ñ½Éäè(€€€€€€€Ñ•µÀ€ôA…Ñ ¡‘¥É•Ñ½Éä¤(€€€€€€€•¹Ù}‘¥È€ôÑ•µÀ€¼€‰Ù•¹Øˆ(€€€€€€€•¹Ù}ÁåÑ¡½¸€ô•¹Ù}‘¥È€¼€ ‰MÉ¥ÁÑÌ½ÁåÑ¡½¸¹•á”ˆ¥˜½Ì¹¹…µ”€ôô€‰¹Ðˆ•±Í”€‰‰¥¸½ÁåÑ¡½¸ˆ¤(€€€€€€€Íµ½­”€ôÑ•µÀ€¼€‰Ý¡••±}Íµ½­”¹Áäˆ(€€€€€€€±•‘•È€ôÑ•µÀ€¼€‰Ù…±¥¹©Í½¹°ˆ(€€€€€€€Í¡ÕÑ¥°¹½ÁäÈ¡I==P€¼€‰Ñ•ÍÑÌˆ€¼€‰¥¹Ñ•É…Ñ¥½¸ˆ€¼€‰Ý¡••±}Íµ½­”¹Áäˆ°Íµ½­”¤(€€€€€€€Í¡ÕÑ¥°¹½ÁäÈ¡I==P€¼€‰Ñ•ÍÑÌˆ€¼€‰™¥áÑÕÉ•Ìˆ€¼€‰Ù•É¥™¥…Ñ¥½¸ˆ€¼€‰Ù…±¥¹©Í½¹°ˆ°±•‘•È¤((€€€€€€€ÍÑ•ÁÌ¹…ÁÁ•¹ (€€€€€€€€€€€ÉÕ¹}ÍÑ•À (€€€€€€€€€€€€€€€¹…µ”°(€€€€€€€€€€€€€€€€‰É•…Ñ”µÙ•¹Øˆ°(€€€€€€€€€€€€€€€mÍåÌ¹•á•ÕÑ…‰±”°€ˆµ´ˆ°€‰Ù•¹Øˆ°ÍÑÈ¡•¹Ù}‘¥È¥t°(€€€€€€€€€€€€€€€½ÕÑÁÕÐ°(€€€€€€€€€€€€€€€Ñ¥µ•½ÕÐôÄÈÀ°(€€€€€€€€€€€€¤(€€€€€€€€¤(€€€€€€€ÍÑ•ÁÌ¹…ÁÁ•¹ (€€€€€€€€€€€ÉÕ¹}ÍÑ•À (€€€€€€€€€€€€€€€¹…µ”°(€€€€€€€€€€€€€€€€‰¥¹ÍÑ…±°µ±½­•µ‘•Á•¹‘•¹¥•Ìˆ°(€€€€€€€€€€€€€€€mÍÑÈ¡•¹Ù}ÁåÑ¡½¸¤°€ˆµ´ˆ°€‰Á¥Àˆ°€‰¥¹ÍÑ…±°ˆ°€ˆµÈˆ°ÍÑÈ¡1=-%1¥t°(€€€€€€€€€€€€€€€½ÕÑÁÕÐ°(€€€€€€€€€€€€€€€ÝõÑ•µÀ°(€€€€€€€€€€€€€€€Ñ¥µ•½ÕÐôÌÀÀ°(€€€€€€€€€€€€¤(€€€€€€€€¤(€€€€€€€ÍÑ•ÁÌ¹…ÁÁ•¹ (€€€€€€€€€€€ÉÕ¹}ÍÑ•À (€€€€€€€€€€€€€€€¹…µ”°(€€€€€€€€€€€€€€€€‰¥¹ÍÑ…±°µÝ¡••°ˆ°(€€€€€€€€€€€€€€€mÍÑÈ¡•¹Ù}ÁåÑ¡½¸¤°€ˆµ´ˆ°€‰Á¥Àˆ°€‰¥¹ÍÑ…±°ˆ°€ˆ´µ¹¼µ‘•ÁÌˆ°ÍÑÈ¡Ý¡••°¥t°(€€€€€€€€€€€€€€€½ÕÑÁÕÐ°(€€€€€€€€€€€€€€€ÝõÑ•µÀ°(€€€€€€€€€€€€€€€Ñ¥µ•½ÕÐôÄÈÀ°(€€€€€€€€€€€€¤(€€€€€€€€¤(€€€€€€€ÍÑ•ÁÌ¹…ÁÁ•¹ (€€€€€€€€€€€ÉÕ¹}ÍÑ•À (€€€€€€€€€€€€€€€¹…µ”°(€€€€€€€€€€€€€€€€‰Íµ½­”ˆ°(€€€€€€€€€€€€€€€mÍÑÈ¡•¹Ù}ÁåÑ¡½¸¤°€ˆµ$ˆ°ÍÑÈ¡Íµ½­”¤°ÍÑÈ¡±•‘•È¥t°(€€€€€€€€€€€€€€€½ÕÑÁÕÐ°(€€€€€€€€€€€€€€€ÝõÑ•µÀ°(€€€€€€€€€€€€€€€Ñ¥µ•½ÕÐôØÀ°(€€€€€€€€€€€€¤(€€€€€€€€¤((€€€É•ÑÕÉ¸Ù•É¥™¥•È¡¹…µ”°ÍÑ•ÁÌ¤°Ý¡••°(()‘•˜ÉÕ¹}™½Éµ…±}Ñ±Œ¡½ÕÑÁÕÐèA…Ñ ¤€´ø‘¥ÑmÍÑÈ°¹åtè(€€€¹…µ”€ô€‰™½Éµ…±}Ñ±Œˆ(€€€ÍÑ•ÁÌè±¥ÍÑm‘¥ÑmÍÑÈ°¹åut€ômt(€€€Ý¥Ñ Ñ•µÁ™¥±”¹Q•µÁ½É…Éå¥É•Ñ½Éä¡ÁÉ•™¥àô‰Ý•…Ù•ÈµÑ±Œ´ˆ¤…Ì‘¥É•Ñ½Éäè(€€€€€€€©…È€ôA…Ñ ¡‘¥É•Ñ½Éä¤€¼€‰Ñ±„ÉÑ½½±Ì¹©…Èˆ(€€€€€€€ÍÑ•ÁÌ¹…ÁÁ•¹ (€€€€€€€€€€€ÉÕ¹}ÍÑ•À (€€€€€€€€€€€€€€€¹…µ”°(€€€€€€€€€€€€€€€€‰…ÅÕ¥É”µÁ¥¹¹•µÑ±Œˆ°(€€€€€€€€€€€€€€€mÍåÌ¹•á•ÕÑ…‰±”°€ˆµ´ˆ°€‰Ñ½½±Ì¹™•Ñ¡}Ñ±Œˆ°ÍÑÈ¡©…È¥t°(€€€€€€€€€€€€€€€½ÕÑÁÕÐ°(€€€€€€€€€€€€€€€Ñ¥µ•½ÕÐôÄàÀ°(€€€€€€€€€€€€¤(€€€€€€€€¤(€€€€€€€ÍÑ•ÁÌ¹…ÁÁ•¹ (€€€€€€€€€€€ÉÕ¹}ÍÑ•À (€€€€€€€€€€€€€€€¹…µ”°(€€€€€€€€€€€€€€€€‰‰½Õ¹‘•µ¥¹Ù…É¥…¹ÑÌˆ°(€€€€€€€€€€€€€€€l(€€€€€€€€€€€€€€€€€€€€‰©…Ù„ˆ°(€€€€€€€€€€€€€€€€€€€€ˆµÀˆ°(€€€€€€€€€€€€€€€€€€€ÍÑÈ¡©…È¤°(€€€€€€€€€€€€€€€€€€€€‰Ñ±ŒÈ¹Q1ˆ°(€€€€€€€€€€€€€€€€€€€€ˆµ‘•…‘±½¬ˆ°(€€€€€€€€€€€€€€€€€€€€ˆµ½¹™¥œˆ°(€€€€€€€€€€€€€€€€€€€€‰]¥Ñ¹•ÍÍ	½Õ¹‘…Éä¹™œˆ°(€€€€€€€€€€€€€€€€€€€€‰]¥Ñ¹•ÍÍ	½Õ¹‘…Éä¹Ñ±„ˆ°(€€€€€€€€€€€€€€€t°(€€€€€€€€€€€€€€€½ÕÑÁÕÐ°(€€€€€€€€€€€€€€€Ýõ=I51}%H°(€€€€€€€€€€€€€€€Ñ¥µ•½ÕÐôÄàÀ°(€€€€€€€€€€€€¤(€€€€€€€€¤(€€€É•ÑÕÉ¸Ù•É¥™¥•È¡¹…µ”°ÍÑ•ÁÌ¤(()‘•˜±½…‘}…‘Ù•ÉÍ…É¥…±}É•ÍÕ±ÑÌ¡Á…Ñ èA…Ñ ¤€´ø±¥ÍÑm‘¥ÑmÍÑÈ°¹åutè(€€€ÑÉäè(€€€€€€€‘½Õµ•¹Ð€ô©Í½¸¹±½…‘Ì¡Á…Ñ ¹É•…‘}Ñ•áÐ ¤¤(€€€€€€€É•ÍÕ±ÑÌ€ô‘½Õµ•¹Ñl‰É•ÍÕ±ÑÌ‰t(€€€€€€€É•ÑÕÉ¸É•ÍÕ±ÑÌ¥˜¥Í¥¹ÍÑ…¹”¡É•ÍÕ±ÑÌ°±¥ÍÐ¤•±Í”mt(€€€•á•ÁÐ€¡=MÉÉ½È°©Í½¸¹)M=9•½‘•ÉÉ½È°-•åÉÉ½È°QåÁ•ÉÉ½È¤è(€€€€€€€É•ÑÕÉ¸mt(()‘•˜™±…ÑÑ•¹}½µµ…¹‘Ì¡Ù•É¥™¥•ÉÌè±¥ÍÑm‘¥ÑmÍÑÈ°¹åut¤€´ø±¥ÍÑm‘¥ÑmÍÑÈ°¹åutè(€€€½µµ…¹‘Ì€ômt(€€€™½È¥Ñ•´¥¸Ù•É¥™¥•ÉÌè(€€€€€€€™½ÈÍÑ•À¥¸¥Ñ•µl‰ÍÑ•ÁÌ‰tè(€€€€€€€€€€€½µµ…¹‘Ì¹…ÁÁ•¹ (€€€€€€€€€€€€€€€ì(€€€€€€€€€€€€€€€€€€€€‰Ù•É¥™¥•Èˆè¥Ñ•µl‰¹…µ”‰t°(€€€€€€€€€€€€€€€€€€€€‰ÍÑ•ÀˆèÍÑ•Ál‰ÍÑ•À‰t°(€€€€€€€€€€€€€€€€€€€€‰½µµ…¹ˆèÍÑ•Ál‰½µµ…¹‰t°(€€€€€€€€€€€€€€€€€€€€‰•á¥Ñ}½‘”ˆèÍÑ•Ál‰•á¥Ñ}½‘”‰t°(€€€€€€€€€€€€€€€€€€€€‰ÍÑ…ÑÕÌˆèÍÑ•Ál‰ÍÑ…ÑÕÌ‰t°(€€€€€€€€€€€€€€€ô(€€€€€€€€€€€€¤(€€€É•ÑÕÉ¸½µµ…¹‘Ì(()‘•˜‰Õ¥±‘}•Ù¥‘•¹•}µ…¹¥™•ÍÐ¡½ÕÑÁÕÐèA…Ñ °Ý¡••°èA…Ñ ð9½¹”¤€´øÑÕÁ±•m‘¥ÑmÍÑÈ°ÍÑÉt°ÍÑÉtè(€€€…¹‘¥‘…Ñ•Ì€ôl(€€€€€€€I==P€¼€‰ÁåÁÉ½©•Ð¹Ñ½µ°ˆ°(€€€€€€€1=-%1°(€€€€€€€I==P€¼I!%Y°(€€€€€€€I==P€¼€‰Í¡•µ…Ìˆ€¼€‰Ù•É¥™¥…Ñ¥½¹}ÉÕ¸¹Í¡•µ„¹©Í½¸ˆ°(€€€€€€€I==P€¼€‰Í¡•µ…Ìˆ€¼€‰ÑÉ¥…‘}É••¥ÁÐ¹Í¡•µ„¹©Í½¸ˆ°(€€€t(€€€…¹‘¥‘…Ñ•Ì¹•áÑ•¹¡Í½ÉÑ• ¡I==P€¼€‰Ñ•ÍÑÌˆ€¼€‰™¥áÑÕÉ•Ìˆ€¼€‰Ù•É¥™¥…Ñ¥½¸ˆ¤¹±½ˆ ˆ¨ˆ¤¤¤(€€€…¹‘¥‘…Ñ•Ì¹•áÑ•¹¡Í½ÉÑ•¡Á…Ñ ™½ÈÁ…Ñ ¥¸½ÕÑÁÕÐ¹±½ˆ ˆ¨ˆ¤¥˜Á…Ñ ¹¥Í}™¥±” ¤¤¤(€€€¥˜Ý¡••°¥Ì¹½Ð9½¹”è(€€€€€€€…¹‘¥‘…Ñ•Ì¹…ÁÁ•¹¡Ý¡••°¤((€€€¡…Í¡•Ìè‘¥ÑmÍÑÈ°ÍÑÉt€ôíô(€€€™½ÈÁ…Ñ ¥¸…¹‘¥‘…Ñ•Ìè(€€€€€€€¥˜¹½ÐÁ…Ñ ¹¥Í}™¥±” ¤è(€€€€€€€€€€€½¹Ñ¥¹Õ”(€€€€€€€ÑÉäè(€€€€€€€€€€€±…‰•°€ôÍÑÈ¡Á…Ñ ¹É•±…Ñ¥Ù•}Ñ¼¡I==P¤¤(€€€€€€€•á•ÁÐY…±Õ•ÉÉ½Èè(€€€€€€€€€€€±…‰•°€ôÁ…Ñ ¹¹…µ”(€€€€€€€¡…Í¡•Ím±…‰•±t€ôÍ¡„ÈÔÙ}™¥±”¡Á…Ñ ¤((€€€µ…¹¥™•ÍÐ€ôì(€€€€€€€€‰Í¡•µ„ˆè€‰Ý•…Ù•Èµ•Ù¥‘•¹”µµ…¹¥™•ÍÐ´Äˆ°(€€€€€€€€‰™¥±•Ìˆè‘¥Ð¡Í½ÉÑ•¡¡…Í¡•Ì¹¥Ñ•µÌ ¤¤¤°(€€€ô(€€€µ…¹¥™•ÍÑ}Á…Ñ €ô½ÕÑÁÕÐ€¼€‰•Ù¥‘•¹”µµ…¹¥™•ÍÐ¹©Í½¸ˆ(€€€µ…¹¥™•ÍÑ}‰åÑ•Ì€ô€¡©Í½¸¹‘ÕµÁÌ¡µ…¹¥™•ÍÐ°¥¹‘•¹ÐôÈ°Í½ÉÑ}­•åÌõQÉÕ”¤€¬€‰q¸ˆ¤¹•¹½‘” ¤(€€€µ…¹¥™•ÍÑ}Á…Ñ ¹ÝÉ¥Ñ•}‰åÑ•Ì¡µ…¹¥™•ÍÑ}‰åÑ•Ì¤(€€€É•ÑÕÉ¸¡…Í¡•Ì°¡…Í¡±¥ˆ¹Í¡„ÈÔØ¡µ…¹¥™•ÍÑ}‰åÑ•Ì¤¹¡•á‘¥•ÍÐ ¤(()‘•˜¥Í}Ù…±¥‘}Ù•É‘¥Ð (€€€Ù•É¥™¥•ÉÌè±¥ÍÑm‘¥ÑmÍÑÈ°¹åut°(€€€…‘Ù•ÉÍ…É¥…±}É•ÍÕ±ÑÌè±¥ÍÑm‘¥ÑmÍÑÈ°¹åut°(€€€Ý¡••±}Í¡„ÈÔØèÍÑÈð9½¹”°(¤€´ø‰½½°è(€€€€ˆˆ‰AML¥™˜•Ù•ÉäÉ•ÅÕ¥É•Ù•É¥™¥•È…¹…‘Ù•ÉÍ…É¥…°…Í”¥ÌÁÉ•Í•¹Ð…¹AML¸ˆˆˆ(€€€‰å}¹…µ”€ôí¥Ñ•´¹•Ð ‰¹…µ”ˆ¤è¥Ñ•´™½È¥Ñ•´¥¸Ù•É¥™¥•ÉÍô(€€€¥˜Í•Ð¡‰å}¹…µ”¤€„ôÍ•Ð¡IEU%I}YI%%IL¤è(€€€€€€€É•ÑÕÉ¸…±Í”(€€€¥˜…¹ä¡‰å}¹…µ•m¹…µ•t¹•Ð ‰ÍÑ…ÑÕÌˆ¤€„ô€‰AMLˆ™½È¹…µ”¥¸IEU%I}YI%%IL¤è(€€€€€€€É•ÑÕÉ¸…±Í”(€€€…Í•}¥‘Ì€ôí¥Ñ•´¹•Ð ‰…Í•}¥ˆ¤™½È¥Ñ•´¥¸…‘Ù•ÉÍ…É¥…±}É•ÍÕ±ÑÍô(€€€¥˜…Í•}¥‘Ì€„ôí˜‰Xµí¥¹‘•àèÀÍ‘ôˆ™½È¥¹‘•à¥¸É…¹” Ä°€Ü¥ôè(€€€€€€€É•ÑÕÉ¸…±Í”(€€€¥˜…¹ä¡¥Ñ•´¹•Ð ‰ÍÑ…ÑÕÌˆ¤€„ô€‰AMLˆ™½È¥Ñ•´¥¸…‘Ù•ÉÍ…É¥…±}É•ÍÕ±ÑÌ¤è(€€€€€€€É•ÑÕÉ¸…±Í”(€€€É•ÑÕÉ¸¥Í¥¹ÍÑ…¹”¡Ý¡••±}Í¡„ÈÔØ°ÍÑÈ¤…¹±•¸¡Ý¡••±}Í¡„ÈÔØ¤€ôô€ØÐ(()‘•˜µ…¥¸ ¤€´ø¥¹Ðè(€€€Á…ÉÍ•È€ô…ÉÁ…ÉÍ”¹ÉÕµ•¹ÑA…ÉÍ•È¡‘•ÍÉ¥ÁÑ¥½¸õ}}‘½}|¤(€€€Á…ÉÍ•È¹…‘‘}…ÉÕµ•¹Ð ˆ´µ½ÕÑÁÕÐˆ°ÑåÁ”õA…Ñ °‘•™…Õ±ÐõI==P€¼€‰Ù•É¥™¥…Ñ¥½¸µ½ÕÑÁÕÐˆ¤(€€€…ÉÌ€ôÁ…ÉÍ•È¹Á…ÉÍ•}…ÉÌ ¤(€€€…ÉÌ¹½ÕÑÁÕÐ¹µ­‘¥È¡Á…É•¹ÑÌõQÉÕ”°•á¥ÍÑ}½¬õQÉÕ”¤((€€€‘¥ÉÑå}…Ñ}ÍÑ…ÉÐ€ô‰½½°¡¥Ð ‰ÍÑ…ÑÕÌˆ°€ˆ´µÁ½É•±…¥¸ˆ°‘•™…Õ±Ðôˆˆ¤¤(€€€Ù•É¥™¥•‘}½µµ¥Ð€ô¥Ð ‰É•ØµÁ…ÉÍ”ˆ°€‰!ˆ¤(€€€Í½ÕÉ•}¡•…€ô½Ì¹•¹Ù¥É½¸¹•Ð ‰]YI}M=UI}!}M!ˆ¤½ÈÙ•É¥™¥•‘}½µµ¥Ð(€€€‰…Í•}Í¡„€ô½Ì¹•¹Ù¥É½¸¹•Ð ‰]YI}	M}M!ˆ¤½È¥Ð (€€€€€€€€‰É•ØµÁ…ÉÍ”ˆ°€‰!xˆ°‘•™…Õ±ÐõÙ•É¥™¥•‘}½µµ¥Ð(€€€€¤((€€€Ù•É¥™¥•ÉÌ€ôl(€€€€€€€ÉÕ¹}Í¥µÁ±•}Ù•É¥™¥•È (€€€€€€€€€€€€‰Õ¹¥Ñ}…¹‘}¥¹Ñ•É…Ñ¥½¸ˆ°mÍåÌ¹•á•ÕÑ…‰±”°€ˆµ´ˆ°€‰ÁåÑ•ÍÐˆ°€ˆµÄ‰t°…ÉÌ¹½ÕÑÁÕÐ(€€€€€€€€¤°(€€€€€€€ÉÕ¹}Í¥µÁ±•}Ù•É¥™¥•È (€€€€€€€€€€€€‰‰½Õ¹‘}Ý¥Ñ¹•ÍÌˆ°(€€€€€€€€€€€l(€€€€€€€€€€€€€€€ÍåÌ¹•á•ÕÑ…‰±”°(€€€€€€€€€€€€€€€€ˆµ´ˆ°(€€€€€€€€€€€€€€€€‰Ñ½½±Ì¹ÉÕ¹}Ù•É¥™¥•‘}Ý¥Ñ¹•ÍÌˆ°(€€€€€€€€€€€€€€€I!%Y°(€€€€€€€€€€€€€€€€ˆ´µ•áÁ•Ñ•µ­•äµÍ¡„ÈÔØˆ°(€€€€€€€€€€€€€€€-d°(€€€€€€€€€€€t°(€€€€€€€€€€€…ÉÌ¹½ÕÑÁÕÐ°(€€€€€€€€¤°(€€€€€€€ÉÕ¹}Í¥µÁ±•}Ù•É¥™¥•È (€€€€€€€€€€€€‰µÕÑ…Ñ¥½¹}ÍÕ¥Ñ”ˆ°(€€€€€€€€€€€mÍåÌ¹•á•ÕÑ…‰±”°€ˆµ´ˆ°€‰Ñ½½±Ì¹¡•­}Ù•É¥™¥•É}µÕÑ…Ñ¥½¹Ì‰t°(€€€€€€€€€€€…ÉÌ¹½ÕÑÁÕÐ°(€€€€€€€€¤°(€€€t((€€€…‘Ù•ÉÍ…É¥…±}Á…Ñ €ô…ÉÌ¹½ÕÑÁÕÐ€¼€‰…‘Ù•ÉÍ…É¥…°µÉ•ÍÕ±ÑÌ¹©Í½¸ˆ(€€€Ù•É¥™¥•ÉÌ¹…ÁÁ•¹ (€€€€€€€ÉÕ¹}Í¥µÁ±•}Ù•É¥™¥•È (€€€€€€€€€€€€‰…‘Ù•ÉÍ…É¥…±}½ÉÁÕÌˆ°(€€€€€€€€€€€l(€€€€€€€€€€€€€€€ÍåÌ¹•á•ÕÑ…‰±”°(€€€€€€€€€€€€€€€€ˆµ´ˆ°(€€€€€€€€€€€€€€€€‰Ñ½½±Ì¹ÉÕ¹}…‘Ù•ÉÍ…É¥…±}½ÉÁÕÌˆ°(€€€€€€€€€€€€€€€€ˆ´µ½ÕÑÁÕÐˆ°(€€€€€€€€€€€€€€€ÍÑÈ¡…‘Ù•ÉÍ…É¥…±}Á…Ñ ¤°(€€€€€€€€€€€t°(€€€€€€€€€€€…ÉÌ¹½ÕÑÁÕÐ°(€€€€€€€€¤(€€€€¤((€€€Ý¡••±}Ù•É¥™¥•È°Ý¡••°€ôÉÕ¹}¥¹ÍÑ…±±•‘}Ý¡••°¡…ÉÌ¹½ÕÑÁÕÐ¤(€€€Ù•É¥™¥•ÉÌ¹…ÁÁ•¹¡Ý¡••±}Ù•É¥™¥•È¤(€€€Ù•É¥™¥•ÉÌ¹…ÁÁ•¹¡ÉÕ¹}™½Éµ…±}Ñ±Œ¡…ÉÌ¹½ÕÑÁÕÐ¤¤((€€€…‘Ù•ÉÍ…É¥…±}É•ÍÕ±ÑÌ€ô±½…‘}…‘Ù•ÉÍ…É¥…±}É•ÍÕ±ÑÌ¡…‘Ù•ÉÍ…É¥…±}Á…Ñ ¤(€€€Ý¡••±}Í¡„ÈÔØ€ôÍ¡„ÈÔÙ}™¥±”¡Ý¡••°¤¥˜Ý¡••°¥Ì¹½Ð9½¹”…¹Ý¡••°¹¥Í}™¥±” ¤•±Í”9½¹”(€€€…ÉÑ¥™…Ñ}¡…Í¡•Ì°µ…¹¥™•ÍÑ}Í¡„ÈÔØ€ô‰Õ¥±‘}•Ù¥‘•¹•}µ…¹¥™•ÍÐ¡…ÉÌ¹½ÕÑÁÕÐ°Ý¡••°¤(€€€½Ù•É…±°€ô€ (€€€€€€€€‰AMLˆ¥˜¥Í}Ù…±¥‘}Ù•É‘¥Ð¡Ù•É¥™¥•ÉÌ°…‘Ù•ÉÍ…É¥…±}É•ÍÕ±ÑÌ°Ý¡••±}Í¡„ÈÔØ¤•±Í”€‰%0ˆ(€€€€¤((€€€É•Á½ÉÐ€ôì(€€€€€€€€‰Í¡•µ…}Ù•ÉÍ¥½¸ˆè€ˆÄ¸Àˆ°(€€€€€€€€‰É•Á½Í¥Ñ½ÉäˆèÉ•Á½Í¥Ñ½Éå}¹…µ” ¤°(€€€€€€€€‰Í½ÕÉ•}¡•…‘}Í¡„ˆèÍ½ÕÉ•}¡•…°(€€€€€€€€‰Ù•É¥™¥•‘}½µµ¥Ñ}Í¡„ˆè½Ì¹•¹Ù¥É½¸¹•Ð ‰%Q!U	}M!ˆ¤½ÈÙ•É¥™¥•‘}½µµ¥Ð°(€€€€€€€€‰‰…Í•}Í¡„ˆè‰…Í•}Í¡„°(€€€€€€€€‰‘¥ÉÑäˆè‘¥ÉÑå}…Ñ}ÍÑ…ÉÐ°(€€€€€€€€‰É•…Ñ•‘}…Ðˆè‘…Ñ•Ñ¥µ”¹¹½Ü¡Ñ¥µ•é½¹”¹ÕÑŒ¤¹¥Í½™½Éµ…Ð ¤°(€€€€€€€€‰Í½Á”ˆè€‰±½…°µ¡•­Ìµ¹½Ðµ¥¹‘•Á•¹‘•¹ÐµÉ•ÁÉ½‘ÕÑ¥½¸ˆ°(€€€€€€€€‰±½­™¥±•}Í¡„ÈÔØˆèÍ¡„ÈÔÙ}™¥±”¡1=-%1¤°(€€€€€€€€‰Ý¡••±}Í¡„ÈÔØˆèÝ¡••±}Í¡„ÈÔØ°(€€€€€€€€‰•¹Ù¥É½¹µ•¹Ðˆèì(€€€€€€€€€€€€‰ÁåÑ¡½¹}Ù•ÉÍ¥½¸ˆèÍåÌ¹Ù•ÉÍ¥½¸°(€€€€€€€€€€€€‰½Ìˆè½Ì¹¹…µ”°(€€€€€€€€€€€€‰Á±…Ñ™½É´ˆèÁ±…Ñ™½É´¹Á±…Ñ™½É´ ¤°(€€€€€€€€€€€€‰ÉÕ¹¹•Èˆè½Ì¹•¹Ù¥É½¸¹•Ð ‰IU99I}=Lˆ°€‰±½…°ˆ¤°(€€€€€€€ô°(€€€€€€€€‰¥Ñ¡Õ‰}ÉÕ¹}¥ˆè½Ì¹•¹Ù¥É½¸¹•Ð ‰%Q!U	}IU9}%ˆ°€‰±½…°ˆ¤°(€€€€€€€€‰½µµ…¹‘Ìˆè™±…ÑÑ•¹}½µµ…¹‘Ì¡Ù•É¥™¥•ÉÌ¤°(€€€€€€€€‰Ù•É¥™¥•ÉÌˆèÙ•É¥™¥•ÉÌ°(€€€€€€€€‰…‘Ù•ÉÍ…É¥…±}É•ÍÕ±ÑÌˆè…‘Ù•ÉÍ…É¥…±}É•ÍÕ±ÑÌ°(€€€€€€€€‰…ÉÑ¥™…Ñ}¡…Í¡•Ìˆè…ÉÑ¥™…Ñ}¡…Í¡•Ì°(€€€€€€€€‰•Ù¥‘•¹•}µ…¹¥™•ÍÑ}Í¡„ÈÔØˆèµ…¹¥™•ÍÑ}Í¡„ÈÔØ°(€€€€€€€€‰¥µÁ±•µ•¹Ñ…Ñ¥½¹}ÍÑ…ÑÕÌˆè%5A159QQ%=9}MQQUL°(€€€€€€€€‰½Ù•É…±±}Ù•É‘¥Ðˆè½Ù•É…±°°(€€€ô((€€€…¹½¹¥…°€ô…ÉÌ¹½ÕÑÁÕÐ€¼€‰Ù•É¥™¥…Ñ¥½¸µÉ•Á½ÉÐ¹©Í½¸ˆ(€€€½µÁ…Ñ¥‰¥±¥Ñä€ô…ÉÌ¹½ÕÑÁÕÐ€¼€‰É•Á½ÉÐ¹©Í½¸ˆ(€€€•¹½‘•€ô©Í½¸¹‘ÕµÁÌ¡É•Á½ÉÐ°¥¹‘•¹ÐôÈ°Í½ÉÑ}­•åÌõQÉÕ”¤€¬€‰q¸ˆ(€€€…¹½¹¥…°¹ÝÉ¥Ñ•}Ñ•áÐ¡•¹½‘•¤(€€€½µÁ…Ñ¥‰¥±¥Ñä¹ÝÉ¥Ñ•}Ñ•áÐ¡•¹½‘•¤((€€€Í¡•µ„€ô©Í½¸¹±½…‘Ì ¡I==P€¼€‰Í¡•µ…Ìˆ€¼€‰Ù•É¥™¥…Ñ¥½¹}ÉÕ¸¹Í¡•µ„¹©Í½¸ˆ¤¹É•…‘}Ñ•áÐ ¤¤(€€€ÑÉäè(€€€€€€€É…™ÐÈÀÈÀÄÉY…±¥‘…Ñ½È¹¡•­}Í¡•µ„¡Í¡•µ„¤(€€€€€€€É…™ÐÈÀÈÀÄÉY…±¥‘…Ñ½È¡Í¡•µ„¤¹Ù…±¥‘…Ñ”¡É•Á½ÉÐ¤(€€€•á•ÁÐá•ÁÑ¥½¸…Ì•áŒè(€€€€€€€ÁÉ¥¹Ð¡˜‰Ù•É¥™¥…Ñ¥½¸É•Á½ÉÐÍ¡•µ„Ù…±¥‘…Ñ¥½¸™…¥±•èí•áôˆ°™¥±”õÍåÌ¹ÍÑ‘•ÉÈ¤(€€€€€€€É•ÑÕÉ¸€Ä((€€€ÁÉ¥¹Ð¡©Í½¸¹‘ÕµÁÌ¡ì‰ÍÑ…ÑÕÌˆè½Ù•É…±°°€‰É•Á½ÉÐˆèÍÑÈ¡…¹½¹¥…°¥ô¤¤(€€€É•ÑÕÉ¸€À¥˜½Ù•É…±°€ôô€‰AMLˆ•±Í”€Ä(()¥˜}}¹…µ•}|€ôô€‰}}µ…¥¹}|ˆè(€€€É…¥Í”MåÍÑ•µá¥Ð¡µ…¥¸ ¤¤(
+IMPLEMENTATION_STATUS = {
+    "chronicle": "DEFERRED_TO_BOUND_WITNESS",
+    "kernel": "DEFERRED_TO_BOUND_WITNESS",
+    "receipt": "DEFERRED_TO_BOUND_WITNESS",
+}
+
+
+def sha256_file(path: Path) -> str:
+    return hashlib.sha256(path.read_bytes()).hexdigest()
+
+
+def git(*args: str, default: str | None = None) -> str:
+    try:
+        return subprocess.check_output(
+            ["git", *args], cwd=ROOT, text=True, stderr=subprocess.DEVNULL
+        ).strip()
+    except (OSError, subprocess.CalledProcessError):
+        if default is None:
+            raise
+        return default
+
+
+def repository_name() -> str:
+    configured = os.environ.get("GITHUB_REPOSITORY")
+    if configured:
+        return configured
+    remote = git("config", "--get", "remote.origin.url", default="local/unknown")
+    if remote.endswith(".git"):
+        remote = remote[:-4]
+    if remote.startswith("git@github.com:"):
+        return remote.split(":", 1)[1]
+    marker = "github.com/"
+    if marker in remote:
+        return remote.split(marker, 1)[1]
+    return remote
+
+
+def _log_bytes(command: list[str], stdout: bytes, stderr: bytes) -> bytes:
+    prefix = ("$ " + " ".join(command) + "\n").encode()
+    return prefix + stdout + b"\n--- stderr ---\n" + stderr
+
+
+def run_step(
+    verifier: str,
+    step: str,
+    command: list[str],
+    output: Path,
+    *,
+    cwd: Path = ROOT,
+    timeout: int = 300,
+) -> dict[str, Any]:
+    """Execute one required step; missing tools and timeouts are hard failures."""
+    try:
+        result = subprocess.run(command, cwd=cwd, capture_output=True, timeout=timeout)
+        code = result.returncode
+        stdout, stderr = result.stdout, result.stderr
+    except (OSError, subprocess.TimeoutExpired) as exc:
+        code = -1
+        raw_stdout = getattr(exc, "stdout", None) or b""
+        raw_stderr = getattr(exc, "stderr", None) or b""
+        stdout = raw_stdout.encode() if isinstance(raw_stdout, str) else raw_stdout
+        stderr = raw_stderr.encode() if isinstance(raw_stderr, str) else raw_stderr
+        stderr += ("\n" + repr(exc)).encode()
+
+    log = _log_bytes(command, stdout, stderr)
+    filename = f"{verifier}--{step}.log"
+    (output / filename).write_bytes(log)
+    return {
+        "step": step,
+        "command": command,
+        "exit_code": code,
+        "status": "PASS" if code == 0 else "FAIL",
+        "log": filename,
+        "log_sha256": hashlib.sha256(log).hexdigest(),
+    }
+
+
+def verifier(name: str, steps: list[dict[str, Any]]) -> dict[str, Any]:
+    status = "PASS" if steps and all(step["status"] == "PASS" for step in steps) else "FAIL"
+    first_failure = next((step["exit_code"] for step in steps if step["status"] == "FAIL"), 0)
+    return {"name": name, "status": status, "exit_code": first_failure, "steps": steps}
+
+
+def run_simple_verifier(
+    name: str, command: list[str], output: Path, *, timeout: int = 300
+) -> dict[str, Any]:
+    return verifier(name, [run_step(name, "run", command, output, timeout=timeout)])
+
+
+def run_installed_wheel(output: Path) -> tuple[dict[str, Any], Path | None]:
+    name = "installed_wheel"
+    steps: list[dict[str, Any]] = []
+    dist = ROOT / "dist"
+    shutil.rmtree(dist, ignore_errors=True)
+
+    steps.append(
+        run_step(
+            name,
+            "build",
+            [sys.executable, "-m", "build", "--no-isolation", "--wheel"],
+            output,
+            timeout=180,
+        )
+    )
+    wheels = sorted(dist.glob("*.whl")) if dist.exists() else []
+    if len(wheels) != 1:
+        message = f"expected exactly one built wheel, found {len(wheels)}\n".encode()
+        log = _log_bytes(["internal", "locate-wheel"], b"", message)
+        filename = f"{name}--locate-wheel.log"
+        (output / filename).write_bytes(log)
+        steps.append(
+            {
+                "step": "locate-wheel",
+                "command": ["internal", "locate-wheel"],
+                "exit_code": -1,
+                "status": "FAIL",
+                "log": filename,
+                "log_sha256": hashlib.sha256(log).hexdigest(),
+            }
+        )
+        return verifier(name, steps), None
+
+    wheel = wheels[0]
+    with tempfile.TemporaryDirectory(prefix="weaver-wheel-") as directory:
+        temp = Path(directory)
+        env_dir = temp / "venv"
+        env_python = env_dir / ("Scripts/python.exe" if os.name == "nt" else "bin/python")
+        smoke = temp / "wheel_smoke.py"
+        ledger = temp / "valid.jsonl"
+        shutil.copy2(ROOT / "tests" / "integration" / "wheel_smoke.py", smoke)
+        shutil.copy2(ROOT / "tests" / "fixtures" / "verification" / "valid.jsonl", ledger)
+
+        steps.append(
+            run_step(
+                name,
+                "create-venv",
+                [sys.executable, "-m", "venv", str(env_dir)],
+                output,
+                timeout=120,
+            )
+        )
+        steps.append(
+            run_step(
+                name,
+                "install-locked-dependencies",
+                [str(env_python), "-m", "pip", "install", "-r", str(LOCKFILE)],
+                output,
+                cwd=temp,
+                timeout=300,
+            )
+        )
+        steps.append(
+            run_step(
+                name,
+                "install-wheel",
+                [str(env_python), "-m", "pip", "install", "--no-deps", str(wheel)],
+                output,
+                cwd=temp,
+                timeout=120,
+            )
+        )
+        steps.append(
+            run_step(
+                name,
+                "smoke",
+                [str(env_python), "-I", str(smoke), str(ledger)],
+                output,
+                cwd=temp,
+                timeout=60,
+            )
+        )
+
+    return verifier(name, steps), wheel
+
+
+def run_formal_tlc(output: Path) -> dict[str, Any]:
+    name = "formal_tlc"
+    steps: list[dict[str, Any]] = []
+    with tempfile.TemporaryDirectory(prefix="weaver-tlc-") as directory:
+        jar = Path(directory) / "tla2tools.jar"
+        steps.append(
+            run_step(
+                name,
+                "acquire-pinned-tlc",
+                [sys.executable, "-m", "tools.fetch_tlc", str(jar)],
+                output,
+                timeout=180,
+            )
+        )
+        steps.append(
+            run_step(
+                name,
+                "bounded-invariants",
+                [
+                    "java",
+                    "-cp",
+                    str(jar),
+                    "tlc2.TLC",
+                    "-deadlock",
+                    "-config",
+                    "WitnessBoundary.cfg",
+                    "WitnessBoundary.tla",
+                ],
+                output,
+                cwd=FORMAL_DIR,
+                timeout=180,
+            )
+        )
+    return verifier(name, steps)
+
+
+def load_adversarial_results(path: Path) -> list[dict[str, Any]]:
+    try:
+        document = json.loads(path.read_text())
+        results = document["results"]
+        return results if isinstance(results, list) else []
+    except (OSError, json.JSONDecodeError, KeyError, TypeError):
+        return []
+
+
+def flatten_commands(verifiers: list[dict[str, Any]]) -> list[dict[str, Any]]:
+    commands = []
+    for item in verifiers:
+        for step in item["steps"]:
+            commands.append(
+                {
+                    "verifier": item["name"],
+                    "step": step["step"],
+                    "command": step["command"],
+                    "exit_code": step["exit_code"],
+                    "status": step["status"],
+                }
+            )
+    return commands
+
+
+def build_evidence_manifest(output: Path, wheel: Path | None) -> tuple[dict[str, str], str]:
+    candidates = [
+        ROOT / "pyproject.toml",
+        LOCKFILE,
+        ROOT / ARCHIVE,
+        ROOT / "schemas" / "verification_run.schema.json",
+        ROOT / "schemas" / "triad_receipt.schema.json",
+    ]
+    candidates.extend(sorted((ROOT / "tests" / "fixtures" / "verification").glob("*")))
+    candidates.extend(sorted(path for path in output.glob("*") if path.is_file()))
+    if wheel is not None:
+        candidates.append(wheel)
+
+    hashes: dict[str, str] = {}
+    for path in candidates:
+        if not path.is_file():
+            continue
+        try:
+            label = str(path.relative_to(ROOT))
+        except ValueError:
+            label = path.name
+        hashes[label] = sha256_file(path)
+
+    manifest = {
+        "schema": "weaver-evidence-manifest-1",
+        "files": dict(sorted(hashes.items())),
+    }
+    manifest_path = output / "evidence-manifest.json"
+    manifest_bytes = (json.dumps(manifest, indent=2, sort_keys=True) + "\n").encode()
+    manifest_path.write_bytes(manifest_bytes)
+    return hashes, hashlib.sha256(manifest_bytes).hexdigest()
+
+
+def is_valid_verdict(
+    verifiers: list[dict[str, Any]],
+    adversarial_results: list[dict[str, Any]],
+    wheel_sha256: str | None,
+) -> bool:
+    """PASS iff every required verifier and adversarial case is present and PASS."""
+    by_name = {item.get("name"): item for item in verifiers}
+    if set(by_name) != set(REQUIRED_VERIFIERS):
+        return False
+    if any(by_name[name].get("status") != "PASS" for name in REQUIRED_VERIFIERS):
+        return False
+    case_ids = {item.get("case_id") for item in adversarial_results}
+    if case_ids != {f"ADV-{index:03d}" for index in range(1, 7)}:
+        return False
+    if any(item.get("status") != "PASS" for item in adversarial_results):
+        return False
+    return isinstance(wheel_sha256, str) and len(wheel_sha256) == 64
+
+
+def main() -> int:
+    parser = argparse.ArgumentParser(description=__doc__)
+    parser.add_argument("--output", type=Path, default=ROOT / "verification-output")
+    args = parser.parse_args()
+    args.output.mkdir(parents=True, exist_ok=True)
+
+    dirty_at_start = bool(git("status", "--porcelain", default=""))
+    verified_commit = git("rev-parse", "HEAD")
+    source_head = os.environ.get("WEAVER_SOURCE_HEAD_SHA") or verified_commit
+    base_sha = os.environ.get("WEAVER_BASE_SHA") or git(
+        "rev-parse", "HEAD^", default=verified_commit
+    )
+
+    verifiers = [
+        run_simple_verifier(
+            "unit_and_integration", [sys.executable, "-m", "pytest", "-q"], args.output
+        ),
+        run_simple_verifier(
+            "bound_witness",
+            [
+                sys.executable,
+                "-m",
+                "tools.run_verified_witness",
+                ARCHIVE,
+                "--expected-key-sha256",
+                KEY,
+            ],
+            args.output,
+        ),
+        run_simple_verifier(
+            "mutation_suite",
+            [sys.executable, "-m", "tools.check_verifier_mutations"],
+            args.output,
+        ),
+    ]
+
+    adversarial_path = args.output / "adversarial-results.json"
+    verifiers.append(
+        run_simple_verifier(
+            "adversarial_corpus",
+            [
+                sys.executable,
+                "-m",
+                "tools.run_adversarial_corpus",
+                "--output",
+                str(adversarial_path),
+            ],
+            args.output,
+        )
+    )
+
+    wheel_verifier, wheel = run_installed_wheel(args.output)
+    verifiers.append(wheel_verifier)
+    verifiers.append(run_formal_tlc(args.output))
+
+    adversarial_results = load_adversarial_results(adversarial_path)
+    wheel_sha256 = sha256_file(wheel) if wheel is not None and wheel.is_file() else None
+    artifact_hashes, manifest_sha256 = build_evidence_manifest(args.output, wheel)
+    overall = (
+        "PASS" if is_valid_verdict(verifiers, adversarial_results, wheel_sha256) else "FAIL"
+    )
+
+    report = {
+        "schema_version": "1.0",
+        "repository": repository_name(),
+        "source_head_sha": source_head,
+        "verified_commit_sha": os.environ.get("GITHUB_SHA") or verified_commit,
+        "base_sha": base_sha,
+        "dirty": dirty_at_start,
+        "created_at": datetime.now(timezone.utc).isoformat(),
+        "scope": "local-checks-not-independent-reproduction",
+        "lockfile_sha256": sha256_file(LOCKFILE),
+        "wheel_sha256": wheel_sha256,
+        "environment": {
+            "python_version": sys.version,
+            "os": os.name,
+            "platform": platform.platform(),
+            "runner": os.environ.get("RUNNER_OS", "local"),
+        },
+        "github_run_id": os.environ.get("GITHUB_RUN_ID", "local"),
+        "commands": flatten_commands(verifiers),
+        "verifiers": verifiers,
+        "adversarial_results": adversarial_results,
+        "artifact_hashes": artifact_hashes,
+        "evidence_manifest_sha256": manifest_sha256,
+        "implementation_status": IMPLEMENTATION_STATUS,
+        "overall_verdict": overall,
+    }
+
+    canonical = args.output / "verification-report.json"
+    compatibility = args.output / "report.json"
+    encoded = json.dumps(report, indent=2, sort_keys=True) + "\n"
+    canonical.write_text(encoded)
+    compatibility.write_text(encoded)
+
+    schema = json.loads((ROOT / "schemas" / "verification_run.schema.json").read_text())
+    try:
+        Draft202012Validator.check_schema(schema)
+        Draft202012Validator(schema).validate(report)
+    except Exception as exc:
+        print(f"verification report schema validation failed: {exc}", file=sys.stderr)
+        return 1
+
+    print(json.dumps({"status": overall, "report": str(canonical)}))
+    return 0 if overall == "PASS" else 1
+
+
+if __name__ == "__main__":
+    raise SystemExit(main())
