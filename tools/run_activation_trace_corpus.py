@@ -5,6 +5,7 @@ from __future__ import annotations
 import argparse
 import hashlib
 import json
+from collections.abc import Callable
 from dataclasses import replace
 from pathlib import Path
 from typing import Any
@@ -96,7 +97,7 @@ def _run_case(case: dict[str, Any], trace: ActivationTraceRecorder):
     scenario = case["scenario"]
     intent = _base_intent()
     verifier = CorpusVerifier(valid=scenario != "authority_invalid")
-    backend = _backend_ok
+    backend: Callable[[ActivationIntent], BackendActivationResult] = _backend_ok
 
     if scenario == "contract_version_mismatch":
         intent = replace(intent, contract_version="future-contract")
