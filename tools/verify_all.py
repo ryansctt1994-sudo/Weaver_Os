@@ -29,6 +29,7 @@ REQUIRED_VERIFIERS = (
     "adversarial_corpus",
     "installed_wheel",
     "formal_tlc",
+    "static_analysis_strict",
 )
 IMPLEMENTATION_STATUS = {
     "chronicle": "DEFERRED_TO_BOUND_WITNESS",
@@ -303,8 +304,12 @@ def is_valid_verdict(
     verifiers: list[dict[str, Any]],
     adversarial_results: list[dict[str, Any]],
     wheel_sha256: str | None,
+    *,
+    dirty: bool = False,
 ) -> bool:
-    """PASS iff every required verifier and adversarial case is present and PASS."""
+    """PASS iff every required verifier/case passes for a clean, bound source tree."""
+    if dirty:
+        return False
     by_name = {item.get("name"): item for item in verifiers}
     if set(by_name) != set(REQUIRED_VERIFIERS):
         return False
@@ -315,7 +320,11 @@ def is_valid_verdict(
         return False
     if any(item.get("status") != "PASS" for item in adversarial_results):
         return False
-    return isinstance(wheel_sha256, str) and len(wheel_sha256) == 64
+    return (
+        isinstance(wheel_sha256, str)
+        and len(wheel_sha256) == 64
+        and all(char in "0123456789abcdef" for char in wheel_sha256)
+    )
 
 
 def main() -> int:
@@ -372,12 +381,37 @@ def main() -> int:
     wheel_verifier, wheel = run_installed_wheel(args.output)
     verifiers.append(wheel_verifier)
     verifiers.append(run_formal_tlc(args.output))
+    verifiers.append(
+        verifier(
+            "static_analysis_strict",
+            [
+                run_step(
+                    "static_analysis_strict",
+                    "ruff",
+                    [sys.executable, "-m", "ruff", "check", "."],
+                    args.output,
+                    timeout=180,
+                ),
+                run_step(
+                    "static_analysis_strict",
+                    "mypy",
+                    [sys.executable, "-m", "mypy", "."],
+                    args.output,
+                    timeout=300,
+                ),
+            ],
+        )
+    )
 
     adversarial_results = load_adversarial_results(adversarial_path)
     wheel_sha256 = sha256_file(wheel) if wheel is not None and wheel.is_file() else None
     artifact_hashes, manifest_sha256 = build_evidence_manifest(args.output, wheel)
     overall = (
-        "PASS" if is_valid_verdict(verifiers, adversarial_results, wheel_sha256) else "FAIL"
+        "PASS"
+        if is_valid_verdict(
+            verifiers, adversarial_results, wheel_sha256, dirty=dirty_at_start
+        )
+        else "FAIL"
     )
 
     report = {
