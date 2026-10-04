@@ -19,6 +19,8 @@ from typing import Any, Protocol
 
 from triadic_controls.crypto.verifier import VerificationResult
 
+from .trace import ActivationTraceRecorder
+
 CONTRACT_VERSION = "weaver-activation-contract-1"
 DEFAULT_SYSTEM_ID = "weaver-activation-runtime"
 _SHA256_RE = re.compile(r"^[0-9a-f]{64}$")
@@ -212,10 +214,16 @@ class WeaverActivationAdapter:
         verifier: AuthorityVerifier,
         *,
         system_id: str = DEFAULT_SYSTEM_ID,
+        trace_recorder: ActivationTraceRecorder | None = None,
     ) -> None:
         self._verifier = verifier
         self._system_id = system_id
+        self._trace_recorder = trace_recorder
         self._consumed_request_ids: set[str] = set()
+
+    def _trace(self, action: str, request_id: str, **fields: object) -> None:
+        if self._trace_recorder is not None:
+            self._trace_recorder.emit(action, request_id, **fields)
 
     def execute(
         self,
@@ -269,6 +277,12 @@ class WeaverActivationAdapter:
                 authority_event_type=verification.ledger_event_type,
             )
 
+        self._trace(
+            "Authorize",
+            intent.request_id,
+            authority_event_type=verification.ledger_event_type,
+        )
+
         expected_payload = build_activation_authority_payload(
             intent,
             authority_level=requested_level,
@@ -290,7 +304,17 @@ class WeaverActivationAdapter:
                 authority_event_type=verification.ledger_event_type,
             )
 
+        self._trace(
+            "BindContract",
+            intent.request_id,
+            contract_sha256=intent.contract_sha256(),
+            backend_id=intent.backend_id,
+            checkpoint_sha256=intent.checkpoint_sha256,
+            input_sha256=intent.input_sha256,
+        )
+
         self._consumed_request_ids.add(intent.request_id)
+        self._trace("Execute", intent.request_id)
         try:
             result = backend(intent)
         except Exception:
@@ -339,6 +363,16 @@ class WeaverActivationAdapter:
                 result=result,
             )
 
+        self._trace(
+            "VerifyGood",
+            intent.request_id,
+            backend_id=result.backend_id,
+            checkpoint_sha256=result.checkpoint_sha256,
+            input_sha256=intent.input_sha256,
+            output_sha256=result.output_sha256,
+        )
+        self._trace("RecordPass", intent.request_id)
+
         return self._evidence(
             intent,
             authority_payload,
@@ -374,6 +408,12 @@ class WeaverActivationAdapter:
         authority_event_type: str = "NOT_VERIFIED",
         result: BackendActivationResult | None = None,
     ) -> ActivationEvidence:
+        self._trace(
+            "Reject",
+            intent.request_id,
+            rejection_code=code.value,
+            authority_event_type=authority_event_type,
+        )
         return self._evidence(
             intent,
             authority_payload,
