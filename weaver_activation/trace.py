@@ -2,11 +2,12 @@
 
 from __future__ import annotations
 
+import copy
 import hashlib
 import json
 from pathlib import Path
 
-TRACE_SCHEMA_VERSION = "weaver-activation-trace-1"
+TRACE_SCHEMA_VERSION = "weaver-activation-trace-2"
 
 
 def _canonical_json(value: object) -> bytes:
@@ -34,11 +35,11 @@ class ActivationTraceRecorder:
             **fields,
         }
         _canonical_json(event)
-        self._events.append(event)
+        self._events.append(copy.deepcopy(event))
 
     @property
     def events(self) -> tuple[dict[str, object], ...]:
-        return tuple(dict(event) for event in self._events)
+        return tuple(copy.deepcopy(event) for event in self._events)
 
     def canonical_ndjson(self) -> bytes:
         return b"".join(_canonical_json(event) + b"\n" for event in self._events)

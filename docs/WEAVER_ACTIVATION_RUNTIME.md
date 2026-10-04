@@ -125,3 +125,25 @@ The in-process native seam now:
 - retains file hashing before load, after load, and after execution
 
 These checks do not prove arbitrary process-memory integrity, do not hash relocated executable pages, and cannot undo a preload/interposer that entered before the current process started. Relaxing the search-path policy for an ABI conformance test is not a production qualification. Full loader-environment sanitization requires a fresh isolated worker process started with a controlled environment. Dependency closure/RPATH/RUNPATH attestation is also not yet claimed.
+
+### Stateful trace correspondence (bounded continuation)
+
+Trace schema `weaver-activation-trace-2` adds `BeginAttempt` and
+`TerminalReceipt`. Every attempt binds the consumed-request IDs, execution
+counts, terminal state and evidence-receipt hash, and SHA-256 of the complete
+prior canonical NDJSON prefix. The checker derives these values by replaying
+that retained prefix and rejects altered snapshots even when their snapshot
+hash is recomputed. A detached continuation is rejected.
+
+The original `activation_trace_corpus.json` remains frozen. The separately
+versioned `activation_trace_stateful_corpus.json` extends its nine scenarios with
+same-adapter duplicates after PASS and BACKEND_FAILED. The trace wrapper models
+retry admission and duplicate rejection separately from the original execution
+lifecycle: the original terminal receipt and execution count remain unchanged.
+Duplicate rejection cannot call the backend or grant authority.
+
+This is correspondence for this bounded, single-request corpus. State is still
+process-local; this does not establish durable exactly-once execution across
+restart, authenticate an observer, or detect coordinated rewriting of an entire
+trace and its external digest. Evidence hashes need an independently retained
+anchor for that stronger threat model. This is not universal Python/C refinement.

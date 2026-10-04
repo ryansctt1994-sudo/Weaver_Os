@@ -220,6 +220,8 @@ class WeaverActivationAdapter:
         self._system_id = system_id
         self._trace_recorder = trace_recorder
         self._consumed_request_ids: set[str] = set()
+        self._execution_counts: dict[str, int] = {}
+        self._terminal_receipts: dict[str, dict[str, object]] = {}
 
     def _trace(self, action: str, request_id: str, **fields: object) -> None:
         if self._trace_recorder is not None:
@@ -234,6 +236,19 @@ class WeaverActivationAdapter:
         requested_level: int,
         backend: Callable[[ActivationIntent], BackendActivationResult],
     ) -> ActivationEvidence:
+        if self._trace_recorder is not None:
+            snapshot = {
+                "consumed_request_ids": sorted(self._consumed_request_ids),
+                "execution_counts": dict(self._execution_counts),
+                "terminal_receipts": dict(self._terminal_receipts),
+                "prior_trace_sha256": self._trace_recorder.sha256(),
+            }
+            self._trace(
+                "BeginAttempt",
+                intent.request_id,
+                pre_state=snapshot,
+                pre_state_sha256=_sha256_json(snapshot),
+            )
         if intent.contract_version != CONTRACT_VERSION:
             return self._reject(
                 intent,
@@ -241,12 +256,8 @@ class WeaverActivationAdapter:
                 ActivationRejectCode.CONTRACT_VERSION_MISMATCH,
             )
 
-        retention_floor_valid = (
-            intent.retention_floor is None
-            or (
-                _valid_metric(intent.retention_floor)
-                and 0.0 <= intent.retention_floor <= 1.0
-            )
+        retention_floor_valid = intent.retention_floor is None or (
+            _valid_metric(intent.retention_floor) and 0.0 <= intent.retention_floor <= 1.0
         )
         identity_valid = (
             _valid_id(intent.request_id)
@@ -314,6 +325,7 @@ class WeaverActivationAdapter:
         )
 
         self._consumed_request_ids.add(intent.request_id)
+        self._execution_counts[intent.request_id] = 1
         self._trace("Execute", intent.request_id)
         try:
             result = backend(intent)
@@ -352,8 +364,7 @@ class WeaverActivationAdapter:
             )
 
         if intent.retention_floor is not None and (
-            result.retention_metric is None
-            or result.retention_metric < intent.retention_floor
+            result.retention_metric is None or result.retention_metric < intent.retention_floor
         ):
             return self._reject(
                 intent,
@@ -383,9 +394,7 @@ class WeaverActivationAdapter:
         )
 
     @staticmethod
-    def _result_matches_intent(
-        intent: ActivationIntent, result: BackendActivationResult
-    ) -> bool:
+    def _result_matches_intent(intent: ActivationIntent, result: BackendActivationResult) -> bool:
         backend_digest_matches = intent.backend_sha256 is None or (
             result.backend_sha256 == intent.backend_sha256
         )
@@ -423,8 +432,8 @@ class WeaverActivationAdapter:
             reject_code=code.value,
         )
 
-    @staticmethod
     def _evidence(
+        self,
         intent: ActivationIntent,
         authority_payload: Mapping[str, Any],
         *,
@@ -435,7 +444,7 @@ class WeaverActivationAdapter:
     ) -> ActivationEvidence:
         intent_data = asdict(intent)
         intent_data["action"] = intent.action.value
-        return ActivationEvidence(
+        evidence = ActivationEvidence(
             status=status,
             request_id=intent.request_id,
             model_id=intent.model_id,
@@ -445,14 +454,10 @@ class WeaverActivationAdapter:
             authority_event_type=authority_event_type,
             authority_payload_sha256=_sha256_evidence_json(authority_payload),
             intent_sha256=_sha256_evidence_json(intent_data),
-            result_sha256=(
-                _sha256_evidence_json(asdict(result)) if result is not None else None
-            ),
+            result_sha256=(_sha256_evidence_json(asdict(result)) if result is not None else None),
             checkpoint_sha256=_admitted_digest(intent.checkpoint_sha256),
             input_sha256=_admitted_digest(intent.input_sha256),
-            output_sha256=(
-                _admitted_digest(result.output_sha256) if result is not None else None
-            ),
+            output_sha256=(_admitted_digest(result.output_sha256) if result is not None else None),
             primary_metric=result.primary_metric if result is not None else None,
             retention_metric=result.retention_metric if result is not None else None,
             reject_code=reject_code,
@@ -461,3 +466,18 @@ class WeaverActivationAdapter:
             ),
             authority_delta=0,
         )
+
+        # Observational receipt state; never used as authority or execution admission.
+        receipt = _evidence_safe(asdict(evidence))
+        receipt_hash = _sha256_json(receipt)
+        self._terminal_receipts[intent.request_id] = {
+            "state": "Recorded" if status is ActivationStatus.PASS else "Rejected",
+            "receipt_sha256": receipt_hash,
+        }
+        self._trace(
+            "TerminalReceipt",
+            intent.request_id,
+            receipt=receipt,
+            receipt_sha256=receipt_hash,
+        )
+        return evidence

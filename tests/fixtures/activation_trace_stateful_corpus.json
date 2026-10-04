@@ -1,0 +1,133 @@
+{
+  "schema": "weaver-activation-trace-corpus-1",
+  "scope": "bounded first attempts and same-adapter duplicate continuations with prefix-derived pre-state; no durable restart claim",
+  "cases": [
+    {
+      "case_id": "TRACE-001",
+      "scenario": "pass",
+      "expected_status": "PASS",
+      "expected_reject_code": null,
+      "expected_actions": [
+        "Authorize",
+        "BindContract",
+        "Execute",
+        "VerifyGood",
+        "RecordPass"
+      ]
+    },
+    {
+      "case_id": "TRACE-002",
+      "scenario": "contract_version_mismatch",
+      "expected_status": "REJECT",
+      "expected_reject_code": "CONTRACT_VERSION_MISMATCH",
+      "expected_actions": [
+        "Reject"
+      ]
+    },
+    {
+      "case_id": "TRACE-003",
+      "scenario": "malformed_identity",
+      "expected_status": "REJECT",
+      "expected_reject_code": "MALFORMED_IDENTITY",
+      "expected_actions": [
+        "Reject"
+      ]
+    },
+    {
+      "case_id": "TRACE-004",
+      "scenario": "authority_invalid",
+      "expected_status": "REJECT",
+      "expected_reject_code": "AUTHORITY_INVALID",
+      "expected_actions": [
+        "Reject"
+      ]
+    },
+    {
+      "case_id": "TRACE-005",
+      "scenario": "authority_binding_mismatch",
+      "expected_status": "REJECT",
+      "expected_reject_code": "AUTHORITY_BINDING_MISMATCH",
+      "expected_actions": [
+        "Authorize",
+        "Reject"
+      ]
+    },
+    {
+      "case_id": "TRACE-006",
+      "scenario": "backend_failed",
+      "expected_status": "REJECT",
+      "expected_reject_code": "BACKEND_FAILED",
+      "expected_actions": [
+        "Authorize",
+        "BindContract",
+        "Execute",
+        "Reject"
+      ]
+    },
+    {
+      "case_id": "TRACE-007",
+      "scenario": "result_identity_mismatch",
+      "expected_status": "REJECT",
+      "expected_reject_code": "RESULT_IDENTITY_MISMATCH",
+      "expected_actions": [
+        "Authorize",
+        "BindContract",
+        "Execute",
+        "Reject"
+      ]
+    },
+    {
+      "case_id": "TRACE-008",
+      "scenario": "metric_invalid",
+      "expected_status": "REJECT",
+      "expected_reject_code": "METRIC_INVALID",
+      "expected_actions": [
+        "Authorize",
+        "BindContract",
+        "Execute",
+        "Reject"
+      ]
+    },
+    {
+      "case_id": "TRACE-009",
+      "scenario": "retention_gate_failed",
+      "expected_status": "REJECT",
+      "expected_reject_code": "RETENTION_GATE_FAILED",
+      "expected_actions": [
+        "Authorize",
+        "BindContract",
+        "Execute",
+        "Reject"
+      ]
+    },
+    {
+      "case_id": "TRACE-010",
+      "scenario": "duplicate_after_pass",
+      "expected_status": "REJECT",
+      "expected_reject_code": "DUPLICATE_REQUEST",
+      "expected_actions": [
+        "Authorize",
+        "BindContract",
+        "Execute",
+        "VerifyGood",
+        "RecordPass",
+        "Authorize",
+        "Reject"
+      ]
+    },
+    {
+      "case_id": "TRACE-011",
+      "scenario": "duplicate_after_failure",
+      "expected_status": "REJECT",
+      "expected_reject_code": "DUPLICATE_REQUEST",
+      "expected_actions": [
+        "Authorize",
+        "BindContract",
+        "Execute",
+        "Reject",
+        "Authorize",
+        "Reject"
+      ]
+    }
+  ]
+}

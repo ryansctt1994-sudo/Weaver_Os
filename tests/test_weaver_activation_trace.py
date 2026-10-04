@@ -65,7 +65,11 @@ def test_pass_trace_is_canonical_and_ordered():
 
     events = recorder.events
     assert [event["seq"] for event in events] == list(range(len(events)))
-    assert [event["action"] for event in events] == [
+    assert [
+        event["action"]
+        for event in events
+        if event["action"] not in {"BeginAttempt", "TerminalReceipt"}
+    ] == [
         "Authorize",
         "BindContract",
         "Execute",
@@ -99,5 +103,55 @@ def test_pre_authority_rejection_has_no_authorize_event():
         requested_level=3,
         backend=_backend,
     )
-    assert [event["action"] for event in recorder.events] == ["Reject"]
-    assert recorder.events[0]["rejection_code"] == "MALFORMED_IDENTITY"
+    assert [
+        event["action"]
+        for event in recorder.events
+        if event["action"] not in {"BeginAttempt", "TerminalReceipt"}
+    ] == ["Reject"]
+    assert recorder.events[1]["rejection_code"] == "MALFORMED_IDENTITY"
+
+
+def test_duplicate_pre_state_is_prefix_bound(tmp_path):
+    from tools.check_activation_trace_conformance import _compile_trace, _load_trace
+    from tools.run_activation_trace_corpus import run_corpus
+
+    run_corpus(tmp_path)
+    events = _load_trace(tmp_path / "trace-010.ndjson")
+    starts = [event for event in events if event["action"] == "BeginAttempt"]
+    assert starts[1]["pre_state"]["consumed_request_ids"] == ["r1"]
+    assert starts[1]["pre_state"]["execution_counts"] == {"r1": 1}
+    assert starts[1]["pre_state"]["terminal_receipts"]["r1"]["state"] == "Recorded"
+    generated = _compile_trace(events, "test")
+    assert "RejectDuplicate" in generated
+    assert sum(event["action"] == "Execute" for event in events) == 1
+
+
+def test_altered_or_detached_continuation_fails(tmp_path):
+    import copy
+
+    import pytest
+
+    from tools.check_activation_trace_conformance import _compile_trace, _load_trace
+    from tools.run_activation_trace_corpus import run_corpus
+
+    run_corpus(tmp_path)
+    original = _load_trace(tmp_path / "trace-010.ndjson")
+    start = next(
+        i for i, event in enumerate(original) if event["action"] == "BeginAttempt" and i > 0
+    )
+    for key, value in [
+        ("consumed_request_ids", []),
+        ("execution_counts", {"r1": 0}),
+        ("terminal_receipts", {}),
+        ("prior_trace_sha256", "0" * 64),
+    ]:
+        mutated = copy.deepcopy(original)
+        mutated[start]["pre_state"][key] = value
+        with pytest.raises(ValueError, match="pre-state"):
+            _compile_trace(mutated, "test")
+    with pytest.raises(ValueError, match="pre-state"):
+        _compile_trace(original[start:], "test")
+    mutated = copy.deepcopy(original)
+    mutated[5 + 1]["receipt_sha256"] = "0" * 64
+    with pytest.raises(ValueError, match="receipt digest"):
+        _compile_trace(mutated, "test")

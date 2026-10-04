@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 import argparse
+import copy
 import hashlib
 import json
 import shutil
@@ -12,10 +13,11 @@ from pathlib import Path
 from typing import Any
 
 from tools.run_activation_trace_corpus import run_corpus
+from weaver_activation.trace import _canonical_json
 
 ROOT = Path(__file__).resolve().parents[1]
 FORMAL = ROOT / "audit-package" / "formal" / "tla+"
-TRACE_SCHEMA = "weaver-activation-trace-1"
+TRACE_SCHEMA = "weaver-activation-trace-2"
 
 
 def _sha256(data: bytes) -> str:
@@ -36,12 +38,68 @@ def _load_trace(path: Path) -> list[dict[str, Any]]:
     return events
 
 
+def _validate_pre_states(events: list[dict[str, Any]]) -> None:
+    """Derive snapshots from the retained prefix, never trust a supplied checkpoint."""
+    if not events or events[0]["action"] != "BeginAttempt":
+        raise ValueError("trace requires an initial pre-state")
+    consumed: set[str] = set()
+    counts: dict[str, int] = {}
+    terminals: dict[str, dict[str, object]] = {}
+    pending: dict[str, str] = {}
+    prefix = b""
+    for event in events:
+        request = event["request_id"]
+        action = event["action"]
+        if action == "BeginAttempt":
+            expected = {
+                "consumed_request_ids": sorted(consumed),
+                "execution_counts": counts,
+                "terminal_receipts": terminals,
+                "prior_trace_sha256": _sha256(prefix),
+            }
+            if event.get("pre_state") != expected:
+                raise ValueError("pre-state does not match retained trace prefix")
+            if event.get("pre_state_sha256") != _sha256(_canonical_json(expected)):
+                raise ValueError("pre-state digest mismatch")
+            if pending:
+                raise ValueError("attempt starts before terminal receipt")
+        elif action == "Execute":
+            if request in consumed:
+                raise ValueError("request executed twice")
+            consumed.add(request)
+            counts[request] = 1
+        elif action in {"Reject", "RecordPass"}:
+            pending[request] = "REJECT" if action == "Reject" else "PASS"
+        elif action == "TerminalReceipt":
+            receipt = event["receipt"]
+            if (
+                receipt["request_id"] != request
+                or receipt["status"] != pending.pop(request, None)
+                or receipt["authority_delta"] != 0
+            ):
+                raise ValueError("terminal receipt mismatch")
+            digest = _sha256(_canonical_json(receipt))
+            if event["receipt_sha256"] != digest:
+                raise ValueError("terminal receipt digest mismatch")
+            terminals[request] = {
+                "state": "Recorded" if receipt["status"] == "PASS" else "Rejected",
+                "receipt_sha256": digest,
+            }
+        prefix += _canonical_json(event) + b"\n"
+    if pending:
+        raise ValueError("missing terminal receipt")
+
+
 def _record(fields: list[tuple[str, str]]) -> str:
     body = ", ".join(f'{key} |-> "{value}"' for key, value in fields)
     return f"[{body}]"
 
 
 def _compile_trace(events: list[dict[str, Any]], trace_sha256: str) -> str:
+    if len({event["request_id"] for event in events}) != 1:
+        raise ValueError("bounded trace compiler requires one request identity")
+    _validate_pre_states(events)
+    retry = False
     bound_backend: str | None = None
     bound_checkpoint: str | None = None
     bound_input: str | None = None
@@ -51,6 +109,21 @@ def _compile_trace(events: list[dict[str, Any]], trace_sha256: str) -> str:
         action = str(event["action"])
         request = "R1"
 
+        if action == "BeginAttempt":
+            retry = bool(event["pre_state"]["consumed_request_ids"])
+            if retry:
+                rows.append(_record([("action", "BeginRetry"), ("request", request)]))
+            continue
+        if action == "TerminalReceipt":
+            continue
+        if retry:
+            if action == "Authorize":
+                rows.append(_record([("action", "AuthorizeRetry"), ("request", request)]))
+            elif action == "Reject" and event["rejection_code"] == "DUPLICATE_REQUEST":
+                rows.append(_record([("action", "RejectDuplicate"), ("request", request)]))
+            else:
+                raise ValueError("unsupported continuation action")
+            continue
         if action == "Authorize":
             row = _record(
                 [
@@ -88,9 +161,7 @@ def _compile_trace(events: list[dict[str, Any]], trace_sha256: str) -> str:
                     ),
                     (
                         "checkpoint",
-                        "CP1"
-                        if str(event["checkpoint_sha256"]) == bound_checkpoint
-                        else "CP2",
+                        "CP1" if str(event["checkpoint_sha256"]) == bound_checkpoint else "CP2",
                     ),
                     (
                         "input",
@@ -158,13 +229,13 @@ def _check_negative_controls(
     mutations: list[tuple[str, list[dict[str, Any]]]] = []
 
     reordered = [dict(event) for event in traces["TRACE-001"]]
-    reordered[1], reordered[2] = reordered[2], reordered[1]
+    reordered[2], reordered[3] = reordered[3], reordered[2]
     for index, event in enumerate(reordered):
         event["seq"] = index
     mutations.append(("execute-before-bind", reordered))
 
     wrong_phase = [dict(event) for event in traces["TRACE-006"]]
-    wrong_phase[-1]["rejection_code"] = "AUTHORITY_INVALID"
+    wrong_phase[-2]["rejection_code"] = "AUTHORITY_INVALID"
     mutations.append(("post-execution-authority-reject", wrong_phase))
 
     results: list[dict[str, Any]] = []
@@ -193,6 +264,41 @@ def _check_negative_controls(
                 "tlc_log_sha256": _sha256(log),
             }
         )
+    original = traces["TRACE-010"]
+    continuation = next(
+        i for i, event in enumerate(original) if event["action"] == "BeginAttempt" and i > 0
+    )
+    for field, replacement in (
+        ("consumed_request_ids", []),
+        ("execution_counts", {"r1": 0}),
+        ("terminal_receipts", {}),
+        ("prior_trace_sha256", "0" * 64),
+    ):
+        altered = copy.deepcopy(original)
+        altered[continuation]["pre_state"][field] = replacement
+        # Rehash the forged snapshot: the retained prefix must still defeat it.
+        altered[continuation]["pre_state_sha256"] = _sha256(
+            _canonical_json(altered[continuation]["pre_state"])
+        )
+        path = output / f"negative-pre-state-{field}.ndjson"
+        data = b"".join(_canonical_json(event) + b"\n" for event in altered)
+        path.write_bytes(data)
+        detected = False
+        reason = ""
+        try:
+            _compile_trace(altered, _sha256(data))
+        except ValueError as exc:
+            detected = True
+            reason = str(exc)
+        results.append(
+            {
+                "mutation": f"pre-state-{field}",
+                "detected": detected,
+                "trace_file": path.name,
+                "trace_sha256": _sha256(data),
+                "rejection_reason": reason,
+            }
+        )
     return results
 
 
@@ -212,10 +318,7 @@ def check_conformance(jar: Path, output: Path) -> dict[str, Any]:
         generated_path.write_bytes(generated_bytes)
         result = _run_tlc(jar, generated)
         log = (
-            "$ TLC WeaverActivationTrace\n"
-            + result.stdout
-            + "\n--- stderr ---\n"
-            + result.stderr
+            "$ TLC WeaverActivationTrace\n" + result.stdout + "\n--- stderr ---\n" + result.stderr
         ).encode()
         log_path = output / f"{case_id.lower()}-tlc.log"
         log_path.write_bytes(log)

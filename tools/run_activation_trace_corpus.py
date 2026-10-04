@@ -21,7 +21,7 @@ from weaver_activation import (
 from weaver_activation.trace import ActivationTraceRecorder
 
 ROOT = Path(__file__).resolve().parents[1]
-CORPUS = ROOT / "tests" / "fixtures" / "activation_trace_corpus.json"
+CORPUS = ROOT / "tests" / "fixtures" / "activation_trace_stateful_corpus.json"
 
 CP = "a" * 64
 INP = "b" * 64
@@ -41,9 +41,7 @@ class CorpusVerifier:
     ) -> VerificationResult:
         return VerificationResult(
             is_valid=self.valid,
-            ledger_event_type=(
-                "TOKEN_SIGNATURE_VALIDATED" if self.valid else "QUORUM_FAILED"
-            ),
+            ledger_event_type=("TOKEN_SIGNATURE_VALIDATED" if self.valid else "QUORUM_FAILED"),
             failure_codes=[] if self.valid else ["INSUFFICIENT_QUORUM"],
             verified_issuers=["issuer"] if self.valid else [],
             verification_time="2026-10-04T00:00:00+00:00",
@@ -103,7 +101,7 @@ def _run_case(case: dict[str, Any], trace: ActivationTraceRecorder):
         intent = replace(intent, contract_version="future-contract")
     elif scenario == "malformed_identity":
         intent = replace(intent, checkpoint_sha256="not-a-digest")
-    elif scenario == "backend_failed":
+    elif scenario in {"backend_failed", "duplicate_after_failure"}:
         backend = _backend_fail
     elif scenario == "result_identity_mismatch":
         backend = _backend_result_mismatch
@@ -119,13 +117,23 @@ def _run_case(case: dict[str, Any], trace: ActivationTraceRecorder):
         payload = build_activation_authority_payload(other, authority_level=3)
 
     adapter = WeaverActivationAdapter(verifier, trace_recorder=trace)
-    return adapter.execute(
+    evidence = adapter.execute(
         intent,
         authority_envelope={"fixture": True},
         authority_payload=payload,
         requested_level=3,
         backend=backend,
     )
+
+    if scenario in {"duplicate_after_pass", "duplicate_after_failure"}:
+        evidence = adapter.execute(
+            intent,
+            authority_envelope={"fixture": True},
+            authority_payload=payload,
+            requested_level=3,
+            backend=backend,
+        )
+    return evidence
 
 
 def run_corpus(output: Path) -> dict[str, Any]:
@@ -137,7 +145,11 @@ def run_corpus(output: Path) -> dict[str, Any]:
     for case in corpus["cases"]:
         recorder = ActivationTraceRecorder()
         evidence = _run_case(case, recorder)
-        actions = [str(event["action"]) for event in recorder.events]
+        actions = [
+            str(event["action"])
+            for event in recorder.events
+            if event["action"] not in {"BeginAttempt", "TerminalReceipt"}
+        ]
         expected_status = case["expected_status"]
         expected_code = case["expected_reject_code"]
         passed = (

@@ -34,3 +34,13 @@ The repository verification gate requires both `WitnessBoundary` and `WeaverActi
 `Inv_TraceCanAdvance` is the critical refinement-side guard: if an unconsumed runtime event remains, that exact abstract event must be enabled in the base model. This prevents impossible traces from passing by stuttering. CI also requires two negative controls to fail: `Execute` before `BindContract`, and an authority-phase rejection code after execution.
 
 This establishes mechanical correspondence for the frozen first-attempt adapter corpus. It is not a universal refinement proof. Duplicate-request behavior needs a persisted consumed-request pre-state before it can be represented faithfully, and native checkpoint execution/memory integrity remain separate lower-layer obligations.
+
+The stateful trace cut adds prefix-derived pre-state and retained terminal
+receipt hashes under trace schema v2. The original nine-case corpus is preserved;
+the separate eleven-case corpus includes duplicates after PASS and backend
+failure. `Retry` preserves all original model variables and checks prior
+consumption, execution count one, and an existing terminal state. Its separate
+retry phase requires admission before duplicate evidence. Four snapshot negative
+controls recompute forged snapshot hashes and must still fail prefix validation.
+This extension covers same-adapter retries only; it adds no restart persistence
+or universal refinement claim.
