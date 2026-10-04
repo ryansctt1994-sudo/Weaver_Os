@@ -31,7 +31,7 @@ Role: canonical verification and governance spine.
 
 Current mainline work includes cryptographic authorization checks, replay handling, canonicalization, Chronicle-style history, release provenance, archive binding, mutation checks, bounded TLA/TLC witness work, and a fail-closed ledger spine.
 
-At this baseline, the latest observed main commit was `1b0afa62bd3a3c5a595f63736d576fe82d65d393`, whose commit message explicitly limits the new ledger evidence to a local deterministic check. Newer PR CI was queued during this audit, so this document does not promote that in-flight work.
+At this baseline, `main` includes merged verification closure commit `9b86b059ee1673f866d9e1b124214da24a08a3bb` from PR #60. The PR head (`9eb5e33f0e2c27704f79e42f2b90f347ae6b8ad6`) passed normal CI, tests, triadic-controls CI, the bounded TLA model, and the aggregate verification-evidence workflow before merge. That is bounded self/CI evidence; it is not independent reproduction or production authorization.
 
 Allowed status:
 
@@ -118,8 +118,8 @@ The legacy `E3_RECEIPTED` wording in `zorel-kernel` refers to an authorship/prov
 
 ## Immediate portfolio priorities
 
-1. Finish the current `Weaver_Os` verification PR and record exact green-run provenance.
+1. Freeze/tag the merged `Weaver_Os` verification closure and preserve its exact green-run artifacts.
 2. Produce independent reproduction for one narrow, frozen artifact before widening claims.
 3. Keep `Lumen-Nexus` R-level terminology separate from Weaver E-level terminology unless a mapping is explicitly specified.
-4. Repair stale or empty READMEs in the non-fork repositories.
+4. Treat the 2026-10-04 native-repo README normalization as the new documentation baseline and keep future status changes evidence-bound.
 5. Keep upstream forks minimally modified; record local changes separately when they become portfolio work.
