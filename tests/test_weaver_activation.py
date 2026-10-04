@@ -80,6 +80,7 @@ def test_exact_contract_passes_without_authority_gain():
     evidence = execute(adapter)
     assert evidence.status is ActivationStatus.PASS
     assert evidence.contract_version == CONTRACT_VERSION
+    assert evidence.contract_sha256 is not None
     assert len(evidence.contract_sha256) == 64
     assert evidence.authority_delta == 0
 
@@ -235,4 +236,30 @@ def test_backend_exception_becomes_rejection_evidence():
 
     evidence = execute(adapter, backend=backend)
     assert evidence.reject_code == ActivationRejectCode.BACKEND_FAILED.value
+    assert evidence.authority_delta == 0
+
+
+def test_nonfinite_retention_floor_rejects_without_crashing_evidence() -> None:
+    verifier = StubVerifier()
+    adapter = WeaverActivationAdapter(verifier)
+    intent = make_intent(retention_floor=float("nan"))
+    evidence = adapter.execute(
+        intent,
+        authority_envelope={"fixture": True},
+        authority_payload={"malformed": True},
+        requested_level=3,
+        backend=backend_ok,
+    )
+    assert evidence.status is ActivationStatus.REJECT
+    assert evidence.reject_code == ActivationRejectCode.MALFORMED_IDENTITY.value
+    assert evidence.contract_sha256 is None
+    assert evidence.authority_delta == 0
+    assert verifier.calls == 0
+
+
+def test_every_rejection_has_code_and_zero_authority_delta() -> None:
+    adapter = WeaverActivationAdapter(StubVerifier(valid=False))
+    evidence = execute(adapter)
+    assert evidence.status is ActivationStatus.REJECT
+    assert evidence.reject_code
     assert evidence.authority_delta == 0
