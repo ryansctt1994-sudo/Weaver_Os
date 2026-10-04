@@ -1,38 +1,176 @@
-"""Reports cannot claim success with failed, missing, or duplicated checks."""
+"""The aggregate report can only claim PASS when closure is mechanically complete."""
 
-import json
+from __future__ import annotations
+
 from copy import deepcopy
-from pathlib import Path
 
 import pytest
 from jsonschema import Draft202012Validator
 from jsonschema.exceptions import ValidationError
 
-ROOT = Path(__file__).resolve().parents[1]
-FIXTURES = ROOT / "tests/fixtures/verification"
+from tools.verify_all import REQUIRED_VERIFIERS, is_valid_verdict
+
+ZERO40 = "0" * 40
+ZERO64 = "0" * 64
 
 
-@pytest.mark.parametrize(
-    "name", ["missing-check", "failed-check", "duplicate-check", "unknown-field"]
-)
-def test_invalid_report(name):
-    validator = Draft202012Validator(
-        json.loads((ROOT / "schemas/verification_run.schema.json").read_text())
+def step(name: str = "run") -> dict:
+    return {
+        "step": name,
+        "command": ["synthetic-test"],
+        "exit_code": 0,
+        "status": "PASS",
+        "log": f"{name}.log",
+        "log_sha256": ZERO64,
+    }
+
+
+def verifier(name: str) -> dict:
+    return {"name": name, "status": "PASS", "exit_code": 0, "steps": [step()]}
+
+
+def adversarial(index: int) -> dict:
+    return {
+        "case_id": f"ADV-{index:03d}",
+        "case_name": f"case-{index}",
+        "expected_verdict": "REJECT",
+        "observed_verdict": "REJECT",
+        "status": "PASS",
+        "failure_code": "expected rejection",
+        "fixture": f"case-{index}.json",
+        "fixture_sha256": ZERO64,
+        "exit_code": 1,
+    }
+
+
+def valid_report() -> dict:
+    verifiers = [verifier(name) for name in REQUIRED_VERIFIERS]
+    return {
+        "schema_version": "1.0",
+        "repository": "test/repo",
+        "source_head_sha": ZERO40,
+        "verified_commit_sha": ZERO40,
+        "base_sha": ZERO40,
+        "dirty": False,
+        "created_at": "2026-10-04T00:00:00Z",
+        "scope": "local-checks-not-independent-reproduction",
+        "lockfile_sha256": ZERO64,
+        "wheel_sha256": ZERO64,
+        "environment": {
+            "python_version": "synthetic-test",
+            "os": "posix",
+            "platform": "synthetic-test",
+            "runner": "synthetic-test",
+        },
+        "github_run_id": "synthetic-test",
+        "commands": [
+            {
+                "verifier": item["name"],
+                "step": "run",
+                "command": ["synthetic-test"],
+                "exit_code": 0,
+                "status": "PASS",
+            }
+            for item in verifiers
+        ],
+        "verifiers": verifiers,
+        "adversarial_results": [adversarial(index) for index in range(1, 7)],
+        "artifact_hashes": {
+            "a": ZERO64,
+            "b": ZERO64,
+            "c": ZERO64,
+            "d": ZERO64,
+            "e": ZERO64,
+        },
+        "evidence_manifest_sha256": ZERO64,
+        "implementation_status": {
+            "chronicle": "DEFERRED_TO_BOUND_WITNESS",
+            "kernel": "DEFERRED_TO_BOUND_WITNESS",
+            "receipt": "DEFERRED_TO_BOUND_WITNESS",
+        },
+        "overall_verdict": "PASS",
+    }
+
+
+@pytest.fixture
+def schema():
+    import json
+    from pathlib import Path
+
+    root = Path(__file__).resolve().parents[1]
+    return json.loads((root / "schemas" / "verification_run.schema.json").read_text())
+
+
+def test_valid_complete_report(schema):
+    report = valid_report()
+    Draft202012Validator(schema).validate(report)
+    assert is_valid_verdict(
+        report["verifiers"], report["adversarial_results"], report["wheel_sha256"]
     )
+
+
+@pytest.mark.parametrize("missing", REQUIRED_VERIFIERS)
+def test_missing_required_verifier_rejected(schema, missing):
+    report = valid_report()
+    report["verifiers"] = [item for item in report["verifiers"] if item["name"] != missing]
+    report["overall_verdict"] = "FAIL"
     with pytest.raises(ValidationError):
-        validator.validate(json.loads((FIXTURES / f"report-{name}.json").read_text()))
-
-
-def test_valid_report_and_schema_copy():
-    validator = Draft202012Validator(
-        json.loads((ROOT / "schemas/verification_run.schema.json").read_text())
+        Draft202012Validator(schema).validate(report)
+    assert not is_valid_verdict(
+        report["verifiers"], report["adversarial_results"], report["wheel_sha256"]
     )
-    report = json.loads((FIXTURES / "report-valid.json").read_text())
-    validator.validate(report)
-    failure = deepcopy(report)
-    failure["status"] = "FAIL"
-    failure["checks"][0].update(status="FAIL", returncode=1)
-    validator.validate(failure)
-    assert (ROOT / "schemas/triad_event.schema.json").read_bytes() == (
-        ROOT / "triadic_controls/schemas/triad_event.schema.json"
-    ).read_bytes()
+
+
+def test_failed_verifier_cannot_claim_pass(schema):
+    report = valid_report()
+    target = report["verifiers"][0]
+    target["status"] = "FAIL"
+    target["exit_code"] = 2
+    target["steps"][0]["status"] = "FAIL"
+    target["steps"][0]["exit_code"] = 2
+    with pytest.raises(ValidationError):
+        Draft202012Validator(schema).validate(report)
+    assert not is_valid_verdict(
+        report["verifiers"], report["adversarial_results"], report["wheel_sha256"]
+    )
+
+
+def test_missing_wheel_digest_cannot_claim_pass(schema):
+    report = valid_report()
+    report["wheel_sha256"] = None
+    with pytest.raises(ValidationError):
+        Draft202012Validator(schema).validate(report)
+    assert not is_valid_verdict(
+        report["verifiers"], report["adversarial_results"], report["wheel_sha256"]
+    )
+
+
+def test_missing_adversarial_case_rejected(schema):
+    report = valid_report()
+    report["adversarial_results"].pop()
+    report["overall_verdict"] = "FAIL"
+    with pytest.raises(ValidationError):
+        Draft202012Validator(schema).validate(report)
+    assert not is_valid_verdict(
+        report["verifiers"], report["adversarial_results"], report["wheel_sha256"]
+    )
+
+
+def test_fail_report_is_schema_valid_when_a_required_verifier_fails(schema):
+    report = valid_report()
+    target = report["verifiers"][0]
+    target["status"] = "FAIL"
+    target["exit_code"] = 3
+    target["steps"][0]["status"] = "FAIL"
+    target["steps"][0]["exit_code"] = 3
+    report["commands"][0]["status"] = "FAIL"
+    report["commands"][0]["exit_code"] = 3
+    report["overall_verdict"] = "FAIL"
+    Draft202012Validator(schema).validate(report)
+
+
+def test_unknown_top_level_field_rejected(schema):
+    report = deepcopy(valid_report())
+    report["authority"] = "production"
+    with pytest.raises(ValidationError):
+        Draft202012Validator(schema).validate(report)

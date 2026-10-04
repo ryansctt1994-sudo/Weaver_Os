@@ -9,34 +9,29 @@ permissions:
 jobs:
   verify:
     runs-on: ubuntu-24.04
-    timeout-minutes: 15
+    timeout-minutes: 20
+    env:
+      WEAVER_SOURCE_HEAD_SHA: ${{ github.event.pull_request.head.sha }}
+      WEAVER_BASE_SHA: ${{ github.event.pull_request.base.sha }}
     steps:
       - uses: actions/checkout@v4
+        with:
+          fetch-depth: 2
       - uses: actions/setup-python@v5
         with:
           python-version: '3.12'
+      - uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: '17'
       - name: Install locked verification dependencies
+        shell: bash
         run: |
           mkdir -p verification-output
           set -o pipefail
           python -m pip install -r requirements-verification.lock 2>&1 | tee verification-output/install.log
-      - name: Run required checks
+      - name: Run complete fail-closed verification gate
         run: make verify
-      - name: Build wheel without dependency re-resolution
-        run: |
-          set -o pipefail
-          python -m build --no-isolation 2>&1 | tee verification-output/build.log
-      - name: Verify installed wheel outside checkout
-        shell: bash
-        run: |
-          set -euo pipefail
-          python -m venv "$RUNNER_TEMP/wheel-env"
-          "$RUNNER_TEMP/wheel-env/bin/pip" install -r requirements-verification.lock
-          "$RUNNER_TEMP/wheel-env/bin/pip" install --no-deps dist/*.whl
-          cp tests/integration/wheel_smoke.py "$RUNNER_TEMP/wheel_smoke.py"
-          cp tests/fixtures/verification/valid.jsonl "$RUNNER_TEMP/valid.jsonl"
-          cd "$RUNNER_TEMP"
-          "$RUNNER_TEMP/wheel-env/bin/python" -I wheel_smoke.py valid.jsonl 2>&1 | tee "$GITHUB_WORKSPACE/verification-output/wheel.log"
       - name: Retain evidence even on failure
         if: always()
         uses: actions/upload-artifact@v4

@@ -38,5 +38,13 @@
       "accept": false,
       "error": "duplicate JSON key"
     }
+  ],
+  "receipt_cases": [
+    {
+      "file": "malformed-receipt.json",
+      "sha256": "1e0f62e22ee14d5de1c5e730fb68cb0c530127b27309ca95cff36a704d39fa6a",
+      "accept": false,
+      "error": "receipt_hash"
+    }
   ]
 }
