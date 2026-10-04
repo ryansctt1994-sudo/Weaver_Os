@@ -3,6 +3,7 @@ import copy
 import json
 from datetime import datetime, timedelta, timezone
 from pathlib import Path
+from typing import Any
 
 import pytest
 from cryptography.hazmat.primitives import serialization
@@ -148,7 +149,7 @@ def signed_production_envelope(
         # The role policy caps the full authority window at 3,600 seconds.
         "valid_until": iso_offset(3540),
     }
-    envelope = {
+    envelope: dict[str, Any] = {
         "payload_type": "AUTHORITY_TOKEN",
         "payload_schema_version": "0.5.0",
         "payload_hash_alg": "sha256",
