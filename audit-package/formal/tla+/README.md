@@ -12,3 +12,17 @@ java -cp /path/to/tla2tools.jar tlc2.TLC -deadlock -config WitnessBoundary.cfg W
 Local run on 2026-10-01 UTC: TLC2 `2026.10.01.003433`, 917 states generated, 254 distinct states, complete graph depth 8, zero errors. A negative control changed `Unauthorized` to increment `protected`; TLC reported `RejectedPreservesState` violation at depth 2. The original JAR had SHA-256 `e3f5f648b75d68c14176b961ec7bfc1e94ab4c14de57f251b8c40a0fbf916e27`. On 2026-10-01 the named release download returned different bytes, and the pinned checksum correctly stopped CI. The replacement was explicitly inspected against the official asset metadata and rerun: TLC2 `2026.10.01.024053` (rev `0dab95e`), the same 917 generated / 254 distinct states, depth 8, and zero errors. The current pinned asset and digest are given above. This preserves the old result as history and records a new tool revision rather than treating the old download URL as an immutable artifact.
 
 This is bounded model checking of this abstraction. It does not prove the Python implementation refines the model, discharge the older CCS skeleton, authenticate a publisher, or provide an independent operator's reproduction receipt.
+
+
+## WeaverActivation bounded model
+
+`WeaverActivation.tla` is a separate bounded model for the Weaver Activation Runtime. It models two concurrent requests, authority admission, exact contract/artifact/input binding, single execution via an explicit execution counter, substitution and non-finite-result rejection, PASS recording, deterministic REJECT evidence, protected-state preservation, and zero authority gain.
+
+Run it with the same pinned TLC JAR:
+
+```sh
+cd audit-package/formal/tla+
+java -cp /path/to/tla2tools.jar tlc2.TLC -deadlock -config WeaverActivation.cfg WeaverActivation.tla
+```
+
+The repository verification gate requires both `WitnessBoundary` and `WeaverActivation`. Neither model is a refinement proof of the Python/C implementation; runtime correspondence remains a separate obligation.
