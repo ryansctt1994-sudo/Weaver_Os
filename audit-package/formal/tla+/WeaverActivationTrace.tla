@@ -64,4 +64,8 @@ TraceSpec == TraceInit /\ [][TraceNext]_traceVars
 Inv_TraceIndexRange ==
   traceIdx \in 1..(Len(RuntimeTrace) + 1)
 
+Inv_TraceCanAdvance ==
+  traceIdx <= Len(RuntimeTrace) =>
+    ENABLED ApplyEvent(RuntimeTrace[traceIdx])
+
 ====
