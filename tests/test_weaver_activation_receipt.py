@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import json
+from dataclasses import replace
 from pathlib import Path
 
 import jsonschema
@@ -59,15 +60,12 @@ def test_pass_receipt_is_canonical_and_schema_valid() -> None:
 
 
 def test_reject_receipt_omits_nonfinite_metric_but_binds_result_hash() -> None:
-    evidence = pass_evidence()
-    evidence = ActivationEvidence(
-        **{
-            **evidence.__dict__,
-            "status": ActivationStatus.REJECT,
-            "primary_metric": float("nan"),
-            "output_sha256": None,
-            "reject_code": "METRIC_INVALID",
-        }
+    evidence = replace(
+        pass_evidence(),
+        status=ActivationStatus.REJECT,
+        primary_metric=float("nan"),
+        output_sha256=None,
+        reject_code="METRIC_INVALID",
     )
     receipt = ActivationReceipt.from_evidence(evidence)
     assert receipt.verdict == "REJECT"
@@ -77,7 +75,6 @@ def test_reject_receipt_omits_nonfinite_metric_but_binds_result_hash() -> None:
 
 
 def test_pass_receipt_refuses_missing_backend_artifact_digest() -> None:
-    evidence = pass_evidence()
-    evidence = ActivationEvidence(**{**evidence.__dict__, "backend_sha256": None})
+    evidence = replace(pass_evidence(), backend_sha256=None)
     with pytest.raises(ValueError, match="complete admitted digests"):
         ActivationReceipt.from_evidence(evidence)
