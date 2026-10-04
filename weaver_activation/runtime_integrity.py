@@ -13,13 +13,13 @@ from collections.abc import Mapping
 from dataclasses import dataclass
 from pathlib import Path
 
-_DANGEROUS_LOADER_ENV = (
+_INTERPOSITION_ENV = (
     "LD_PRELOAD",
-    "LD_LIBRARY_PATH",
     "LD_AUDIT",
-    "LD_DEBUG",
-    "LD_PROFILE",
     "DYLD_INSERT_LIBRARIES",
+)
+_SEARCH_PATH_ENV = (
+    "LD_LIBRARY_PATH",
     "DYLD_LIBRARY_PATH",
     "DYLD_FRAMEWORK_PATH",
 )
@@ -31,12 +31,21 @@ class RuntimeIntegrityError(RuntimeError):
 
 def assert_clean_loader_environment(
     environment: Mapping[str, str] | None = None,
+    *,
+    reject_search_paths: bool = True,
 ) -> None:
     env = os.environ if environment is None else environment
-    present = sorted(name for name in _DANGEROUS_LOADER_ENV if env.get(name))
-    if present:
+    interposition = sorted(name for name in _INTERPOSITION_ENV if env.get(name))
+    if interposition:
         raise RuntimeIntegrityError(
-            "unsafe dynamic-loader environment: " + ", ".join(present)
+            "dynamic-loader interposition is present: " + ", ".join(interposition)
+        )
+
+    search_paths = sorted(name for name in _SEARCH_PATH_ENV if env.get(name))
+    if reject_search_paths and search_paths:
+        raise RuntimeIntegrityError(
+            "dynamic-loader search path is externally influenced: "
+            + ", ".join(search_paths)
         )
 
 
