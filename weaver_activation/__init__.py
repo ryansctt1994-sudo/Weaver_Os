@@ -13,6 +13,7 @@ from .activation import (
 )
 from .native import NativeWeaverBackend, NativeWeaverProtocolError
 from .receipt import RECEIPT_SCHEMA_VERSION, ActivationReceipt
+from .trace import TRACE_SCHEMA_VERSION, ActivationTraceRecorder
 
 __all__ = [
     "CONTRACT_VERSION",
@@ -23,6 +24,8 @@ __all__ = [
     "ActivationStatus",
     "BackendActivationResult",
     "ActivationReceipt",
+    "ActivationTraceRecorder",
+    "TRACE_SCHEMA_VERSION",
     "RECEIPT_SCHEMA_VERSION",
     "NativeWeaverBackend",
     "NativeWeaverProtocolError",
