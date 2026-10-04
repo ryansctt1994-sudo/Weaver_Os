@@ -10,6 +10,7 @@ from .activation import (
     VoidActivationAdapter,
     build_activation_authority_payload,
 )
+from .native import NativeVoidBackend, NativeVoidProtocolError
 
 __all__ = [
     "ActivationAction",
@@ -18,6 +19,8 @@ __all__ = [
     "ActivationRejectCode",
     "ActivationStatus",
     "BackendActivationResult",
+    "NativeVoidBackend",
+    "NativeVoidProtocolError",
     "VoidActivationAdapter",
     "build_activation_authority_payload",
 ]
