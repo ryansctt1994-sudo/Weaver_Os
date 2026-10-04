@@ -16,7 +16,7 @@ This is bounded model checking of this abstraction. It does not prove the Python
 
 ## WeaverActivation bounded model
 
-`WeaverActivation.tla` is a separate bounded model for the Weaver Activation Runtime. It models two concurrent requests, authority admission, exact contract/artifact/input binding, single execution via an explicit execution counter, substitution and non-finite-result rejection, PASS recording, deterministic REJECT evidence, protected-state preservation, and zero authority gain.
+`WeaverActivation.tla` is a separate bounded model for the Weaver Activation Runtime. It models two concurrent requests, authority admission, an explicit authority-event → request/contract/backend/checkpoint/input binding, single execution via an execution counter, phase-correct rejection, substitution and non-finite-result rejection, PASS recording, deterministic REJECT evidence, protected-state preservation, and zero authority gain.
 
 Run it with the same pinned TLC JAR:
 
