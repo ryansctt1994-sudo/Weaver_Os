@@ -76,7 +76,32 @@ The bounded TLC model checks:
 
 The model intentionally uses an execution counter rather than treating membership in a consumed-request set as proof of single execution. It also models rejection evidence directly while keeping `Rejected` terminal.
 
-This is bounded model checking of an abstraction. It is not yet a refinement proof that the Python/C implementation implements every TLA+ transition exactly.
+This is bounded model checking of an abstraction. It is not a general refinement proof that the Python/C implementation implements every TLA+ transition exactly.
+
+## Trace-driven correspondence
+
+`ActivationTraceRecorder` can be attached to `WeaverActivationAdapter` without changing authority or execution semantics. It emits canonical NDJSON observations for the abstract lifecycle actions `Authorize`, `BindContract`, `Execute`, `VerifyGood`, `Reject`, and `RecordPass`.
+
+The frozen corpus at `tests/fixtures/activation_trace_corpus.json` currently contains nine first-attempt cases:
+- PASS
+- contract-version mismatch
+- malformed identity
+- invalid authority
+- authority-binding mismatch
+- backend failure
+- result-identity mismatch
+- invalid metric
+- retention-gate failure
+
+`tools/check_activation_trace_conformance.py` executes those cases through the real Python adapter, hashes every emitted NDJSON trace, deterministically compiles each trace into `GeneratedActivationTrace.tla`, and replays it through `WeaverActivationTrace.tla`.
+
+The wrapper checks `Inv_TraceCanAdvance`: whenever unconsumed runtime events remain, the next emitted event must correspond to an enabled `WeaverActivation` transition. This prevents an impossible runtime trace from satisfying the temporal specification merely by stuttering.
+
+Two negative controls are mandatory:
+- moving `Execute` before `BindContract` must be rejected
+- changing a post-execution backend rejection into `AUTHORITY_INVALID` must be rejected
+
+This correspondence cut is deliberately scoped. Process-local duplicate-request rejection is not included because a faithful duplicate trace requires a persisted pre-state showing that the request was previously consumed. Native checkpoint execution identity and arbitrary in-process memory integrity also remain separate obligations. The result is mechanical trace conformance for the frozen first-attempt corpus, not universal implementation refinement.
 
 ## Canonical activation receipt
 
