@@ -79,6 +79,17 @@ def _sha256_evidence_json(value: object) -> str:
     return _sha256_json(_evidence_safe(value))
 
 
+def _try_contract_sha256(intent: "ActivationIntent") -> str | None:
+    try:
+        return intent.contract_sha256()
+    except (TypeError, ValueError):
+        return None
+
+
+def _admitted_digest(value: str | None) -> str | None:
+    return value if value is not None and _SHA256_RE.fullmatch(value) else None
+
+
 def _valid_digest(value: str | None, *, optional: bool = False) -> bool:
     if value is None:
         return optional
@@ -147,13 +158,17 @@ class BackendActivationResult:
 class ActivationEvidence:
     status: ActivationStatus
     request_id: str
+    model_id: str
+    backend_id: str
     contract_version: str
-    contract_sha256: str
+    contract_sha256: str | None
     authority_event_type: str
     authority_payload_sha256: str
     intent_sha256: str
     result_sha256: str | None
-    checkpoint_sha256: str
+    checkpoint_sha256: str | None
+    input_sha256: str | None
+    output_sha256: str | None
     primary_metric: float | None
     retention_metric: float | None
     reject_code: str | None
@@ -383,19 +398,25 @@ class WeaverActivationAdapter:
         return ActivationEvidence(
             status=status,
             request_id=intent.request_id,
+            model_id=intent.model_id,
+            backend_id=intent.backend_id,
             contract_version=intent.contract_version,
-            contract_sha256=intent.contract_sha256(),
+            contract_sha256=_try_contract_sha256(intent),
             authority_event_type=authority_event_type,
-            authority_payload_sha256=_sha256_json(authority_payload),
-            intent_sha256=_sha256_json(intent_data),
+            authority_payload_sha256=_sha256_evidence_json(authority_payload),
+            intent_sha256=_sha256_evidence_json(intent_data),
             result_sha256=(
                 _sha256_evidence_json(asdict(result)) if result is not None else None
             ),
-            checkpoint_sha256=intent.checkpoint_sha256,
+            checkpoint_sha256=_admitted_digest(intent.checkpoint_sha256),
+            input_sha256=_admitted_digest(intent.input_sha256),
+            output_sha256=(
+                _admitted_digest(result.output_sha256) if result is not None else None
+            ),
             primary_metric=result.primary_metric if result is not None else None,
             retention_metric=result.retention_metric if result is not None else None,
             reject_code=reject_code,
-            backend_sha256=(
+            backend_sha256=_admitted_digest(
                 result.backend_sha256 if result is not None else intent.backend_sha256
             ),
             authority_delta=0,
