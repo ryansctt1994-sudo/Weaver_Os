@@ -258,6 +258,21 @@ def run_formal_tlc(output: Path) -> dict[str, Any]:
                 timeout=180,
             )
         )
+        steps.append(
+            run_step(
+                name,
+                "activation-runtime-mutation-probes",
+                [
+                    sys.executable,
+                    "-m",
+                    "tools.check_activation_tla_mutations",
+                    str(jar),
+                ],
+                output,
+                cwd=ROOT,
+                timeout=180,
+            )
+        )
     return verifier(name, steps)
 
 
