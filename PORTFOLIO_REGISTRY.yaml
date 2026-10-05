@@ -1,0 +1,232 @@
+schema_version: "1.0"
+registry_id: "WNR-2026-10-05-P0-FREEZE"
+observed_date: "2026-10-05"
+timezone: "America/Chicago"
+
+portfolio:
+  canonical_anchor: "ryansctt1994-sudo/Weaver_Os"
+  witness_level: "W0"
+  authority_level: "O0"
+  production_authority: "PROHIBITED"
+  status_document: "PORTFOLIO_STATUS.md"
+  provenance_registry: "PORTFOLIO_REGISTRY.md"
+  baseline_markers:
+    provenance_baseline_commit: "6cf2c14"
+    fail_closed_evidence_gate_commit: "9b86b05"
+  claim_boundary:
+    - "Evidence remains local to the artifact and property that earned it."
+    - "CI success does not imply production readiness."
+    - "Evidence does not grant authority."
+    - "Capability does not grant authority."
+    - "Open, draft, or stacked pull requests are candidate work unless an immutable PR head is explicitly evaluated."
+
+registry_invariants:
+  - id: "INV-SOURCE-MERGE-DISTINCT"
+    statement: "source_sha and verification_merge_sha may differ and must remain explicit."
+  - id: "INV-GREEN-NOT-AUTHORITY"
+    statement: "green checks never raise authority above the declared authority ceiling."
+  - id: "INV-DRAFT-NOT-RUNTIME"
+    statement: "a draft or specification artifact does not imply an implemented runtime."
+  - id: "INV-OPEN-PR-NOT-MAINLINE"
+    statement: "an open PR does not silently become canonical mainline state."
+  - id: "INV-PREDECESSOR-GREEN"
+    statement: "stacked promotion is forbidden while a predecessor gate is red."
+  - id: "INV-PROTECTED-MERGE"
+    statement: "promotion to canonical main must occur through the protected PR path."
+
+objects:
+  - object_id: "WEAVER-ACTIVATION-PR65"
+    system: "Weaver Activation Runtime v1"
+    repository: "ryansctt1994-sudo/Weaver_Os"
+    pull_request: 65
+    lifecycle: "CANDIDATE"
+    draft: false
+    target_branch: "main"
+    source_sha: "8db6965aa6341a07828f17bdd0d30ca11caf545b"
+    base_sha_at_evaluation: "ee725f7"
+    verification_merge_sha: "afc1c655"
+    merged_to_main: false
+    mergeability_observed: "clean"
+    check_runs:
+      observed_count: 9
+      conclusion: "success"
+      combined_commit_status_api: "empty/pending; non-authoritative for this evaluation"
+      observed_jobs:
+        - "pytest 3.10"
+        - "pytest 3.11"
+        - "pytest 3.12"
+        - "package CI 3.10"
+        - "package CI 3.11"
+        - "tlc job 1"
+        - "tlc job 2"
+        - "test"
+        - "verify"
+    evidence_status: "CI_QUALIFIED"
+    evidence_ceiling: "Activation-runtime revision only; bounded same-adapter correspondence."
+    authority_ceiling: "O0"
+    allowed_claims:
+      - "CI-qualified activation-runtime revision."
+      - "Bounded correspondence evidence exists for the tested same-adapter scope."
+    prohibited_claims:
+      - "sealed"
+      - "production-ready"
+      - "full-system formally verified"
+      - "independently reproduced"
+    next_gate:
+      order: 2
+      action: "Merge only through the protected PR path, tag the exact promoted revision, and attach the check-run report to source_sha."
+      success_condition: "The promoted mainline artifact is explicitly bound to the evaluated source SHA and retains O0."
+
+  - object_id: "INTROSPECTION-TWIN-PR1"
+    system: "Introspection Twin replay correction"
+    repository: "ryansctt1994-sudo/introspection-twin"
+    pull_request: 1
+    lifecycle: "CANDIDATE"
+    draft: false
+    target_branch: "main"
+    source_sha: "16ecc263897026c3e0f26c605f04b2980ee777f4"
+    merged_to_main: false
+    mergeability_observed: "clean"
+    evidence_status: "CI_QUALIFIED_CORRECTION"
+    authority_ceiling: "O0"
+    corrected_check:
+      name: "build-and-replay"
+      conclusion: "success"
+    prior_false_green:
+      preserve: true
+      run_id: "37189158459"
+      mechanism: "scripts/check_kernel_replay.sh was non-executable; piping the failed invocation to tee allowed the pipeline to exit 0, so kernel replay never actually ran."
+    required_provenance:
+      - "Preserve the false-green run."
+      - "Preserve the corrected green replay run."
+      - "Do not rewrite the earlier run as a valid replay."
+    next_gate:
+      order: 3
+      action: "Merge through the protected PR path after the registry freeze and preserve both the false-green and corrected evidence."
+      success_condition: "Mainline CI fails unless kernel replay actually executes and passes."
+
+  - object_id: "WEAVER-RECOVERY-PR66"
+    system: "Weaver Recovery specification and lattice core"
+    repository: "ryansctt1994-sudo/Weaver_Os"
+    pull_request: 66
+    lifecycle: "SPECIFICATION_CANDIDATE"
+    draft: true
+    source_sha: "b162a7cea43959214bd9e928ea6c9965976cdcc2"
+    current_stack_base: "feature/weaver-activation-runtime"
+    stacked_on: "WEAVER-ACTIVATION-PR65"
+    merged_to_main: false
+    mergeability_observed: "clean"
+    observed_checks:
+      - name: "verify"
+        conclusion: "success"
+      - name: "recovery-and-lattice"
+        conclusion: "success"
+    evidence_status: "SPEC_AND_FORMAL_LIBRARY_CI_QUALIFIED"
+    evidence_ceiling: "WeaverRecovery.tla specification candidate plus Lean lattice library; no durable recovery runtime is established."
+    authority_ceiling: "O0"
+    explicit_absences:
+      - "NO_WAL_IMPLEMENTATION"
+      - "NO_DURABLE_INTENT_IMPLEMENTATION"
+      - "NO_PERSISTENCE_RUNTIME"
+      - "NO_CRASH_INJECTION_CAMPAIGN"
+    required_runtime_semantics:
+      - "durable intent before dispatch"
+      - "fsync before dispatch"
+      - "terminal receipt"
+      - "EXECUTION_OUTCOME_UNKNOWN"
+      - "CRASH_INDETERMINATE"
+      - "model-free deterministic recovery"
+    required_crash_boundaries:
+      - "before durable intent"
+      - "after durable intent and before dispatch"
+      - "during execution"
+      - "after execution and before terminal receipt"
+      - "during terminal receipt persistence"
+      - "during recovery replay"
+    next_gate:
+      order: 4
+      action: "After PR #65 promotion, retarget/rebase onto post-#65 main, keep draft status, implement durable recovery, and run crash-injection plus hostile-recovery tests."
+      success_condition: "The runtime never invents success, duplicate execution, or authority during recovery."
+
+  - object_id: "WGRSI-RC-STACK"
+    system: "Weaver Governed RSI"
+    repository: "ryansctt1994-sudo/Weaver-Governed-RSI"
+    lifecycle: "BLOCKED_STACK"
+    authority_ceiling: "O0"
+    baseline_pull_request:
+      pull_request: 1
+      state: "open"
+      note: "Historical baseline remains open and is not a promotion basis for RC1-RC3."
+    stages:
+      - stage: "RC1"
+        pull_request: 4
+        source_sha: "5bb28fa09dbe1be264e4ebae7f62eec2fbeb93af"
+        status: "BLOCKED_RED"
+        failing_gates:
+          - "ci-1-syntax-lint"
+          - "dependency-and-static-security"
+        required_before_promotion:
+          - "All RC1 required checks green."
+          - "No security or lint failure waived as evidence."
+      - stage: "RC2"
+        pull_request: 5
+        source_sha: "6518582635d1f764d45031f9578dded1e1c65c30"
+        status: "BLOCKED_ON_RC1"
+        failing_gates:
+          - "ci-1-syntax-lint"
+          - "dependency-and-static-security"
+          - "ci-9-mutation-testing"
+          - "evaluator-isolation"
+        required_before_promotion:
+          - "RC1 promoted on a green, frozen predecessor."
+          - "RC2 rebased on that predecessor."
+          - "Mutation and evaluator-isolation gates green."
+      - stage: "RC3"
+        pull_request: 6
+        source_sha: "3d1b32aa96c81350cb64ee0cf5eb8c6f921af624"
+        status: "BLOCKED_ON_RC2"
+        failing_gates:
+          - "ci-1-syntax-lint"
+          - "dependency-and-static-security"
+          - "ci-9-mutation-testing"
+          - "evaluator-isolation"
+          - "governed-internalization"
+        required_before_promotion:
+          - "RC2 promoted on a green, frozen predecessor."
+          - "RC3 rebased on that predecessor."
+          - "Governed-internalization gate green."
+    promotion_rule: "RC1 must be fully green first; RC2 must then be rebased and made green; RC3 must then be rebased and made green. No upward merge through red predecessors."
+    next_gate:
+      order: 7
+      action: "After recovery and stop-first isolation gates, repair RC1 first; only then advance RC2 and RC3."
+      success_condition: "Each RSI stage has an independently inspectable green predecessor and no waived safety gate."
+
+immediate_dependency_order:
+  - order: 1
+    object: "PORTFOLIO_REGISTRY.yaml"
+    action: "Freeze this registry through review before promotion."
+  - order: 2
+    object: "WEAVER-ACTIVATION-PR65"
+    action: "Protected merge and evidence-bound tag."
+  - order: 3
+    object: "INTROSPECTION-TWIN-PR1"
+    action: "Protected merge with false-green provenance retained."
+  - order: 4
+    object: "WEAVER-RECOVERY-PR66"
+    action: "Retarget after PR #65 and implement durable recovery; remain draft until runtime evidence exists."
+  - order: 5
+    object: "STOP-FIRST-V0.4"
+    action: "Prove delegated-cgroup process-tree kill and separate-UID rollback before shell or network enablement."
+  - order: 6
+    object: "UNIFIED-EXECUTION-RECEIPTS"
+    action: "Bind proposal, authorization, durable intent, execution, terminal receipt, Chronicle, and replay to one transaction identity."
+  - order: 7
+    object: "WGRSI-RC-STACK"
+    action: "Repair RC1, then rebase/repair RC2, then rebase/repair RC3."
+
+freeze_rules:
+  - "A later moving branch head does not silently replace any source_sha recorded above."
+  - "A rerun on a different SHA is a new evidence object."
+  - "A merge commit is recorded separately from the evaluated source head."
+  - "Any evidence promotion requires an explicit registry change reviewed through the protected PR path."
+  - "Authority remains O0 unless a separate governance decision explicitly changes it."
