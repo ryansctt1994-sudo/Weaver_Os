@@ -1,0 +1,255 @@
+schema_version: portfolio-promotion-freeze-1
+freeze_id: PPF-2026-10-05-001
+evaluated_at: "2026-10-05T04:15:00Z"
+evaluator: live-github-read
+canonical_anchor: ryansctt1994-sudo/Weaver_Os
+portfolio_posture: W0
+authority_ceiling: O0
+production: prohibited
+scope: four-object promotion boundary only
+does_not_replace: PORTFOLIO_REGISTRY.md
+claim_boundary: >
+  This freeze records the objects under evaluation before any promotion merge.
+  It is not a release, not a seal, and not authority. A later merge does not
+  rewrite these recorded identities.
+
+invariants:
+  - id: INV-SOURCE-MERGE-DISTINCT
+    rule: source_sha and merge_sha may differ and, when both are present, must remain explicit distinct objects
+  - id: INV-GREEN-IS-NOT-AUTHORITY
+    rule: a green check set cannot raise authority above O0 or clear a prohibited claim
+  - id: INV-SPEC-IS-NOT-RUNTIME
+    rule: a draft specification candidate cannot be recorded as an implemented runtime
+
+objects:
+  - id: weaver-activation-runtime-pr-65
+    name: Weaver Activation Runtime
+    repo: ryansctt1994-sudo/Weaver_Os
+    pr: 65
+    url: https://github.com/ryansctt1994-sudo/Weaver_Os/pull/65
+    source_head: 8db6965aa6341a07828f17bdd0d30ca11caf545b
+    base_at_evaluation: ee725f7cf923d86d915900fc93ef2e3f6e5eef1c
+    base_ref: main
+    verified_merge_sha: afc1c6551160fb4fd448dda27bb3378bf2eceb79
+    verified_merge_sha_status: recorded-distinct-object
+    verified_merge_sha_source: pr-body-qualification-note
+    draft: false
+    mergeable_state_at_evaluation: clean
+    status: CI_QUALIFIED
+    authority: O0
+    evidence_ceiling: bounded to the tested activation runtime and same-adapter correspondence
+    runtime_implemented: true
+    persistence_implemented: false
+    next_gate: protected merge plus immutable release manifest bound to source head
+    prohibited_claims:
+      - sealed
+      - production-ready
+      - implementation-wide formal proof
+    checks:
+      - name: pytest (3.10)
+        conclusion: success
+        check_run_id: 111402573231
+        run_id: 37190871875
+      - name: pytest (3.11)
+        conclusion: success
+        check_run_id: 111402573083
+        run_id: 37190871875
+      - name: pytest (3.12)
+        conclusion: success
+        check_run_id: 111402573285
+        run_id: 37190871875
+      - name: Test, lint, type-check, and package (3.10)
+        conclusion: success
+        check_run_id: 111402573073
+        run_id: 37190871803
+      - name: Test, lint, type-check, and package (3.11)
+        conclusion: success
+        check_run_id: 111402572844
+        run_id: 37190871803
+      - name: tlc
+        conclusion: success
+        check_run_id: 111402572914
+        run_id: 37190871825
+      - name: tlc
+        conclusion: success
+        check_run_id: 111402572845
+        run_id: 37190871809
+      - name: test
+        conclusion: success
+        check_run_id: 111402572859
+        run_id: 37190871812
+      - name: verify
+        conclusion: success
+        check_run_id: 111402573397
+        run_id: 37190871920
+    notes:
+      - Combined commit-status API was empty and pending; check runs are the qualification signal.
+      - Source head and verified merge commit are distinct and must not be substituted.
+
+  - id: introspection-twin-pr-1
+    name: Introspection Twin replay-exit correction
+    repo: ryansctt1994-sudo/introspection-twin
+    pr: 1
+    url: https://github.com/ryansctt1994-sudo/introspection-twin/pull/1
+    source_head: 16ecc263897026c3e0f26c605f04b2980ee777f4
+    base_at_evaluation: fcc63c085497a26bf1468294a3df53fdd6a56c9f
+    base_ref: main
+    draft: false
+    mergeable_state_at_evaluation: clean
+    status: CI_QUALIFIED_CORRECTION
+    authority: O0
+    provenance_flag: PRIOR_FALSE_GREEN_PRESERVED
+    evidence_ceiling: CI correction of a false-green replay exit; does not close name-typed axioms, commit binding, or signatures
+    runtime_implemented: false
+    next_gate: protected merge with both runs retained
+    evidence_record:
+      false_green_run: 37189158459
+      false_green_mechanism: non-executable replay script piped to tee exited 0
+      corrected_runs:
+        - run_id: 37189236598
+          name: build-and-replay
+          conclusion: success
+          check_run_id: 111397760210
+        - run_id: 37189242723
+          name: build-and-replay
+          conclusion: success
+          check_run_id: 111397778861
+    prohibited_claims:
+      - self-awareness
+      - replay proven for all future heads
+      - authority promotion
+
+  - id: weaver-recovery-pr-66
+    name: Weaver Recovery specification and lattice core
+    repo: ryansctt1994-sudo/Weaver_Os
+    pr: 66
+    url: https://github.com/ryansctt1994-sudo/Weaver_Os/pull/66
+    source_head: b162a7cea43959214bd9e928ea6c9965976cdcc2
+    relationship: STACKED_ON_PR_65
+    stacked_on: weaver-activation-runtime-pr-65
+    base_ref: feature/weaver-activation-runtime
+    base_at_evaluation: 8db6965aa6341a07828f17bdd0d30ca11caf545b
+    recorded_merge_ref: 3051e6d6c6cf7d840d7616ab9941f872cc111b13
+    recorded_merge_ref_status: recorded-distinct-object
+    draft: true
+    mergeable_state_at_evaluation: clean
+    status: SPECIFICATION_CANDIDATE
+    authority: O0
+    evidence_ceiling: specification plus Lean lattice library only
+    runtime_implemented: false
+    missing_capability: NO_RUNTIME_PERSISTENCE_IMPLEMENTATION
+    next_gate: retarget after PR 65 merge, then implement WAL and recovery semantics and crash campaign
+    checks:
+      - name: recovery-and-lattice
+        conclusion: success
+        check_run_id: 111406250828
+        run_id: 37192091138
+      - name: verify
+        conclusion: success
+        check_run_id: 111406250652
+        run_id: 37192091136
+    prohibited_claims:
+      - recovery runtime implemented
+      - exactly-once execution proven
+      - authority promotion
+
+  - id: wgrsi-rc1-pr-4
+    name: WGRSI-RC1 governed recursive gain experiment
+    repo: ryansctt1994-sudo/Weaver-Governed-RSI
+    pr: 4
+    url: https://github.com/ryansctt1994-sudo/Weaver-Governed-RSI/pull/4
+    source_head: 5bb28fa09dbe1be264e4ebae7f62eec2fbeb93af
+    stack_role: RC1
+    status: BLOCKED_RED
+    authority: O0
+    promotion: forbidden
+    predecessor: none
+    failing_jobs:
+      - name: ci-1-syntax-lint
+        conclusion: failure
+        check_run_id: 111381266525
+        run_id: 37183731786
+      - name: dependency-and-static-security
+        conclusion: failure
+        check_run_id: 111381266850
+        run_id: 37183731811
+    prohibited_claims:
+      - recursive gain demonstrated
+      - authority promotion
+
+  - id: wgrsi-rc2-pr-5
+    name: WGRSI-RC2 evaluator isolation and signed receipts
+    repo: ryansctt1994-sudo/Weaver-Governed-RSI
+    pr: 5
+    url: https://github.com/ryansctt1994-sudo/Weaver-Governed-RSI/pull/5
+    source_head: 6518582635d1f764d45031f9578dded1e1c65c30
+    stack_role: RC2
+    status: BLOCKED_ON_RC1
+    authority: O0
+    promotion: forbidden
+    predecessor: wgrsi-rc1-pr-4
+    failing_jobs:
+      - name: ci-1-syntax-lint
+        conclusion: failure
+        check_run_id: 111382165950
+        run_id: 37184040333
+      - name: dependency-and-static-security
+        conclusion: failure
+        check_run_id: 111382165820
+        run_id: 37184040397
+      - name: ci-9-mutation-testing
+        conclusion: failure
+        check_run_id: 111382165970
+        run_id: 37184040427
+      - name: evaluator-isolation
+        conclusion: failure
+        check_run_id: 111382165743
+        run_id: 37184040383
+    prohibited_claims:
+      - evaluator independence established
+      - authority promotion
+
+  - id: wgrsi-rc3-pr-6
+    name: WGRSI-RC3 governed insight internalization
+    repo: ryansctt1994-sudo/Weaver-Governed-RSI
+    pr: 6
+    url: https://github.com/ryansctt1994-sudo/Weaver-Governed-RSI/pull/6
+    source_head: 3d1b32aa96c81350cb64ee0cf5eb8c6f921af624
+    stack_role: RC3
+    status: BLOCKED_ON_RC2
+    authority: O0
+    promotion: forbidden
+    predecessor: wgrsi-rc2-pr-5
+    failing_jobs:
+      - name: ci-1-syntax-lint
+        conclusion: failure
+        check_run_id: 111382979473
+        run_id: 37184312300
+      - name: dependency-and-static-security
+        conclusion: failure
+        check_run_id: 111382979384
+        run_id: 37184312306
+      - name: ci-9-mutation-testing
+        conclusion: failure
+        check_run_id: 111382979451
+        run_id: 37184312282
+      - name: evaluator-isolation
+        conclusion: failure
+        check_run_id: 111382979471
+        run_id: 37184312285
+      - name: governed-internalization
+        conclusion: failure
+        check_run_id: 111382979501
+        run_id: 37184312349
+    prohibited_claims:
+      - insight internalization established
+      - authority promotion
+
+queue:
+  - registry freeze
+  - Weaver_Os PR 65 protected merge
+  - introspection-twin PR 1 protected merge
+  - Weaver_Os PR 66 retarget onto post-65 main
+  - recovery implementation against WeaverRecovery.tla
+  - stop-first host proof
+  - WGRSI RC1 repair
