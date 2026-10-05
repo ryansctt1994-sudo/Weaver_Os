@@ -13,6 +13,8 @@ This document is the current portfolio-level status. Repository-specific READMEs
 
 See [PORTFOLIO_REGISTRY.md](PORTFOLIO_REGISTRY.md) for the complete repository and upstream-parent inventory.
 
+See [PORTFOLIO_REGISTRY.yaml](PORTFOLIO_REGISTRY.yaml) for the machine-readable artifact/promotion ledger. The YAML registry records immutable candidate SHAs, artifact-local evidence ceilings, authority ceilings, blockers, dependency order, and next gates. It does not promote open or draft work into canonical mainline state.
+
 ## Portfolio identity
 
 The account is a mixed-origin research portfolio. It contains original engineering, collaborative work, manually imported research material, experimental scaffolds, and upstream forks.
