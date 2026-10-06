@@ -1,6 +1,6 @@
 {
-  "manifest_version": "1.1",
-  "source_base_commit": "ee725f7cf923d86d915900fc93ef2e3f6e5eef1c",
+  "manifest_version": "1.2",
+  "source_base_commit": "75f58094d0842f56054bb987e50deb175df8486a",
   "release_commit": null,
   "docker_image": null,
   "environment": {
@@ -12,8 +12,9 @@
   "environment_status": "DECLARED_NOT_REPLAYED",
   "authority_ledger_hash": "82713cf5a2d9d294c80ba912d51fc4e29bd460c680686ed2f71f74415addb0c9",
   "expected_head_hash": "e3ff77f12b8663c1fe1ac14bf1e1bd7d675e969f54e49462f4abcf1f41f97e85",
-  "expected_state_digest": null,
-  "state_digest_status": "NOT_COMPUTED_FROM_RUNTIME",
+  "expected_state_digest": "39a5996b1bba7a0ed4f0a5c549ad58af5300b5abb5890ddf9eb47c9d039c5a0e",
+  "state_digest_status": "LOCAL_REDUCER_COMPUTED",
+  "state_digest_method": "authority-transition-reducer-v1",
   "timestamp": "2026-10-06T17:26:00Z",
-  "manifest_hash": "7959510fc80c8cd44f4b40e0368230c692ddf95668c0d8c6c96e0471a6b0dbea"
+  "manifest_hash": "69efb8c50c89535a532780a2da4fea2342340b85210d2c6c1c1955f21c362255"
 }
