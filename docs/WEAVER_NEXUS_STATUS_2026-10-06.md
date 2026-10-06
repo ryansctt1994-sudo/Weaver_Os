@@ -9,88 +9,96 @@
 
 ## One-line state
 
-The public spine now has corrected manifest semantics, a derived local verifier,
-and a bounded executable A1 transition invariant. E3.5 remains deliberately
-withheld because no qualified runtime-state replay or independent reproduction
-has been established.
+The public spine now has corrected manifest semantics, derived ledger/head
+verification, an executable A1 transition invariant, a bounded runtime-state
+observation contract, and a deterministic local authority-state reducer.
+E3.5 remains withheld because actual qualified runtime replay and independent
+operator reproduction have not been established.
 
 ## Canonical mainline milestones
 
-- Manifest binding repair merged through PR #69.
-- Derived ledger/head verifier merged through PR #70.
-- Exact-predecessor / scope-separation transition invariant merged through PR #71.
-- Mainline verification workflows were green after the merged sequence.
+- PR #69 — manifest binding repair.
+- PR #70 — derived ledger/head verifier and explicit E3.5 hold.
+- PR #71 — exact-predecessor and scope/support transition invariant.
+- PR #72 — bounded runtime-state digest contract mechanics.
+- PR #73 — bounded local authority-state replay and manifest v1.2.
 
 ## Current file-level spine
 
 - Executable spine: `tools/fail_closed_spine.py`.
 - Shared chain mechanics: `tools/spine_hash.py`.
-- Evidence ceiling: `LOCAL_DETERMINISTIC_CHECK`.
-- Canonical ledger digest: `82713cf5a2d9d294c80ba912d51fc4e29bd460c680686ed2f71f74415addb0c9`.
-- Ordered chain head: `e3ff77f12b8663c1fe1ac14bf1e1bd7d675e969f54e49462f4abcf1f41f97e85`.
+- Local state reducer: `tools/authority_state.py`.
+- Runtime observation contract: `tools/runtime_state_digest.py`.
+- Evidence ceiling for local spine: `LOCAL_DETERMINISTIC_CHECK`.
+- Canonical ledger digest:
+  `82713cf5a2d9d294c80ba912d51fc4e29bd460c680686ed2f71f74415addb0c9`.
+- Ordered chain head:
+  `e3ff77f12b8663c1fe1ac14bf1e1bd7d675e969f54e49462f4abcf1f41f97e85`.
+- Local projected state digest:
+  `39a5996b1bba7a0ed4f0a5c549ad58af5300b5abb5890ddf9eb47c9d039c5a0e`.
+- State digest class: `LOCAL_REDUCER_COMPUTED`.
 
 ## Preserved historical defects
 
 ### WN-DEFECT-MANIFEST-001
 
-The historical manifest carried placeholder source/image/head fields.
+Historical placeholder source/image/head bindings.
 
-**Disposition:** repaired in manifest v1.1; history preserved.
+**Disposition:** repaired; history preserved.
 
 ### WN-DEFECT-VERIFY-001
 
-The historical verifier assigned pinned constants to values labeled computed.
+Historical pinned constants labeled as computed values.
 
-**Disposition:** repaired for the local spine; the verifier now derives the
-ledger digest and ordered chain head from actual ledger content.
+**Disposition:** repaired for bounded local verification.
 
 ### WN-SPEC-IMPL-001
 
-The historical E3.5 specification described a stronger replay procedure than
-the implementation provided.
+Historical E3.5 specification exceeded the implemented replay path.
 
-**Disposition:** preserved and narrowed. E3.5 remains withheld until the
-missing runtime/reproduction predicates exist.
+**Disposition:** narrowed; E3.5 remains fail-closed.
 
 ## Current propositions
 
 ```text
-RepositoryPresence                = ESTABLISHED
-SpineImplementation               = ESTABLISHED
-LocalDeterministicMechanics       = ESTABLISHED_WITHIN_SCOPE
-ManifestV1HistoricalCorrectness   = FAILED_STALE_PRESERVED
-ManifestV1_1Semantics             = MERGED
-DerivedHeadVerification           = MERGED
-E35Qualification                  = WITHHELD
-A1PredecessorBindingReference     = MERGED
-A1ScopeSupportSeparationReference = MERGED
-RuntimeStateDigestQualification   = NOT_ESTABLISHED
-CrossHostReplay                   = NOT_ESTABLISHED
-IndependentReproduction           = NOT_ESTABLISHED
-Witness                           = W0
-OperationalAuthority              = O0_WITHHELD
-Production                        = PROHIBITED
+RepositoryPresence                 = ESTABLISHED
+SpineImplementation                = ESTABLISHED
+LocalDeterministicMechanics        = ESTABLISHED_WITHIN_SCOPE
+DerivedHeadVerification            = ESTABLISHED_WITHIN_SCOPE
+LocalAuthorityStateReduction       = ESTABLISHED_WITHIN_SCOPE
+RuntimeStateContractMechanics      = ESTABLISHED_WITH_FIXTURE_SCOPE
+QualifiedRuntimeReplay             = NOT_ESTABLISHED
+E35Qualification                   = WITHHELD
+A1PredecessorBindingReference      = ESTABLISHED_WITHIN_SCOPE
+A1ScopeSupportSeparationReference  = ESTABLISHED_WITHIN_SCOPE
+RemoteCIReceipt                    = CANDIDATE_PENDING_EXECUTION
+IndependentReproduction            = NOT_ESTABLISHED
+Witness                            = W0
+OperationalAuthority               = O0_WITHHELD
+Production                         = PROHIBITED
 ```
 
 ## Governing separations
 
 ```text
-Specification != LocalRun != IndependentReproduction != Authority
+Specification != LocalRun != RuntimeReplay != IndependentReproduction != Authority
+LocalReducerDigest != RuntimeStateDigest
 ManifestConsistency != KnownReleaseIdentity
 Mechanics != ScientificResult
 Reproduction != Scope
 ScopeCoverage != EvidentialSupport
+RemoteCIReplay != IndependentOperatorReproduction
 CandidatePRState != CanonicalMainState
 DeclaredGovernance != ServerEnforcedGovernance
 ```
 
 ## Immediate sequence
 
-1. Define the runtime-state digest boundary without inventing a runtime result.
-2. Implement a real adapter from a named runtime to that boundary.
-3. Bind replay input identity to the frozen E3.5 ledger.
-4. Populate `expected_state_digest` only after the runtime actually derives it.
-5. Perform same-operator cross-host replay.
+1. Emit an artifact-bound remote CI spine receipt.
+2. Preserve same-origin remote CI as non-independent evidence only.
+3. Implement a real named-runtime adapter to the runtime-state contract.
+4. Bind replay input and runtime source independently.
+5. Compare runtime-derived state against the correct projection contract.
 6. Obtain independent operator reproduction separately.
 7. Enforce Gate Zero server-side.
 
