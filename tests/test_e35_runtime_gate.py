@@ -7,7 +7,11 @@ from pathlib import Path
 
 import pytest
 
-from tools import e35_runtime_gate as gate
+from tools.e35_runtime_gate import (
+    E35RuntimeGateError,
+    load_runtime_sut,
+    qualify_e35_runtime,
+)
 
 
 LEDGER = [
@@ -118,19 +122,19 @@ def write_sut(root: Path, artifact_hash: str, *, projection_method=None) -> Path
 
 
 def test_checked_in_runtime_sut_is_explicitly_unbound():
-    with pytest.raises(gate.E35RuntimeGateError) as exc:
-        gate.load_runtime_sut()
+    with pytest.raises(E35RuntimeGateError) as exc:
+        load_runtime_sut()
     assert exc.value.code.startswith("E35_RUNTIME_SUT_UNBOUND:")
     assert exc.value.exit_code == 1
 
 
 def test_gate_qualifies_equivalent_runtime_projection(tmp_path, monkeypatch):
-    monkeypatch.setattr(gate, "ROOT", tmp_path)
+    monkeypatch.setattr("tools.e35_runtime_gate.ROOT", tmp_path)
     artifact, artifact_hash = write_runtime(tmp_path)
     ledger = write_ledger(tmp_path)
     sut = write_sut(tmp_path, artifact_hash)
 
-    receipt = gate.qualify_e35_runtime(sut_path=sut, ledger_path=ledger)
+    receipt = qualify_e35_runtime(sut_path=sut, ledger_path=ledger)
 
     assert artifact.is_file()
     assert receipt.result == "LOCAL_RUNTIME_REPLAY_PASS"
@@ -147,33 +151,33 @@ def test_gate_qualifies_equivalent_runtime_projection(tmp_path, monkeypatch):
 
 
 def test_gate_rejects_runtime_state_projection_mismatch(tmp_path, monkeypatch):
-    monkeypatch.setattr(gate, "ROOT", tmp_path)
+    monkeypatch.setattr("tools.e35_runtime_gate.ROOT", tmp_path)
     _, artifact_hash = write_runtime(tmp_path, wrong_state=True)
     ledger = write_ledger(tmp_path)
     sut = write_sut(tmp_path, artifact_hash)
 
-    with pytest.raises(gate.E35RuntimeGateError) as exc:
-        gate.qualify_e35_runtime(sut_path=sut, ledger_path=ledger)
+    with pytest.raises(E35RuntimeGateError) as exc:
+        qualify_e35_runtime(sut_path=sut, ledger_path=ledger)
 
     assert exc.value.code == "E35_RUNTIME_STATE_DIGEST_MISMATCH"
     assert exc.value.exit_code == 1
 
 
 def test_gate_rejects_artifact_hash_mismatch(tmp_path, monkeypatch):
-    monkeypatch.setattr(gate, "ROOT", tmp_path)
+    monkeypatch.setattr("tools.e35_runtime_gate.ROOT", tmp_path)
     write_runtime(tmp_path)
     write_ledger(tmp_path)
     sut = write_sut(tmp_path, "0" * 64)
 
-    with pytest.raises(gate.E35RuntimeGateError) as exc:
-        gate.load_runtime_sut(sut)
+    with pytest.raises(E35RuntimeGateError) as exc:
+        load_runtime_sut(sut)
 
     assert exc.value.code == "E35_RUNTIME_ARTIFACT_HASH_MISMATCH"
     assert exc.value.exit_code == 1
 
 
 def test_gate_rejects_non_equivalent_projection_method(tmp_path, monkeypatch):
-    monkeypatch.setattr(gate, "ROOT", tmp_path)
+    monkeypatch.setattr("tools.e35_runtime_gate.ROOT", tmp_path)
     _, artifact_hash = write_runtime(tmp_path)
     write_ledger(tmp_path)
     sut = write_sut(
@@ -182,7 +186,7 @@ def test_gate_rejects_non_equivalent_projection_method(tmp_path, monkeypatch):
         projection_method="some-richer-runtime-state-v1",
     )
 
-    with pytest.raises(gate.E35RuntimeGateError) as exc:
-        gate.load_runtime_sut(sut)
+    with pytest.raises(E35RuntimeGateError) as exc:
+        load_runtime_sut(sut)
 
     assert exc.value.code == "E35_RUNTIME_PROJECTION_NOT_REFERENCE_EQUIVALENT"
