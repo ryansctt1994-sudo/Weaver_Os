@@ -5,15 +5,12 @@ verify-e35:
 		echo "❌ ERROR: Missing published_manifest.json or authority_ledger.json"; \
 		exit 2; \
 	fi
-	@echo "📏 Computing canonical hashes..."
-	@python3 verify_attestations.py
-	@RESULT=$$?; \
-	if [ $$RESULT -eq 0 ]; then \
-		echo "✅ E3.5 LOCAL VERIFIER PASSED"; \
-	else \
-		echo "❌ E3.5 FAILED"; \
-	fi; \
-	exit $$RESULT
+	@python3 verify_attestations.py --scope e35
+
+.PHONY: verify-spine
+verify-spine:
+	@echo "🔍 Verifying local deterministic spine..."
+	@python3 verify_attestations.py --scope local-spine
 
 .PHONY: verify
 verify:
