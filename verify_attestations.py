@@ -3,7 +3,8 @@
 
 Scopes:
 - local-spine: derive ledger hash and ordered chain head from ledger bytes,
-  recompute manifest hash, and compare those values to the manifest.
+  recompute manifest hash, validate manifest schema, and compare derived
+  values to the manifest.
 - e35: run the local checks, then fail closed while runtime replay and
   independent reproduction gates remain unimplemented.
 
@@ -18,10 +19,13 @@ import sys
 from pathlib import Path
 from typing import Any
 
+from jsonschema import Draft7Validator, FormatChecker
+
 from tools.spine_hash import SpineValidationError, canonical, chain_events, sha256_hex
 
 ROOT = Path(__file__).resolve().parent
 MANIFEST_PATH = ROOT / "published_manifest.json"
+MANIFEST_SCHEMA_PATH = ROOT / "schemas" / "published_manifest.schema.json"
 LEDGER_PATH = ROOT / "authority_ledger.json"
 
 
@@ -48,25 +52,27 @@ def require_manifest_v11(manifest: Any) -> dict[str, Any]:
     if not isinstance(manifest, dict):
         raise VerificationError("MANIFEST_NOT_OBJECT")
 
-    required = {
-        "manifest_version",
-        "source_base_commit",
-        "release_commit",
-        "docker_image",
-        "environment",
-        "environment_status",
-        "authority_ledger_hash",
-        "expected_head_hash",
-        "expected_state_digest",
-        "state_digest_status",
-        "timestamp",
-        "manifest_hash",
-    }
-    missing = sorted(required - set(manifest))
-    if missing:
-        raise VerificationError("MANIFEST_FIELDS_MISSING:" + ",".join(missing))
-    if manifest.get("manifest_version") != "1.1":
-        raise VerificationError("MANIFEST_VERSION_UNSUPPORTED")
+    schema = load_json(MANIFEST_SCHEMA_PATH)
+    if not isinstance(schema, dict):
+        raise VerificationError("MANIFEST_SCHEMA_NOT_OBJECT")
+
+    try:
+        Draft7Validator.check_schema(schema)
+    except Exception as exc:
+        raise VerificationError(f"MANIFEST_SCHEMA_INVALID:{exc}") from exc
+
+    validator = Draft7Validator(schema, format_checker=FormatChecker())
+    errors = sorted(
+        validator.iter_errors(manifest),
+        key=lambda error: tuple(str(part) for part in error.absolute_path),
+    )
+    if errors:
+        first = errors[0]
+        location = ".".join(str(part) for part in first.absolute_path) or "<root>"
+        raise VerificationError(
+            f"MANIFEST_SCHEMA_REJECTED:{location}:{first.message}"
+        )
+
     return manifest
 
 
@@ -86,9 +92,21 @@ def verify_local_spine(manifest: dict[str, Any], ledger: Any) -> bool:
         raise VerificationError(f"LEDGER_INVALID:{exc}") from exc
 
     checks = [
-        compare("authority_ledger_hash", ledger_hash, manifest.get("authority_ledger_hash")),
-        compare("manifest_hash", compute_manifest_hash(manifest), manifest.get("manifest_hash")),
-        compare("expected_head_hash", chain_head, manifest.get("expected_head_hash")),
+        compare(
+            "authority_ledger_hash",
+            ledger_hash,
+            manifest.get("authority_ledger_hash"),
+        ),
+        compare(
+            "manifest_hash",
+            compute_manifest_hash(manifest),
+            manifest.get("manifest_hash"),
+        ),
+        compare(
+            "expected_head_hash",
+            chain_head,
+            manifest.get("expected_head_hash"),
+        ),
     ]
     print(f"derived_chain_head: {chain_head}")
     return all(checks)
