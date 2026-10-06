@@ -1,0 +1,32 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://weaver-os.local/schemas/queue_message_receipt.schema.json",
+  "title": "QueueMessageReceipt",
+  "type": "object",
+  "required": [
+    "receipt_version",
+    "receipt_type",
+    "runtime",
+    "authority_id",
+    "channel",
+    "sender_id_hash",
+    "message_id_hash",
+    "decision",
+    "result",
+    "receipt_hash"
+  ],
+  "properties": {
+    "receipt_version": { "const": "0.1" },
+    "receipt_type": { "const": "QueueMessageReceipt" },
+    "runtime": { "const": "tinyclaw" },
+    "authority_id": { "type": "string", "minLength": 1 },
+    "channel": { "enum": ["discord", "telegram", "whatsapp", "tinyoffice", "api"] },
+    "sender_id_hash": { "type": "string" },
+    "message_id_hash": { "type": "string" },
+    "decision": { "enum": ["allow", "block", "escalate"] },
+    "result": { "enum": ["queued", "blocked", "escalated", "failed"] },
+    "previous_receipt_hash": { "type": ["string", "null"] },
+    "receipt_hash": { "type": "string" }
+  },
+  "additionalProperties": false
+}

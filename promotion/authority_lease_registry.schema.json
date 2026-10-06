@@ -1,0 +1,54 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://weaver-os.local/schemas/authority_lease_registry.schema.json",
+  "title": "AuthorityLeaseRegistry",
+  "type": "object",
+  "required": ["schema_version", "leases"],
+  "properties": {
+    "schema_version": { "const": "0.1" },
+    "leases": {
+      "type": "array",
+      "items": { "$ref": "#/$defs/authority_lease" }
+    }
+  },
+  "$defs": {
+    "authority_lease": {
+      "type": "object",
+      "required": [
+        "authority_id",
+        "scope",
+        "status",
+        "allowed_actions",
+        "denied_actions",
+        "evidence_level",
+        "open_challenges",
+        "promotion_gate"
+      ],
+      "properties": {
+        "authority_id": { "type": "string", "minLength": 1 },
+        "scope": { "type": "string", "minLength": 1 },
+        "status": {
+          "enum": [
+            "proposed",
+            "active",
+            "challenged",
+            "restricted",
+            "suspended",
+            "revoked",
+            "reinstated",
+            "expired",
+            "superseded"
+          ]
+        },
+        "allowed_actions": { "type": "array", "items": { "type": "string" } },
+        "denied_actions": { "type": "array", "items": { "type": "string" } },
+        "evidence_level": { "type": "string" },
+        "open_challenges": { "type": "array", "items": { "type": "string" } },
+        "promotion_gate": { "enum": ["HOLD", "CANDIDATE", "PROMOTED", "REVOKED"] },
+        "expires_at": { "type": ["string", "null"], "format": "date-time" }
+      },
+      "additionalProperties": false
+    }
+  },
+  "additionalProperties": false
+}

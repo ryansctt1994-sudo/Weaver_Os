@@ -1,0 +1,10 @@
+schema_version: "0.1"
+receipt_type: "AuthorityChallengeReceipt"
+build_id: "B_MASTER_BUILD_V0_1_TINYCLAW_FIRST_RUNTIME"
+authority_id: "tinyclaw.local_runtime.v0_1"
+challenge_source: "strix|replay|ci|human_review|witness"
+severity: "low|medium|high|critical"
+status: "open"
+authority_effect: "challenge|restrict|suspend|revoke|none"
+evidence_receipts: []
+receipt_hash: "sha256"
