@@ -17,11 +17,14 @@ def test_local_receipt_is_bounded_and_passes():
     receipt = build_receipt(
         load_json("published_manifest.json"),
         load_json("authority_ledger.json"),
-        source_commit="a" * 40,
+        verified_commit="a" * 40,
+        source_head_sha="a" * 40,
         environ={},
     )
 
     assert receipt["overall_result"] == "PASS"
+    assert receipt["verified_commit"] == "a" * 40
+    assert receipt["source_head_sha"] == "a" * 40
     assert receipt["execution_class"] == "LOCAL_OPERATOR_EXECUTION"
     assert receipt["operator_independence"] == "NOT_ESTABLISHED"
     assert receipt["witness_state"] == "W0"
@@ -36,13 +39,15 @@ def test_local_receipt_is_bounded_and_passes():
     assert len(receipt["receipt_sha256"]) == 64
 
 
-def test_ci_receipt_never_claims_independent_operator():
+def test_ci_receipt_distinguishes_verified_merge_from_source_head():
     receipt = build_receipt(
         load_json("published_manifest.json"),
         load_json("authority_ledger.json"),
-        source_commit="b" * 40,
+        verified_commit="c" * 40,
+        source_head_sha="b" * 40,
         environ={
             "GITHUB_ACTIONS": "true",
+            "GITHUB_EVENT_NAME": "pull_request",
             "RUNNER_OS": "Linux",
             "RUNNER_ARCH": "X64",
             "GITHUB_RUN_ID": "123",
@@ -50,6 +55,8 @@ def test_ci_receipt_never_claims_independent_operator():
         },
     )
 
+    assert receipt["verified_commit"] == "c" * 40
+    assert receipt["source_head_sha"] == "b" * 40
     assert receipt["execution_class"] == "REMOTE_CI_SAME_ORIGIN"
     assert receipt["operator_independence"] == "NOT_ESTABLISHED"
     assert receipt["witness_state"] == "W0"
@@ -62,7 +69,8 @@ def test_manifest_substitution_makes_receipt_fail():
     receipt = build_receipt(
         manifest,
         load_json("authority_ledger.json"),
-        source_commit="c" * 40,
+        verified_commit="c" * 40,
+        source_head_sha="c" * 40,
         environ={},
     )
 
