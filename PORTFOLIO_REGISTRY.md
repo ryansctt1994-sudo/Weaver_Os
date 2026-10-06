@@ -1,12 +1,12 @@
 # Repository Provenance Registry
 
-**Audit date:** 2026-10-04  
+**Audit date:** 2026-10-06  
 **Account:** `ryansctt1994-sudo`  
 **Purpose:** keep repository provenance, role, and authorship boundaries explicit.
 
 ## Inventory summary
 
-- 71 accessible repositories were observed.
+- 73 accessible repositories are currently visible to the connected account.
 - 15 are not marked as GitHub forks.
 - 56 are GitHub forks.
 - A non-fork flag does not itself prove authorship. `Delta-RPM-Protocol`, for example, identifies Rooke Alan Poole and an external source repository in its own README.
@@ -113,3 +113,8 @@ EVIDENCE STAYS LOCAL TO THE ARTIFACT THAT EARNED IT.
 NO FORK INHERITS PORTFOLIO AUTHORITY.
 NO PORTFOLIO REPO INHERITS UPSTREAM AUTHORSHIP.
 ```
+
+
+## 2026-10-06 reconciliation note
+
+The current connector inventory contains 73 repositories. The previous 15/56 fork split is retained only as a historical 2026-10-04 observation until the two newly visible repositories are re-audited. `introspection-twin` is treated as a portfolio research artifact for status purposes, but that does not by itself establish original authorship, independence, or external witness status. `Alpha-OmegaLeanTeam` remains provenance-pending.
