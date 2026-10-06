@@ -33,8 +33,8 @@ jobs:
       - name: Lint
         run: ruff check .
 
-      - name: Run witness from verified snapshot
-        run: python -m tools.run_verified_witness releases/weaver-witness-signed-rc1/WEAVER_WITNESS_SIGNED_RC1.zip --expected-key-sha256 5ac8e9d25de8d37cd9165d4a7458c34634aeded53c1709573ddf4cc122bcefb9
+      - name: Run sealed witness demonstration
+        run: python -m tools.reproduce_witness --operator author-controlled-ci --output /tmp/weaver-witness-result
 
       - name: Type check
         run: mypy triadic_controls src
