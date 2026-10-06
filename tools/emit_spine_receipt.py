@@ -131,7 +131,8 @@ def build_receipt(
         "overall_result": overall,
         "limitations": [
             "same-origin automated execution is not independent operator reproduction",
-            "pull-request verified_commit may be a synthetic merge commit distinct from source_head_sha",
+            "pull-request verified_commit may be a synthetic merge commit "
+            "distinct from source_head_sha",
             "local reducer state is not Chronicle/Raft runtime state",
             "receipt does not grant authority or production permission",
         ],
