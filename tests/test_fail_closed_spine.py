@@ -39,7 +39,7 @@ def test_payload_tamper_changes_hash_and_head():
 
 
 def test_manifest_schema_accepts_candidate():
-    assert verify_attestations.require_manifest_v11(load_manifest())
+    assert verify_attestations.require_manifest_v12(load_manifest())
 
 
 def test_manifest_schema_rejects_unknown_field():
@@ -49,17 +49,17 @@ def test_manifest_schema_rejects_unknown_field():
         verify_attestations.VerificationError,
         match="MANIFEST_SCHEMA_REJECTED",
     ):
-        verify_attestations.require_manifest_v11(manifest)
+        verify_attestations.require_manifest_v12(manifest)
 
 
-def test_manifest_schema_rejects_unqualified_digest_value():
+def test_manifest_schema_rejects_status_value_impersonation():
     manifest = load_manifest()
-    manifest["expected_state_digest"] = "0" * 64
+    manifest["state_digest_status"] = "NOT_COMPUTED"
     with pytest.raises(
         verify_attestations.VerificationError,
         match="MANIFEST_SCHEMA_REJECTED",
     ):
-        verify_attestations.require_manifest_v11(manifest)
+        verify_attestations.require_manifest_v12(manifest)
 
 
 def test_manifest_hash_is_self_consistent():
@@ -75,6 +75,6 @@ def test_local_spine_scope_passes():
 
 
 def test_e35_scope_is_withheld():
-    # E3.5 must remain red until release identity, runtime state digest,
-    # environment replay, and independent reproduction gates are implemented.
+    # A local reducer digest is still not a runtime replay or an independent
+    # reproduction result.
     assert verify_attestations.main(["--scope", "e35"]) == 1

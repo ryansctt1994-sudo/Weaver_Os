@@ -3,12 +3,17 @@
 Evidence ceiling: `LOCAL_DETERMINISTIC_CHECK`  
 Authority: `O0`
 
-`tools/fail_closed_spine.py` and `verify_attestations.py --scope local-spine`
-share the same pure canonical chain mechanics in `tools/spine_hash.py`.
+The local spine now has three separately derived values:
 
-This is intentionally separate from E3.5.
+1. canonical authority-ledger digest;
+2. ordered chain head;
+3. a bounded local authority-state projection digest.
+
+The state projection is produced by `tools/authority_state.py` and is **not**
+Chronicle/Raft runtime state.
 
 ```text
+LocalReducerDigest != RuntimeStateDigest
 LocalSpineVerified != E3.5
 E3.5 != IndependentReproduction
 Evidence != Authority
@@ -24,52 +29,72 @@ python3 tools/fail_closed_spine.py --tamper
 make verify-spine
 ```
 
-For the source state at `ee725f7cf923d86d915900fc93ef2e3f6e5eef1c`:
+For the manifest v1.2 candidate derived from
+`75f58094d0842f56054bb987e50deb175df8486a`:
 
 ```text
-authority_ledger_hash = 82713cf5a2d9d294c80ba912d51fc4e29bd460c680686ed2f71f74415addb0c9
-ordered_chain_head    = e3ff77f12b8663c1fe1ac14bf1e1bd7d675e969f54e49462f4abcf1f41f97e85
+authority_ledger_hash =
+82713cf5a2d9d294c80ba912d51fc4e29bd460c680686ed2f71f74415addb0c9
+
+ordered_chain_head =
+e3ff77f12b8663c1fe1ac14bf1e1bd7d675e969f54e49462f4abcf1f41f97e85
+
+local_state_digest =
+39a5996b1bba7a0ed4f0a5c549ad58af5300b5abb5890ddf9eb47c9d039c5a0e
+
+state_digest_method =
+authority-transition-reducer-v1
 ```
 
-The local verifier derives these values from `authority_ledger.json`; it no
-longer substitutes the historical `beefcafe...` head constant.
+The canonical local projected state is:
+
+```json
+{"receipt_id":"AL-ADOC-2026-001","state":"EXECUTED"}
+```
+
+The chain head commits to transition history. The local state digest commits only
+to the final bounded state projection. They are distinct properties.
+
+## Reducer admission rules
+
+The local reducer fails closed on:
+
+- malformed payload JSON;
+- duplicate JSON keys;
+- missing transition fields;
+- unrecognized payload fields;
+- receipt identity changes;
+- state discontinuity;
+- no-op transitions;
+- unsupported event types;
+- malformed ledger sequence.
 
 ## Strict E3.5 behavior
 
-`make verify-e35` remains fail-closed and is expected to return non-zero.
+`make verify-e35` remains intentionally non-zero.
 
-Current blockers are explicit:
+The local state digest does not satisfy the E3.5 runtime-state requirement.
+Open gates remain:
 
-- release commit identity is unbound;
-- the declared environment has not been replay-qualified;
-- no runtime-derived state digest is qualified;
-- independent reproduction is not implemented by the local verifier.
-
-This is the desired state until those properties are actually demonstrated.
+- externally bound release identity;
+- replay-qualified environment;
+- Chronicle/runtime-derived state digest;
+- independent reproduction.
 
 ## What this earns
 
-- shared deterministic chain mechanics;
-- derived ledger/head verification against manifest v1.1;
-- specified tamper changes both ledger digest and chain head;
-- a distinct green local-spine gate;
-- an explicit red E3.5 gate.
+- deterministic local replay of the admitted transition sequence;
+- a bounded final-state projection;
+- a locally derived state digest;
+- explicit separation between local reduction and runtime replay;
+- continued fail-closed E3.5 behavior.
 
 ## What this does not earn
 
+- Chronicle/Raft runtime equivalence;
 - released-artifact replay;
-- runtime state reconstruction;
-- Chronicle-raft consensus;
+- cross-host reproduction;
 - independent reproduction;
-- signed witness quorum;
+- witness promotion;
 - production readiness;
-- authority to execute.
-
-## Next gates
-
-1. Run and archive `make verify-spine`.
-2. Run and archive the expected-red `make verify-e35`.
-3. Bind a concrete release artifact/commit externally.
-4. Implement an actual runtime state-digest derivation path.
-5. Reproduce on a second host.
-6. Obtain an independent operator reproduction before any independent promotion.
+- operational authority.
