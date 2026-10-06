@@ -23,7 +23,7 @@ jobs:
           python-version: "3.12"
 
       - name: Emit bounded spine receipt
-        run: python3 tools/emit_spine_receipt.py --output spine-execution-receipt.json
+        run: python3 -m tools.emit_spine_receipt --output spine-execution-receipt.json
 
       - name: Show receipt
         run: cat spine-execution-receipt.json
