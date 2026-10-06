@@ -12,11 +12,12 @@
     "expected_head_hash",
     "expected_state_digest",
     "state_digest_status",
+    "state_digest_method",
     "timestamp",
     "manifest_hash"
   ],
   "properties": {
-    "manifest_version": {"type": "string", "const": "1.1"},
+    "manifest_version": {"type": "string", "const": "1.2"},
     "source_base_commit": {
       "type": "string",
       "pattern": "^[a-f0-9]{40}$",
@@ -56,12 +57,18 @@
     },
     "expected_state_digest": {
       "type": ["string", "null"],
-      "pattern": "^[a-f0-9]{64}$",
-      "description": "Runtime-derived state digest when one exists. Null means the runtime state digest has not been computed and qualified."
+      "pattern": "^[a-f0-9]{64}$"
     },
     "state_digest_status": {
       "type": "string",
-      "enum": ["NOT_COMPUTED_FROM_RUNTIME", "COMPUTED_FROM_RUNTIME"]
+      "enum": [
+        "NOT_COMPUTED",
+        "LOCAL_REDUCER_COMPUTED",
+        "COMPUTED_FROM_RUNTIME"
+      ]
+    },
+    "state_digest_method": {
+      "type": ["string", "null"]
     },
     "timestamp": {"type": "string", "format": "date-time"},
     "manifest_hash": {
@@ -74,13 +81,33 @@
     {
       "if": {
         "properties": {
-          "state_digest_status": {"const": "NOT_COMPUTED_FROM_RUNTIME"}
+          "state_digest_status": {"const": "NOT_COMPUTED"}
         },
         "required": ["state_digest_status"]
       },
       "then": {
         "properties": {
-          "expected_state_digest": {"type": "null"}
+          "expected_state_digest": {"type": "null"},
+          "state_digest_method": {"type": "null"}
+        }
+      }
+    },
+    {
+      "if": {
+        "properties": {
+          "state_digest_status": {"const": "LOCAL_REDUCER_COMPUTED"}
+        },
+        "required": ["state_digest_status"]
+      },
+      "then": {
+        "properties": {
+          "expected_state_digest": {
+            "type": "string",
+            "pattern": "^[a-f0-9]{64}$"
+          },
+          "state_digest_method": {
+            "const": "authority-transition-reducer-v1"
+          }
         }
       }
     },
@@ -96,6 +123,10 @@
           "expected_state_digest": {
             "type": "string",
             "pattern": "^[a-f0-9]{64}$"
+          },
+          "state_digest_method": {
+            "type": "string",
+            "minLength": 1
           }
         }
       }
