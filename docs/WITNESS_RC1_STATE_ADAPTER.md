@@ -80,7 +80,7 @@ tests/fixtures/witness_rc1_authorized_command.json
 
 If the tests pass, they establish only that:
 
-- a real frozen RC1 runtime can be adapted to the new state-envelope contract;
+- a real frozen RC1 runtime can be adapted to the state-envelope contract;
 - source bytes are checked against the release manifest;
 - replay-input identity is bound;
 - the observer, not the runtime, derives the final full-state digest;
@@ -96,16 +96,21 @@ Therefore:
 
 ```text
 WitnessRC1AdapterPass != E3.5RuntimeReplay
-WitnessRC1StateDigest != PublishedManifestExpectedStateDigest
+WitnessRC1StateDigest != LocalAuthorityReducerDigest
 SameRepoExecution != IndependentReproduction
 ```
 
-The E3.5 manifest must remain:
+The current E3.5 manifest v1.2 contains a **local reducer** digest:
 
 ```text
-expected_state_digest = null
-state_digest_status = NOT_COMPUTED_FROM_RUNTIME
+state_digest_status = LOCAL_REDUCER_COMPUTED
+state_digest_method = authority-transition-reducer-v1
 ```
 
-until a named runtime actually replays the E3.5 ledger under the frozen
-qualification protocol.
+The witness RC1 adapter does not justify changing that classification to
+`COMPUTED_FROM_RUNTIME`, because it is a different runtime and a different
+replay input.
+
+A future E3.5 runtime adapter must replay the frozen E3.5 authority ledger under
+the qualification protocol and leave the local-reducer result historically
+intact.
