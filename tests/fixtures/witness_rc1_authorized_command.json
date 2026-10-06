@@ -1,0 +1,11 @@
+{
+  "cmd": {
+    "command_id": "C1",
+    "actor": "human",
+    "target": "protected.counter",
+    "action": "increment",
+    "experiment_id": "WN-WITNESS-001",
+    "nonce": "N1",
+    "authorized": true
+  }
+}
