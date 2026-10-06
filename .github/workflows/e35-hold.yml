@@ -1,0 +1,52 @@
+name: E3.5 hold gate
+
+on:
+  pull_request:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  e35-withheld:
+    name: Require E3.5 to remain withheld
+    runs-on: ubuntu-24.04
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Run local fail-closed spine
+        run: |
+          python3 tools/fail_closed_spine.py
+          python3 tools/fail_closed_spine.py --tamper
+
+      - name: Assert E3.5 is still withheld
+        shell: bash
+        run: |
+          set +e
+          python3 verify_attestations.py > e35-output.txt 2>&1
+          code=$?
+          set -e
+          cat e35-output.txt
+          if [ "$code" -eq 0 ]; then
+            echo "FAIL: E3.5 unexpectedly returned success"
+            exit 1
+          fi
+          if [ "$code" -ne 1 ]; then
+            echo "FAIL: E3.5 returned unexpected exit code $code"
+            exit 1
+          fi
+          echo "EXPECTED_RED_E35_CONFIRMED"
+
+      - name: Retain E3.5 hold evidence
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: e35-hold-${{ github.sha }}
+          path: e35-output.txt
+          if-no-files-found: error
