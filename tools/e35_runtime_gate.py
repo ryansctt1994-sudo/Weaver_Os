@@ -185,9 +185,9 @@ def load_runtime_sut(path: Path = DEFAULT_SUT_PATH) -> RuntimeSUT:
         raise E35RuntimeGateError("E35_RUNTIME_ID_INVALID")
     if not _valid_sha256(artifact_sha256):
         raise E35RuntimeGateError("E35_RUNTIME_ARTIFACT_SHA256_INVALID")
-    if not _valid_sha256(ledger_file_sha256):
+    if not isinstance(ledger_file_sha256, str) or not _valid_sha256(ledger_file_sha256):
         raise E35RuntimeGateError("E35_LEDGER_FILE_SHA256_INVALID")
-    if not _valid_sha256(replay_input_digest):
+    if not isinstance(replay_input_digest, str) or not _valid_sha256(replay_input_digest):
         raise E35RuntimeGateError("E35_REPLAY_INPUT_DIGEST_INVALID")
     if projection_method != REFERENCE_PROJECTION_METHOD:
         raise E35RuntimeGateError("E35_RUNTIME_PROJECTION_NOT_REFERENCE_EQUIVALENT")
