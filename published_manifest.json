@@ -1,16 +1,19 @@
 {
-  "manifest_version": "1.0",
-  "git_commit": "a1b2c3d4e5f67890",
-  "docker_image": "chronicle-raft:e5-locked",
+  "manifest_version": "1.1",
+  "source_base_commit": "ee725f7cf923d86d915900fc93ef2e3f6e5eef1c",
+  "release_commit": null,
+  "docker_image": null,
   "environment": {
     "os": "linux",
     "architecture": "amd64",
     "go_version": "1.23",
     "python_version": "3.9"
   },
+  "environment_status": "DECLARED_NOT_REPLAYED",
   "authority_ledger_hash": "82713cf5a2d9d294c80ba912d51fc4e29bd460c680686ed2f71f74415addb0c9",
-  "expected_head_hash": "beefcafe1234567890abcdef1234567890abcdef1234567890abcdef12345678",
-  "expected_state_digest": "aea9fb035a1860be0ee39206f3c14042c4fbca3c030e534e92e2124713fc4e3d",
-  "timestamp": "2026-06-20T16:45:00Z",
-  "manifest_hash": "be8c302cb1202ba07932f520e08ad501fadfe6be82db89467c513cc9c9441714"
+  "expected_head_hash": "e3ff77f12b8663c1fe1ac14bf1e1bd7d675e969f54e49462f4abcf1f41f97e85",
+  "expected_state_digest": null,
+  "state_digest_status": "NOT_COMPUTED_FROM_RUNTIME",
+  "timestamp": "2026-10-06T17:26:00Z",
+  "manifest_hash": "7959510fc80c8cd44f4b40e0368230c692ddf95668c0d8c6c96e0471a6b0dbea"
 }

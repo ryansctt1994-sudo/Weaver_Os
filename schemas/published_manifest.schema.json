@@ -3,19 +3,34 @@
   "type": "object",
   "required": [
     "manifest_version",
-    "git_commit",
+    "source_base_commit",
+    "release_commit",
     "docker_image",
     "environment",
+    "environment_status",
     "authority_ledger_hash",
     "expected_head_hash",
     "expected_state_digest",
+    "state_digest_status",
     "timestamp",
     "manifest_hash"
   ],
   "properties": {
-    "manifest_version": {"type": "string", "const": "1.0"},
-    "git_commit": {"type": "string"},
-    "docker_image": {"type": "string"},
+    "manifest_version": {"type": "string", "const": "1.1"},
+    "source_base_commit": {
+      "type": "string",
+      "pattern": "^[a-f0-9]{40}$",
+      "description": "Exact predecessor/source commit whose ledger and spine state this manifest was derived from. This is not the commit containing the manifest itself."
+    },
+    "release_commit": {
+      "type": ["string", "null"],
+      "pattern": "^[a-f0-9]{40}$",
+      "description": "Optional externally bound commit/release identity. Null means no release commit identity has been independently bound."
+    },
+    "docker_image": {
+      "type": ["string", "null"],
+      "description": "Qualified release image identity. Null means no image is claimed."
+    },
     "environment": {
       "type": "object",
       "required": ["os", "architecture", "go_version", "python_version"],
@@ -27,15 +42,64 @@
       },
       "additionalProperties": false
     },
-    "authority_ledger_hash": {"type": "string", "pattern": "^[a-f0-9]{64}$"},
-    "expected_head_hash": {"type": "string", "pattern": "^[a-f0-9]{64}$"},
-    "expected_state_digest": {"type": "string", "pattern": "^[a-f0-9]{64}$"},
+    "environment_status": {
+      "type": "string",
+      "enum": ["DECLARED_NOT_REPLAYED", "REPLAYED"]
+    },
+    "authority_ledger_hash": {
+      "type": "string",
+      "pattern": "^[a-f0-9]{64}$"
+    },
+    "expected_head_hash": {
+      "type": "string",
+      "pattern": "^[a-f0-9]{64}$"
+    },
+    "expected_state_digest": {
+      "type": ["string", "null"],
+      "pattern": "^[a-f0-9]{64}$",
+      "description": "Runtime-derived state digest when one exists. Null means the runtime state digest has not been computed and qualified."
+    },
+    "state_digest_status": {
+      "type": "string",
+      "enum": ["NOT_COMPUTED_FROM_RUNTIME", "COMPUTED_FROM_RUNTIME"]
+    },
     "timestamp": {"type": "string", "format": "date-time"},
     "manifest_hash": {
       "type": "string",
       "pattern": "^[a-f0-9]{64}$",
-      "description": "SHA-256 of the canonical manifest JSON excluding this field."
+      "description": "SHA-256 of canonical manifest JSON excluding this field."
     }
   },
+  "allOf": [
+    {
+      "if": {
+        "properties": {
+          "state_digest_status": {"const": "NOT_COMPUTED_FROM_RUNTIME"}
+        },
+        "required": ["state_digest_status"]
+      },
+      "then": {
+        "properties": {
+          "expected_state_digest": {"type": "null"}
+        }
+      }
+    },
+    {
+      "if": {
+        "properties": {
+          "state_digest_status": {"const": "COMPUTED_FROM_RUNTIME"}
+        },
+        "required": ["state_digest_status"]
+      },
+      "then": {
+        "properties": {
+          "expected_state_digest": {
+            "type": "string",
+            "pattern": "^[a-f0-9]{64}$"
+          }
+        }
+      }
+    }
+  ],
   "additionalProperties": false
 }
