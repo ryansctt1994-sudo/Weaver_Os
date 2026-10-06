@@ -69,7 +69,8 @@ def build_receipt(
     manifest: Mapping[str, Any],
     ledger: Any,
     *,
-    source_commit: str,
+    verified_commit: str,
+    source_head_sha: str,
     environ: Mapping[str, str],
 ) -> dict[str, Any]:
     try:
@@ -95,7 +96,8 @@ def build_receipt(
     receipt: dict[str, Any] = {
         "schema": SCHEMA,
         "created_at": datetime.now(timezone.utc).isoformat(),
-        "source_commit": source_commit,
+        "verified_commit": verified_commit,
+        "source_head_sha": source_head_sha,
         "source_base_commit": manifest.get("source_base_commit"),
         "execution_class": execution_class,
         "operator_independence": "NOT_ESTABLISHED",
@@ -109,6 +111,7 @@ def build_receipt(
             "runner_arch": environ.get("RUNNER_ARCH", "unknown"),
             "github_run_id": environ.get("GITHUB_RUN_ID", "local"),
             "github_run_attempt": environ.get("GITHUB_RUN_ATTEMPT", "local"),
+            "github_event_name": environ.get("GITHUB_EVENT_NAME", "local"),
         },
         "derived": {
             "authority_ledger_hash": ledger_hash,
@@ -128,6 +131,7 @@ def build_receipt(
         "overall_result": overall,
         "limitations": [
             "same-origin automated execution is not independent operator reproduction",
+            "pull-request verified_commit may be a synthetic merge commit distinct from source_head_sha",
             "local reducer state is not Chronicle/Raft runtime state",
             "receipt does not grant authority or production permission",
         ],
@@ -150,10 +154,14 @@ def main(argv: list[str] | None = None) -> int:
         ledger = _load_json(LEDGER_PATH)
         if not isinstance(manifest, dict):
             raise SpineReceiptError("MANIFEST_NOT_OBJECT")
+
+        verified_commit = _git_head()
+        source_head_sha = os.environ.get("WEAVER_SOURCE_HEAD_SHA") or verified_commit
         receipt = build_receipt(
             manifest,
             ledger,
-            source_commit=os.environ.get("GITHUB_SHA") or _git_head(),
+            verified_commit=verified_commit,
+            source_head_sha=source_head_sha,
             environ=os.environ,
         )
     except SpineReceiptError as exc:
