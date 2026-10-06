@@ -1,0 +1,47 @@
+{
+  "schema_version": "1.0",
+  "policy_id": "WEAVER-GATE-ZERO-1",
+  "repository": "ryansctt1994-sudo/Weaver_Os",
+  "default_branch": "main",
+  "declaration_status": "DECLARED_NOT_SERVER_ENFORCED",
+  "required_server_controls": {
+    "pull_request_only": true,
+    "block_force_pushes": true,
+    "block_deletions": true,
+    "require_linear_history": true,
+    "require_status_checks": true
+  },
+  "required_workflow_files": [
+    ".github/workflows/ci.yml",
+    ".github/workflows/tests.yml",
+    ".github/workflows/triadic-controls-ci.yml",
+    ".github/workflows/verification.yml",
+    ".github/workflows/witness-tla.yml",
+    ".github/workflows/gate-zero.yml"
+  ],
+  "required_repository_files": [
+    "README.md",
+    "PORTFOLIO_STATUS.md",
+    "PORTFOLIO_REGISTRY.md",
+    "PORTFOLIO_CORE_REGISTRY.json",
+    "docs/PROMOTION_RULES.md",
+    "governance/GATE_ZERO.md"
+  ],
+  "governance_coordinates": {
+    "witness": "W0",
+    "operational_authority": "O0_WITHHELD",
+    "production": "PROHIBITED"
+  },
+  "invariants": [
+    "architecture != authority",
+    "specification != implementation",
+    "declared_success != replay_verified_success",
+    "capability != authorization",
+    "candidate_pr_state != canonical_main_state"
+  ],
+  "notes": [
+    "This file declares expected repository governance.",
+    "It does not itself configure GitHub branch protection.",
+    "Server-side enforcement must be configured separately and independently verified."
+  ]
+}

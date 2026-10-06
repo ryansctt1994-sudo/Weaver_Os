@@ -8,6 +8,10 @@ Weaver OS is a compact verification spine for checking authority claims, replay 
 
 See [`PORTFOLIO_STATUS.md`](PORTFOLIO_STATUS.md) for the canonical portfolio status and [`PORTFOLIO_REGISTRY.md`](PORTFOLIO_REGISTRY.md) for the complete repository/upstream provenance inventory.
 
+Machine-readable core state is recorded in [`PORTFOLIO_CORE_REGISTRY.json`](PORTFOLIO_CORE_REGISTRY.json). Repository governance expectations are declared in [`governance/gate-zero.json`](governance/gate-zero.json) and explained in [`governance/GATE_ZERO.md`](governance/GATE_ZERO.md).
+
+A checked-in governance declaration is not proof of GitHub server-side enforcement.
+
 ## Core Thesis
 
 Cognition may propose, but it cannot authorize itself. Weaver OS turns authority claims into signed, replay-checked, schema-validated artifacts so rejected or invalid claims cannot silently become trusted state.
@@ -47,6 +51,8 @@ architecture != authority
 specification != implementation
 declared_success != replay_verified_success
 capability != authorization
+candidate_pr_state != canonical_main_state
+declared_governance != server_enforced_governance
 ```
 
 Promotion requires passing tests, reproducible commands, and explicit receipts. See [`docs/PROMOTION_RULES.md`](docs/PROMOTION_RULES.md).
