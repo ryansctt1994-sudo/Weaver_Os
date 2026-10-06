@@ -46,8 +46,14 @@
       "type": "string",
       "enum": ["DECLARED_NOT_REPLAYED", "REPLAYED"]
     },
-    "authority_ledger_hash": {"type": "string", "pattern": "^[a-f0-9]{64}$"},
-    "expected_head_hash": {"type": "string", "pattern": "^[a-f0-9]{64}$"},
+    "authority_ledger_hash": {
+      "type": "string",
+      "pattern": "^[a-f0-9]{64}$"
+    },
+    "expected_head_hash": {
+      "type": "string",
+      "pattern": "^[a-f0-9]{64}$"
+    },
     "expected_state_digest": {
       "type": ["string", "null"],
       "pattern": "^[a-f0-9]{64}$",
@@ -64,5 +70,36 @@
       "description": "SHA-256 of canonical manifest JSON excluding this field."
     }
   },
+  "allOf": [
+    {
+      "if": {
+        "properties": {
+          "state_digest_status": {"const": "NOT_COMPUTED_FROM_RUNTIME"}
+        },
+        "required": ["state_digest_status"]
+      },
+      "then": {
+        "properties": {
+          "expected_state_digest": {"type": "null"}
+        }
+      }
+    },
+    {
+      "if": {
+        "properties": {
+          "state_digest_status": {"const": "COMPUTED_FROM_RUNTIME"}
+        },
+        "required": ["state_digest_status"]
+      },
+      "then": {
+        "properties": {
+          "expected_state_digest": {
+            "type": "string",
+            "pattern": "^[a-f0-9]{64}$"
+          }
+        }
+      }
+    }
+  ],
   "additionalProperties": false
 }
