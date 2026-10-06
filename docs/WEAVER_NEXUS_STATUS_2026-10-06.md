@@ -11,11 +11,14 @@
 
 The public spine now has corrected manifest semantics, derived ledger/head
 verification, an executable A1 transition invariant, a deterministic local
-authority-state reducer, generic runtime-state observation mechanics, and one
-bounded real-runtime adapter for Witness RC1. The remaining E3.5 gap is now
-specific: the actual E3.5 runtime/SUT has not replayed the frozen authority
-ledger under the qualification protocol, and no independent operator has
-reproduced that result.
+authority-state reducer, generic runtime-state observation mechanics, one
+bounded real-runtime adapter for Witness RC1, and an artifact-bound successful
+same-origin remote CI replay of the bounded spine on canonical main.
+
+The remaining E3.5 gap is specific: the actual E3.5 runtime/SUT has not replayed
+the frozen authority ledger under the qualification protocol, no released E3.5
+artifact has been qualified, and no independent operator has reproduced that
+result.
 
 ## Canonical mainline milestones
 
@@ -25,7 +28,67 @@ reproduced that result.
 - PR #72 — bounded runtime-state observation/digest contract.
 - PR #73 — bounded local authority-state replay and manifest v1.2.
 - PR #74 — bounded Witness RC1 real-runtime state adapter.
-- PR #75 — remote CI spine receipt: candidate until merged and replayed on main.
+- PR #75 — conflicting remote-receipt candidate; closed and superseded.
+- PR #76 — reconciled remote CI spine receipt; merged to main.
+
+## Canonical mainline receipt
+
+Main commit:
+
+```text
+b8719c35f2970b5169d42d4ac6fa2c60e3f4952d
+```
+
+The main push triggered six workflows and all six completed successfully:
+
+```text
+CI                       run 37511431229  PASS
+tests                    run 37511431214  PASS
+triadic-controls CI      run 37511431186  PASS
+Witness TLA model        run 37511431217  PASS
+Verification evidence    run 37511431213  PASS
+Cross-host spine receipt run 37511431224  PASS
+```
+
+The cross-host workflow emitted:
+
+```text
+execution_class       = REMOTE_CI_SAME_ORIGIN
+source_head_sha       = b8719c35f2970b5169d42d4ac6fa2c60e3f4952d
+verified_commit       = b8719c35f2970b5169d42d4ac6fa2c60e3f4952d
+operator_independence = NOT_ESTABLISHED
+witness_state         = W0
+authority             = O0_WITHHELD
+production            = PROHIBITED
+overall_result        = PASS
+```
+
+Workflow artifact:
+
+```text
+artifact_id =
+11434757818
+
+artifact_zip_sha256 =
+5df1d9eb889fdb2e45f010d6c96addc5862674cd5e62dea4216492796eb83bd4
+
+receipt_sha256 =
+c96feceeb89bb13f62e18b02cbcead4b8ae7fba65e99d0a820a4f6ad1f1ac0ad
+```
+
+The receipt payload digest was independently recomputed during review and
+matched the recorded `receipt_sha256`.
+
+The raw receipt and artifact binding are preserved under
+`evidence/spine-receipts/`.
+
+This establishes a bounded same-origin remote CI replay only.
+
+```text
+RemoteCIReplay != IndependentOperatorReproduction
+RemoteCIReplay != E3.5
+RemoteCIReplay != WitnessPromotion
+```
 
 ## Current file-level spine
 
@@ -34,7 +97,7 @@ reproduced that result.
 - Local authority reducer: `tools/authority_state.py`.
 - Runtime-state observer: `tools/runtime_state_digest.py`.
 - Witness RC1 adapter: `tools/witness_rc1_state_adapter.py`.
-- Candidate remote receipt emitter: `tools/emit_spine_receipt.py`.
+- Remote receipt emitter: `tools/emit_spine_receipt.py`.
 
 Bound local values:
 
@@ -72,6 +135,19 @@ Historical E3.5 specification exceeded the implemented replay path.
 
 **Disposition:** narrowed. The remaining gap is explicit.
 
+### WN-TEST-MUTATION-001
+
+A signature-negative-control test attempted to mutate a signature by replacing
+its first character with `A`. When the original signature already began with
+`A`, the mutation was a no-op and the test incorrectly expected rejection.
+
+**Disposition:** repaired by forcing the replacement character to differ from
+the original first character.
+
+```text
+MutationIntent != MutationOccurred
+```
+
 ## Current propositions
 
 ```text
@@ -84,9 +160,10 @@ LocalReducerStateDigest             = ESTABLISHED_WITHIN_SCOPE
 RuntimeStateObservationContract     = ESTABLISHED_WITH_FIXTURE_SCOPE
 WitnessRC1RuntimeAdapter            = ESTABLISHED_WITHIN_BOUNDED_RC1_SCOPE
 WitnessRC1E35Equivalence            = NOT_CLAIMED
+RemoteCISpineReceipt                = ESTABLISHED_WITHIN_SAME_ORIGIN_CI_SCOPE
+CrossHostMechanicsReplay            = ESTABLISHED_WITHIN_SAME_ORIGIN_CI_SCOPE
 E35RuntimeReplay                    = NOT_ESTABLISHED
 ReleasedArtifactReplayForE35        = NOT_ESTABLISHED
-RemoteCISpineReceipt                = CANDIDATE_PR75
 IndependentOperatorReproduction     = NOT_ESTABLISHED
 Witness                             = W0
 OperationalAuthority               = O0_WITHHELD
@@ -105,19 +182,19 @@ Mechanics != ScientificResult
 Reproduction != Scope
 ScopeCoverage != EvidentialSupport
 RemoteCIReplay != IndependentOperatorReproduction
+MutationIntent != MutationOccurred
 CandidatePRState != CanonicalMainState
 DeclaredGovernance != ServerEnforcedGovernance
 ```
 
 ## Immediate sequence
 
-1. Qualify or reject PR #75 and preserve its remote CI receipt.
-2. Keep remote CI classified as same-origin/non-independent.
-3. Identify the actual E3.5 runtime/SUT for `authority_ledger.json`.
-4. Build an adapter for that exact runtime and exact replay input.
-5. Compare only semantically equivalent state projections.
-6. Freeze and replay a released E3.5 artifact.
-7. Obtain independent operator reproduction separately.
-8. Enforce Gate Zero server-side.
+1. Identify the actual E3.5 runtime/SUT for `authority_ledger.json`.
+2. Build an adapter for that exact runtime and exact replay input.
+3. Bind runtime source, release identity, and replay input independently.
+4. Compare only semantically equivalent state projections.
+5. Freeze and replay a released E3.5 artifact.
+6. Obtain independent operator reproduction separately.
+7. Enforce Gate Zero server-side.
 
 No item above changes W0, O0, or production status.
