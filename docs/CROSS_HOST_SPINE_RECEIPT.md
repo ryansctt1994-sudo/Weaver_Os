@@ -16,7 +16,19 @@ The receipt derives rather than trusts:
 - state-digest method;
 - manifest self-digest.
 
-It also records the exact source commit and execution environment.
+It records both:
+
+- `verified_commit` — the exact Git object actually checked out and executed;
+- `source_head_sha` — the source branch head supplied separately by CI.
+
+On pull-request workflows these may differ because GitHub can execute a
+synthetic merge commit.
+
+```text
+PRSourceHead != VerifiedMergeCommit
+```
+
+That difference is preserved rather than collapsed.
 
 ## Remote CI classification
 
@@ -26,8 +38,8 @@ When executed by GitHub Actions, the receipt is classified:
 REMOTE_CI_SAME_ORIGIN
 ```
 
-This may demonstrate that a separate hosted runner reproduced the bounded local
-mechanics for the exact commit.
+A successful remote CI receipt establishes only that the bounded mechanics
+replayed on that hosted runner for the bound tested tree.
 
 It does not establish an independent operator or independent witness:
 
