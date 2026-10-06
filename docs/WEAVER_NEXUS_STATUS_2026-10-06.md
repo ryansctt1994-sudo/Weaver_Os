@@ -174,7 +174,7 @@ WitnessRC1RuntimeAdapter            = ESTABLISHED_WITHIN_BOUNDED_RC1_SCOPE
 WitnessRC1E35Equivalence            = NOT_CLAIMED
 RemoteCISpineReceipt                = ESTABLISHED_WITHIN_SAME_ORIGIN_CI_SCOPE
 CrossHostMechanicsReplay            = ESTABLISHED_WITHIN_SAME_ORIGIN_CI_SCOPE
-E35RuntimeAdmissionGate             = CANDIDATE_THIS_BRANCH
+E35RuntimeAdmissionGate             = HARDENED_CANDIDATE_THIS_BRANCH
 E35RuntimeSUT                       = UNBOUND
 E35RuntimeReplay                    = NOT_ESTABLISHED
 ReleasedArtifactReplayForE35        = NOT_ESTABLISHED
@@ -199,7 +199,7 @@ RemoteCIReplay != IndependentOperatorReproduction
 MutationIntent != MutationOccurred
 InjectionClient != GovernanceRuntime
 AttestationSnippet != RunnableSUT
-PrePostHashPathExec != AtomicByteToProcessIdentity
+DirectPathExecPrePostHash != AtomicByteToProcessIdentity
 CandidatePRState != CanonicalMainState
 DeclaredGovernance != ServerEnforcedGovernance
 ```
