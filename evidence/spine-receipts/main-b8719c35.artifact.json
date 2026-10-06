@@ -1,0 +1,15 @@
+{
+  "schema": "weaver-spine-receipt-artifact-binding-1",
+  "repository": "ryansctt1994-sudo/Weaver_Os",
+  "branch": "main",
+  "commit": "b8719c35f2970b5169d42d4ac6fa2c60e3f4952d",
+  "workflow_run_id": 37511431224,
+  "artifact_id": 11434757818,
+  "artifact_zip_sha256": "5df1d9eb889fdb2e45f010d6c96addc5862674cd5e62dea4216492796eb83bd4",
+  "receipt_sha256": "c96feceeb89bb13f62e18b02cbcead4b8ae7fba65e99d0a820a4f6ad1f1ac0ad",
+  "classification": "REMOTE_CI_SAME_ORIGIN",
+  "operator_independence": "NOT_ESTABLISHED",
+  "witness_state": "W0",
+  "operational_authority": "O0_WITHHELD",
+  "production": "PROHIBITED"
+}
