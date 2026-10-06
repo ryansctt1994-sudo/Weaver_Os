@@ -27,12 +27,14 @@ import sys
 from pathlib import Path
 from typing import Any
 
+try:
+    from tools.spine_hash import SpineValidationError, chain_events
+except ModuleNotFoundError:
+    # Direct script execution places tools/ rather than the repository root
+    # first on sys.path. Import the sibling module without mutating sys.path.
+    from spine_hash import SpineValidationError, chain_events
+
 ROOT = Path(__file__).resolve().parents[1]
-if str(ROOT) not in sys.path:
-    sys.path.insert(0, str(ROOT))
-
-from tools.spine_hash import SpineValidationError, chain_events
-
 LEDGER_PATH = ROOT / "authority_ledger.json"
 MANIFEST_PATH = ROOT / "published_manifest.json"
 
