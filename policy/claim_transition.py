@@ -16,8 +16,9 @@ from __future__ import annotations
 import hashlib
 import json
 import re
+from collections.abc import Collection, Mapping
 from dataclasses import dataclass
-from typing import Any, Collection, Mapping
+from typing import Any
 
 _SHA256 = re.compile(r"^[a-f0-9]{64}$")
 
@@ -122,9 +123,9 @@ def validate_transition(
         return _reject("NO_OP_TRANSITION")
 
     bindings = certificate.get("artifact_bindings")
-    if not _valid_bindings(bindings):
+    if not isinstance(bindings, dict) or not _valid_bindings(bindings):
         return _reject("ARTIFACT_BINDINGS_INVALID")
-    if dict(bindings) != dict(expected_artifact_bindings):
+    if bindings != dict(expected_artifact_bindings):
         return _reject("ARTIFACT_BINDINGS_MISMATCH")
 
     support_ids = certificate.get("support_ids")
