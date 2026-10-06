@@ -1,0 +1,53 @@
+{
+  "checks": {
+    "authority_ledger_hash": true,
+    "chain_head": true,
+    "local_state_digest": true,
+    "manifest_hash": true,
+    "state_digest_method": true
+  },
+  "created_at": "2026-10-06T18:27:25.432452+00:00",
+  "derived": {
+    "authority_ledger_hash": "82713cf5a2d9d294c80ba912d51fc4e29bd460c680686ed2f71f74415addb0c9",
+    "chain_head": "e3ff77f12b8663c1fe1ac14bf1e1bd7d675e969f54e49462f4abcf1f41f97e85",
+    "local_state": {
+      "receipt_id": "AL-ADOC-2026-001",
+      "state": "EXECUTED"
+    },
+    "local_state_digest": "39a5996b1bba7a0ed4f0a5c549ad58af5300b5abb5890ddf9eb47c9d039c5a0e",
+    "state_digest_method": "authority-transition-reducer-v1"
+  },
+  "environment": {
+    "github_event_name": "push",
+    "github_run_attempt": "1",
+    "github_run_id": "37511431224",
+    "platform": "Linux-6.17.0-1022-azure-x86_64-with-glibc2.39",
+    "python_version": "3.12.14 (main, Aug 13 2026, 02:47:42) [GCC 13.3.0]",
+    "runner_arch": "X64",
+    "runner_os": "Linux"
+  },
+  "execution_class": "REMOTE_CI_SAME_ORIGIN",
+  "limitations": [
+    "same-origin automated execution is not independent operator reproduction",
+    "pull-request verified_commit may be a synthetic merge commit distinct from source_head_sha",
+    "local reducer state is not Chronicle/Raft runtime state",
+    "receipt does not grant authority or production permission"
+  ],
+  "manifest": {
+    "environment_status": "DECLARED_NOT_REPLAYED",
+    "manifest_hash": "69efb8c50c89535a532780a2da4fea2342340b85210d2c6c1c1955f21c362255",
+    "manifest_version": "1.2",
+    "release_commit": null,
+    "state_digest_status": "LOCAL_REDUCER_COMPUTED"
+  },
+  "operational_authority": "O0_WITHHELD",
+  "operator_independence": "NOT_ESTABLISHED",
+  "overall_result": "PASS",
+  "production": "PROHIBITED",
+  "receipt_sha256": "c96feceeb89bb13f62e18b02cbcead4b8ae7fba65e99d0a820a4f6ad1f1ac0ad",
+  "schema": "weaver-spine-execution-receipt-1",
+  "source_base_commit": "75f58094d0842f56054bb987e50deb175df8486a",
+  "source_head_sha": "b8719c35f2970b5169d42d4ac6fa2c60e3f4952d",
+  "verified_commit": "b8719c35f2970b5169d42d4ac6fa2c60e3f4952d",
+  "witness_state": "W0"
+}
