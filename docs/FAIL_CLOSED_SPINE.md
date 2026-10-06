@@ -3,49 +3,73 @@
 Evidence ceiling: `LOCAL_DETERMINISTIC_CHECK`  
 Authority: `O0`
 
-`tools/fail_closed_spine.py` is the current file-level portfolio spine. It does not claim E3.5, independent witness, or operational authority.
+`tools/fail_closed_spine.py` and `verify_attestations.py --scope local-spine`
+share the same pure canonical chain mechanics in `tools/spine_hash.py`.
 
-The older `verify_attestations.py` path compares pinned constants to manifest values for the head/state checks. That can pass without deriving those values from the actual chain/runtime and must not be cited as reproduction.
+This is intentionally separate from E3.5.
 
-## Run
+```text
+LocalSpineVerified != E3.5
+E3.5 != IndependentReproduction
+Evidence != Authority
+```
 
-From the repository root:
+## Local mechanics
+
+Run:
 
 ```bash
 python3 tools/fail_closed_spine.py
 python3 tools/fail_closed_spine.py --tamper
+make verify-spine
 ```
 
-Clean mode prints the canonical ledger hash and the ordered hash-chain head. Tamper mode mutates the final payload and requires the ledger hash and chain head to diverge.
-
-For the source state at `ee725f7cf923d86d915900fc93ef2e3f6e5eef1c`, the manifest v1.1 candidate binds:
+For the source state at `ee725f7cf923d86d915900fc93ef2e3f6e5eef1c`:
 
 ```text
 authority_ledger_hash = 82713cf5a2d9d294c80ba912d51fc4e29bd460c680686ed2f71f74415addb0c9
-expected_head_hash    = e3ff77f12b8663c1fe1ac14bf1e1bd7d675e969f54e49462f4abcf1f41f97e85
+ordered_chain_head    = e3ff77f12b8663c1fe1ac14bf1e1bd7d675e969f54e49462f4abcf1f41f97e85
 ```
 
-The state digest remains explicitly unqualified.
+The local verifier derives these values from `authority_ledger.json`; it no
+longer substitutes the historical `beefcafe...` head constant.
+
+## Strict E3.5 behavior
+
+`make verify-e35` remains fail-closed and is expected to return non-zero.
+
+Current blockers are explicit:
+
+- release commit identity is unbound;
+- the declared environment has not been replay-qualified;
+- no runtime-derived state digest is qualified;
+- independent reproduction is not implemented by the local verifier.
+
+This is the desired state until those properties are actually demonstrated.
 
 ## What this earns
 
-- A cloneable local program derives a ledger digest and ordered chain head from actual ledger contents.
-- The specified payload tamper cannot retain both the original ledger digest and chain head.
-- A stale manifest can be detected rather than silently treated as truth.
+- shared deterministic chain mechanics;
+- derived ledger/head verification against manifest v1.1;
+- specified tamper changes both ledger digest and chain head;
+- a distinct green local-spine gate;
+- an explicit red E3.5 gate.
 
 ## What this does not earn
 
-- Independent reproduction
-- Runtime-derived state digest
-- Chronicle-raft consensus
-- Signed witness quorum
-- Production readiness
-- Authority to execute
+- released-artifact replay;
+- runtime state reconstruction;
+- Chronicle-raft consensus;
+- independent reproduction;
+- signed witness quorum;
+- production readiness;
+- authority to execute.
 
 ## Next gates
 
-1. Land the manifest/schema correction without changing the verifier.
-2. Capture the expected-red `make verify-e35` result against the corrected manifest.
-3. Repair the verifier in a separate change so it derives the chain head from ledger bytes.
-4. Keep E3.5 red until every required runtime-derived field, including state digest, is actually qualified.
-5. Reproduce on another host; do not call same-operator cross-host execution independent witness.
+1. Run and archive `make verify-spine`.
+2. Run and archive the expected-red `make verify-e35`.
+3. Bind a concrete release artifact/commit externally.
+4. Implement an actual runtime state-digest derivation path.
+5. Reproduce on a second host.
+6. Obtain an independent operator reproduction before any independent promotion.
