@@ -223,7 +223,7 @@ def run_formal_tlc(output: Path) -> dict[str, Any]:
         steps.append(
             run_step(
                 name,
-                "bounded-invariants",
+                "witness-boundary-invariants",
                 [
                     "java",
                     "-cp",
@@ -237,6 +237,57 @@ def run_formal_tlc(output: Path) -> dict[str, Any]:
                 output,
                 cwd=FORMAL_DIR,
                 timeout=180,
+            )
+        )
+        steps.append(
+            run_step(
+                name,
+                "activation-runtime-invariants",
+                [
+                    "java",
+                    "-cp",
+                    str(jar),
+                    "tlc2.TLC",
+                    "-deadlock",
+                    "-config",
+                    "WeaverActivation.cfg",
+                    "WeaverActivation.tla",
+                ],
+                output,
+                cwd=FORMAL_DIR,
+                timeout=180,
+            )
+        )
+        steps.append(
+            run_step(
+                name,
+                "activation-runtime-mutation-probes",
+                [
+                    sys.executable,
+                    "-m",
+                    "tools.check_activation_tla_mutations",
+                    str(jar),
+                ],
+                output,
+                cwd=ROOT,
+                timeout=180,
+            )
+        )
+        steps.append(
+            run_step(
+                name,
+                "activation-trace-conformance",
+                [
+                    sys.executable,
+                    "-m",
+                    "tools.check_activation_trace_conformance",
+                    str(jar),
+                    "--output",
+                    str(output / "activation-trace"),
+                ],
+                output,
+                cwd=ROOT,
+                timeout=300,
             )
         )
     return verifier(name, steps)
@@ -274,9 +325,29 @@ def build_evidence_manifest(output: Path, wheel: Path | None) -> tuple[dict[str,
         ROOT / ARCHIVE,
         ROOT / "schemas" / "verification_run.schema.json",
         ROOT / "schemas" / "triad_receipt.schema.json",
+        ROOT / "schemas" / "activation_receipt.schema.json",
+        FORMAL_DIR / "WeaverActivation.tla",
+        FORMAL_DIR / "WeaverActivation.cfg",
+        FORMAL_DIR / "WeaverActivationTrace.tla",
+        FORMAL_DIR / "WeaverActivationTrace.cfg",
+        ROOT / "tests" / "fixtures" / "activation_trace_corpus.json",
+        ROOT / "weaver_activation" / "trace.py",
+        ROOT / "tools" / "run_activation_trace_corpus.py",
+        ROOT / "tools" / "check_activation_trace_conformance.py",
     ]
     candidates.extend(sorted((ROOT / "tests" / "fixtures" / "verification").glob("*")))
-    candidates.extend(sorted(path for path in output.glob("*") if path.is_file()))
+    excluded_generated = {
+        output / "evidence-manifest.json",
+        output / "verification-report.json",
+        output / "report.json",
+    }
+    candidates.extend(
+        sorted(
+            path
+            for path in output.rglob("*")
+            if path.is_file() and path not in excluded_generated
+        )
+    )
     if wheel is not None:
         candidates.append(wheel)
 

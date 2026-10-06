@@ -1,0 +1,63 @@
+name: Activation TLA model
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+
+permissions:
+  contents: read
+
+jobs:
+  tlc:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: '17'
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+
+      - name: Install runtime dependencies
+        run: python -m pip install -e .
+
+      - name: Acquire pinned TLC
+        shell: bash
+        run: |
+          set -euo pipefail
+          mkdir -p verification-output
+          python3 -m tools.fetch_tlc "$RUNNER_TEMP/tla2tools.jar" | tee verification-output/activation-tlc-download.log
+
+      - name: Check activation invariants
+        working-directory: audit-package/formal/tla+
+        shell: bash
+        run: |
+          set -euo pipefail
+          java -cp "$RUNNER_TEMP/tla2tools.jar" tlc2.TLC -deadlock -config WeaverActivation.cfg WeaverActivation.tla 2>&1 | tee "$GITHUB_WORKSPACE/verification-output/activation-tlc.log"
+
+      - name: Check activation formal mutation probes
+        shell: bash
+        run: |
+          set -euo pipefail
+          python3 -m tools.check_activation_tla_mutations "$RUNNER_TEMP/tla2tools.jar" 2>&1 | tee verification-output/activation-tlc-mutations.log
+
+      - name: Check runtime-to-model trace conformance
+        shell: bash
+        run: |
+          set -euo pipefail
+          python3 -m tools.check_activation_trace_conformance "$RUNNER_TEMP/tla2tools.jar" --output verification-output/activation-trace 2>&1 | tee verification-output/activation-trace-conformance.log
+
+      - name: Retain activation TLC evidence
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: activation-tla-${{ github.sha }}
+          path: verification-output/
+          if-no-files-found: warn

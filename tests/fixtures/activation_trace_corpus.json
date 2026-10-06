@@ -1,0 +1,69 @@
+{
+  "schema": "weaver-activation-trace-corpus-1",
+  "scope": "first-attempt adapter lifecycle; duplicate-request persistent pre-state excluded",
+  "cases": [
+    {
+      "case_id": "TRACE-001",
+      "scenario": "pass",
+      "expected_status": "PASS",
+      "expected_reject_code": null,
+      "expected_actions": ["Authorize", "BindContract", "Execute", "VerifyGood", "RecordPass"]
+    },
+    {
+      "case_id": "TRACE-002",
+      "scenario": "contract_version_mismatch",
+      "expected_status": "REJECT",
+      "expected_reject_code": "CONTRACT_VERSION_MISMATCH",
+      "expected_actions": ["Reject"]
+    },
+    {
+      "case_id": "TRACE-003",
+      "scenario": "malformed_identity",
+      "expected_status": "REJECT",
+      "expected_reject_code": "MALFORMED_IDENTITY",
+      "expected_actions": ["Reject"]
+    },
+    {
+      "case_id": "TRACE-004",
+      "scenario": "authority_invalid",
+      "expected_status": "REJECT",
+      "expected_reject_code": "AUTHORITY_INVALID",
+      "expected_actions": ["Reject"]
+    },
+    {
+      "case_id": "TRACE-005",
+      "scenario": "authority_binding_mismatch",
+      "expected_status": "REJECT",
+      "expected_reject_code": "AUTHORITY_BINDING_MISMATCH",
+      "expected_actions": ["Authorize", "Reject"]
+    },
+    {
+      "case_id": "TRACE-006",
+      "scenario": "backend_failed",
+      "expected_status": "REJECT",
+      "expected_reject_code": "BACKEND_FAILED",
+      "expected_actions": ["Authorize", "BindContract", "Execute", "Reject"]
+    },
+    {
+      "case_id": "TRACE-007",
+      "scenario": "result_identity_mismatch",
+      "expected_status": "REJECT",
+      "expected_reject_code": "RESULT_IDENTITY_MISMATCH",
+      "expected_actions": ["Authorize", "BindContract", "Execute", "Reject"]
+    },
+    {
+      "case_id": "TRACE-008",
+      "scenario": "metric_invalid",
+      "expected_status": "REJECT",
+      "expected_reject_code": "METRIC_INVALID",
+      "expected_actions": ["Authorize", "BindContract", "Execute", "Reject"]
+    },
+    {
+      "case_id": "TRACE-009",
+      "scenario": "retention_gate_failed",
+      "expected_status": "REJECT",
+      "expected_reject_code": "RETENTION_GATE_FAILED",
+      "expected_actions": ["Authorize", "BindContract", "Execute", "Reject"]
+    }
+  ]
+}

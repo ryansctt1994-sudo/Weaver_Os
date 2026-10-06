@@ -2,13 +2,45 @@
 
 This concrete TLA+ model abstracts a single protected counter, one command, and three ledger blocks. It checks that a rejected command preserves the counter, an accepted command follows the authorized action, and a verification verdict requires intact blocks, the pinned head, and the trusted key. The `ByteTamper` action is a Boolean abstraction of byte mutation; the model does not compute SHA-256, Ed25519, or JSON parsing. The Python adversarial tests exercise those implementation details separately.
 
-Run TLC using official GitHub asset ID `602290600` from `tlaplus/tlaplus` v1.8.0. Download `https://api.github.com/repos/tlaplus/tlaplus/releases/assets/602290600` with the `Accept: application/octet-stream` header. Verify SHA-256 `1d99ab9ad6cf6fb9839dcc7d4a04fd262e136d452edf2a4928c5c18dd4b3468f` before use. CI pins both the asset ID and digest, so replacing the named release asset will not silently select a new binary:
+Run TLC using the repository's canonical pinned acquisition helper, `python -m tools.fetch_tlc /path/to/tla2tools.jar`. The current pin is TLA+ tools v1.7.4 with SHA-256 `936a262061c914694dfd669a543be24573c45d5aa0ff20a8b96b23d01e050e88`. Both standalone formal workflows and the consolidated verification gate use this same helper so the tool identity cannot drift silently:
 
 ```sh
 cd audit-package/formal/tla+
 java -cp /path/to/tla2tools.jar tlc2.TLC -deadlock -config WitnessBoundary.cfg WitnessBoundary.tla
 ```
 
-Local run on 2026-10-01 UTC: TLC2 `2026.10.01.003433`, 917 states generated, 254 distinct states, complete graph depth 8, zero errors. A negative control changed `Unauthorized` to increment `protected`; TLC reported `RejectedPreservesState` violation at depth 2. The original JAR had SHA-256 `e3f5f648b75d68c14176b961ec7bfc1e94ab4c14de57f251b8c40a0fbf916e27`. On 2026-10-01 the named release download returned different bytes, and the pinned checksum correctly stopped CI. The replacement was explicitly inspected against the official asset metadata and rerun: TLC2 `2026.10.01.024053` (rev `0dab95e`), the same 917 generated / 254 distinct states, depth 8, and zero errors. The current pinned asset and digest are given above. This preserves the old result as history and records a new tool revision rather than treating the old download URL as an immutable artifact.
+Historical local WitnessBoundary runs remain evidence for those specific tool revisions only. Current CI truth is the repository pin above; changing the TLC version or digest requires an explicit source change and a fresh verification run.
 
 This is bounded model checking of this abstraction. It does not prove the Python implementation refines the model, discharge the older CCS skeleton, authenticate a publisher, or provide an independent operator's reproduction receipt.
+
+
+## WeaverActivation bounded model
+
+`WeaverActivation.tla` is a separate bounded model for the Weaver Activation Runtime. It models two concurrent requests, authority admission, an explicit authority-event → request/contract/backend/checkpoint/input binding, single execution via an execution counter, phase-correct rejection, substitution and non-finite-result rejection, PASS recording, deterministic REJECT evidence, protected-state preservation, and zero authority gain.
+
+Run it with the same pinned TLC JAR:
+
+```sh
+cd audit-package/formal/tla+
+java -cp /path/to/tla2tools.jar tlc2.TLC -deadlock -config WeaverActivation.cfg WeaverActivation.tla
+```
+
+The repository verification gate requires both `WitnessBoundary` and `WeaverActivation`. It also runs targeted `WeaverActivation` mutation probes: removing the exact authority/contract binding guard must violate `Inv_AuthorityExactBinding`, and removing the rejection-phase guard must violate `Inv_RejectionPhaseSound`.
+
+### WeaverActivation runtime-trace correspondence
+
+`WeaverActivationTrace.tla` replays canonical runtime observations emitted by `ActivationTraceRecorder`. The frozen first-attempt corpus is executed through the Python adapter, each NDJSON trace is SHA-256 bound, and the conformance checker deterministically generates a `GeneratedActivationTrace.tla` data module for TLC.
+
+`Inv_TraceCanAdvance` is the critical refinement-side guard: if an unconsumed runtime event remains, that exact abstract event must be enabled in the base model. This prevents impossible traces from passing by stuttering. CI also requires two negative controls to fail: `Execute` before `BindContract`, and an authority-phase rejection code after execution.
+
+This establishes mechanical correspondence for the frozen first-attempt adapter corpus. It is not a universal refinement proof. Duplicate-request behavior needs a persisted consumed-request pre-state before it can be represented faithfully, and native checkpoint execution/memory integrity remain separate lower-layer obligations.
+
+The stateful trace cut adds prefix-derived pre-state and retained terminal
+receipt hashes under trace schema v2. The original nine-case corpus is preserved;
+the separate eleven-case corpus includes duplicates after PASS and backend
+failure. `Retry` preserves all original model variables and checks prior
+consumption, execution count one, and an existing terminal state. Its separate
+retry phase requires admission before duplicate evidence. Four snapshot negative
+controls recompute forged snapshot hashes and must still fail prefix validation.
+This extension covers same-adapter retries only; it adds no restart persistence
+or universal refinement claim.

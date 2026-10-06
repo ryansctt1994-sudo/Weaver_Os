@@ -19,6 +19,7 @@ This repo currently contains:
 | Module or directory | Purpose |
 | --- | --- |
 | `triadic_controls/` | Signature verification, replay cache, and authority schemas |
+| `weaver_activation/` | Versioned Weaver activation contract and native capability boundary |
 | `src/weaver_release_guard/` | Release provenance CLI, OIDC verification, and utilities |
 | `canonical/` | Canonical serialization |
 | `chronicle/` | Hash-chained event history |
@@ -39,6 +40,11 @@ Root scripts include `inject_ledger.py` and `verify_attestations.py`. Default
 `pytest -q` also collects the admission and pathology tests in
 `weaver_auth/bedrock/tests/`. These components have different validation scopes;
 being listed here does not imply certification or deployment authority.
+
+The `weaver_activation` runtime is Weaver-owned. It binds exact activation intent,
+backend artifacts, inputs, checkpoints, results, and retention gates beneath the
+existing authority verifier. See
+[`docs/WEAVER_ACTIVATION_RUNTIME.md`](docs/WEAVER_ACTIVATION_RUNTIME.md).
 
 ## Repository Policy
 
