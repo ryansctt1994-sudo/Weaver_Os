@@ -13,7 +13,6 @@ from tools.e35_runtime_gate import (
     qualify_e35_runtime,
 )
 
-
 LEDGER = [
     {
         "sequence_number": 1,
