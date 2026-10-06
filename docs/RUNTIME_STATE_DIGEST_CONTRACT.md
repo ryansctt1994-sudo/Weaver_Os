@@ -1,42 +1,60 @@
 # Runtime State Digest Contract
 
-**Status:** IMPLEMENTED CONTRACT MECHANICS · RUNTIME E3.5 NOT QUALIFIED  
+**Status:** IMPLEMENTED CONTRACT MECHANICS · E3.5 RUNTIME REPLAY NOT QUALIFIED  
 **Authority:** O0 · WITHHELD  
 **Witness:** W0  
 **Production:** PROHIBITED
 
 ## Purpose
 
-The E3.5 path requires a runtime-derived state digest.
+The E3.5 path requires a runtime-derived state digest. The repository now has
+three distinct layers that must not impersonate one another:
 
-The repository now also has a deterministic **local authority-state reducer**.
-That is a different property from runtime replay.
+1. a bounded local authority-state reducer;
+2. a generic runtime-state observation contract;
+3. a bounded adapter for the frozen Witness RC1 runtime.
 
-Current manifest v1.2 records:
-
-```text
-state_digest_status = LOCAL_REDUCER_COMPUTED
-state_digest_method = authority-transition-reducer-v1
-expected_state_digest = 39a5996b1bba7a0ed4f0a5c549ad58af5300b5abb5890ddf9eb47c9d039c5a0e
-```
-
-That digest is derived from the bounded local projection of
-`authority_ledger.json`. It is **not** a Chronicle/Raft or other runtime-state
-digest.
-
-Therefore:
+None of those, by itself, is the missing E3.5 authority-ledger runtime replay.
 
 ```text
 LocalReducerDigest != RuntimeStateDigest
-LocalReplay != RuntimeReplay
+RuntimeContractMechanics != ActualRuntimeReplay
+WitnessRC1AdapterPass != E3.5RuntimeReplay
+RuntimeReplay != IndependentReproduction
 ```
 
-The correct response is not to reinterpret the local reducer digest as runtime
-evidence.
+## Local reference projection
 
-## Runtime output envelope
+`tools/authority_state.py` deterministically reduces the admitted
+`STATE_TRANSITION` events in `authority_ledger.json` to:
 
-A runtime command must emit exactly one JSON object:
+```json
+{"receipt_id":"AL-ADOC-2026-001","state":"EXECUTED"}
+```
+
+Current local digest:
+
+```text
+39a5996b1bba7a0ed4f0a5c549ad58af5300b5abb5890ddf9eb47c9d039c5a0e
+```
+
+Method:
+
+```text
+authority-transition-reducer-v1
+```
+
+Manifest classification:
+
+```text
+state_digest_status = LOCAL_REDUCER_COMPUTED
+```
+
+That is not equivalent to `COMPUTED_FROM_RUNTIME`.
+
+## Generic runtime output envelope
+
+A runtime command may be observed through:
 
 ```json
 {
@@ -59,20 +77,10 @@ The observer derives:
 STATE_DIGEST = SHA256(canonical_json(state))
 ```
 
-The runtime does not get to supply its own trusted state digest.
+The runtime does not get to supply its own trusted digest.
 
-## Independent bindings
-
-The caller supplies independently:
-
-- expected runtime identity;
-- expected source-binding kind;
-- expected source-binding value;
-- expected replay-input digest.
-
-All must match the runtime envelope.
-
-Therefore:
+The caller independently supplies expected runtime identity, source binding, and
+replay-input identity.
 
 ```text
 RuntimeClaimsSource != SourceBindingEstablished
@@ -80,46 +88,33 @@ RuntimeClaimsReplayInput != ReplayInputBindingEstablished
 RuntimeEmitsState != RuntimeStateQualified
 ```
 
-## Execution behavior
+## Witness RC1 adapter
 
-`tools/runtime_state_digest.py`:
-
-- executes the runtime command without a shell;
-- requires exit code zero;
-- applies a timeout;
-- rejects oversized stdout/stderr after capture;
-- rejects malformed or ambiguous output;
-- rejects source/runtime/input substitution;
-- derives the state digest itself.
-
-The stdout/stderr limits are post-execution admission limits, not a hard
-subprocess memory sandbox.
-
-## Test fixture boundary
-
-`tests/fixtures/runtime_state_emitter.py` exists only to test the contract.
-
-A passing fixture test establishes:
+`tools/witness_rc1_state_adapter.py` adapts the frozen runtime at:
 
 ```text
-RuntimeStateContractMechanics
+releases/weaver-witness-signed-rc1/src/weaver_core.py
 ```
 
-It does not establish:
+to the generic runtime envelope.
+
+This is a real bounded runtime adapter. It binds actual RC1 source bytes against
+the frozen RC1 release manifest and binds its named command input.
+
+Its state projection includes protected state, used command IDs, Chronicle
+entries, last verdict, and last receipt.
+
+That projection is intentionally different from the authority-ledger local
+reference projection.
+
+Therefore:
 
 ```text
-ActualWeaverRuntimeReplay
-ReleasedArtifactReplay
-IndependentReproduction
-E3.5
-Authority
+WitnessRC1StateDigest != LocalAuthorityReducerDigest
+DifferentProjectionContract != ComparableDigestMeaning
 ```
 
-## Named-runtime adapter
-
-The next layer is a real adapter from an already frozen runtime to this
-envelope. The witness RC1 adapter exercises that contract against a real bounded
-runtime, but it does not replay the E3.5 authority ledger.
+The RC1 adapter also does **not** replay `authority_ledger.json`.
 
 Therefore:
 
@@ -127,16 +122,57 @@ Therefore:
 WitnessRC1AdapterPass != E3.5RuntimeReplay
 ```
 
+## Projection-comparison rule
+
+Two state digests are directly comparable only when all of the following match:
+
+- replay input identity;
+- projection contract;
+- canonicalization contract;
+- digest algorithm;
+- relevant source/runtime binding.
+
+```text
+SameDigestMeaningRequiresSameProjectionContract
+```
+
+If a future E3.5 adapter implements the same bounded state projection as
+`authority-transition-reducer-v1`, the runtime-derived digest may be compared
+against the local reference digest.
+
+If it exposes a different state projection, it must use a separately named
+method and may not silently replace the local result.
+
+## Current manifest state
+
+```text
+expected_state_digest =
+39a5996b1bba7a0ed4f0a5c549ad58af5300b5abb5890ddf9eb47c9d039c5a0e
+
+state_digest_status = LOCAL_REDUCER_COMPUTED
+state_digest_method = authority-transition-reducer-v1
+```
+
+This remains correct even though the RC1 runtime adapter exists, because RC1 is
+a different runtime/input/projection from the E3.5 authority-ledger path.
+
 ## Next E3.5 gate
 
-A future E3.5 runtime adapter must:
+The next adapter must target the actual E3.5 runtime/SUT and:
 
-1. identify the exact runtime implementation;
-2. bind the exact runtime source/release;
-3. replay the exact E3.5 ledger/input;
-4. emit canonical runtime state;
+1. bind its exact runtime source or release;
+2. bind the exact `authority_ledger.json` replay input;
+3. replay that input;
+4. emit a named canonical state projection;
 5. allow the observer to derive the digest;
-6. preserve the existing local-reducer digest as a separate historical property.
+6. compare only against a semantically equivalent reference projection;
+7. preserve the local reducer and RC1 results as separate historical properties.
 
-No runtime-derived state should silently overwrite or impersonate the existing
-local-reducer result.
+Until that exists:
+
+```text
+E3.5 = WITHHELD
+Witness = W0
+Authority = O0_WITHHELD
+Production = PROHIBITED
+```
