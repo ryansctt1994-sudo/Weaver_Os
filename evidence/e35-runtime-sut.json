@@ -1,10 +1,13 @@
 {
-  "schema": "weaver-e35-runtime-sut-1",
+  "schema": "weaver-e35-runtime-sut-2",
   "status": "UNBOUND",
   "reason": "NO_ADMITTED_GOVERNANCE_RUNTIME",
   "runtime_id": null,
   "artifact_path": null,
   "artifact_sha256": null,
+  "ledger_path": null,
+  "ledger_file_sha256": null,
+  "replay_input_digest": null,
   "projection_method": null,
-  "command": null
+  "launch_mode": null
 }
