@@ -6,7 +6,6 @@ import sys
 from pathlib import Path
 
 import pytest
-
 import tools.e35_runtime_gate as gate
 
 
