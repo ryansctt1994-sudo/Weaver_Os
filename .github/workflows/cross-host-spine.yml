@@ -13,6 +13,8 @@ jobs:
   receipt:
     name: Emit bounded remote CI spine receipt
     runs-on: ubuntu-24.04
+    env:
+      WEAVER_SOURCE_HEAD_SHA: ${{ github.event.pull_request.head.sha || github.sha }}
     steps:
       - name: Check out repository
         uses: actions/checkout@v4
