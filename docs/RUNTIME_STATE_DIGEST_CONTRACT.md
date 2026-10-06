@@ -1,6 +1,6 @@
 # Runtime State Digest Contract
 
-**Status:** CANDIDATE MECHANICS · NOT E3.5 QUALIFICATION  
+**Status:** IMPLEMENTED CONTRACT MECHANICS · E3.5 RUNTIME REPLAY NOT QUALIFIED  
 **Authority:** O0 · WITHHELD  
 **Witness:** W0  
 **Production:** PROHIBITED
@@ -8,17 +8,19 @@
 ## Purpose
 
 The E3.5 path requires a runtime-derived state digest. The repository now has
-two lower-level mechanics that must remain distinct:
+three distinct layers that must not impersonate one another:
 
 1. a bounded local authority-state reducer;
-2. a runtime-state observation contract.
+2. a generic runtime-state observation contract;
+3. a bounded adapter for the frozen Witness RC1 runtime.
 
-Neither is, by itself, a qualified Weaver runtime replay.
+None of those, by itself, is the missing E3.5 authority-ledger runtime replay.
 
 ```text
 LocalReducerDigest != RuntimeStateDigest
-RuntimeStateContractMechanics != ActualRuntimeReplay
-ActualRuntimeReplay != IndependentReproduction
+RuntimeContractMechanics != ActualRuntimeReplay
+WitnessRC1AdapterPass != E3.5RuntimeReplay
+RuntimeReplay != IndependentReproduction
 ```
 
 ## Local reference projection
@@ -30,29 +32,29 @@ ActualRuntimeReplay != IndependentReproduction
 {"receipt_id":"AL-ADOC-2026-001","state":"EXECUTED"}
 ```
 
-Its current local digest is:
+Current local digest:
 
 ```text
 39a5996b1bba7a0ed4f0a5c549ad58af5300b5abb5890ddf9eb47c9d039c5a0e
 ```
 
-and its method is:
+Method:
 
 ```text
 authority-transition-reducer-v1
 ```
 
-The manifest may bind this value only as:
+Manifest classification:
 
 ```text
 state_digest_status = LOCAL_REDUCER_COMPUTED
 ```
 
-This is not equivalent to `COMPUTED_FROM_RUNTIME`.
+That is not equivalent to `COMPUTED_FROM_RUNTIME`.
 
-## Runtime output envelope
+## Generic runtime output envelope
 
-A future qualified runtime command must emit exactly one JSON object:
+A runtime command may be observed through:
 
 ```json
 {
@@ -77,18 +79,8 @@ STATE_DIGEST = SHA256(canonical_json(state))
 
 The runtime does not get to supply its own trusted digest.
 
-## Independent bindings
-
-The caller supplies independently:
-
-- expected runtime identity;
-- expected source-binding kind;
-- expected source-binding value;
-- expected replay-input digest.
-
-All must match the runtime envelope.
-
-Therefore:
+The caller independently supplies expected runtime identity, source binding, and
+replay-input identity.
 
 ```text
 RuntimeClaimsSource != SourceBindingEstablished
@@ -96,43 +88,62 @@ RuntimeClaimsReplayInput != ReplayInputBindingEstablished
 RuntimeEmitsState != RuntimeStateQualified
 ```
 
-## Reference-to-runtime comparison
+## Witness RC1 adapter
 
-If a runtime adapter claims to implement the same state projection as
-`authority-transition-reducer-v1`, its projected state digest must equal the
-local reference digest for the same bound replay input.
+`tools/witness_rc1_state_adapter.py` adapts the frozen runtime at:
 
-If it exposes a different state projection, the digests are not directly
-comparable and the method must be separately named and specified.
+```text
+releases/weaver-witness-signed-rc1/src/weaver_core.py
+```
+
+to the generic runtime envelope.
+
+This is a real bounded runtime adapter. It binds actual RC1 source bytes against
+the frozen RC1 release manifest and binds its named command input.
+
+Its state projection includes protected state, used command IDs, Chronicle
+entries, last verdict, and last receipt.
+
+That projection is intentionally different from the authority-ledger local
+reference projection.
+
+Therefore:
+
+```text
+WitnessRC1StateDigest != LocalAuthorityReducerDigest
+DifferentProjectionContract != ComparableDigestMeaning
+```
+
+The RC1 adapter also does **not** replay `authority_ledger.json`.
+
+Therefore:
+
+```text
+WitnessRC1AdapterPass != E3.5RuntimeReplay
+```
+
+## Projection-comparison rule
+
+Two state digests are directly comparable only when all of the following match:
+
+- replay input identity;
+- projection contract;
+- canonicalization contract;
+- digest algorithm;
+- relevant source/runtime binding.
 
 ```text
 SameDigestMeaningRequiresSameProjectionContract
 ```
 
-## Execution behavior
+If a future E3.5 adapter implements the same bounded state projection as
+`authority-transition-reducer-v1`, the runtime-derived digest may be compared
+against the local reference digest.
 
-`tools/runtime_state_digest.py`:
-
-- executes the runtime command without a shell;
-- requires exit code zero;
-- applies a timeout;
-- rejects oversized stdout/stderr after capture;
-- rejects malformed or ambiguous output;
-- rejects source/runtime/input substitution;
-- derives the state digest itself.
-
-The stdout/stderr limits are post-execution admission limits, not a hard
-subprocess memory sandbox.
-
-## Test fixture boundary
-
-`tests/fixtures/runtime_state_emitter.py` exists only to test the contract.
-
-A passing fixture establishes contract mechanics, not an actual Weaver runtime.
+If it exposes a different state projection, it must use a separately named
+method and may not silently replace the local result.
 
 ## Current manifest state
-
-The current manifest is allowed to contain the local reference digest:
 
 ```text
 expected_state_digest =
@@ -142,13 +153,20 @@ state_digest_status = LOCAL_REDUCER_COMPUTED
 state_digest_method = authority-transition-reducer-v1
 ```
 
-E3.5 still requires a separately qualified runtime-derived state result.
+This remains correct even though the RC1 runtime adapter exists, because RC1 is
+a different runtime/input/projection from the E3.5 authority-ledger path.
 
-## Next gate
+## Next E3.5 gate
 
-Provide a real adapter from a named Weaver runtime to the runtime envelope,
-bind it to the frozen replay input and exact runtime source, then compare the
-runtime projection against the appropriate frozen projection contract.
+The next adapter must target the actual E3.5 runtime/SUT and:
+
+1. bind its exact runtime source or release;
+2. bind the exact `authority_ledger.json` replay input;
+3. replay that input;
+4. emit a named canonical state projection;
+5. allow the observer to derive the digest;
+6. compare only against a semantically equivalent reference projection;
+7. preserve the local reducer and RC1 results as separate historical properties.
 
 Until that exists:
 
