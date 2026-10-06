@@ -2,11 +2,11 @@
 """Bounded verifier for the Weaver fail-closed spine.
 
 Scopes:
-- local-spine: derive ledger hash and ordered chain head from ledger bytes,
-  recompute manifest hash, validate manifest schema, and compare derived
-  values to the manifest.
-- e35: run the local checks, then fail closed while runtime replay and
-  independent reproduction gates remain unimplemented.
+- local-spine: derive ledger hash, ordered chain head, and the bounded local
+  authority-state projection from ledger bytes; validate manifest schema and
+  compare derived values to the manifest.
+- e35: run the local checks, then fail closed while released-artifact replay,
+  runtime-derived state, and independent reproduction remain unimplemented.
 
 A local-spine pass is not E3.5, witness, authority, or production permission.
 """
@@ -21,6 +21,7 @@ from typing import Any
 
 from jsonschema import Draft7Validator, FormatChecker
 
+from tools.authority_state import AuthorityStateError, replay_authority_state
 from tools.spine_hash import SpineValidationError, canonical, chain_events, sha256_hex
 
 ROOT = Path(__file__).resolve().parent
@@ -48,7 +49,7 @@ def compute_manifest_hash(manifest: dict[str, Any]) -> str:
     return sha256_hex(canonical(payload))
 
 
-def require_manifest_v11(manifest: Any) -> dict[str, Any]:
+def require_manifest_v12(manifest: Any) -> dict[str, Any]:
     if not isinstance(manifest, dict):
         raise VerificationError("MANIFEST_NOT_OBJECT")
 
@@ -88,8 +89,9 @@ def compare(name: str, computed: Any, expected: Any) -> bool:
 def verify_local_spine(manifest: dict[str, Any], ledger: Any) -> bool:
     try:
         ledger_hash, chain_head = chain_events(ledger)
-    except SpineValidationError as exc:
-        raise VerificationError(f"LEDGER_INVALID:{exc}") from exc
+        authority_state = replay_authority_state(ledger)
+    except (SpineValidationError, AuthorityStateError) as exc:
+        raise VerificationError(f"LEDGER_REPLAY_INVALID:{exc}") from exc
 
     checks = [
         compare(
@@ -107,8 +109,23 @@ def verify_local_spine(manifest: dict[str, Any], ledger: Any) -> bool:
             chain_head,
             manifest.get("expected_head_hash"),
         ),
+        compare(
+            "expected_state_digest",
+            authority_state.digest,
+            manifest.get("expected_state_digest"),
+        ),
+        compare(
+            "state_digest_method",
+            authority_state.method,
+            manifest.get("state_digest_method"),
+        ),
     ]
     print(f"derived_chain_head: {chain_head}")
+    print(f"derived_local_state_digest: {authority_state.digest}")
+    print(
+        "derived_local_state: "
+        + json.dumps(authority_state.state, sort_keys=True, separators=(",", ":"))
+    )
     return all(checks)
 
 
@@ -123,11 +140,12 @@ def verify_e35_prerequisites(manifest: dict[str, Any]) -> bool:
         print(f"FAIL environment_status: {manifest.get('environment_status')}")
         ok = False
 
-    if (
-        manifest.get("state_digest_status") != "COMPUTED_FROM_RUNTIME"
-        or manifest.get("expected_state_digest") is None
-    ):
-        print("FAIL state_digest: NOT_COMPUTED_FROM_RUNTIME")
+    if manifest.get("state_digest_status") != "COMPUTED_FROM_RUNTIME":
+        print(
+            "FAIL state_digest_status: "
+            + str(manifest.get("state_digest_status"))
+            + " (runtime replay required)"
+        )
         ok = False
     else:
         print("FAIL state_digest: RUNTIME_REPLAY_INPUT_NOT_IMPLEMENTED")
@@ -149,7 +167,7 @@ def main(argv: list[str] | None = None) -> int:
     args = parser.parse_args(argv)
 
     try:
-        manifest = require_manifest_v11(load_json(MANIFEST_PATH))
+        manifest = require_manifest_v12(load_json(MANIFEST_PATH))
         ledger = load_json(LEDGER_PATH)
         local_ok = verify_local_spine(manifest, ledger)
     except VerificationError as exc:
@@ -162,6 +180,7 @@ def main(argv: list[str] | None = None) -> int:
 
     if args.scope == "local-spine":
         print("EVIDENCE_CEILING: LOCAL_DETERMINISTIC_CHECK")
+        print("STATE_DIGEST_CLASS: LOCAL_REDUCER_COMPUTED")
         print("AUTHORITY: O0")
         print("RESULT: LOCAL_SPINE_VERIFIED")
         return 0
