@@ -14,9 +14,10 @@ import os
 import platform
 import subprocess
 import sys
+from collections.abc import Mapping
 from datetime import datetime, timezone
 from pathlib import Path
-from typing import Any, Mapping
+from typing import Any
 
 from tools.authority_state import AuthorityStateError, replay_authority_state
 from tools.spine_hash import SpineValidationError, canonical, chain_events, sha256_hex
