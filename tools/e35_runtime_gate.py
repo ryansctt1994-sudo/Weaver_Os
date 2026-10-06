@@ -17,7 +17,7 @@ import os
 import sys
 from dataclasses import asdict, dataclass
 from pathlib import Path
-from typing import Any
+from typing import Any, cast
 
 from tools.authority_state import AuthorityStateError, replay_authority_state
 from tools.runtime_state_digest import RuntimeStateError, observe_runtime_state
