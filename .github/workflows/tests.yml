@@ -31,6 +31,16 @@ jobs:
       - name: Run tests
         run: pytest
 
+      - name: Run WN-E2E-001 transaction and fresh-process replay
+        run: python demo/e2e_transaction.py demo receipts/wn-e2e-001
+
+      - name: Retain WN-E2E-001 local evidence
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: wn-e2e-001-python-${{ matrix.python-version }}
+          path: receipts/wn-e2e-001/
+
       - name: Build wheel and sdist
         run: python -m build
 
