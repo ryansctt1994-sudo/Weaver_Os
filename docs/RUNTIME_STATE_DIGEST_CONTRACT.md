@@ -1,19 +1,38 @@
 # Runtime State Digest Contract
 
-**Status:** CANDIDATE MECHANICS · NOT E3.5 QUALIFICATION  
+**Status:** IMPLEMENTED CONTRACT MECHANICS · RUNTIME E3.5 NOT QUALIFIED  
 **Authority:** O0 · WITHHELD  
 **Witness:** W0  
 **Production:** PROHIBITED
 
 ## Purpose
 
-The E3.5 path requires a runtime-derived state digest, but the repository does
-not currently contain a qualified runtime adapter that replays
-`authority_ledger.json` into a canonical runtime state.
+The E3.5 path requires a runtime-derived state digest.
 
-The correct response is not to place another pinned digest in the manifest.
+The repository now also has a deterministic **local authority-state reducer**.
+That is a different property from runtime replay.
 
-This contract defines the boundary a future runtime adapter must satisfy.
+Current manifest v1.2 records:
+
+```text
+state_digest_status = LOCAL_REDUCER_COMPUTED
+state_digest_method = authority-transition-reducer-v1
+expected_state_digest = 39a5996b1bba7a0ed4f0a5c549ad58af5300b5abb5890ddf9eb47c9d039c5a0e
+```
+
+That digest is derived from the bounded local projection of
+`authority_ledger.json`. It is **not** a Chronicle/Raft or other runtime-state
+digest.
+
+Therefore:
+
+```text
+LocalReducerDigest != RuntimeStateDigest
+LocalReplay != RuntimeReplay
+```
+
+The correct response is not to reinterpret the local reducer digest as runtime
+evidence.
 
 ## Runtime output envelope
 
@@ -40,7 +59,7 @@ The observer derives:
 STATE_DIGEST = SHA256(canonical_json(state))
 ```
 
-The runtime does not get to supply its own state digest.
+The runtime does not get to supply its own trusted state digest.
 
 ## Independent bindings
 
@@ -58,7 +77,7 @@ Therefore:
 ```text
 RuntimeClaimsSource != SourceBindingEstablished
 RuntimeClaimsReplayInput != ReplayInputBindingEstablished
-RuntimeEmitsState != ManifestStateDigestQualified
+RuntimeEmitsState != RuntimeStateQualified
 ```
 
 ## Execution behavior
@@ -96,17 +115,28 @@ E3.5
 Authority
 ```
 
-## Next gate
+## Named-runtime adapter
 
-The next implementation must provide a real adapter from a named Weaver runtime
-to this envelope and bind its replay input to the same ledger identity used by
-the E3.5 manifest.
+The next layer is a real adapter from an already frozen runtime to this
+envelope. The witness RC1 adapter exercises that contract against a real bounded
+runtime, but it does not replay the E3.5 authority ledger.
 
-Until that exists:
+Therefore:
 
 ```text
-expected_state_digest = null
-state_digest_status = NOT_COMPUTED_FROM_RUNTIME
+WitnessRC1AdapterPass != E3.5RuntimeReplay
 ```
 
-remains the correct manifest state.
+## Next E3.5 gate
+
+A future E3.5 runtime adapter must:
+
+1. identify the exact runtime implementation;
+2. bind the exact runtime source/release;
+3. replay the exact E3.5 ledger/input;
+4. emit canonical runtime state;
+5. allow the observer to derive the digest;
+6. preserve the existing local-reducer digest as a separate historical property.
+
+No runtime-derived state should silently overwrite or impersonate the existing
+local-reducer result.
