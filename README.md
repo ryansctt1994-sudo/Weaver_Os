@@ -8,6 +8,8 @@ Weaver OS is a compact verification spine for checking authority claims, replay 
 
 See [`PORTFOLIO_STATUS.md`](PORTFOLIO_STATUS.md) for the canonical portfolio status and [`PORTFOLIO_REGISTRY.md`](PORTFOLIO_REGISTRY.md) for the complete repository/upstream provenance inventory.
 
+The bounded Weaver spine state for 2026-10-06 is [`docs/WEAVER_NEXUS_STATUS_2026-10-06.md`](docs/WEAVER_NEXUS_STATUS_2026-10-06.md). That note outranks the summary below.
+
 ## Core Thesis
 
 Cognition may propose, but it cannot authorize itself. Weaver OS turns authority claims into signed, replay-checked, schema-validated artifacts so rejected or invalid claims cannot silently become trusted state.
@@ -103,13 +105,15 @@ This package verifies cryptographic authorization claims. It does not prove huma
 ## Status
 
 ```text
-MVP_VERIFICATION_SPINE
-ARCHITECTURE_FROZEN
-EVIDENCE_NOT_FROZEN
-AUTHORITY_NOT_EARNED
+Witness                         W0
+Authority                       O0 WITHHELD
+Production                      PROHIBITED
+E3.5 runtime replay             NOT ESTABLISHED
+Same-origin remote CI receipt   RECORDED
+Independent reproduction        NOT ESTABLISHED
 ```
 
-Production deployment still requires persistent replay-cache storage with atomic multi-process semantics, operational key management, deployment-specific governance policy, and independent replay receipts.
+`ARCHITECTURE_FROZEN` is not a current root claim. A module listed above is not a certification. Production deployment still requires persistent replay-cache storage with atomic multi-process semantics, operational key management, deployment-specific governance policy, and independent replay receipts.
 
 ## License
 
