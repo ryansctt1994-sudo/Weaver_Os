@@ -9,89 +9,114 @@
 
 ## One-line state
 
-The public spine now has corrected manifest semantics, derived local verification,
-an executable one-coordinate A1 transition invariant, a deterministic local
-authority-state reducer, and runtime-state observation mechanics. E3.5 remains
-withheld because the actual E3.5 runtime replay and independent reproduction
-have not been established.
+The public spine now has corrected manifest semantics, derived ledger/head
+verification, an executable A1 transition invariant, a deterministic local
+authority-state reducer, generic runtime-state observation mechanics, and one
+bounded real-runtime adapter for Witness RC1. The remaining E3.5 gap is now
+specific: the actual E3.5 runtime/SUT has not replayed the frozen authority
+ledger under the qualification protocol, and no independent operator has
+reproduced that result.
 
 ## Canonical mainline milestones
 
-- PR #69 — manifest binding semantics repaired.
-- PR #70 — pinned-head verifier theater replaced by derived local verification.
-- PR #71 — exact-predecessor and scope/support transition invariants added.
-- PR #72 — runtime-state digest observation contract added.
-- PR #73 — bounded local authority-state reducer added; manifest advanced to v1.2.
-- PR #74 — witness RC1 runtime-state adapter is candidate state until merged.
+- PR #69 — manifest binding repair.
+- PR #70 — derived ledger/head verifier and explicit E3.5 hold.
+- PR #71 — exact-predecessor and scope/support transition invariant.
+- PR #72 — bounded runtime-state observation/digest contract.
+- PR #73 — bounded local authority-state replay and manifest v1.2.
+- PR #74 — bounded Witness RC1 real-runtime state adapter.
+- PR #75 — remote CI spine receipt: candidate until merged and replayed on main.
 
 ## Current file-level spine
 
+- Executable spine: `tools/fail_closed_spine.py`.
 - Shared chain mechanics: `tools/spine_hash.py`.
 - Local authority reducer: `tools/authority_state.py`.
 - Runtime-state observer: `tools/runtime_state_digest.py`.
-- Evidence ceiling for the local spine: `LOCAL_DETERMINISTIC_CHECK`.
-- Canonical ledger digest: `82713cf5a2d9d294c80ba912d51fc4e29bd460c680686ed2f71f74415addb0c9`.
-- Ordered chain head: `e3ff77f12b8663c1fe1ac14bf1e1bd7d675e969f54e49462f4abcf1f41f97e85`.
-- Local reducer digest: `39a5996b1bba7a0ed4f0a5c549ad58af5300b5abb5890ddf9eb47c9d039c5a0e`.
+- Witness RC1 adapter: `tools/witness_rc1_state_adapter.py`.
+- Candidate remote receipt emitter: `tools/emit_spine_receipt.py`.
+
+Bound local values:
+
+```text
+authority_ledger_hash =
+82713cf5a2d9d294c80ba912d51fc4e29bd460c680686ed2f71f74415addb0c9
+
+ordered_chain_head =
+e3ff77f12b8663c1fe1ac14bf1e1bd7d675e969f54e49462f4abcf1f41f97e85
+
+local_authority_state_digest =
+39a5996b1bba7a0ed4f0a5c549ad58af5300b5abb5890ddf9eb47c9d039c5a0e
+
+state_digest_status =
+LOCAL_REDUCER_COMPUTED
+```
 
 ## Preserved historical defects
 
 ### WN-DEFECT-MANIFEST-001
 
-Historical manifest placeholder bindings were repaired; the defect remains
-preserved as history.
+Historical placeholder source/image/head bindings.
+
+**Disposition:** repaired; history preserved.
 
 ### WN-DEFECT-VERIFY-001
 
-Historical pinned-constant self-comparison was repaired for the local spine.
+Historical pinned constants labeled as computed values.
+
+**Disposition:** repaired for bounded local verification.
 
 ### WN-SPEC-IMPL-001
 
-The historical E3.5 specification exceeded the implementation. The gap is now
-explicit rather than silently treated as a result.
+Historical E3.5 specification exceeded the implemented replay path.
+
+**Disposition:** narrowed. The remaining gap is explicit.
 
 ## Current propositions
 
 ```text
-RepositoryPresence                 = ESTABLISHED
-SpineImplementation                = ESTABLISHED
-LocalDeterministicMechanics        = ESTABLISHED_WITHIN_SCOPE
-ManifestV1_2Semantics              = MERGED
-DerivedHeadVerification            = MERGED
-LocalAuthorityReducer              = MERGED
-LocalReducerStateDigest            = ESTABLISHED_WITHIN_SCOPE
-RuntimeStateObservationContract    = MERGED
-WitnessRC1RuntimeAdapter           = CANDIDATE_PR74
-E35RuntimeReplay                   = NOT_ESTABLISHED
-ReleasedArtifactReplay             = NOT_ESTABLISHED_FOR_E35
-CrossHostReplay                    = NOT_ESTABLISHED
-IndependentReproduction            = NOT_ESTABLISHED
-Witness                            = W0
+RepositoryPresence                  = ESTABLISHED
+SpineImplementation                 = ESTABLISHED
+LocalDeterministicMechanics         = ESTABLISHED_WITHIN_SCOPE
+DerivedHeadVerification             = ESTABLISHED_WITHIN_SCOPE
+LocalAuthorityStateReduction        = ESTABLISHED_WITHIN_SCOPE
+LocalReducerStateDigest             = ESTABLISHED_WITHIN_SCOPE
+RuntimeStateObservationContract     = ESTABLISHED_WITH_FIXTURE_SCOPE
+WitnessRC1RuntimeAdapter            = ESTABLISHED_WITHIN_BOUNDED_RC1_SCOPE
+WitnessRC1E35Equivalence            = NOT_CLAIMED
+E35RuntimeReplay                    = NOT_ESTABLISHED
+ReleasedArtifactReplayForE35        = NOT_ESTABLISHED
+RemoteCISpineReceipt                = CANDIDATE_PR75
+IndependentOperatorReproduction     = NOT_ESTABLISHED
+Witness                             = W0
 OperationalAuthority               = O0_WITHHELD
-Production                         = PROHIBITED
+Production                          = PROHIBITED
 ```
 
 ## Governing separations
 
 ```text
-Specification != LocalRun != IndependentReproduction != Authority
-ManifestConsistency != KnownReleaseIdentity
+Specification != LocalRun != RuntimeReplay != IndependentReproduction != Authority
 LocalReducerDigest != RuntimeStateDigest
+WitnessRC1AdapterPass != E3.5RuntimeReplay
+DifferentProjectionContract != ComparableDigestMeaning
+ManifestConsistency != KnownReleaseIdentity
 Mechanics != ScientificResult
 Reproduction != Scope
 ScopeCoverage != EvidentialSupport
+RemoteCIReplay != IndependentOperatorReproduction
 CandidatePRState != CanonicalMainState
 DeclaredGovernance != ServerEnforcedGovernance
 ```
 
 ## Immediate sequence
 
-1. Qualify or reject PR #74 as a bounded real-runtime adapter.
-2. Identify the actual E3.5 runtime/SUT that can replay `authority_ledger.json`.
-3. Build a separate adapter for that exact runtime and exact replay input.
-4. Preserve the local reducer digest as a distinct property; do not overwrite it.
-5. Freeze and replay a released artifact.
-6. Perform same-operator cross-host replay.
+1. Qualify or reject PR #75 and preserve its remote CI receipt.
+2. Keep remote CI classified as same-origin/non-independent.
+3. Identify the actual E3.5 runtime/SUT for `authority_ledger.json`.
+4. Build an adapter for that exact runtime and exact replay input.
+5. Compare only semantically equivalent state projections.
+6. Freeze and replay a released E3.5 artifact.
 7. Obtain independent operator reproduction separately.
 8. Enforce Gate Zero server-side.
 

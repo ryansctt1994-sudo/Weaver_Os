@@ -1,0 +1,38 @@
+name: Cross-host spine receipt
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  receipt:
+    name: Emit bounded remote CI spine receipt
+    runs-on: ubuntu-24.04
+    env:
+      WEAVER_SOURCE_HEAD_SHA: ${{ github.event.pull_request.head.sha || github.sha }}
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Emit bounded spine receipt
+        run: python3 -m tools.emit_spine_receipt --output spine-execution-receipt.json
+
+      - name: Show receipt
+        run: cat spine-execution-receipt.json
+
+      - name: Upload receipt
+        uses: actions/upload-artifact@v4
+        with:
+          name: spine-receipt-${{ github.sha }}
+          path: spine-execution-receipt.json
+          if-no-files-found: error
