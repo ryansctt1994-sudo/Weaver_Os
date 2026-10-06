@@ -4,6 +4,8 @@ import copy
 import json
 from pathlib import Path
 
+import pytest
+
 import verify_attestations
 from tools.spine_hash import chain_events
 
@@ -12,6 +14,12 @@ ROOT = Path(__file__).resolve().parents[1]
 
 def load_ledger():
     return json.loads((ROOT / "authority_ledger.json").read_text(encoding="utf-8"))
+
+
+def load_manifest():
+    return json.loads(
+        (ROOT / "published_manifest.json").read_text(encoding="utf-8")
+    )
 
 
 def test_known_ledger_hash_and_head():
@@ -30,11 +38,36 @@ def test_payload_tamper_changes_hash_and_head():
     assert bad_head != clean_head
 
 
+def test_manifest_schema_accepts_candidate():
+    assert verify_attestations.require_manifest_v11(load_manifest())
+
+
+def test_manifest_schema_rejects_unknown_field():
+    manifest = load_manifest()
+    manifest["undeclared"] = True
+    with pytest.raises(
+        verify_attestations.VerificationError,
+        match="MANIFEST_SCHEMA_REJECTED",
+    ):
+        verify_attestations.require_manifest_v11(manifest)
+
+
+def test_manifest_schema_rejects_unqualified_digest_value():
+    manifest = load_manifest()
+    manifest["expected_state_digest"] = "0" * 64
+    with pytest.raises(
+        verify_attestations.VerificationError,
+        match="MANIFEST_SCHEMA_REJECTED",
+    ):
+        verify_attestations.require_manifest_v11(manifest)
+
+
 def test_manifest_hash_is_self_consistent():
-    manifest = json.loads(
-        (ROOT / "published_manifest.json").read_text(encoding="utf-8")
+    manifest = load_manifest()
+    assert (
+        verify_attestations.compute_manifest_hash(manifest)
+        == manifest["manifest_hash"]
     )
-    assert verify_attestations.compute_manifest_hash(manifest) == manifest["manifest_hash"]
 
 
 def test_local_spine_scope_passes():
@@ -43,5 +76,5 @@ def test_local_spine_scope_passes():
 
 def test_e35_scope_is_withheld():
     # E3.5 must remain red until release identity, runtime state digest,
-    # environment replay, and independent witness gates are implemented.
+    # environment replay, and independent reproduction gates are implemented.
     assert verify_attestations.main(["--scope", "e35"]) == 1
