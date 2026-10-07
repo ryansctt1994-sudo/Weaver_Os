@@ -102,13 +102,13 @@ Repository-local R-level terminology must not silently map onto Weaver E-level t
 
 Role: bounded evidence companion.
 
-Chronicle tamper-evidence tests and Lucifer Latch RTL simulation are bounded implementation/simulation results, not independent certification or silicon validation. PR #4 has a hosted 12-test Chronicle run bound to tested head `6f6e6b78a2d6439d719fa406612387808db4899b`; the current review head is one later README-only documentation commit, so no new execution claim is inferred.
+Chronicle tamper-evidence tests and Lucifer Latch RTL simulation are bounded implementation/simulation results, not independent certification or silicon validation. PR #4 was synchronized with current `main` and then rerun in hosted CI: run `37663879478` executed 12 Chronicle pytest tests successfully for review head `11a6463b750e9d9684aa202714de24fa6f8bb9d6` (GitHub merge revision `3550aa58798fd88e8045aff2369a8fecd4b6f801`). This remains same-project CI, not independent witness evidence.
 
 ### `introspection-twin`
 
 Role: Lean receipt-lattice / authority-gate experiment.
 
-Kernel replay and hostile-suite results remain bounded to the recorded environment. Historical prose referring to an “independent replay” is not admitted as portfolio-independent evidence unless a qualifying witness receipt is located and reviewed. PR #1 has hosted replay evidence bound to tested head `bb6f2d34d382d598e3505360d022c963553e7432`; the current review head is one later README-only documentation commit, so no new execution claim is inferred.
+Kernel replay and hostile-suite results remain bounded to the recorded environment. Historical prose referring to an “independent replay” is not admitted as portfolio-independent evidence unless a qualifying witness receipt is located and reviewed. PR #1 was synchronized with current `main` and then rerun in hosted CI: run `37663999598` passed 10 replay-driver regressions, replayed 10 honest modules, refused both expected poisoned modules, and ended `KERNEL REPLAY: PASS` for review head `9bb60e4d26bfc1e35af57f6b322e1543ca0e237b` (GitHub merge revision `4a955c112bb505c1296202e03e31b0b0b5a5f142`). `FRESH=0`; this remains same-project CI, not independent witness evidence.
 
 ### `Alpha-OmegaLeanTeam`
 
