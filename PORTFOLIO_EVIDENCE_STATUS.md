@@ -1,4 +1,4 @@
-> **Historical snapshot:** This file records the portfolio evidence view as of 2026-06-27. It is retained for provenance and must not be treated as the current portfolio source of truth. See [PORTFOLIO_STATUS.md](PORTFOLIO_STATUS.md) and [PORTFOLIO_REGISTRY.md](PORTFOLIO_REGISTRY.md) for the current 2026-10-04 classification.
+> **Historical snapshot:** This file records the portfolio evidence view as of 2026-06-27. It is retained for provenance and must not be treated as the current portfolio source of truth. See [PORTFOLIO_STATUS.md](PORTFOLIO_STATUS.md) and [PORTFOLIO_REGISTRY.md](PORTFOLIO_REGISTRY.md) for the current 2026-10-07 classification.
 
 # Weaver / Cathedral Portfolio Evidence Status
 
