@@ -159,4 +159,4 @@ Architecture descriptions, council/micro-agent counts, configuration values, pro
 3. Obtain one signed non-origin reproduction on non-origin hardware.
 4. Reconcile the MLP candidate registry against the canonical registry source.
 5. Continue README/status cleanup where narrative or inherited upstream claims outrun repository-local evidence.
-6. Configure server-enforced branch protection/rulesets for the canonical repos; the current `Weaver_Os/main` branch is not protected at the repository setting level.
+6. Configure server-enforced branch protection/rulesets for the canonical repos; all six audited flagship `main` branches are currently unprotected at the repository setting level. See [`docs/GATE_ZERO_ENFORCEMENT.md`](docs/GATE_ZERO_ENFORCEMENT.md) for the audited matrix and solo-safe / dual-control rollout.
