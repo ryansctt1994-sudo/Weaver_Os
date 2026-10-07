@@ -17,6 +17,8 @@
 
 This file is the current GitHub portfolio-level status. Repository-specific READMEs remain authoritative only for their own bounded implementation scope. Older snapshots are historical evidence and must not silently override this file.
 
+The consolidated candidate master handoff is [`docs/MASTER_HANDOFF_2026-10-07.md`](docs/MASTER_HANDOFF_2026-10-07.md). It remains candidate material until admitted through the repository's governance/merge process; writing a document does not make it canonical by self-declaration.
+
 The reconstructed `MLP-REGISTRY 0.1.1-candidate` is a candidate registry only. It supersedes nothing until reconciled against the canonical registry source and explicitly ratified.
 
 ## Current portfolio determination
@@ -55,6 +57,29 @@ one_successful_property_may_not_impersonate_another
 ```
 
 The portfolio naming layer is now frozen to exactly three top-level systems: **MYTHOS · LOGOS · PRAXIS**. Earlier names remain subordinate artifact, protocol, model, persona, implementation, or historical labels rather than peer systems. The human is the constitutional decision layer, not a fourth peer system. This naming consolidation does **not** promote evidence, witness, authority, or production state.
+
+
+### Three Temporal Layers and legacy namespace lock
+
+The portfolio distinguishes three non-interchangeable temporal layers:
+
+1. **Historical lineage** — prior names, protocols, personas, models, metaphors, and deprecated topologies are preserved for provenance.
+2. **Current constitutional architecture** — only **MYTHOS · LOGOS · PRAXIS**, with the human as the decision layer, governs present classification.
+3. **Experimentally earned future promotion** — advancement requires bounded evidence and explicit admission; no name or implementation can self-promote into this layer.
+
+> **History may explain the system. The constitution governs the system. Evidence alone may advance the system.**
+
+Older topologies including **Soul · Logos · Aether · Praxis** are deprecated as peer-system maps. Soul and the historical third-hybrid-path philosophy are MYTHOS lineage; Aether's useful sentinel/epistemic functions are subsumed into LOGOS verification and bounded PRAXIS mechanisms such as VTK.
+
+The historical **Elpis · Lumen · Witness** Triad is also quarantined. Lumen survives only where explicitly bound to current artifacts such as `Lumen-Nexus`; **Witness** is no longer a persona or system component and means only qualifying independent witness state under the current evidence model.
+
+**Phoenix-Symmind**, **Symmind Protocol**, **Guardian Binding**, and **Logos Linguistics** are preserved as foundational LOGOS ancestry, not as the current executable LOGOS runtime.
+
+Canonical historical-name rule:
+
+> **A historical name may identify ancestry. It may not recreate authority.**
+
+These lineage rules do not change the current portfolio state.
 
 ## VTK / void-exec advancement state
 
