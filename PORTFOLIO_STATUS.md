@@ -1,6 +1,6 @@
 # Weaver Nexus GitHub Portfolio Status
 
-**Baseline date:** 2026-10-06  
+**Baseline date:** 2026-10-07  
 **Canonical GitHub anchor:** `ryansctt1994-sudo/Weaver_Os`  
 **Accessible repository inventory observed:** 73 repositories  
 **Portfolio evidence ceiling:** `E2`  
@@ -8,7 +8,8 @@
 **Witness:** `W0`  
 **Operational authority:** `O0 — WITHHELD`  
 **Production:** `PROHIBITED`  
-**Portfolio E4:** `NOT EARNED`
+**Portfolio E4:** `NOT EARNED`  
+**Top-level naming layer:** `MYTHOS · LOGOS · PRAXIS` (frozen naming layer; human decision layer remains above the three systems)
 
 > **Prime invariant:** No mechanism may silently convert uncertainty into authority.
 
@@ -53,7 +54,7 @@ repository_presence != implementation_achievement
 one_successful_property_may_not_impersonate_another
 ```
 
-A proposed MYTHOS · LOGOS · PRAXIS three-plane organization exists as a candidate architecture change. **AP-0001 remains PENDING.** Until steward ratification, that proposal does not silently rename or supersede the current canonical GitHub control structure.
+The portfolio naming layer is now frozen to exactly three top-level systems: **MYTHOS · LOGOS · PRAXIS**. Earlier names remain subordinate artifact, protocol, model, persona, implementation, or historical labels rather than peer systems. The human is the constitutional decision layer, not a fourth peer system. This naming consolidation does **not** promote evidence, witness, authority, or production state.
 
 ## VTK / void-exec advancement state
 
@@ -101,13 +102,19 @@ Repository-local R-level terminology must not silently map onto Weaver E-level t
 
 Role: bounded evidence companion.
 
-Chronicle tamper-evidence tests and Lucifer Latch RTL simulation are bounded implementation/simulation results, not independent certification or silicon validation.
+Chronicle tamper-evidence tests and Lucifer Latch RTL simulation are bounded implementation/simulation results, not independent certification or silicon validation. PR #4 has a hosted 12-test Chronicle run bound to tested head `6f6e6b78a2d6439d719fa406612387808db4899b`; the current review head is one later README-only documentation commit, so no new execution claim is inferred.
 
 ### `introspection-twin`
 
 Role: Lean receipt-lattice / authority-gate experiment.
 
-Kernel replay and hostile-suite results remain bounded to the recorded environment. Historical prose referring to an “independent replay” is not admitted as portfolio-independent evidence unless a qualifying witness receipt is located and reviewed.
+Kernel replay and hostile-suite results remain bounded to the recorded environment. Historical prose referring to an “independent replay” is not admitted as portfolio-independent evidence unless a qualifying witness receipt is located and reviewed. PR #1 has hosted replay evidence bound to tested head `bb6f2d34d382d598e3505360d022c963553e7432`; the current review head is one later README-only documentation commit, so no new execution claim is inferred.
+
+### `Alpha-OmegaLeanTeam`
+
+Role: formal-methods theorem registry and isolated proof tracks.
+
+The v0.5 root corpus and its imported theorem families remain property-scoped formal evidence. Draft PR #22 is candidate correspondence work and does not change portfolio authority or witness state.
 
 ### `Quillan-v4.2-repo`
 
@@ -152,3 +159,4 @@ Architecture descriptions, council/micro-agent counts, configuration values, pro
 3. Obtain one signed non-origin reproduction on non-origin hardware.
 4. Reconcile the MLP candidate registry against the canonical registry source.
 5. Continue README/status cleanup where narrative or inherited upstream claims outrun repository-local evidence.
+6. Configure server-enforced branch protection/rulesets for the canonical repos; the current `Weaver_Os/main` branch is not protected at the repository setting level.
