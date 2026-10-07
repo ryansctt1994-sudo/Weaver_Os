@@ -1,13 +1,13 @@
 # Repository Provenance Registry
 
-**Audit date:** 2026-10-06  
+**Audit date:** 2026-10-07  
 **Account:** `ryansctt1994-sudo`  
 **Purpose:** keep repository provenance, role, and authorship boundaries explicit.
 
 ## Inventory summary
 
 - 73 accessible repositories are currently visible to the connected account.
-- 15 are not marked as GitHub forks.
+- 17 are not marked as GitHub forks.
 - 56 are GitHub forks.
 - A non-fork flag does not itself prove authorship. `Delta-RPM-Protocol`, for example, identifies Rooke Alan Poole and an external source repository in its own README.
 
@@ -29,7 +29,9 @@
 | `Weaver--Cathedral-` | integration/staging blueprint |
 | `A.G.I-Seed-` | governed software-modification research |
 | `Lumen-Nexus` | evidence-first governed architecture |
-| `Weaver-Governed-RSI` | RSI governance incubator shell |
+| `Weaver-Governed-RSI` | RSI governance incubator shell / candidate lineage |
+| `introspection-twin` | Lean receipt-lattice / authority-gate research artifact |
+| `Alpha-OmegaLeanTeam` | Lean theorem registry and isolated formalization tracks |
 
 ## GitHub forks and upstream parents
 
@@ -115,6 +117,11 @@ NO PORTFOLIO REPO INHERITS UPSTREAM AUTHORSHIP.
 ```
 
 
-## 2026-10-06 reconciliation note
+## 2026-10-07 reconciliation note
 
-The current connector inventory contains 73 repositories. The previous 15/56 fork split is retained only as a historical 2026-10-04 observation until the two newly visible repositories are re-audited. `introspection-twin` is treated as a portfolio research artifact for status purposes, but that does not by itself establish original authorship, independence, or external witness status. `Alpha-OmegaLeanTeam` remains provenance-pending.
+The current connector inventory contains **73 repositories: 17 non-forks and 56 GitHub forks**. The two repositories that were previously pending re-audit are now classified by GitHub metadata as non-forks:
+
+- `introspection-twin` — non-fork; repository-local provenance still distinguishes its reimplementation lineage and imported ideas from sole-authorship claims.
+- `Alpha-OmegaLeanTeam` — non-fork; imported IntrospectionTwin, Weaver Lattice Core, Mathlib, and other upstream theorem/source contributions retain their own provenance boundaries.
+
+A non-fork classification is repository metadata, not proof of sole authorship.
