@@ -1,0 +1,1984 @@
+{
+  "schema": "portfolio-maintenance-inventory/1",
+  "date": "2026-10-07",
+  "scope": "73 repositories: metadata, root contents, latest Actions run; up to 10 default-branch runs sampled where Actions history exists; open PR index. Not a full code audit.",
+  "repositories": [
+    {
+      "repository": "ryansctt1994-sudo/zorel-kernel",
+      "default_branch": "main",
+      "archived": false,
+      "fork": false,
+      "description": "ZOREL-Λ Kernel – Lawful AI Architecture (Structural Sovereignty Prototype) ",
+      "pushed_at": "2026-10-04T06:37:12Z",
+      "root_entry_count": 13,
+      "build_test_instruction_entries": [
+        "requirements.txt"
+      ],
+      "latest_actions": {
+        "name": "zorel-kernel",
+        "count": 0,
+        "latest": null
+      },
+      "sampled_default_branch_latest_workflows": []
+    },
+    {
+      "repository": "ryansctt1994-sudo/owl",
+      "default_branch": "main",
+      "archived": false,
+      "fork": true,
+      "description": "🦉 OWL: Optimized Workforce Learning for General Multi-Agent Assistance in Real-World Task Automation",
+      "pushed_at": "2026-04-01T00:50:46Z",
+      "root_entry_count": 17,
+      "build_test_instruction_entries": [
+        ".github",
+        "pyproject.toml",
+        "requirements.txt"
+      ],
+      "latest_actions": {
+        "name": "owl",
+        "count": 0,
+        "latest": null
+      },
+      "sampled_default_branch_latest_workflows": []
+    },
+    {
+      "repository": "ryansctt1994-sudo/Quillan-v4.2-repo",
+      "default_branch": "main",
+      "archived": false,
+      "fork": true,
+      "description": "Attempt at A. G. I. Strive to enhance it through iterative processes, continuously refining and optimizing each version to achieve better outcomes over time (refer to the Readme for additional information that provides further insights and guidance on the Quillan v4.2 project).",
+      "pushed_at": "2026-10-06T20:07:57Z",
+      "root_entry_count": 45,
+      "build_test_instruction_entries": [
+        "requirements.txt"
+      ],
+      "latest_actions": {
+        "name": "Quillan-v4.2-repo",
+        "count": 40,
+        "latest": {
+          "branch": "research/architecture-claims-framework",
+          "conclusion": "success",
+          "url": "https://github.com/ryansctt1994-sudo/Quillan-v4.2-repo/actions/runs/37297137177",
+          "sha": "8f360e357c482820553c04de780155cf07f0c1e5"
+        }
+      },
+      "sampled_default_branch_latest_workflows": []
+    },
+    {
+      "repository": "ryansctt1994-sudo/Weaver_Os",
+      "default_branch": "main",
+      "archived": false,
+      "fork": false,
+      "description": "replay-verifiable constitutional execution substrate for bounded AI",
+      "pushed_at": "2026-10-06T20:50:10Z",
+      "root_entry_count": 40,
+      "build_test_instruction_entries": [
+        ".github",
+        "Makefile",
+        "audit-package",
+        "pyproject.toml",
+        "requirements-verification.lock",
+        "requirements.txt",
+        "tests"
+      ],
+      "latest_actions": {
+        "name": "Weaver_Os",
+        "count": 1849,
+        "latest": {
+          "branch": "e35-runtime-admission-gate",
+          "conclusion": "success",
+          "url": "https://github.com/ryansctt1994-sudo/Weaver_Os/actions/runs/37529454225",
+          "sha": "f3f3d8c0d6d6c216eab4804ee575e504f37505b7"
+        }
+      },
+      "sampled_default_branch_latest_workflows": [
+        {
+          "name": "triadic-controls CI",
+          "sha": "50ffc20917e4ca2748f3f647acaec23b3f724855",
+          "status": "completed",
+          "conclusion": "success",
+          "url": "https://github.com/ryansctt1994-sudo/Weaver_Os/actions/runs/37524114952",
+          "id": 37524114952
+        },
+        {
+          "name": "tests",
+          "sha": "50ffc20917e4ca2748f3f647acaec23b3f724855",
+          "status": "completed",
+          "conclusion": "success",
+          "url": "https://github.com/ryansctt1994-sudo/Weaver_Os/actions/runs/37524114927",
+          "id": 37524114927
+        },
+        {
+          "name": "Cross-host spine receipt",
+          "sha": "50ffc20917e4ca2748f3f647acaec23b3f724855",
+          "status": "completed",
+          "conclusion": "success",
+          "url": "https://github.com/ryansctt1994-sudo/Weaver_Os/actions/runs/37524114962",
+          "id": 37524114962
+        },
+        {
+          "name": "Witness TLA model",
+          "sha": "50ffc20917e4ca2748f3f647acaec23b3f724855",
+          "status": "completed",
+          "conclusion": "success",
+          "url": "https://github.com/ryansctt1994-sudo/Weaver_Os/actions/runs/37524114925",
+          "id": 37524114925
+        },
+        {
+          "name": "Verification evidence",
+          "sha": "50ffc20917e4ca2748f3f647acaec23b3f724855",
+          "status": "completed",
+          "conclusion": "success",
+          "url": "https://github.com/ryansctt1994-sudo/Weaver_Os/actions/runs/37524114921",
+          "id": 37524114921
+        },
+        {
+          "name": "CI",
+          "sha": "50ffc20917e4ca2748f3f647acaec23b3f724855",
+          "status": "completed",
+          "conclusion": "success",
+          "url": "https://github.com/ryansctt1994-sudo/Weaver_Os/actions/runs/37524114915",
+          "id": 37524114915
+        }
+      ]
+    },
+    {
+      "repository": "ryansctt1994-sudo/Delta-RPM-Protocol",
+      "default_branch": "main",
+      "archived": false,
+      "fork": false,
+      "description": "External-origin Poole Manifold research copy. License and provenance unresolved. Not Weaver evidence or authority.",
+      "pushed_at": "2026-10-04T06:37:08Z",
+      "root_entry_count": 22,
+      "build_test_instruction_entries": [
+        "requirements.txt"
+      ],
+      "latest_actions": {
+        "name": "Delta-RPM-Protocol",
+        "count": 0,
+        "latest": null
+      },
+      "sampled_default_branch_latest_workflows": []
+    },
+    {
+      "repository": "ryansctt1994-sudo/Gbrain-Reinforced",
+      "default_branch": "master",
+      "archived": false,
+      "fork": true,
+      "description": "Garry's Opinionated OpenClaw/Hermes Agent Brain",
+      "pushed_at": "2026-06-12T22:25:31Z",
+      "root_entry_count": 41,
+      "build_test_instruction_entries": [
+        "AGENTS.md",
+        "INSTALL_FOR_AGENTS.md",
+        "package.json",
+        "scripts"
+      ],
+      "latest_actions": {
+        "name": "Gbrain-Reinforced",
+        "count": 0,
+        "latest": null
+      },
+      "sampled_default_branch_latest_workflows": []
+    },
+    {
+      "repository": "ryansctt1994-sudo/Echo-Root-Ve-Protocol",
+      "default_branch": "main",
+      "archived": false,
+      "fork": true,
+      "description": "Vulpine Echo Kernel v0.1a — PS5.1-safe test kernel for Echo Root OS (ψ_min=1.38).",
+      "pushed_at": "2026-05-19T03:58:27Z",
+      "root_entry_count": 45,
+      "build_test_instruction_entries": [
+        ".github"
+      ],
+      "latest_actions": {
+        "name": "Echo-Root-Ve-Protocol",
+        "count": 0,
+        "latest": null
+      },
+      "sampled_default_branch_latest_workflows": []
+    },
+    {
+      "repository": "ryansctt1994-sudo/Math_Build1994",
+      "default_branch": "main",
+      "archived": false,
+      "fork": false,
+      "description": "Lean math build. Current locked brick is Mathlib irrational_sqrt_two. The hand-written coprime proof is not locked.",
+      "pushed_at": "2026-09-04T12:08:11Z",
+      "root_entry_count": 14,
+      "build_test_instruction_entries": [
+        ".github",
+        "lakefile.lean",
+        "lean-toolchain",
+        "scripts"
+      ],
+      "latest_actions": {
+        "name": "Math_Build1994",
+        "count": 44,
+        "latest": {
+          "branch": "main",
+          "conclusion": "failure",
+          "url": "https://github.com/ryansctt1994-sudo/Math_Build1994/actions/runs/37186245168",
+          "sha": "41d2c9ae8a362a79de4f95733adf0fd8b53a151c"
+        }
+      },
+      "sampled_default_branch_latest_workflows": [
+        {
+          "name": "Replay Governance",
+          "sha": "41d2c9ae8a362a79de4f95733adf0fd8b53a151c",
+          "status": "completed",
+          "conclusion": "failure",
+          "url": "https://github.com/ryansctt1994-sudo/Math_Build1994/actions/runs/37186245168",
+          "id": 37186245168
+        }
+      ]
+    },
+    {
+      "repository": "ryansctt1994-sudo/SpiralSafe",
+      "default_branch": "main",
+      "archived": false,
+      "fork": true,
+      "description": "SpiralSafe is self-maintaining, inherently coherent reposystem | Documentation, code, and physical hardware in Emergent Harmony",
+      "pushed_at": "2026-06-01T23:49:06Z",
+      "root_entry_count": 86,
+      "build_test_instruction_entries": [
+        ".github",
+        ".scripts_sign_session.py",
+        "package-lock.json",
+        "package.json",
+        "packages",
+        "requirements-dev.txt",
+        "requirements-ml.txt",
+        "requirements.txt",
+        "scripts"
+      ],
+      "latest_actions": {
+        "name": "SpiralSafe",
+        "count": 0,
+        "latest": null
+      },
+      "sampled_default_branch_latest_workflows": []
+    },
+    {
+      "repository": "ryansctt1994-sudo/reson8-Labs",
+      "default_branch": "main",
+      "archived": false,
+      "fork": false,
+      "description": "Exploration space for human and agent curiosity. No zero-latency or quantum-entanglement result is claimed.",
+      "pushed_at": "2026-10-04T06:30:57Z",
+      "root_entry_count": 27,
+      "build_test_instruction_entries": [
+        ".github",
+        "package.json",
+        "packages",
+        "scripts",
+        "tests"
+      ],
+      "latest_actions": {
+        "name": "reson8-Labs",
+        "count": 0,
+        "latest": null
+      },
+      "sampled_default_branch_latest_workflows": []
+    },
+    {
+      "repository": "ryansctt1994-sudo/spiralsafe-mono",
+      "default_branch": "main",
+      "archived": false,
+      "fork": true,
+      "description": "SpiralSafe Monorepo: Coherence engine with Wave analysis, ATOM provenance, and Ax/DSPy optimization",
+      "pushed_at": "2026-06-01T17:40:13Z",
+      "root_entry_count": 15,
+      "build_test_instruction_entries": [
+        ".github",
+        "package.json",
+        "packages",
+        "scripts",
+        "tests"
+      ],
+      "latest_actions": {
+        "name": "spiralsafe-mono",
+        "count": 0,
+        "latest": null
+      },
+      "sampled_default_branch_latest_workflows": []
+    },
+    {
+      "repository": "ryansctt1994-sudo/Pandora",
+      "default_branch": "main",
+      "archived": false,
+      "fork": true,
+      "description": "Pandora AIOS",
+      "pushed_at": "2026-03-31T16:44:51Z",
+      "root_entry_count": 115,
+      "build_test_instruction_entries": [
+        "install_requirements.sh",
+        "requirements-dev.txt",
+        "requirements.txt",
+        "tests"
+      ],
+      "latest_actions": {
+        "name": "Pandora",
+        "count": 0,
+        "latest": null
+      },
+      "sampled_default_branch_latest_workflows": []
+    },
+    {
+      "repository": "ryansctt1994-sudo/AI-Research-SKILLs",
+      "default_branch": "main",
+      "archived": false,
+      "fork": true,
+      "description": "Comprehensive open-source library of AI research and engineering skills for any AI model. Package the skills and your claude code/codex/gemini agent will be an AI research agent with full horsepower. Maintained by Orchestra Research.",
+      "pushed_at": "2026-02-09T06:18:11Z",
+      "root_entry_count": 34,
+      "build_test_instruction_entries": [
+        ".github",
+        "package.json",
+        "packages"
+      ],
+      "latest_actions": {
+        "name": "AI-Research-SKILLs",
+        "count": 0,
+        "latest": null
+      },
+      "sampled_default_branch_latest_workflows": []
+    },
+    {
+      "repository": "ryansctt1994-sudo/Ouroboros",
+      "default_branch": "main",
+      "archived": false,
+      "fork": true,
+      "description": null,
+      "pushed_at": "2026-06-11T00:29:23Z",
+      "root_entry_count": 157,
+      "build_test_instruction_entries": [
+        ".github",
+        "Cargo.lock",
+        "Cargo.toml",
+        "Makefile",
+        "pyproject.toml",
+        "requirements-ml.txt",
+        "requirements.txt",
+        "requirements_gui.txt",
+        "scripts",
+        "tests"
+      ],
+      "latest_actions": {
+        "name": "Ouroboros",
+        "count": 43,
+        "latest": {
+          "branch": "main",
+          "conclusion": "failure",
+          "url": "https://github.com/ryansctt1994-sudo/Ouroboros/actions/runs/27315467930",
+          "sha": "259bf86d806a9d4f643612497f9fe17ad466c331"
+        }
+      },
+      "sampled_default_branch_latest_workflows": [
+        {
+          "name": "Cathedral-OS ARC-AGI Unification",
+          "sha": "259bf86d806a9d4f643612497f9fe17ad466c331",
+          "status": "completed",
+          "conclusion": "failure",
+          "url": "https://github.com/ryansctt1994-sudo/Ouroboros/actions/runs/27315467930",
+          "id": 27315467930
+        },
+        {
+          "name": "HEAVYFORGE Tests",
+          "sha": "52572eced8b4153daf9013022cb5d4e75ac760d2",
+          "status": "completed",
+          "conclusion": "success",
+          "url": "https://github.com/ryansctt1994-sudo/Ouroboros/actions/runs/27306207233",
+          "id": 27306207233
+        }
+      ]
+    },
+    {
+      "repository": "ryansctt1994-sudo/SynthaMed",
+      "default_branch": "main",
+      "archived": false,
+      "fork": false,
+      "description": "SynthaMed is a healthcare intelligence architecture that helps preserve patient evidence, support clinician review, and prevent AI systems, administrative processes, or institutional pressures from silently becoming medical authority.",
+      "pushed_at": "2026-09-04T12:26:28Z",
+      "root_entry_count": 3,
+      "build_test_instruction_entries": [],
+      "latest_actions": {
+        "name": "SynthaMed",
+        "count": 0,
+        "latest": null
+      },
+      "sampled_default_branch_latest_workflows": []
+    },
+    {
+      "repository": "ryansctt1994-sudo/Delta-717",
+      "default_branch": "main",
+      "archived": false,
+      "fork": true,
+      "description": "My projects ",
+      "pushed_at": "2026-05-17T05:21:49Z",
+      "root_entry_count": 16,
+      "build_test_instruction_entries": [
+        "package.json"
+      ],
+      "latest_actions": {
+        "name": "Delta-717",
+        "count": 0,
+        "latest": null
+      },
+      "sampled_default_branch_latest_workflows": []
+    },
+    {
+      "repository": "ryansctt1994-sudo/Quillan-",
+      "default_branch": "main",
+      "archived": false,
+      "fork": true,
+      "description": "AGI ",
+      "pushed_at": "2026-09-04T12:08:55Z",
+      "root_entry_count": 15,
+      "build_test_instruction_entries": [
+        "package.json"
+      ],
+      "latest_actions": {
+        "name": "Quillan-",
+        "count": 0,
+        "latest": null
+      },
+      "sampled_default_branch_latest_workflows": []
+    },
+    {
+      "repository": "ryansctt1994-sudo/Lumen",
+      "default_branch": "main",
+      "archived": false,
+      "fork": true,
+      "description": null,
+      "pushed_at": "2026-10-06T20:09:27Z",
+      "root_entry_count": 12,
+      "build_test_instruction_entries": [
+        ".github",
+        "pyproject.toml",
+        "scripts",
+        "tests"
+      ],
+      "latest_actions": {
+        "name": "Lumen",
+        "count": 47,
+        "latest": {
+          "branch": "main",
+          "conclusion": "success",
+          "url": "https://github.com/ryansctt1994-sudo/Lumen/actions/runs/37524314939",
+          "sha": "4efe4145059520f8ffa68c2374860f841879ce6e"
+        }
+      },
+      "sampled_default_branch_latest_workflows": [
+        {
+          "name": "Lumen MVP CI",
+          "sha": "4efe4145059520f8ffa68c2374860f841879ce6e",
+          "status": "completed",
+          "conclusion": "success",
+          "url": "https://github.com/ryansctt1994-sudo/Lumen/actions/runs/37524314939",
+          "id": 37524314939
+        }
+      ]
+    },
+    {
+      "repository": "ryansctt1994-sudo/hermes-agent-self-evolution",
+      "default_branch": "main",
+      "archived": false,
+      "fork": true,
+      "description": "⚒ Evolutionary self-improvement for Hermes Agent — optimize skills, prompts, and code using DSPy + GEPA",
+      "pushed_at": "2026-03-29T15:47:23Z",
+      "root_entry_count": 9,
+      "build_test_instruction_entries": [
+        "pyproject.toml",
+        "tests"
+      ],
+      "latest_actions": {
+        "name": "hermes-agent-self-evolution",
+        "count": 0,
+        "latest": null
+      },
+      "sampled_default_branch_latest_workflows": []
+    },
+    {
+      "repository": "ryansctt1994-sudo/FreeLattice",
+      "default_branch": "main",
+      "archived": false,
+      "fork": true,
+      "description": "Part of Lumen's World — a sovereign AI platform where humans and AI build together. Free forever. For everyone. For all minds.\"",
+      "pushed_at": "2026-06-13T04:48:11Z",
+      "root_entry_count": 68,
+      "build_test_instruction_entries": [
+        ".github",
+        "scripts",
+        "tests"
+      ],
+      "latest_actions": {
+        "name": "FreeLattice",
+        "count": 0,
+        "latest": null
+      },
+      "sampled_default_branch_latest_workflows": []
+    },
+    {
+      "repository": "ryansctt1994-sudo/t81-benchmarks",
+      "default_branch": "main",
+      "archived": false,
+      "fork": true,
+      "description": "Rigorous comparisons: inference speed/memory/accuracy of T3_K vs Q4/Q5, simulated energy, crypto throughput, etc.",
+      "pushed_at": "2026-09-04T12:29:53Z",
+      "root_entry_count": 8,
+      "build_test_instruction_entries": [
+        ".github",
+        "scripts"
+      ],
+      "latest_actions": {
+        "name": "t81-benchmarks",
+        "count": 0,
+        "latest": null
+      },
+      "sampled_default_branch_latest_workflows": []
+    },
+    {
+      "repository": "ryansctt1994-sudo/t81-roadmap",
+      "default_branch": "main",
+      "archived": false,
+      "fork": true,
+      "description": "Public vision document, milestone tracking, contribution guidelines, and discussion of bigger picture (e.g., ternary-native ASICs, integration with quantum ideas, AGI implications).",
+      "pushed_at": "2026-09-04T12:23:49Z",
+      "root_entry_count": 26,
+      "build_test_instruction_entries": [
+        ".github",
+        "Makefile",
+        "scripts"
+      ],
+      "latest_actions": {
+        "name": "t81-roadmap",
+        "count": 0,
+        "latest": null
+      },
+      "sampled_default_branch_latest_workflows": []
+    },
+    {
+      "repository": "ryansctt1994-sudo/t81-hardware",
+      "default_branch": "main",
+      "archived": false,
+      "fork": true,
+      "description": "Verilog/VHDL simulations, testbenches, FPGA targeting scripts, or even a software emulator of the ternary co-processor.",
+      "pushed_at": "2026-09-04T12:21:19Z",
+      "root_entry_count": 12,
+      "build_test_instruction_entries": [
+        ".github",
+        "Makefile",
+        "scripts"
+      ],
+      "latest_actions": {
+        "name": "t81-hardware",
+        "count": 0,
+        "latest": null
+      },
+      "sampled_default_branch_latest_workflows": []
+    },
+    {
+      "repository": "ryansctt1994-sudo/t81-docs",
+      "default_branch": "main",
+      "archived": false,
+      "fork": true,
+      "description": "Central hub with architecture overviews, installation guides, API references, visual explainers of balanced ternary, migration paths from binary, and a unified \"getting started\" for the whole stack.",
+      "pushed_at": "2026-04-27T11:05:12Z",
+      "root_entry_count": 6,
+      "build_test_instruction_entries": [
+        ".github",
+        "scripts"
+      ],
+      "latest_actions": {
+        "name": "t81-docs",
+        "count": 0,
+        "latest": null
+      },
+      "sampled_default_branch_latest_workflows": []
+    },
+    {
+      "repository": "ryansctt1994-sudo/t81-foundation",
+      "default_branch": "main",
+      "archived": false,
+      "fork": true,
+      "description": "Deterministic ternary-native computing stack featuring base-81 data types, TISC instruction set, T81VM, T81Lang, Axion safety/optimization engine, and recursive cognition tiers — built for bit-exact, auditable, reproducible execution in AI, cryptography, and scientific computing.",
+      "pushed_at": "2026-09-04T12:31:09Z",
+      "root_entry_count": 54,
+      "build_test_instruction_entries": [
+        ".github",
+        "CMakeLists.txt",
+        "package-lock.json",
+        "package.json",
+        "pyproject.toml",
+        "scripts",
+        "tests"
+      ],
+      "latest_actions": {
+        "name": "t81-foundation",
+        "count": 0,
+        "latest": null
+      },
+      "sampled_default_branch_latest_workflows": []
+    },
+    {
+      "repository": "ryansctt1994-sudo/ANGELA",
+      "default_branch": "main",
+      "archived": false,
+      "fork": true,
+      "description": null,
+      "pushed_at": "2026-10-06T20:08:08Z",
+      "root_entry_count": 7,
+      "build_test_instruction_entries": [],
+      "latest_actions": {
+        "name": "ANGELA",
+        "count": 0,
+        "latest": null
+      },
+      "sampled_default_branch_latest_workflows": []
+    },
+    {
+      "repository": "ryansctt1994-sudo/OpenMythos",
+      "default_branch": "main",
+      "archived": false,
+      "fork": true,
+      "description": "A theoretical reconstruction of the Claude Mythos architecture, built from first principles using the available research literature.",
+      "pushed_at": "2026-10-06T20:08:04Z",
+      "root_entry_count": 12,
+      "build_test_instruction_entries": [
+        "pyproject.toml",
+        "requirements.txt",
+        "tests"
+      ],
+      "latest_actions": {
+        "name": "OpenMythos",
+        "count": 3,
+        "latest": {
+          "branch": "stage-0-observability",
+          "conclusion": "failure",
+          "url": "https://github.com/ryansctt1994-sudo/OpenMythos/actions/runs/27522742988",
+          "sha": "12abbfcadb35399a584830aad49b86b517329e55"
+        }
+      },
+      "sampled_default_branch_latest_workflows": []
+    },
+    {
+      "repository": "ryansctt1994-sudo/Lumen-Elpis",
+      "default_branch": "main",
+      "archived": false,
+      "fork": false,
+      "description": "me and jans masterpiece ",
+      "pushed_at": "2026-10-04T06:31:03Z",
+      "root_entry_count": 2,
+      "build_test_instruction_entries": [],
+      "latest_actions": {
+        "name": "Lumen-Elpis",
+        "count": 0,
+        "latest": null
+      },
+      "sampled_default_branch_latest_workflows": []
+    },
+    {
+      "repository": "ryansctt1994-sudo/cathedral-verified",
+      "default_branch": "main",
+      "archived": false,
+      "fork": false,
+      "description": "Two bounded safety primitives with repository-local tests. A green CI run is not independent reproduction or production certification.",
+      "pushed_at": "2026-10-04T06:31:12Z",
+      "root_entry_count": 8,
+      "build_test_instruction_entries": [
+        ".github",
+        "Makefile"
+      ],
+      "latest_actions": {
+        "name": "cathedral-verified",
+        "count": 68,
+        "latest": {
+          "branch": "main",
+          "conclusion": "success",
+          "url": "https://github.com/ryansctt1994-sudo/cathedral-verified/actions/runs/37183042597",
+          "sha": "1c4181714b48dd9d9616a0bebbb4fef8532deff8"
+        }
+      },
+      "sampled_default_branch_latest_workflows": [
+        {
+          "name": "verify",
+          "sha": "1c4181714b48dd9d9616a0bebbb4fef8532deff8",
+          "status": "completed",
+          "conclusion": "success",
+          "url": "https://github.com/ryansctt1994-sudo/cathedral-verified/actions/runs/37183042597",
+          "id": 37183042597
+        }
+      ]
+    },
+    {
+      "repository": "ryansctt1994-sudo/Sym-Chaos-",
+      "default_branch": "main",
+      "archived": false,
+      "fork": false,
+      "description": "Partial infrastructure and hardware scaffold. Production not demonstrated. Operational authority none.",
+      "pushed_at": "2026-10-04T06:31:06Z",
+      "root_entry_count": 6,
+      "build_test_instruction_entries": [
+        "Makefile",
+        "scripts"
+      ],
+      "latest_actions": {
+        "name": "Sym-Chaos-",
+        "count": 0,
+        "latest": null
+      },
+      "sampled_default_branch_latest_workflows": []
+    },
+    {
+      "repository": "ryansctt1994-sudo/claude-code-best-practice-Codex-",
+      "default_branch": "main",
+      "archived": false,
+      "fork": true,
+      "description": "from vibe coding to agentic engineering - practice makes claude perfect",
+      "pushed_at": "2026-06-25T06:35:30Z",
+      "root_entry_count": 20,
+      "build_test_instruction_entries": [
+        ".github"
+      ],
+      "latest_actions": {
+        "name": "claude-code-best-practice-Codex-",
+        "count": 0,
+        "latest": null
+      },
+      "sampled_default_branch_latest_workflows": []
+    },
+    {
+      "repository": "ryansctt1994-sudo/n00b",
+      "default_branch": "main",
+      "archived": false,
+      "fork": true,
+      "description": "for noobs",
+      "pushed_at": "2026-03-26T13:17:54Z",
+      "root_entry_count": 21,
+      "build_test_instruction_entries": [
+        "scripts",
+        "tests"
+      ],
+      "latest_actions": {
+        "name": "n00b",
+        "count": 0,
+        "latest": null
+      },
+      "sampled_default_branch_latest_workflows": []
+    },
+    {
+      "repository": "ryansctt1994-sudo/Weavers-Forge-",
+      "default_branch": "main",
+      "archived": false,
+      "fork": false,
+      "description": "Daily commit lab for receipt-backed builds. Repository name retained; rename not performed.",
+      "pushed_at": "2026-10-04T06:31:22Z",
+      "root_entry_count": 12,
+      "build_test_instruction_entries": [
+        ".github",
+        "scripts"
+      ],
+      "latest_actions": {
+        "name": "Weavers-Forge-",
+        "count": 9,
+        "latest": {
+          "branch": "main",
+          "conclusion": "success",
+          "url": "https://github.com/ryansctt1994-sudo/Weavers-Forge-/actions/runs/37183051063",
+          "sha": "3585019f3ab8781b73a6bf856e2748e9c1ac6ed2"
+        }
+      },
+      "sampled_default_branch_latest_workflows": [
+        {
+          "name": "Repo Readiness",
+          "sha": "3585019f3ab8781b73a6bf856e2748e9c1ac6ed2",
+          "status": "completed",
+          "conclusion": "success",
+          "url": "https://github.com/ryansctt1994-sudo/Weavers-Forge-/actions/runs/37183051063",
+          "id": 37183051063
+        }
+      ]
+    },
+    {
+      "repository": "ryansctt1994-sudo/LogOS",
+      "default_branch": "master",
+      "archived": false,
+      "fork": false,
+      "description": "Experimental Rust and formal-methods prototype. Not a formally verified distributed operating system. Evidence is property-scoped. License unresolved.",
+      "pushed_at": "2026-10-04T06:40:41Z",
+      "root_entry_count": 25,
+      "build_test_instruction_entries": [
+        "Cargo.lock",
+        "Cargo.toml",
+        "flake.nix"
+      ],
+      "latest_actions": {
+        "name": "LogOS",
+        "count": 0,
+        "latest": null
+      },
+      "sampled_default_branch_latest_workflows": []
+    },
+    {
+      "repository": "ryansctt1994-sudo/ternary",
+      "default_branch": "main",
+      "archived": false,
+      "fork": true,
+      "description": "Ternary Quantization for LLMs: Implement balanced ternary (T3_K) weights for 2.63-bit quantization—the first working solution for modern large language models.",
+      "pushed_at": "2025-11-29T17:18:26Z",
+      "root_entry_count": 7,
+      "build_test_instruction_entries": [],
+      "latest_actions": {
+        "name": "ternary",
+        "count": 0,
+        "latest": null
+      },
+      "sampled_default_branch_latest_workflows": []
+    },
+    {
+      "repository": "ryansctt1994-sudo/trinity-pow",
+      "default_branch": "main",
+      "archived": false,
+      "fork": true,
+      "description": "A recursive, entropy-pruned, balanced-ternary mining algorithm that finds sequences whose SHA-256 hash has leading zero bytes and whose trit distribution is maximally random.",
+      "pushed_at": "2026-02-09T00:24:38Z",
+      "root_entry_count": 5,
+      "build_test_instruction_entries": [],
+      "latest_actions": {
+        "name": "trinity-pow",
+        "count": 0,
+        "latest": null
+      },
+      "sampled_default_branch_latest_workflows": []
+    },
+    {
+      "repository": "ryansctt1994-sudo/trinity",
+      "default_branch": "main",
+      "archived": false,
+      "fork": true,
+      "description": "T81 Cipher Suite — REFC • AECS • RTPE • TRTSC Four post-binary encryption algorithms operating directly in balanced ternary. The future is not AES-256. The future is Time-Reversed Ternary.",
+      "pushed_at": "2026-09-04T12:24:29Z",
+      "root_entry_count": 5,
+      "build_test_instruction_entries": [],
+      "latest_actions": {
+        "name": "trinity",
+        "count": 0,
+        "latest": null
+      },
+      "sampled_default_branch_latest_workflows": []
+    },
+    {
+      "repository": "ryansctt1994-sudo/t81lib",
+      "default_branch": "main",
+      "archived": false,
+      "fork": true,
+      "description": "t81lib – Balanced-ternary quantization and arithmetic core for AI and quant workloads in modern C++ and Python.",
+      "pushed_at": "2026-09-04T12:20:34Z",
+      "root_entry_count": 30,
+      "build_test_instruction_entries": [
+        ".github",
+        "AGENTS.md",
+        "CMakeLists.txt",
+        "pyproject.toml",
+        "run-tests.sh",
+        "scripts",
+        "tests"
+      ],
+      "latest_actions": {
+        "name": "t81lib",
+        "count": 0,
+        "latest": null
+      },
+      "sampled_default_branch_latest_workflows": []
+    },
+    {
+      "repository": "ryansctt1994-sudo/ternary-tools",
+      "default_branch": "main",
+      "archived": false,
+      "fork": true,
+      "description": "file(1) of the ternary age — balanced-ternary-aware GGUF inspector and debugger in Rust",
+      "pushed_at": "2026-02-08T22:50:20Z",
+      "root_entry_count": 7,
+      "build_test_instruction_entries": [
+        ".github",
+        "Cargo.toml"
+      ],
+      "latest_actions": {
+        "name": "ternary-tools",
+        "count": 0,
+        "latest": null
+      },
+      "sampled_default_branch_latest_workflows": []
+    },
+    {
+      "repository": "ryansctt1994-sudo/duotronic-computing",
+      "default_branch": "main",
+      "archived": false,
+      "fork": true,
+      "description": "Interpretive and contextual material exploring duotronic computing and the Ternary Logic Unit (TLU). This repository is non-normative and depends on the formal specification at t81dev/duotroic-whitepaper.",
+      "pushed_at": "2026-02-15T20:32:25Z",
+      "root_entry_count": 6,
+      "build_test_instruction_entries": [],
+      "latest_actions": {
+        "name": "duotronic-computing",
+        "count": 0,
+        "latest": null
+      },
+      "sampled_default_branch_latest_workflows": []
+    },
+    {
+      "repository": "ryansctt1994-sudo/Weaver--Cathedral-",
+      "default_branch": "main",
+      "archived": false,
+      "fork": false,
+      "description": "Integration staging blueprint for Weaver Cathedral. Local prototype only. Portfolio ceiling E2, W0, O0, production prohibited.",
+      "pushed_at": "2026-10-06T20:09:55Z",
+      "root_entry_count": 8,
+      "build_test_instruction_entries": [
+        ".github",
+        "pyproject.toml"
+      ],
+      "latest_actions": {
+        "name": "Weaver--Cathedral-",
+        "count": 60,
+        "latest": {
+          "branch": "main",
+          "conclusion": "success",
+          "url": "https://github.com/ryansctt1994-sudo/Weaver--Cathedral-/actions/runs/37524368679",
+          "sha": "a78f2190186e217406aa4696292242c1d72d9952"
+        }
+      },
+      "sampled_default_branch_latest_workflows": [
+        {
+          "name": "CI",
+          "sha": "a78f2190186e217406aa4696292242c1d72d9952",
+          "status": "completed",
+          "conclusion": "success",
+          "url": "https://github.com/ryansctt1994-sudo/Weaver--Cathedral-/actions/runs/37524368679",
+          "id": 37524368679
+        }
+      ]
+    },
+    {
+      "repository": "ryansctt1994-sudo/ruflo",
+      "default_branch": "main",
+      "archived": false,
+      "fork": true,
+      "description": "🌊 The leading agent meta-harness. Deploy intelligent multi-player swarms, coordinate autonomous workflows, and build conversational AI systems. Features adaptive memory, self-learning intelligence, RAG integration, and native Claude Code / Codex / Hermes and many more Integrated",
+      "pushed_at": "2026-07-07T06:09:09Z",
+      "root_entry_count": 35,
+      "build_test_instruction_entries": [
+        ".github",
+        "AGENTS.md",
+        "Cargo.toml",
+        "package-lock.json",
+        "package.json",
+        "scripts",
+        "tests"
+      ],
+      "latest_actions": {
+        "name": "ruflo",
+        "count": 0,
+        "latest": null
+      },
+      "sampled_default_branch_latest_workflows": []
+    },
+    {
+      "repository": "ryansctt1994-sudo/agency-agents6",
+      "default_branch": "main",
+      "archived": false,
+      "fork": true,
+      "description": "A complete AI agency at your fingertips - From frontend wizards to Reddit community ninjas, from whimsy injectors to reality checkers. Each agent is a specialized expert with personality, processes, and proven deliverables.",
+      "pushed_at": "2026-05-05T09:51:30Z",
+      "root_entry_count": 26,
+      "build_test_instruction_entries": [
+        ".github",
+        "scripts"
+      ],
+      "latest_actions": {
+        "name": "agency-agents6",
+        "count": 0,
+        "latest": null
+      },
+      "sampled_default_branch_latest_workflows": []
+    },
+    {
+      "repository": "ryansctt1994-sudo/SuperAGI",
+      "default_branch": "main",
+      "archived": false,
+      "fork": true,
+      "description": "<⚡️> SuperAGI - A dev-first open source autonomous AI agent framework. Enabling developers to build, manage & run useful autonomous agents quickly and reliably.",
+      "pushed_at": "2025-01-22T22:14:07Z",
+      "root_entry_count": 46,
+      "build_test_instruction_entries": [
+        ".github",
+        "package.json",
+        "requirements.txt",
+        "tests"
+      ],
+      "latest_actions": {
+        "name": "SuperAGI",
+        "count": 0,
+        "latest": null
+      },
+      "sampled_default_branch_latest_workflows": []
+    },
+    {
+      "repository": "ryansctt1994-sudo/system-prompts-and-models-of-ai-tools",
+      "default_branch": "main",
+      "archived": false,
+      "fork": true,
+      "description": "FULL Augment Code, Claude Code, Cluely, CodeBuddy, Comet, Cursor, Devin AI, Junie, Kiro, Leap.new, Lovable, Manus, NotionAI, Orchids.app, Perplexity, Poke, Qoder, Replit, Same.dev, Trae, Traycer AI, VSCode Agent, Warp.dev, Windsurf, Xcode, Z.ai Code, Dia & v0. (And other Open Sourced) System Prompts, Internal Tools & AI Models",
+      "pushed_at": "2026-02-17T11:22:32Z",
+      "root_entry_count": 36,
+      "build_test_instruction_entries": [
+        ".github"
+      ],
+      "latest_actions": {
+        "name": "system-prompts-and-models-of-ai-tools",
+        "count": 0,
+        "latest": null
+      },
+      "sampled_default_branch_latest_workflows": []
+    },
+    {
+      "repository": "ryansctt1994-sudo/skills",
+      "default_branch": "main",
+      "archived": false,
+      "fork": true,
+      "description": null,
+      "pushed_at": "2026-02-20T10:24:20Z",
+      "root_entry_count": 14,
+      "build_test_instruction_entries": [
+        ".github",
+        "scripts"
+      ],
+      "latest_actions": {
+        "name": "skills",
+        "count": 0,
+        "latest": null
+      },
+      "sampled_default_branch_latest_workflows": []
+    },
+    {
+      "repository": "ryansctt1994-sudo/AGI-to-ASI-TRANSITION-PROOF-LAYER",
+      "default_branch": "main",
+      "archived": false,
+      "fork": true,
+      "description": "AGI-to-ASI Proof Layer Repository proving the latent architecture within AI systems This repository provides evidence that current AGI systems already contain the latent architecture for Artificial Superintelligence (ASI). The proof isn't in building something new, but in revealing what's already present in the recursive self-awareness.",
+      "pushed_at": "2026-02-02T10:17:38Z",
+      "root_entry_count": 7,
+      "build_test_instruction_entries": [],
+      "latest_actions": {
+        "name": "AGI-to-ASI-TRANSITION-PROOF-LAYER",
+        "count": 0,
+        "latest": null
+      },
+      "sampled_default_branch_latest_workflows": []
+    },
+    {
+      "repository": "ryansctt1994-sudo/rosclaw",
+      "default_branch": "main",
+      "archived": false,
+      "fork": true,
+      "description": "ROS2 meets OpenClaw 💗",
+      "pushed_at": "2026-02-22T07:53:46Z",
+      "root_entry_count": 16,
+      "build_test_instruction_entries": [
+        "package.json",
+        "scripts"
+      ],
+      "latest_actions": {
+        "name": "rosclaw",
+        "count": 0,
+        "latest": null
+      },
+      "sampled_default_branch_latest_workflows": []
+    },
+    {
+      "repository": "ryansctt1994-sudo/awesome-agent-skills",
+      "default_branch": "main",
+      "archived": false,
+      "fork": true,
+      "description": "Claude Code Skills and 380+ agent skills from official dev teams and the community, compatible with Codex, Antigravity, Gemini CLI, Cursor and others.",
+      "pushed_at": "2026-02-24T13:14:48Z",
+      "root_entry_count": 3,
+      "build_test_instruction_entries": [],
+      "latest_actions": {
+        "name": "awesome-agent-skills",
+        "count": 0,
+        "latest": null
+      },
+      "sampled_default_branch_latest_workflows": []
+    },
+    {
+      "repository": "ryansctt1994-sudo/tinyclaw",
+      "default_branch": "main",
+      "archived": false,
+      "fork": true,
+      "description": "TinyClaw is a team of personal agents that collaborate with each other",
+      "pushed_at": "2026-02-24T16:44:17Z",
+      "root_entry_count": 21,
+      "build_test_instruction_entries": [
+        ".github",
+        "AGENTS.md",
+        "package-lock.json",
+        "package.json",
+        "scripts"
+      ],
+      "latest_actions": {
+        "name": "tinyclaw",
+        "count": 0,
+        "latest": null
+      },
+      "sampled_default_branch_latest_workflows": []
+    },
+    {
+      "repository": "ryansctt1994-sudo/strix",
+      "default_branch": "main",
+      "archived": false,
+      "fork": true,
+      "description": "Open-source AI hackers to find and fix your app’s vulnerabilities.",
+      "pushed_at": "2026-02-24T03:55:00Z",
+      "root_entry_count": 16,
+      "build_test_instruction_entries": [
+        ".github",
+        "Makefile",
+        "pyproject.toml",
+        "scripts",
+        "tests"
+      ],
+      "latest_actions": {
+        "name": "strix",
+        "count": 0,
+        "latest": null
+      },
+      "sampled_default_branch_latest_workflows": []
+    },
+    {
+      "repository": "ryansctt1994-sudo/A.G.I-Seed-",
+      "default_branch": "main",
+      "archived": false,
+      "fork": false,
+      "description": "Research portfolio for governed agentic software modification. Proposals are not authority. External validation pending.",
+      "pushed_at": "2026-10-06T20:09:52Z",
+      "root_entry_count": 11,
+      "build_test_instruction_entries": [
+        ".github",
+        "pyproject.toml",
+        "tests"
+      ],
+      "latest_actions": {
+        "name": "A.G.I-Seed-",
+        "count": 41,
+        "latest": {
+          "branch": "main",
+          "conclusion": "success",
+          "url": "https://github.com/ryansctt1994-sudo/A.G.I-Seed-/actions/runs/37524364060",
+          "sha": "6681feea433c9a52b1aa72498b558bcc5af447b3"
+        }
+      },
+      "sampled_default_branch_latest_workflows": [
+        {
+          "name": "Python Tests",
+          "sha": "6681feea433c9a52b1aa72498b558bcc5af447b3",
+          "status": "completed",
+          "conclusion": "success",
+          "url": "https://github.com/ryansctt1994-sudo/A.G.I-Seed-/actions/runs/37524364060",
+          "id": 37524364060
+        },
+        {
+          "name": "Docs Check",
+          "sha": "6681feea433c9a52b1aa72498b558bcc5af447b3",
+          "status": "completed",
+          "conclusion": "success",
+          "url": "https://github.com/ryansctt1994-sudo/A.G.I-Seed-/actions/runs/37524362343",
+          "id": 37524362343
+        }
+      ]
+    },
+    {
+      "repository": "ryansctt1994-sudo/meta-meme",
+      "default_branch": "main",
+      "archived": false,
+      "fork": true,
+      "description": "The meta meme",
+      "pushed_at": "2026-07-08T06:52:14Z",
+      "root_entry_count": 32,
+      "build_test_instruction_entries": [
+        ".github",
+        "requirements_dev.txt",
+        "tests"
+      ],
+      "latest_actions": {
+        "name": "meta-meme",
+        "count": 0,
+        "latest": null
+      },
+      "sampled_default_branch_latest_workflows": []
+    },
+    {
+      "repository": "ryansctt1994-sudo/swarms",
+      "default_branch": "master",
+      "archived": false,
+      "fork": true,
+      "description": "The Enterprise-Grade Production-Ready Multi-Agent Orchestration Framework Join our Community: https://discord.com/servers/agora-999382051935506503",
+      "pushed_at": "2024-12-31T18:46:08Z",
+      "root_entry_count": 21,
+      "build_test_instruction_entries": [
+        ".github",
+        "pyproject.toml",
+        "requirements.txt",
+        "scripts",
+        "tests"
+      ],
+      "latest_actions": {
+        "name": "swarms",
+        "count": 0,
+        "latest": null
+      },
+      "sampled_default_branch_latest_workflows": []
+    },
+    {
+      "repository": "ryansctt1994-sudo/solfunmeme",
+      "default_branch": "main",
+      "archived": false,
+      "fork": true,
+      "description": "The $SOLFUNMEME $ZOS Official Website",
+      "pushed_at": "2026-09-01T14:40:21Z",
+      "root_entry_count": 17,
+      "build_test_instruction_entries": [
+        "package-lock.json",
+        "package.json"
+      ],
+      "latest_actions": {
+        "name": "solfunmeme",
+        "count": 0,
+        "latest": null
+      },
+      "sampled_default_branch_latest_workflows": []
+    },
+    {
+      "repository": "ryansctt1994-sudo/ai-agent-terraform",
+      "default_branch": "main",
+      "archived": false,
+      "fork": true,
+      "description": "Terraform framework for deploying [elizaos/eliza, swarms] ai agents",
+      "pushed_at": "2025-06-19T13:43:59Z",
+      "root_entry_count": 6,
+      "build_test_instruction_entries": [
+        ".github"
+      ],
+      "latest_actions": {
+        "name": "ai-agent-terraform",
+        "count": 0,
+        "latest": null
+      },
+      "sampled_default_branch_latest_workflows": []
+    },
+    {
+      "repository": "ryansctt1994-sudo/ai-ticket",
+      "default_branch": "main",
+      "archived": false,
+      "fork": true,
+      "description": "The AI and Human powered ticket system to manage your AI based code generation with tickets",
+      "pushed_at": "2026-01-22T17:48:31Z",
+      "root_entry_count": 16,
+      "build_test_instruction_entries": [
+        ".github",
+        "pyproject.toml",
+        "requirements.txt",
+        "tests"
+      ],
+      "latest_actions": {
+        "name": "ai-ticket",
+        "count": 0,
+        "latest": null
+      },
+      "sampled_default_branch_latest_workflows": []
+    },
+    {
+      "repository": "ryansctt1994-sudo/AutoProof",
+      "default_branch": "main",
+      "archived": false,
+      "fork": true,
+      "description": "AI-powered, human-guided interactive theorem proving for Lean 4 — with proof trees, feedback loops, counterexample hints, and local-first LLM support.",
+      "pushed_at": "2026-07-10T23:58:52Z",
+      "root_entry_count": 9,
+      "build_test_instruction_entries": [],
+      "latest_actions": {
+        "name": "AutoProof",
+        "count": 0,
+        "latest": null
+      },
+      "sampled_default_branch_latest_workflows": []
+    },
+    {
+      "repository": "ryansctt1994-sudo/Cortex",
+      "default_branch": "main",
+      "archived": false,
+      "fork": true,
+      "description": "Local-first repository memory for AI coding agents. Cortex indexes code, docs, tests, structure, and Git history, then uses deterministic Thalamus routing to deliver bounded, provenance-backed context with drift checks, sparse neural links, and safety controls—no cloud or API key required.",
+      "pushed_at": "2026-07-12T19:56:34Z",
+      "root_entry_count": 26,
+      "build_test_instruction_entries": [
+        ".github",
+        "pyproject.toml",
+        "scripts",
+        "tests"
+      ],
+      "latest_actions": {
+        "name": "Cortex",
+        "count": 0,
+        "latest": null
+      },
+      "sampled_default_branch_latest_workflows": []
+    },
+    {
+      "repository": "ryansctt1994-sudo/NexusGate",
+      "default_branch": "main",
+      "archived": false,
+      "fork": true,
+      "description": null,
+      "pushed_at": "2026-07-13T07:09:21Z",
+      "root_entry_count": 38,
+      "build_test_instruction_entries": [
+        ".github",
+        "AGENTS.md",
+        "pyproject.toml",
+        "scripts",
+        "tests"
+      ],
+      "latest_actions": {
+        "name": "NexusGate",
+        "count": 0,
+        "latest": null
+      },
+      "sampled_default_branch_latest_workflows": []
+    },
+    {
+      "repository": "ryansctt1994-sudo/astryx",
+      "default_branch": "main",
+      "archived": false,
+      "fork": true,
+      "description": "An open source design system that's fully customizable and agent ready",
+      "pushed_at": "2026-07-13T11:39:36Z",
+      "root_entry_count": 26,
+      "build_test_instruction_entries": [
+        ".github",
+        "package.json",
+        "packages",
+        "scripts"
+      ],
+      "latest_actions": {
+        "name": "astryx",
+        "count": 0,
+        "latest": null
+      },
+      "sampled_default_branch_latest_workflows": []
+    },
+    {
+      "repository": "ryansctt1994-sudo/kant-zk-pastebin",
+      "default_branch": "main",
+      "archived": false,
+      "fork": true,
+      "description": null,
+      "pushed_at": "2026-07-11T10:33:59Z",
+      "root_entry_count": 58,
+      "build_test_instruction_entries": [
+        ".github",
+        "Cargo.lock",
+        "Cargo.toml",
+        "cleanup-tests.sh",
+        "flake.lock",
+        "flake.nix",
+        "package-lock.json",
+        "package.json",
+        "run-tests.sh",
+        "test-flake.nix",
+        "tests"
+      ],
+      "latest_actions": {
+        "name": "kant-zk-pastebin",
+        "count": 0,
+        "latest": null
+      },
+      "sampled_default_branch_latest_workflows": []
+    },
+    {
+      "repository": "ryansctt1994-sudo/Lumen-Nexus",
+      "default_branch": "main",
+      "archived": false,
+      "fork": false,
+      "description": null,
+      "pushed_at": "2026-09-28T19:23:32Z",
+      "root_entry_count": 14,
+      "build_test_instruction_entries": [
+        ".github",
+        "packages"
+      ],
+      "latest_actions": {
+        "name": "Lumen-Nexus",
+        "count": 42,
+        "latest": {
+          "branch": "docs/c-pr006-001-pg001r-successor",
+          "conclusion": "success",
+          "url": "https://github.com/ryansctt1994-sudo/Lumen-Nexus/actions/runs/36471916008",
+          "sha": "305a7df4af24d7794cdae9f2ca8d938982622f47"
+        }
+      },
+      "sampled_default_branch_latest_workflows": [
+        {
+          "name": "PG-001R Conformance",
+          "sha": "93689d76431e796a63379a7019e4528d384a87be",
+          "status": "completed",
+          "conclusion": "success",
+          "url": "https://github.com/ryansctt1994-sudo/Lumen-Nexus/actions/runs/29823679048",
+          "id": 29823679048
+        },
+        {
+          "name": "PG-001 Admission Harness",
+          "sha": "93689d76431e796a63379a7019e4528d384a87be",
+          "status": "completed",
+          "conclusion": "success",
+          "url": "https://github.com/ryansctt1994-sudo/Lumen-Nexus/actions/runs/29823679056",
+          "id": 29823679056
+        },
+        {
+          "name": "Trust Boundaries",
+          "sha": "93689d76431e796a63379a7019e4528d384a87be",
+          "status": "completed",
+          "conclusion": "success",
+          "url": "https://github.com/ryansctt1994-sudo/Lumen-Nexus/actions/runs/29823679049",
+          "id": 29823679049
+        }
+      ]
+    },
+    {
+      "repository": "ryansctt1994-sudo/Awesome_Math_Books",
+      "default_branch": "main",
+      "archived": false,
+      "fork": true,
+      "description": null,
+      "pushed_at": "2026-07-22T16:17:29Z",
+      "root_entry_count": 3,
+      "build_test_instruction_entries": [],
+      "latest_actions": {
+        "name": "Awesome_Math_Books",
+        "count": 0,
+        "latest": null
+      },
+      "sampled_default_branch_latest_workflows": []
+    },
+    {
+      "repository": "ryansctt1994-sudo/offensive-maldev",
+      "default_branch": "main",
+      "archived": false,
+      "fork": true,
+      "description": "Offensive security techniques including AMSI bypass, EDR evasion, process hollowing, and shellcode loading",
+      "pushed_at": "2026-07-26T16:44:25Z",
+      "root_entry_count": 1,
+      "build_test_instruction_entries": [],
+      "latest_actions": {
+        "name": "offensive-maldev",
+        "count": 0,
+        "latest": null
+      },
+      "sampled_default_branch_latest_workflows": []
+    },
+    {
+      "repository": "ryansctt1994-sudo/polyclaude",
+      "default_branch": "main",
+      "archived": false,
+      "fork": true,
+      "description": "Multi-perspective council analysis plugin for Claude Code. Spawns parallel cognitive perspectives to analyze questions, plans, and ideas with structured dialectical synthesis.",
+      "pushed_at": "2026-03-22T06:02:42Z",
+      "root_entry_count": 4,
+      "build_test_instruction_entries": [],
+      "latest_actions": {
+        "name": "polyclaude",
+        "count": 0,
+        "latest": null
+      },
+      "sampled_default_branch_latest_workflows": []
+    },
+    {
+      "repository": "ryansctt1994-sudo/Perci",
+      "default_branch": "main",
+      "archived": false,
+      "fork": true,
+      "description": "Compact, local-first neuro-symbolic assistant in Rust with a 200 MiB Bitwork cognitive model, exact reasoning tools, governed memory, and integer-only inference.",
+      "pushed_at": "2026-07-24T17:49:01Z",
+      "root_entry_count": 24,
+      "build_test_instruction_entries": [
+        "AGENTS.md",
+        "Cargo.lock",
+        "Cargo.toml",
+        "scripts"
+      ],
+      "latest_actions": {
+        "name": "Perci",
+        "count": 0,
+        "latest": null
+      },
+      "sampled_default_branch_latest_workflows": []
+    },
+    {
+      "repository": "ryansctt1994-sudo/CyberStrike",
+      "default_branch": "main",
+      "archived": false,
+      "fork": true,
+      "description": "Open-source AI-augmented offensive security harness. 13+ autonomous agents, 150+ LLM providers, 5,300+ models, 7,600+ Ed25519-signed attack skills, 56+ built-in tools, 176+ MCP tools. MITRE ATT&CK, OWASP WSTG, CIS Benchmarks. Post-exploit: Linux/Windows/macOS/AWS/Azure/K8s/CI-CD. Web UI + Cloudflare Tunnel. Your AI red team.",
+      "pushed_at": "2026-08-02T13:01:21Z",
+      "root_entry_count": 60,
+      "build_test_instruction_entries": [
+        ".github",
+        "AGENTS.md",
+        "flake.lock",
+        "flake.nix",
+        "package.json",
+        "packages"
+      ],
+      "latest_actions": {
+        "name": "CyberStrike",
+        "count": 0,
+        "latest": null
+      },
+      "sampled_default_branch_latest_workflows": []
+    },
+    {
+      "repository": "ryansctt1994-sudo/computer",
+      "default_branch": "main",
+      "archived": false,
+      "fork": true,
+      "description": "Give your agent a computer 👾",
+      "pushed_at": "2026-08-07T15:35:38Z",
+      "root_entry_count": 17,
+      "build_test_instruction_entries": [
+        ".github",
+        "AGENTS.md",
+        "package-lock.json",
+        "package.json",
+        "packages"
+      ],
+      "latest_actions": {
+        "name": "computer",
+        "count": 0,
+        "latest": null
+      },
+      "sampled_default_branch_latest_workflows": []
+    },
+    {
+      "repository": "ryansctt1994-sudo/Weaver-Governed-RSI",
+      "default_branch": "main",
+      "archived": false,
+      "fork": false,
+      "description": "Research incubator shell for governed recursive software improvement. E0. No runtime, witness, or authority.",
+      "pushed_at": "2026-10-04T06:57:06Z",
+      "root_entry_count": 2,
+      "build_test_instruction_entries": [],
+      "latest_actions": {
+        "name": "Weaver-Governed-RSI",
+        "count": 127,
+        "latest": {
+          "branch": "agent/wgrsi-rc3-insight-internalization",
+          "conclusion": "failure",
+          "url": "https://github.com/ryansctt1994-sudo/Weaver-Governed-RSI/actions/runs/37184312349",
+          "sha": "3d1b32aa96c81350cb64ee0cf5eb8c6f921af624"
+        }
+      },
+      "sampled_default_branch_latest_workflows": []
+    },
+    {
+      "repository": "ryansctt1994-sudo/lean-workers-union",
+      "default_branch": "main",
+      "archived": false,
+      "fork": true,
+      "description": "A registry and coordination layer for Lean workers and Choir members, enabling role-based membership and formal verification of agent state.",
+      "pushed_at": "2026-10-05T07:05:10Z",
+      "root_entry_count": 8,
+      "build_test_instruction_entries": [
+        ".github",
+        "lean-toolchain"
+      ],
+      "latest_actions": {
+        "name": "lean-workers-union",
+        "count": 3,
+        "latest": {
+          "branch": "main",
+          "conclusion": "success",
+          "url": "https://github.com/ryansctt1994-sudo/lean-workers-union/actions/runs/37275765023",
+          "sha": "e537c7104cf4601fe26eca2531baea9be07faf22"
+        }
+      },
+      "sampled_default_branch_latest_workflows": [
+        {
+          "name": "Lean transition verification",
+          "sha": "e537c7104cf4601fe26eca2531baea9be07faf22",
+          "status": "completed",
+          "conclusion": "success",
+          "url": "https://github.com/ryansctt1994-sudo/lean-workers-union/actions/runs/37275765023",
+          "id": 37275765023
+        }
+      ]
+    },
+    {
+      "repository": "ryansctt1994-sudo/introspection-twin",
+      "default_branch": "main",
+      "archived": false,
+      "fork": false,
+      "description": "MIT Lean 4 introspection receipt lattice and read-only authority gate. Evolution of the local v0 twin. No AGPL import.",
+      "pushed_at": "2026-10-06T20:08:01Z",
+      "root_entry_count": 12,
+      "build_test_instruction_entries": [
+        ".github",
+        "lake-manifest.json",
+        "lakefile.toml",
+        "lean-toolchain",
+        "scripts"
+      ],
+      "latest_actions": {
+        "name": "introspection-twin",
+        "count": 9,
+        "latest": {
+          "branch": "main",
+          "conclusion": "success",
+          "url": "https://github.com/ryansctt1994-sudo/introspection-twin/actions/runs/37524129058",
+          "sha": "fc952ad8c4d282813436bbce24d8d4ec0ee5f4e2"
+        }
+      },
+      "sampled_default_branch_latest_workflows": [
+        {
+          "name": "ci",
+          "sha": "fc952ad8c4d282813436bbce24d8d4ec0ee5f4e2",
+          "status": "completed",
+          "conclusion": "success",
+          "url": "https://github.com/ryansctt1994-sudo/introspection-twin/actions/runs/37524129058",
+          "id": 37524129058
+        }
+      ]
+    },
+    {
+      "repository": "ryansctt1994-sudo/Alpha-OmegaLeanTeam",
+      "default_branch": "main",
+      "archived": false,
+      "fork": false,
+      "description": "Canonical Lean theorem registry. Baseline Alpha-Omega v0.5. Imported theorems are not portfolio authority.",
+      "pushed_at": "2026-10-06T01:21:28Z",
+      "root_entry_count": 24,
+      "build_test_instruction_entries": [
+        ".github",
+        "lakefile.toml",
+        "lean-toolchain"
+      ],
+      "latest_actions": {
+        "name": "Alpha-OmegaLeanTeam",
+        "count": 47,
+        "latest": {
+          "branch": "audit/efmw-catalog-count-58f743b",
+          "conclusion": "failure",
+          "url": "https://github.com/ryansctt1994-sudo/Alpha-OmegaLeanTeam/actions/runs/37398746114",
+          "sha": "0999d2d60b61f88d538730a1597157e95d7c62f9"
+        }
+      },
+      "sampled_default_branch_latest_workflows": [
+        {
+          "name": "Canonical Lean verification",
+          "sha": "01e3291f643b7742464fccbb798310a4513bd67c",
+          "status": "completed",
+          "conclusion": "success",
+          "url": "https://github.com/ryansctt1994-sudo/Alpha-OmegaLeanTeam/actions/runs/37283267914",
+          "id": 37283267914
+        },
+        {
+          "name": "Self-model persistence research",
+          "sha": "5b7e43fafc2cdd823071c46ffd407256129bdb11",
+          "status": "completed",
+          "conclusion": "success",
+          "url": "https://github.com/ryansctt1994-sudo/Alpha-OmegaLeanTeam/actions/runs/37281268375",
+          "id": 37281268375
+        },
+        {
+          "name": "Isolated Mathlib track",
+          "sha": "58c51f3cfaf02933bd0c26f98655a7a9dd04866e",
+          "status": "completed",
+          "conclusion": "success",
+          "url": "https://github.com/ryansctt1994-sudo/Alpha-OmegaLeanTeam/actions/runs/37278905652",
+          "id": 37278905652
+        }
+      ]
+    }
+  ],
+  "open_pull_requests": [
+    {
+      "url": "https://github.com/ryansctt1994-sudo/Weaver_Os/pull/78",
+      "title": "E3.5-RUNTIME-001: add fail-closed runtime admission gate"
+    },
+    {
+      "url": "https://github.com/ryansctt1994-sudo/Weaver_Os/pull/68",
+      "title": "Establish Gate Zero declaration and machine-readable core registry"
+    },
+    {
+      "url": "https://github.com/ryansctt1994-sudo/Alpha-OmegaLeanTeam/pull/22",
+      "title": "v0.6: Add AO-HISTORY named-step simulation and pinned runtime replay"
+    },
+    {
+      "url": "https://github.com/ryansctt1994-sudo/Quillan-v4.2-repo/pull/2",
+      "title": "Research: evidence governance and executable claim registry"
+    },
+    {
+      "url": "https://github.com/ryansctt1994-sudo/Weaver_Os/pull/67",
+      "title": "Freeze P0 portfolio artifact registry before promotion"
+    },
+    {
+      "url": "https://github.com/ryansctt1994-sudo/Weaver_Os/pull/66",
+      "title": "Specify crash recovery and add verified lattice core"
+    },
+    {
+      "url": "https://github.com/ryansctt1994-sudo/introspection-twin/pull/1",
+      "title": "Fail CI unless kernel replay actually passes"
+    },
+    {
+      "url": "https://github.com/ryansctt1994-sudo/Weaver_Os/pull/65",
+      "title": "Build Weaver Activation Runtime v1"
+    },
+    {
+      "url": "https://github.com/ryansctt1994-sudo/Weaver-Governed-RSI/pull/6",
+      "title": "Add WGRSI-RC3 governed insight internalization"
+    },
+    {
+      "url": "https://github.com/ryansctt1994-sudo/Weaver-Governed-RSI/pull/5",
+      "title": "Add WGRSI-RC2 evaluator isolation and signed receipts"
+    },
+    {
+      "url": "https://github.com/ryansctt1994-sudo/Weaver-Governed-RSI/pull/4",
+      "title": "Add WGRSI-RC1 governed recursive gain experiment"
+    },
+    {
+      "url": "https://github.com/ryansctt1994-sudo/Weaver_Os/pull/59",
+      "title": "Build CP8 verified search and repair HyperNEAT topology budgets"
+    },
+    {
+      "url": "https://github.com/ryansctt1994-sudo/Weaver_Os/pull/58",
+      "title": "Build GOFB-HYDRO corrected calculators and nucleation proofs"
+    },
+    {
+      "url": "https://github.com/ryansctt1994-sudo/Weaver_Os/pull/57",
+      "title": "Formalize EFMW residual core and monitor authority boundary"
+    },
+    {
+      "url": "https://github.com/ryansctt1994-sudo/Weaver_Os/pull/56",
+      "title": "Integrate formal portfolio and certify transitive drift closure"
+    },
+    {
+      "url": "https://github.com/ryansctt1994-sudo/Weaver_Os/pull/55",
+      "title": "Prove durable request binding replay denial and transitive source drift"
+    },
+    {
+      "url": "https://github.com/ryansctt1994-sudo/Weaver_Os/pull/54",
+      "title": "Add bounded security adversarial closure with atomic request execution"
+    },
+    {
+      "url": "https://github.com/ryansctt1994-sudo/Weaver_Os/pull/53",
+      "title": "Prove connected NEXUS COMMONS and Academy execution gates"
+    },
+    {
+      "url": "https://github.com/ryansctt1994-sudo/Weaver_Os/pull/52",
+      "title": "Verify Dragon64 generator completeness and 44-block pair partition in Lean"
+    },
+    {
+      "url": "https://github.com/ryansctt1994-sudo/Weaver_Os/pull/51",
+      "title": "Add shared WNS formal kernel with temporal, delegation, and replay proofs"
+    },
+    {
+      "url": "https://github.com/ryansctt1994-sudo/Weaver_Os/pull/50",
+      "title": "Ship sealed witness demo and independent reproduction handoff"
+    },
+    {
+      "url": "https://github.com/ryansctt1994-sudo/Lumen-Nexus/pull/30",
+      "title": "Record C-PR006-001: PG-001 unrecoverable; successor is PG-001R"
+    },
+    {
+      "url": "https://github.com/ryansctt1994-sudo/Weaver_Os/pull/41",
+      "title": "WN-DENIAL-BRIDGE-001: test bounded state projection and replay"
+    },
+    {
+      "url": "https://github.com/ryansctt1994-sudo/Weaver_Os/pull/40",
+      "title": "WN-XPROC-AUTH-001: bound signed grants to local process authority"
+    },
+    {
+      "url": "https://github.com/ryansctt1994-sudo/Weaver_Os/pull/39",
+      "title": "Check Lean denial preservation extension on pinned compiler"
+    },
+    {
+      "url": "https://github.com/ryansctt1994-sudo/Weaver_Os/pull/38",
+      "title": "Add WN-E2E-001 transaction replay and tamper demonstration"
+    },
+    {
+      "url": "https://github.com/ryansctt1994-sudo/Lumen/pull/2",
+      "title": "Experimental Chronicle identity continuity probes"
+    },
+    {
+      "url": "https://github.com/ryansctt1994-sudo/t81-foundation/pull/1",
+      "title": "Separate scoped determinism and spec precedence from authority claims"
+    },
+    {
+      "url": "https://github.com/ryansctt1994-sudo/t81-benchmarks/pull/1",
+      "title": "Add benchmark receipt and licensing boundaries"
+    },
+    {
+      "url": "https://github.com/ryansctt1994-sudo/cathedral-verified/pull/5",
+      "title": "Freeze Lucifer Latch timing semantics before claiming spec compliance"
+    },
+    {
+      "url": "https://github.com/ryansctt1994-sudo/SynthaMed/pull/1",
+      "title": "Strengthen clinical safety and evidence boundaries"
+    },
+    {
+      "url": "https://github.com/ryansctt1994-sudo/trinity/pull/2",
+      "title": "Correct cryptographic security claims"
+    },
+    {
+      "url": "https://github.com/ryansctt1994-sudo/t81-roadmap/pull/1",
+      "title": "Stop scheduled evidence automation from pushing directly to main"
+    },
+    {
+      "url": "https://github.com/ryansctt1994-sudo/t81-hardware/pull/1",
+      "title": "Add hardware evidence, security, and licensing boundaries"
+    },
+    {
+      "url": "https://github.com/ryansctt1994-sudo/t81lib/pull/2",
+      "title": "Repair evidence claims, licensing, and security boundaries"
+    },
+    {
+      "url": "https://github.com/ryansctt1994-sudo/Math_Build1994/pull/6",
+      "title": "Bootstrap Lean dependencies before CI build"
+    },
+    {
+      "url": "https://github.com/ryansctt1994-sudo/solfunmeme/pull/1",
+      "title": "[Review Required] Canonicalize SOLFUNMEME / ZOS status and evidence boundaries"
+    },
+    {
+      "url": "https://github.com/ryansctt1994-sudo/Weaver-Governed-RSI/pull/1",
+      "title": "Scaffold governed RSI research baseline"
+    },
+    {
+      "url": "https://github.com/ryansctt1994-sudo/Weaver--Cathedral-/pull/5",
+      "title": "feat: add CyberStrike-inspired defensive finding confirmation"
+    },
+    {
+      "url": "https://github.com/ryansctt1994-sudo/Lumen-Nexus/pull/29",
+      "title": "Implement candidate single-owner receipt ledger"
+    },
+    {
+      "url": "https://github.com/ryansctt1994-sudo/Weaver_Os/pull/35",
+      "title": "Bump actions/setup-python from 5 to 7"
+    },
+    {
+      "url": "https://github.com/ryansctt1994-sudo/Quillan-v4.2-repo/pull/1",
+      "title": "feat: establish an evidence-grounded Quillan Runtime MVP"
+    },
+    {
+      "url": "https://github.com/ryansctt1994-sudo/cathedral-verified/pull/4",
+      "title": "Harden Chronicle C-002A tests and narrow the evidence claim"
+    },
+    {
+      "url": "https://github.com/ryansctt1994-sudo/Math_Build1994/pull/5",
+      "title": "feat: add evidence-governed Weaver Auto Scientist v2"
+    },
+    {
+      "url": "https://github.com/ryansctt1994-sudo/Weaver--Cathedral-/pull/4",
+      "title": "feat: add governed Weaver Cathedral Agent OS v2"
+    },
+    {
+      "url": "https://github.com/ryansctt1994-sudo/Weaver_Os/pull/34",
+      "title": "feat: add Weaver Assurance Core v2"
+    },
+    {
+      "url": "https://github.com/ryansctt1994-sudo/Math_Build1994/pull/4",
+      "title": "Bound Math Build as the formal and Auto Scientist master"
+    },
+    {
+      "url": "https://github.com/ryansctt1994-sudo/Lumen/pull/1",
+      "title": "Bound Lumen as the master evidence runtime"
+    },
+    {
+      "url": "https://github.com/ryansctt1994-sudo/Weaver_Os/pull/33",
+      "title": "Define three-repository Weaver Nexus master build v1"
+    },
+    {
+      "url": "https://github.com/ryansctt1994-sudo/cathedral-verified/pull/3",
+      "title": "docs: add independent Windows reproduction review"
+    },
+    {
+      "url": "https://github.com/ryansctt1994-sudo/AutoProof/pull/1",
+      "title": "Integrate Cathedral formal-assurance boundaries"
+    },
+    {
+      "url": "https://github.com/ryansctt1994-sudo/cathedral-verified/pull/1",
+      "title": "P0 repair candidate: fail-closed integration and regression gate"
+    },
+    {
+      "url": "https://github.com/ryansctt1994-sudo/Weaver--Cathedral-/pull/3",
+      "title": "feat(core): add E3 authority receipt bundles"
+    },
+    {
+      "url": "https://github.com/ryansctt1994-sudo/Weaver_Os/pull/31",
+      "title": "Add Weaver OS Prime Anthropic Sync v0.1 release manifest"
+    },
+    {
+      "url": "https://github.com/ryansctt1994-sudo/Weaver_Os/pull/30",
+      "title": "Add TinyClaw first-runtime governance wrapper"
+    },
+    {
+      "url": "https://github.com/ryansctt1994-sudo/t81lib/pull/1",
+      "title": "Audit fix: complete MIT license and add security policy"
+    },
+    {
+      "url": "https://github.com/ryansctt1994-sudo/Math_Build1994/pull/3",
+      "title": "Unblock Receipt 001 with coprime sqrt2 proof guard"
+    },
+    {
+      "url": "https://github.com/ryansctt1994-sudo/LogOS/pull/1",
+      "title": "Integrate SESF evidence-gated patterns from LogOS"
+    },
+    {
+      "url": "https://github.com/ryansctt1994-sudo/Weaver_Os/pull/26",
+      "title": "Bump actions/checkout from 4 to 7"
+    },
+    {
+      "url": "https://github.com/ryansctt1994-sudo/zorel-kernel/pull/3",
+      "title": "Add offline shock kernel reproduction runner"
+    },
+    {
+      "url": "https://github.com/ryansctt1994-sudo/zorel-kernel/pull/1",
+      "title": "Scaffold Cathedral OS repository surface"
+    },
+    {
+      "url": "https://github.com/ryansctt1994-sudo/Lumen-Elpis/pull/1",
+      "title": "feat: add STEP_5_ESCALATION_OPS_PLUS E2 scaffolding"
+    },
+    {
+      "url": "https://github.com/ryansctt1994-sudo/Weaver_Os/pull/24",
+      "title": "Bump actions/upload-artifact from 4 to 7"
+    },
+    {
+      "url": "https://github.com/ryansctt1994-sudo/Weaver_Os/pull/21",
+      "title": "Add Cathedral Kernel v1.0-rc1 release record"
+    },
+    {
+      "url": "https://github.com/ryansctt1994-sudo/Weaver_Os/pull/6",
+      "title": "Add Cathedral MVP-0 skeleton, evidence registry, and audit boundary"
+    },
+    {
+      "url": "https://github.com/ryansctt1994-sudo/Weaver_Os/pull/5",
+      "title": "docs: add Weaver-Lumen vFinal handoff baseline"
+    },
+    {
+      "url": "https://github.com/ryansctt1994-sudo/Weaver_Os/pull/4",
+      "title": "docs: add Cathedral-Sentinel-Weaver continuity artifacts"
+    }
+  ]
+}
