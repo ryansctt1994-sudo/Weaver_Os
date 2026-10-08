@@ -417,3 +417,84 @@ The next era is experimental validation.
 And beneath all four:
 
 > **No mechanism may silently convert uncertainty into authority.**
+
+## 22. Cross-source reconciliation addendum — 2026-10-08
+
+The connected-source sweep was reconciled across GitHub, Google Drive/Docs, Gmail, Calendar, Dropbox, and the ChatGPT Library. This addendum changes source handling and several blocker descriptions; it does **not** promote evidence, witness, authority, or production state.
+
+Machine-readable source precedence: [`PORTFOLIO_SOURCE_MAP.json`](PORTFOLIO_SOURCE_MAP.json).
+
+Machine-readable first-witness target state: [`E4_GATE_A_STATUS.json`](E4_GATE_A_STATUS.json).
+
+Human-readable reconciliation: [`CROSS_SOURCE_RECONCILIATION_2026-10-08.md`](CROSS_SOURCE_RECONCILIATION_2026-10-08.md).
+
+### Workbench v0.9 revalidation
+
+The exact `Weaver_Workbench_v0.9_integrity_dev.zip` archive was re-executed in an assistant-managed Linux x86_64 environment with Python 3.13.5. Its adjacent declared outer SHA-256 matched:
+
+`d661f480531da762957acd2772233169560219641a980b076647b20ee516dc2c`
+
+Observed bounded result:
+
+- 53 archive members; no path-traversal members detected;
+- 52 shipped checksums verified by `scripts/check_release.py`;
+- 176 unit tests PASS;
+- demo PASS;
+- reviewed HTTP protocol-stub smoke PASS;
+- bridge smoke PASS;
+- Git audit smoke PASS, including dirty-tree and committed-blob tamper refusals;
+- live model inference remained `false`.
+
+This is same-workspace/origin-class local evidence. v0.9 is the current integrated Workbench development baseline, but it is not a complete successor to unavailable v0.5.2 source and does not inherit the reported v0.5.2 crash journal, `project-recover`, or inode-bound export behavior.
+
+### Receipt Core pre-freeze state
+
+The old shorthand blocker saying the Receipt Core frozen handoff simply lacks wrapper/`stable_result` construction is stale or partially superseded. Later E4-001 material records the target archive digest `e5cb3af872b42bef93ae284875a8416eb814d02132f8f66265f3fc661cb81ffb`, an 8/8 locally qualified targeted mutation suite, a frozen `stable_result_sha256`, and a required 5/5 wrapper negative-control set.
+
+The honest current state is:
+
+```text
+WVR-004 = BLOCKED / PRE-FREEZE ASSEMBLY
+```
+
+The remaining gate is one exact `BundleDigest` over source, protocol, environment, output-invariance material, mutation suite, nonclaims, operator procedure, receipt templates, and negative findings; then mechanical proof that the correction is in that exact bundle; then a complete origin-side pre-arm audit.
+
+### Gate A remains unresolved
+
+Historical records have named both CALL-004 and WN-RECEIPT-CORE-1.0 as preferred first-witness candidates. Neither is admitted here as the ratified first target.
+
+A valid steward decision must name exactly one version and full artifact/bundle digest and record why alternatives are deferred. Readiness, chronology, a passing local suite, or a prose recommendation cannot self-select the target.
+
+### Source roles after reconciliation
+
+```text
+GitHub admitted main/governance    = canonical implementation/governance state
+GitHub PRs/review branches         = candidate repository state
+Exact frozen artifacts/receipts    = artifact-scoped evidence
+ChatGPT Library                    = integration/staging workspace
+Google Drive                       = research/docs/source archive
+Dropbox                            = historical/frozen artifact vault
+Gmail                              = outside-contact + notification record
+Google Calendar                    = scheduled real-world activity record
+Chat/status summaries              = reasoning/reconstruction, never self-authorizing
+```
+
+Google Drive also restores the Lucifer Latch artifact inventory beyond a mere template: RTL, testbench, checker, TLA+/configuration, and Artix-7 constraint artifacts were located. This strengthens provenance, not physical FPGA validation.
+
+The Distributed Intelligence Compact has a send-ready outside-review package, but qualifying external review was not established in the connected Gmail sweep.
+
+### Updated execution order
+
+1. Enforce Gate Zero server-side on the flagship repositories.
+2. Ratify exactly one Gate A first-witness target.
+3. Finish the selected target's origin-side freeze/preflight without patching the frozen object.
+4. Run Workbench v0.9 against the six real pinned repository checkouts and perform one real local-model execution through the review-digest path.
+5. Run VTK on a capable containment host and retain the exact result.
+6. Obtain one qualifying non-origin reproduction and adjudicate it separately.
+7. Promote only the exact property earned.
+
+Portfolio state after this addendum remains:
+
+```text
+E2 | W0 | O0 WITHHELD | PRODUCTION PROHIBITED | E4 NOT EARNED
+```
