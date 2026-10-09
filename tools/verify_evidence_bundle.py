@@ -168,7 +168,8 @@ def verify_bundle(root: Path, output: Path) -> dict[str, Any]:
     Draft202012Validator.check_schema(schema)
     errors = list(Draft202012Validator(schema).iter_errors(report))
     if errors:
-        refuse(f"report schema failure: {errors[0].message}")
+        location = ".".join(str(part) for part in errors[0].absolute_path)
+        refuse(f"report schema failure at {location or 'root'}: {errors[0].message}")
 
     digest = _digest(report["evidence_manifest_sha256"], "report.evidence_manifest_sha256")
     if _sha256(manifest_data) != digest:
@@ -242,6 +243,14 @@ def verify_bundle(root: Path, output: Path) -> dict[str, Any]:
     adv_doc = _json_bytes((output / "adversarial-results.json").read_bytes(), adv_label)
     if adv_doc.get("schema") != "weaver-adversarial-results-1":
         refuse("unexpected adversarial document schema")
+    baseline = adv_doc.get("baseline")
+    if (
+        not isinstance(baseline, dict)
+        or baseline.get("status") != "PASS"
+        or type(baseline.get("exit_code")) is not int
+        or baseline["exit_code"] != 0
+    ):
+        refuse("adversarial baseline PASS is not bound to zero exit code")
     if adv_doc.get("results") != report["adversarial_results"]:
         refuse("adversarial results differ from verification report")
     cases = report["adversarial_results"]
