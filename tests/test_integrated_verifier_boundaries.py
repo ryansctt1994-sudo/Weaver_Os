@@ -20,7 +20,15 @@ def _good_inputs():
         for name in verify_all.REQUIRED_VERIFIERS
     ]
     adversarial = [
-        {"case_id": f"ADV-{i:03d}", "status": "PASS"} for i in range(1, 7)
+        {
+            "case_id": f"ADV-{i:03d}",
+            "status": "PASS",
+            "expected_verdict": "REJECT",
+            "observed_verdict": "REJECT",
+            "exit_code": 1,
+            "failure_code": "synthetic expected rejection",
+        }
+        for i in range(1, 7)
     ]
     return verifiers, adversarial
 
