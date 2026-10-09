@@ -5,6 +5,7 @@ from __future__ import annotations
 import argparse
 import hashlib
 import json
+import math
 import os
 import platform
 import shutil
@@ -243,11 +244,40 @@ def run_formal_tlc(output: Path) -> dict[str, Any]:
 
 
 def load_adversarial_results(path: Path) -> list[dict[str, Any]]:
+    """Fail closed on ambiguous or nonfinite JSON before verdict admission.
+
+    Malformed input returns no cases; the independent six-case verdict gate
+    must then refuse. This parser does not authenticate the result producer.
+    """
+    def unique_pairs(pairs: list[tuple[str, Any]]) -> dict[str, Any]:
+        result: dict[str, Any] = {}
+        for key, value in pairs:
+            if key in result:
+                raise ValueError(f"duplicate JSON key: {key}")
+            result[key] = value
+        return result
+
+    def finite_float(token: str) -> float:
+        value = float(token)
+        if not math.isfinite(value):
+            raise ValueError(f"nonfinite JSON number: {token}")
+        return value
+
+    def reject_constant(token: str) -> None:
+        raise ValueError(f"nonstandard JSON value: {token}")
+
     try:
-        document = json.loads(path.read_text())
+        document = json.loads(
+            path.read_text(encoding="utf-8"),
+            object_pairs_hook=unique_pairs,
+            parse_float=finite_float,
+            parse_constant=reject_constant,
+        )
+        if not isinstance(document, dict):
+            return []
         results = document["results"]
         return results if isinstance(results, list) else []
-    except (OSError, json.JSONDecodeError, KeyError, TypeError):
+    except (OSError, UnicodeError, ValueError, KeyError, TypeError):
         return []
 
 
