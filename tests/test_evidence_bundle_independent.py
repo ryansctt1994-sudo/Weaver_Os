@@ -5,7 +5,6 @@ from __future__ import annotations
 import hashlib
 import json
 import shutil
-from copy import deepcopy
 from pathlib import Path
 
 import pytest
