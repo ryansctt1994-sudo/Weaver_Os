@@ -13,6 +13,7 @@ import verify_attestations
 @pytest.mark.parametrize("raw", [
     '{"manifest_version":"1.2","manifest_version":"1.3"}',
     '{"outer":{"authority":"O0","authority":"O1"}}',
+    '{"role":"reader","r\\u006fle":"writer"}',
     '{"x":NaN}',
     '{"x":Infinity}',
     '{"x":-Infinity}',
