@@ -94,10 +94,10 @@ def _validate_and_index(snapshot: dict[str, Any]) -> list[dict[str, Any]]:
             raise SnapshotRefusal(f"invalid or duplicate repository: {name}")
         seen_repos.add(name)
         _sha(item["main_sha"], f"{name} main")
-        if item["branch_protected"] not in (True, False, None):
+        if item["branch_protected"] is not None and type(item["branch_protected"]) is not bool:
             raise SnapshotRefusal("branch_protected must be boolean or null")
         rules = item["repository_rulesets"]
-        if rules is not None and (not isinstance(rules, int) or isinstance(rules, bool) or rules < 0):
+        if rules is not None and (type(rules) is not int or rules < 0):
             raise SnapshotRefusal("repository_rulesets must be nonnegative integer or null")
         if type(item["organization_rulesets_checked"]) is not bool:
             raise SnapshotRefusal("organization_rulesets_checked must be boolean")
@@ -184,7 +184,10 @@ def audit_snapshot(snapshot: dict[str, Any]) -> dict[str, Any]:
                     "repository": name,
                     "path": path,
                     "pull_requests": sorted(owners),
-                    "detail": "overlap needs combined source and CI replay, not automatic conflict inference",
+                    "detail": (
+                        "overlap needs combined source and CI replay, "
+                        "not automatic conflict inference"
+                    ),
                 })
     findings.sort(
         key=lambda f: (
