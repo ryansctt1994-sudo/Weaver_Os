@@ -232,3 +232,21 @@ def test_duplicate_adversarial_result_is_refused():
     assert not is_valid_verdict(
         report["verifiers"], report["adversarial_results"], report["wheel_sha256"]
     )
+
+
+@pytest.mark.parametrize(
+    "updates",
+    [
+        {"observed_verdict": "UNEXPECTED_PASS", "exit_code": 0},
+        {"observed_verdict": "REJECT", "exit_code": 0},
+        {"observed_verdict": "REJECT", "exit_code": 1, "failure_code": ""},
+    ],
+)
+def test_adversarial_status_cannot_override_failed_rejection_evidence(schema, updates):
+    report = valid_report()
+    report["adversarial_results"][0].update(updates)
+    assert not is_valid_verdict(
+        report["verifiers"], report["adversarial_results"], report["wheel_sha256"]
+    )
+    with pytest.raises(ValidationError):
+        Draft202012Validator(schema).validate(report)
