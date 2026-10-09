@@ -1,0 +1,60 @@
+name: Exact-commit operator rehearsal
+
+on:
+  pull_request:
+
+permissions:
+  contents: read
+
+jobs:
+  source-replay:
+    name: Detached source operator rehearsal
+    if: github.event.pull_request.head.ref == 'integration/p0-009-reconcile-88-90'
+    runs-on: ubuntu-24.04
+    timeout-minutes: 25
+    env:
+      EXPECTED_SOURCE_SHA: ${{ github.event.pull_request.head.sha }}
+    steps:
+      - name: Check out exact PR source commit detached
+        uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event.pull_request.head.sha }}
+          persist-credentials: false
+
+      - name: Set up locked Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Set up TLC Java runtime
+        uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: "17"
+
+      - name: Install pinned verifier dependencies
+        shell: bash
+        run: |
+          set -euo pipefail
+          mkdir -p "$RUNNER_TEMP/operator-evidence"
+          python -m pip install -r requirements-verification.lock \
+            2>&1 | tee "$RUNNER_TEMP/operator-evidence/dependency-install.log"
+          python -m pip freeze > "$RUNNER_TEMP/operator-evidence/environment.txt"
+
+      - name: Execute exact-source reproduction without witness claim
+        shell: bash
+        run: |
+          set -euo pipefail
+          python -m tools.reproduce_review_candidate \
+            --expected-head "$EXPECTED_SOURCE_SHA" \
+            2>&1 | tee "$RUNNER_TEMP/operator-evidence/local-result.json"
+
+      - name: Retain local result and raw verifier files even on failure
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: operator-rehearsal-${{ github.event.pull_request.head.sha }}
+          path: |
+            ${{ runner.temp }}/operator-evidence/
+            verification-output/
+          if-no-files-found: error

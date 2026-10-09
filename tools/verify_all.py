@@ -5,6 +5,7 @@ from __future__ import annotations
 import argparse
 import hashlib
 import json
+import math
 import os
 import platform
 import shutil
@@ -243,11 +244,40 @@ def run_formal_tlc(output: Path) -> dict[str, Any]:
 
 
 def load_adversarial_results(path: Path) -> list[dict[str, Any]]:
+    """Fail closed on ambiguous or nonfinite JSON before verdict admission.
+
+    Malformed input returns no cases; the independent six-case verdict gate
+    must then refuse. This parser does not authenticate the result producer.
+    """
+    def unique_pairs(pairs: list[tuple[str, Any]]) -> dict[str, Any]:
+        result: dict[str, Any] = {}
+        for key, value in pairs:
+            if key in result:
+                raise ValueError(f"duplicate JSON key: {key}")
+            result[key] = value
+        return result
+
+    def finite_float(token: str) -> float:
+        value = float(token)
+        if not math.isfinite(value):
+            raise ValueError(f"nonfinite JSON number: {token}")
+        return value
+
+    def reject_constant(token: str) -> None:
+        raise ValueError(f"nonstandard JSON value: {token}")
+
     try:
-        document = json.loads(path.read_text())
+        document = json.loads(
+            path.read_text(encoding="utf-8"),
+            object_pairs_hook=unique_pairs,
+            parse_float=finite_float,
+            parse_constant=reject_constant,
+        )
+        if not isinstance(document, dict):
+            return []
         results = document["results"]
         return results if isinstance(results, list) else []
-    except (OSError, json.JSONDecodeError, KeyError, TypeError):
+    except (OSError, UnicodeError, ValueError, KeyError, TypeError):
         return []
 
 
@@ -276,11 +306,21 @@ def build_evidence_manifest(output: Path, wheel: Path | None) -> tuple[dict[str,
         ROOT / "schemas" / "triad_receipt.schema.json",
     ]
     candidates.extend(sorted((ROOT / "tests" / "fixtures" / "verification").glob("*")))
-    candidates.extend(sorted(path for path in output.glob("*") if path.is_file()))
+    # These files are produced after evidence collection and refer to this
+    # manifest. Including a prior run's copies creates stale/self-referential
+    # hashes as soon as the current run overwrites them.
+    generated_reports = {"evidence-manifest.json", "verification-report.json", "report.json"}
+    candidates.extend(
+        sorted(
+            path for path in output.glob("*")
+            if path.is_file() and path.name not in generated_reports
+        )
+    )
     if wheel is not None:
         candidates.append(wheel)
 
     hashes: dict[str, str] = {}
+    sources: dict[str, Path] = {}
     for path in candidates:
         if not path.is_file():
             continue
@@ -288,6 +328,14 @@ def build_evidence_manifest(output: Path, wheel: Path | None) -> tuple[dict[str,
             label = str(path.relative_to(ROOT))
         except ValueError:
             label = path.name
+        # External outputs use basenames. Refuse different files sharing one
+        # evidence key rather than silently replacing an earlier source digest.
+        resolved = path.resolve()
+        if label in sources and sources[label] != resolved:
+            raise ValueError(
+                f"duplicate evidence label {label!r}: {sources[label]} != {resolved}"
+            )
+        sources[label] = resolved
         hashes[label] = sha256_file(path)
 
     manifest = {
@@ -308,17 +356,59 @@ def is_valid_verdict(
     dirty: bool = False,
 ) -> bool:
     """PASS iff every required verifier/case passes for a clean, bound source tree."""
-    if dirty:
+    # A subprocess exit code is a literal integer, not a truthy/falsey value.
+    # Python considers False == 0 and 0.0 == 0; both must refuse here, even
+    # though the later report schema supplies a separate safety check.
+    if (
+        dirty
+        or not isinstance(verifiers, list)
+        or not isinstance(adversarial_results, list)
+        or len(verifiers) != len(REQUIRED_VERIFIERS)
+        or len(adversarial_results) != 6
+        or any(not isinstance(item, dict) for item in verifiers)
+        or any(not isinstance(item, dict) for item in adversarial_results)
+    ):
         return False
-    by_name = {item.get("name"): item for item in verifiers}
+    names = [item.get("name") for item in verifiers]
+    if any(type(name) is not str for name in names):
+        return False
+    by_name = {item["name"]: item for item in verifiers}
     if set(by_name) != set(REQUIRED_VERIFIERS):
         return False
-    if any(by_name[name].get("status") != "PASS" for name in REQUIRED_VERIFIERS):
+    for name in REQUIRED_VERIFIERS:
+        item = by_name[name]
+        steps = item.get("steps")
+        if (
+            item.get("status") != "PASS"
+            or type(item.get("exit_code")) is not int
+            or item["exit_code"] != 0
+        ):
+            return False
+        if not isinstance(steps, list) or not steps:
+            return False
+        if any(
+            not isinstance(step, dict)
+            or step.get("status") != "PASS"
+            or type(step.get("exit_code")) is not int
+            or step["exit_code"] != 0
+            for step in steps
+        ):
+            return False
+    case_ids = [item.get("case_id") for item in adversarial_results]
+    if any(type(case_id) is not str for case_id in case_ids):
         return False
-    case_ids = {item.get("case_id") for item in adversarial_results}
-    if case_ids != {f"ADV-{index:03d}" for index in range(1, 7)}:
+    if set(case_ids) != {f"ADV-{index:03d}" for index in range(1, 7)}:
         return False
-    if any(item.get("status") != "PASS" for item in adversarial_results):
+    if any(
+        item.get("status") != "PASS"
+        or item.get("expected_verdict") != "REJECT"
+        or item.get("observed_verdict") != "REJECT"
+        or type(item.get("exit_code")) is not int
+        or item["exit_code"] == 0
+        or not isinstance(item.get("failure_code"), str)
+        or not item["failure_code"]
+        for item in adversarial_results
+    ):
         return False
     return (
         isinstance(wheel_sha256, str)
@@ -394,7 +484,15 @@ def main() -> int:
                 run_step(
                     "static_analysis_strict",
                     "mypy",
-                    [sys.executable, "-m", "mypy", "."],
+                    [
+                        sys.executable,
+                        "-m",
+                        "mypy",
+                        ".",
+                        "--no-incremental",
+                        "--cache-dir=/dev/null",
+                        "--exclude=^build/",
+                    ],
                     args.output,
                     timeout=300,
                 ),
@@ -463,3 +561,4 @@ def main() -> int:
 
 if __name__ == "__main__":
     raise SystemExit(main())
+

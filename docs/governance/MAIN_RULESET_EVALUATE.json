@@ -1,0 +1,46 @@
+{
+  "name": "main-review-controls-evaluate",
+  "enforcement": "evaluate",
+  "target": "branch",
+  "conditions": {
+    "ref_name": {
+      "include": ["refs/heads/main"],
+      "exclude": []
+    }
+  },
+  "bypass_actors": [],
+  "notes": "Candidate only. Not applied. GitHub rejected enforcement=evaluate on the current plan: Enterprise is required for evaluate mode. Active enforcement was withheld so an unreviewed ruleset cannot block main. This file is not a GitHub ruleset.",
+  "rules": [
+    {"type": "deletion"},
+    {"type": "non_fast_forward"},
+    {
+      "type": "pull_request",
+      "parameters": {
+        "required_approving_review_count": 1,
+        "dismiss_stale_reviews_on_push": true,
+        "require_code_owner_review": false,
+        "require_last_push_approval": false,
+        "required_review_thread_resolution": true
+      }
+    },
+    {
+      "type": "required_status_checks",
+      "parameters": {
+        "strict_required_status_checks_policy": true,
+        "do_not_enforce_on_create": false,
+        "required_status_checks": [
+          {"context": "pytest (3.10)"},
+          {"context": "pytest (3.11)"},
+          {"context": "pytest (3.12)"},
+          {"context": "Test, lint, type-check, and package (3.10)"},
+          {"context": "Test, lint, type-check, and package (3.11)"},
+          {"context": "verify"},
+          {"context": "tlc"},
+          {"context": "Require E3.5 to remain withheld"},
+          {"context": "Emit bounded remote CI spine receipt"},
+          {"context": "test"}
+        ]
+      }
+    }
+  ]
+}

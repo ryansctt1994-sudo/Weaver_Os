@@ -208,7 +208,22 @@
         "fixture": {"type": "string", "minLength": 1},
         "fixture_sha256": {"type": "string", "pattern": "^[0-9a-f]{64}$"},
         "exit_code": {"type": "integer"}
-      }
+      },
+      "allOf": [
+        {
+          "if": {
+            "properties": {"status": {"const": "PASS"}},
+            "required": ["status"]
+          },
+          "then": {
+            "properties": {
+              "observed_verdict": {"const": "REJECT"},
+              "exit_code": {"not": {"const": 0}},
+              "failure_code": {"minLength": 1}
+            }
+          }
+        }
+      ]
     }
   },
   "allOf": [
