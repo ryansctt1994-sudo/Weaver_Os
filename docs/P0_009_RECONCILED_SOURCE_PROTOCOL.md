@@ -54,3 +54,34 @@ No fourth top-level root. MYTHOS · LOGOS · PRAXIS. Human judgment remains in a
 5. Freeze a release only after one accepted reviewed source, exact toolchain and dependency lock, negative controls, and reproducible command output.
 
 **Initial outcome:** SOURCE-ASSEMBLED / VALIDATION-PENDING. This file must not be rewritten merely to make a review gate appear green.
+
+
+## Discovered P0-009 false green (RED preserved)
+
+At the initial combined source head `ea721ff1c9a7e93a337f405f27c0235d061c0ad3`, hosted run
+[`37887781167`](https://github.com/ryansctt1994-sudo/Weaver_Os/actions/runs/37887781167)
+completed SUCCESS even though `verify_attestations.py` terminated at import time:
+
+```text
+ModuleNotFoundError: No module named 'jsonschema'
+EXPECTED_RED_E35_CONFIRMED
+```
+
+The original CI script accepted *any* code 1 as legitimate E3.5 refusal. This is a separate
+false-green attribution defect: `NonzeroExit != ExpectedPolicyRefusal`.
+
+**Repair:** the `e35-hold.yml` job installs the declared version-pinned verification
+dependencies and executes `python -m tools.check_e35_withheld`. Its positive control
+requires the actual local-spine verifier to succeed with all five digest/method PASS
+markers. Its negative control requires E3.5 to exit 1 **with the exact reason and
+`RESULT: E3.5_WITHHELD` marker**, and no traceback or unexpected stderr.
+The machine-readable `e35-output.txt` stores both invoked commands, stdout,
+stderr, exit codes, interpreter and source-head claim for later audit.
+
+The pre-repair E3.5 workflow run is **INVALID AS GOVERNANCE-HOLD EVIDENCE**
+regardless of its GitHub-green label. Neither that defect nor this patch changes
+`W0`, `O0`, release identity, or independent verification.
+
+**New acceptance rule:** the corrected workflow must pass on its new source head,
+and the raw checker receipt must be examined before admitting a bounded E3.5 HOLD
+observation. Do not infer correctness from a GitHub job status alone.
