@@ -276,11 +276,21 @@ def build_evidence_manifest(output: Path, wheel: Path | None) -> tuple[dict[str,
         ROOT / "schemas" / "triad_receipt.schema.json",
     ]
     candidates.extend(sorted((ROOT / "tests" / "fixtures" / "verification").glob("*")))
-    candidates.extend(sorted(path for path in output.glob("*") if path.is_file()))
+    # These files are produced after evidence collection and refer to this
+    # manifest. Including a prior run's copies creates stale/self-referential
+    # hashes as soon as the current run overwrites them.
+    generated_reports = {"evidence-manifest.json", "verification-report.json", "report.json"}
+    candidates.extend(
+        sorted(
+            path for path in output.glob("*")
+            if path.is_file() and path.name not in generated_reports
+        )
+    )
     if wheel is not None:
         candidates.append(wheel)
 
     hashes: dict[str, str] = {}
+    sources: dict[str, Path] = {}
     for path in candidates:
         if not path.is_file():
             continue
@@ -288,6 +298,14 @@ def build_evidence_manifest(output: Path, wheel: Path | None) -> tuple[dict[str,
             label = str(path.relative_to(ROOT))
         except ValueError:
             label = path.name
+        # External outputs use basenames. Refuse different files sharing one
+        # evidence key rather than silently replacing an earlier source digest.
+        resolved = path.resolve()
+        if label in sources and sources[label] != resolved:
+            raise ValueError(
+                f"duplicate evidence label {label!r}: {sources[label]} != {resolved}"
+            )
+        sources[label] = resolved
         hashes[label] = sha256_file(path)
 
     manifest = {
@@ -311,11 +329,22 @@ def is_valid_verdict(
     if dirty:
         return False
     by_name = {item.get("name"): item for item in verifiers}
+    if len(verifiers) != len(REQUIRED_VERIFIERS):
+        return False
     if set(by_name) != set(REQUIRED_VERIFIERS):
         return False
-    if any(by_name[name].get("status") != "PASS" for name in REQUIRED_VERIFIERS):
-        return False
+    for name in REQUIRED_VERIFIERS:
+        item = by_name[name]
+        steps = item.get("steps")
+        if item.get("status") != "PASS" or item.get("exit_code") != 0:
+            return False
+        if not isinstance(steps, list) or not steps:
+            return False
+        if any(step.get("status") != "PASS" or step.get("exit_code") != 0 for step in steps):
+            return False
     case_ids = {item.get("case_id") for item in adversarial_results}
+    if len(adversarial_results) != 6:
+        return False
     if case_ids != {f"ADV-{index:03d}" for index in range(1, 7)}:
         return False
     if any(item.get("status") != "PASS" for item in adversarial_results):
@@ -394,7 +423,15 @@ def main() -> int:
                 run_step(
                     "static_analysis_strict",
                     "mypy",
-                    [sys.executable, "-m", "mypy", "."],
+                    [
+                        sys.executable,
+                        "-m",
+                        "mypy",
+                        ".",
+                        "--no-incremental",
+                        "--cache-dir=/dev/null",
+                        "--exclude=^build/",
+                    ],
                     args.output,
                     timeout=300,
                 ),
@@ -463,3 +500,4 @@ def main() -> int:
 
 if __name__ == "__main__":
     raise SystemExit(main())
+
