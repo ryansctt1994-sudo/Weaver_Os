@@ -14,7 +14,6 @@ import pytest
 
 from tools.witness_rc1_state_adapter import build_envelope
 
-
 COMMAND = (
     Path(__file__).resolve().parents[1]
     / "tests"
