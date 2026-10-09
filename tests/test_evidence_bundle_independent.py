@@ -309,3 +309,43 @@ def test_reported_failure_never_admitted_as_positive_result(tmp_path):
     refresh(root, output, report=report)
     with pytest.raises(BundleRefusal, match="producer overall verdict"):
         verify_bundle(root, output)
+
+
+@pytest.mark.parametrize(
+    "updates",
+    [
+        {"observed_verdict": "UNEXPECTED_PASS", "exit_code": 0},
+        {"observed_verdict": "REJECT", "exit_code": 0},
+        {"observed_verdict": "REJECT", "exit_code": 1, "failure_code": ""},
+    ],
+)
+def test_adversarial_claim_must_match_rejection_even_with_rehashed_bundle(
+    tmp_path, updates
+):
+    root, output = fixture_bundle(tmp_path)
+    adv = json.loads((output / "adversarial-results.json").read_text())
+    adv["results"][0].update(updates)
+    write_json(output / "adversarial-results.json", adv)
+    report = json.loads((output / "verification-report.json").read_text())
+    report["adversarial_results"] = adv["results"]
+    manifest = json.loads((output / "evidence-manifest.json").read_text())
+    manifest["files"]["verification-output/adversarial-results.json"] = sha256(
+        (output / "adversarial-results.json").read_bytes()
+    )
+    refresh(root, output, manifest=manifest, report=report)
+    with pytest.raises(BundleRefusal, match="adversarial"):
+        verify_bundle(root, output)
+
+
+def test_adversarial_baseline_cannot_claim_pass_after_failed_command(tmp_path):
+    root, output = fixture_bundle(tmp_path)
+    adv = json.loads((output / "adversarial-results.json").read_text())
+    adv["baseline"]["exit_code"] = 4
+    write_json(output / "adversarial-results.json", adv)
+    manifest = json.loads((output / "evidence-manifest.json").read_text())
+    manifest["files"]["verification-output/adversarial-results.json"] = sha256(
+        (output / "adversarial-results.json").read_bytes()
+    )
+    refresh(root, output, manifest=manifest)
+    with pytest.raises(BundleRefusal, match="baseline"):
+        verify_bundle(root, output)
