@@ -53,7 +53,7 @@ def test_wrong_or_ambiguous_source_ref_refused(detached_repo, head):
 
 def test_attached_branch_is_not_frozen(detached_repo):
     root, head = detached_repo
-    git(root, "checkout", "-q", "master")
+    git(root, "checkout", "-q", "-b", "attached")
     with pytest.raises(operator.ReproductionRefusal, match="detached"):
         operator.preflight(root, head)
 
