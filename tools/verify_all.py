@@ -276,7 +276,16 @@ def build_evidence_manifest(output: Path, wheel: Path | None) -> tuple[dict[str,
         ROOT / "schemas" / "triad_receipt.schema.json",
     ]
     candidates.extend(sorted((ROOT / "tests" / "fixtures" / "verification").glob("*")))
-    candidates.extend(sorted(path for path in output.glob("*") if path.is_file()))
+    # These files are produced after evidence collection and refer to this
+    # manifest. Including a prior run's copies creates stale/self-referential
+    # hashes as soon as the current run overwrites them.
+    generated_reports = {"evidence-manifest.json", "verification-report.json", "report.json"}
+    candidates.extend(
+        sorted(
+            path for path in output.glob("*")
+            if path.is_file() and path.name not in generated_reports
+        )
+    )
     if wheel is not None:
         candidates.append(wheel)
 
@@ -463,3 +472,4 @@ def main() -> int:
 
 if __name__ == "__main__":
     raise SystemExit(main())
+
