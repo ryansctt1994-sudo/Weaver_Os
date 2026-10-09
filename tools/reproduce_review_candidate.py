@@ -189,7 +189,9 @@ def reproduce(root: Path, expected_head: str) -> dict[str, Any]:
 
 def main(argv: list[str] | None = None) -> int:
     parser = argparse.ArgumentParser(description=__doc__)
-    parser.add_argument("--expected-head", required=True, help="Full frozen SHA from outside checkout")
+    parser.add_argument(
+        "--expected-head", required=True, help="Full frozen SHA from outside checkout"
+    )
     args = parser.parse_args(argv)
     root = Path(__file__).resolve().parents[1]
     try:
