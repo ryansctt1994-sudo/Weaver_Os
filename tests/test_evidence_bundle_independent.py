@@ -108,7 +108,7 @@ def fixture_bundle(tmp_path: Path, outside: bool = False) -> tuple[Path, Path]:
 
     adv_doc = {
         "schema": "weaver-adversarial-results-1",
-        "baseline": {"status": "PASS"},
+        "baseline": {"name": "valid-ledger", "status": "PASS", "exit_code": 0},
         "results": cases,
         "status": "PASS",
     }
