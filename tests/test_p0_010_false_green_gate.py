@@ -73,13 +73,13 @@ def test_false_green_exit_code_substitutions_refused(scope: str, bad: Any):
 def test_malformed_gate_inputs_refuse_without_crashing(mutant: str):
     verifiers, cases = good_inputs()
     if mutant == "null_verifier":
-        verifiers[0] = None  # type: ignore[assignment]
+        verifiers[0] = None  # type: ignore[call-overload]
     elif mutant == "non_mapping_step":
         verifiers[0]["steps"][0] = None
     elif mutant == "unhashable_verifier_name":
         verifiers[0]["name"] = ["not-a-string"]
     elif mutant == "null_case":
-        cases[0] = None  # type: ignore[assignment]
+        cases[0] = None  # type: ignore[call-overload]
     elif mutant == "unhashable_case_id":
         cases[0]["case_id"] = ["not-a-string"]
     elif mutant == "non_list_verifiers":
