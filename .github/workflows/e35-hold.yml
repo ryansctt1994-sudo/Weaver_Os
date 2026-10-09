@@ -31,6 +31,8 @@ jobs:
           python3 tools/fail_closed_spine.py --tamper
 
       - name: Prove that the E3.5 verifier actually ran and withheld
+        env:
+          WEAVER_SOURCE_HEAD_SHA: ${{ github.event.pull_request.head.sha || github.sha }}
         run: |
           python -m tools.check_e35_withheld --output e35-output.txt
 
