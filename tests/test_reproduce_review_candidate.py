@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 import json
+import os
 import subprocess
 from pathlib import Path
 from typing import Any
@@ -203,3 +204,115 @@ def test_source_change_during_execution_refused(detached_repo, monkeypatch):
     with pytest.raises(operator.ReproductionRefusal, match="dirty"):
         operator.reproduce(root, head)
     assert len(commands) == 1
+
+
+@pytest.mark.parametrize("flag", ["--assume-unchanged", "--skip-worktree"])
+def test_index_flags_cannot_hide_modified_tracked_bytes(detached_repo, flag):
+    root, head = detached_repo
+    git(root, "update-index", flag, "requirements-verification.lock")
+    (root / "requirements-verification.lock").write_text("substituted dependencies\n")
+    assert git(root, "status", "--porcelain=v1", "--untracked-files=all") == ""
+    with pytest.raises(operator.ReproductionRefusal, match="tracked source"):
+        operator.preflight(root, head)
+
+
+def test_index_flags_alone_do_not_change_source_identity(detached_repo):
+    root, head = detached_repo
+    git(root, "update-index", "--assume-unchanged", "requirements-verification.lock")
+    assert operator.preflight(root, head) == head
+
+
+def test_hidden_source_change_during_execution_is_refused(detached_repo, monkeypatch):
+    root, head = detached_repo
+    git(root, "update-index", "--assume-unchanged", "requirements-verification.lock")
+    scripted_verifier(monkeypatch, root, head)
+    original_run = operator.subprocess.run
+
+    def mutate(command, *args, **kwargs):
+        result = original_run(command, *args, **kwargs)
+        if command[1:3] == ["-m", "tools.verify_all"]:
+            (root / "requirements-verification.lock").write_text("hidden mutation\n")
+        return result
+
+    monkeypatch.setattr(operator.subprocess, "run", mutate)
+    with pytest.raises(operator.ReproductionRefusal, match="tracked source"):
+        operator.reproduce(root, head)
+
+
+def test_ignored_executable_mode_change_is_refused(detached_repo):
+    root, head = detached_repo
+    git(root, "config", "core.filemode", "false")
+    path = root / "tools/reproduce_review_candidate.py"
+    path.chmod(path.stat().st_mode | 0o111)
+    assert git(root, "status", "--porcelain=v1") == ""
+    with pytest.raises(operator.ReproductionRefusal, match="tracked source"):
+        operator.preflight(root, head)
+
+
+def test_hidden_symlink_substitution_is_refused(detached_repo, tmp_path):
+    root, head = detached_repo
+    path = root / "requirements-verification.lock"
+    target = tmp_path / "same-bytes.lock"
+    target.write_bytes(path.read_bytes())
+    git(root, "update-index", "--assume-unchanged", path.name)
+    path.unlink()
+    path.symlink_to(target)
+    with pytest.raises(operator.ReproductionRefusal, match="tracked source"):
+        operator.preflight(root, head)
+
+
+def test_hidden_missing_tracked_file_is_refused(detached_repo):
+    root, head = detached_repo
+    git(root, "update-index", "--skip-worktree", "requirements-verification.lock")
+    (root / "requirements-verification.lock").unlink()
+    with pytest.raises(operator.ReproductionRefusal, match="tracked source"):
+        operator.preflight(root, head)
+
+
+def test_exact_bytes_are_required_even_when_git_ignores_crlf(detached_repo):
+    root, _ = detached_repo
+    path = root / "vector.txt"
+    path.write_bytes(b"one\ntwo\n")
+    (root / ".gitattributes").write_text("vector.txt text\n")
+    git(root, "add", ".")
+    git(root, "-c", "commit.gpgsign=false", "commit", "-qm", "text conversion fixture")
+    head = git(root, "rev-parse", "HEAD")
+    path.write_bytes(b"one\r\ntwo\r\n")
+    git(root, "add", "vector.txt")  # clean filter retains the original LF blob
+    assert git(root, "status", "--porcelain=v1") == ""
+    with pytest.raises(operator.ReproductionRefusal, match="tracked source"):
+        operator.preflight(root, head)
+
+
+def test_unusual_tracked_filenames_round_trip(detached_repo):
+    root, _ = detached_repo
+    (root / "space and\ttab\nname.txt").write_text("tracked\n")
+    git(root, "add", ".")
+    git(root, "-c", "commit.gpgsign=false", "commit", "-qm", "NUL-delimited path fixture")
+    head = git(root, "rev-parse", "HEAD")
+    assert operator.preflight(root, head) == head
+
+
+@pytest.mark.skipif(os.name != "posix", reason="FIFO fixture requires POSIX")
+def test_hidden_fifo_is_refused_without_opening_it(detached_repo):
+    root, head = detached_repo
+    path = root / "requirements-verification.lock"
+    git(root, "update-index", "--assume-unchanged", path.name)
+    path.unlink()
+    os.mkfifo(path)
+    with pytest.raises(operator.ReproductionRefusal, match="tracked source"):
+        operator.preflight(root, head)
+
+
+def test_git_replace_cannot_rebind_the_pinned_commit(detached_repo):
+    root, head = detached_repo
+    (root / "requirements-verification.lock").write_text("replacement bytes\n")
+    git(root, "add", ".")
+    git(root, "-c", "commit.gpgsign=false", "commit", "-qm", "replacement tree")
+    replacement = git(root, "rev-parse", "HEAD")
+    git(root, "replace", head, replacement)
+    git(root, "checkout", "-q", "--detach", head)
+    assert git(root, "status", "--porcelain=v1") == ""
+    assert git(root, "rev-parse", "HEAD") == head
+    with pytest.raises(operator.ReproductionRefusal):
+        operator.preflight(root, head)

@@ -16,9 +16,10 @@ import json
 import os
 import platform
 import re
+import stat
 import subprocess
 import sys
-from pathlib import Path
+from pathlib import Path, PurePosixPath
 from typing import Any
 
 from tools.verify_evidence_bundle import verify_bundle
@@ -36,17 +37,67 @@ class ReproductionRefusal(ValueError):
 def _git(root: Path, *args: str) -> str:
     try:
         result = subprocess.run(
-            ["git", "-C", str(root), *args],
+            ["git", "--no-replace-objects", "-C", str(root), *args],
             capture_output=True,
             text=True,
             timeout=20,
             check=False,
         )
-    except (OSError, subprocess.TimeoutExpired) as exc:
+    except (OSError, UnicodeError, subprocess.TimeoutExpired) as exc:
         raise ReproductionRefusal(f"git command unavailable: {args!r}") from exc
     if type(result.returncode) is not int or result.returncode != 0:
         raise ReproductionRefusal(f"git command refused: {args!r}")
     return result.stdout.strip()
+
+
+def _verify_tracked_source(root: Path, expected_head: str) -> None:
+    """Compare raw worktree bytes to commit blobs without consulting index flags.
+
+    This exact-source profile admits ordinary files only. Symlinks, gitlinks,
+    missing files, clean-filter conversions, and executable-mode drift refuse.
+    It is a pre/post snapshot check, not an atomic or sandboxed execution proof.
+    """
+    listing = _git(root, "ls-tree", "-r", "-z", "--full-tree", expected_head)
+    if not listing or not listing.endswith("\0"):
+        raise ReproductionRefusal("tracked source tree is empty or malformed")
+    for entry in listing[:-1].split("\0"):
+        metadata, separator, name = entry.partition("\t")
+        fields = metadata.split(" ")
+        relative = PurePosixPath(name)
+        if (
+            not separator
+            or len(fields) != 3
+            or not name
+            or relative.is_absolute()
+            or relative.as_posix() != name
+            or ".." in relative.parts
+            or "\\" in name
+        ):
+            raise ReproductionRefusal("tracked source tree contains an unsafe entry")
+        mode, kind, expected_blob = fields
+        if kind != "blob" or mode not in {"100644", "100755"}:
+            raise ReproductionRefusal(f"unsupported tracked source type: {name!r}")
+        if SHA_RE.fullmatch(expected_blob) is None:
+            raise ReproductionRefusal("tracked source blob identity is malformed")
+        path = root.joinpath(*relative.parts)
+        try:
+            parent = root
+            for part in relative.parts[:-1]:
+                parent = parent / part
+                if not stat.S_ISDIR(parent.lstat().st_mode):
+                    raise ReproductionRefusal(f"unsafe tracked source parent: {name!r}")
+            info = path.lstat()
+            if not stat.S_ISREG(info.st_mode):
+                raise ReproductionRefusal(f"nonregular tracked source file: {name!r}")
+            if bool(info.st_mode & 0o111) != (mode == "100755"):
+                raise ReproductionRefusal(f"tracked source executable mode differs: {name!r}")
+            data = path.read_bytes()
+        except OSError as exc:
+            raise ReproductionRefusal(f"tracked source file unavailable: {name!r}") from exc
+        # Git SHA-1 object IDs bind a type/length header and the raw blob bytes.
+        actual_blob = hashlib.sha1(b"blob " + str(len(data)).encode() + b"\0" + data).hexdigest()
+        if actual_blob != expected_blob:
+            raise ReproductionRefusal(f"tracked source bytes differ: {name!r}")
 
 
 def preflight(root: Path, expected_head: str) -> str:
@@ -60,8 +111,6 @@ def preflight(root: Path, expected_head: str) -> str:
     actual = _git(root, "rev-parse", "--verify", "HEAD")
     if actual != expected_head:
         raise ReproductionRefusal(f"source mismatch: {actual} != {expected_head}")
-    if _git(root, "symbolic-ref", "--quiet", "--short", "HEAD") if False else False:
-        raise AssertionError("unreachable")
     # A symbolic ref exists only for an attached branch.
     attached = subprocess.run(
         ["git", "-C", str(root), "symbolic-ref", "-q", "HEAD"],
@@ -76,6 +125,7 @@ def preflight(root: Path, expected_head: str) -> str:
         raise ReproductionRefusal("source must be checked out detached at exact commit")
     if _git(root, "status", "--porcelain=v1", "--untracked-files=all"):
         raise ReproductionRefusal("source checkout is dirty or contains untracked files")
+    _verify_tracked_source(root, expected_head)
     return actual
 
 
@@ -164,6 +214,7 @@ def reproduce(root: Path, expected_head: str) -> dict[str, Any]:
         "source": {
             "expected_commit_sha": expected_head,
             "observed_commit_sha": checked,
+            "tracked_source_binding": "GIT_BLOB_BYTES_AND_EXECUTABLE_MODE_PRE_POST",
             "tool_sha256": _sha256(root / "tools/reproduce_review_candidate.py"),
             "lockfile_sha256": _sha256(root / "requirements-verification.lock"),
         },
