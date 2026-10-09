@@ -290,6 +290,7 @@ def build_evidence_manifest(output: Path, wheel: Path | None) -> tuple[dict[str,
         candidates.append(wheel)
 
     hashes: dict[str, str] = {}
+    sources: dict[str, Path] = {}
     for path in candidates:
         if not path.is_file():
             continue
@@ -297,6 +298,14 @@ def build_evidence_manifest(output: Path, wheel: Path | None) -> tuple[dict[str,
             label = str(path.relative_to(ROOT))
         except ValueError:
             label = path.name
+        # External outputs use basenames. Refuse different files sharing one
+        # evidence key rather than silently replacing an earlier source digest.
+        resolved = path.resolve()
+        if label in sources and sources[label] != resolved:
+            raise ValueError(
+                f"duplicate evidence label {label!r}: {sources[label]} != {resolved}"
+            )
+        sources[label] = resolved
         hashes[label] = sha256_file(path)
 
     manifest = {
