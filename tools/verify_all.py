@@ -326,26 +326,48 @@ def is_valid_verdict(
     dirty: bool = False,
 ) -> bool:
     """PASS iff every required verifier/case passes for a clean, bound source tree."""
-    if dirty:
+    # A subprocess exit code is a literal integer, not a truthy/falsey value.
+    # Python considers False == 0 and 0.0 == 0; both must refuse here, even
+    # though the later report schema supplies a separate safety check.
+    if (
+        dirty
+        or not isinstance(verifiers, list)
+        or not isinstance(adversarial_results, list)
+        or len(verifiers) != len(REQUIRED_VERIFIERS)
+        or len(adversarial_results) != 6
+        or any(not isinstance(item, dict) for item in verifiers)
+        or any(not isinstance(item, dict) for item in adversarial_results)
+    ):
         return False
-    by_name = {item.get("name"): item for item in verifiers}
-    if len(verifiers) != len(REQUIRED_VERIFIERS):
+    names = [item.get("name") for item in verifiers]
+    if any(type(name) is not str for name in names):
         return False
+    by_name = {item["name"]: item for item in verifiers}
     if set(by_name) != set(REQUIRED_VERIFIERS):
         return False
     for name in REQUIRED_VERIFIERS:
         item = by_name[name]
         steps = item.get("steps")
-        if item.get("status") != "PASS" or item.get("exit_code") != 0:
+        if (
+            item.get("status") != "PASS"
+            or type(item.get("exit_code")) is not int
+            or item["exit_code"] != 0
+        ):
             return False
         if not isinstance(steps, list) or not steps:
             return False
-        if any(step.get("status") != "PASS" or step.get("exit_code") != 0 for step in steps):
+        if any(
+            not isinstance(step, dict)
+            or step.get("status") != "PASS"
+            or type(step.get("exit_code")) is not int
+            or step["exit_code"] != 0
+            for step in steps
+        ):
             return False
-    case_ids = {item.get("case_id") for item in adversarial_results}
-    if len(adversarial_results) != 6:
+    case_ids = [item.get("case_id") for item in adversarial_results]
+    if any(type(case_id) is not str for case_id in case_ids):
         return False
-    if case_ids != {f"ADV-{index:03d}" for index in range(1, 7)}:
+    if set(case_ids) != {f"ADV-{index:03d}" for index in range(1, 7)}:
         return False
     if any(
         item.get("status") != "PASS"
