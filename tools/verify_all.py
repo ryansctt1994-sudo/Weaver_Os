@@ -347,7 +347,16 @@ def is_valid_verdict(
         return False
     if case_ids != {f"ADV-{index:03d}" for index in range(1, 7)}:
         return False
-    if any(item.get("status") != "PASS" for item in adversarial_results):
+    if any(
+        item.get("status") != "PASS"
+        or item.get("expected_verdict") != "REJECT"
+        or item.get("observed_verdict") != "REJECT"
+        or type(item.get("exit_code")) is not int
+        or item["exit_code"] == 0
+        or not isinstance(item.get("failure_code"), str)
+        or not item["failure_code"]
+        for item in adversarial_results
+    ):
         return False
     return (
         isinstance(wheel_sha256, str)
