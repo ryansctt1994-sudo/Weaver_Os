@@ -112,9 +112,10 @@ def fixture_bundle(tmp_path: Path, outside: bool = False) -> tuple[Path, Path]:
         "status": "PASS",
     }
     write_json(output / "adversarial-results.json", adv_doc)
-    files["adversarial-results.json" if outside else "verification-output/adversarial-results.json"] = (
-        sha256((output / "adversarial-results.json").read_bytes())
+    adv_label = "adversarial-results.json" if outside else (
+        "verification-output/adversarial-results.json"
     )
+    files[adv_label] = sha256((output / "adversarial-results.json").read_bytes())
     manifest = {"schema": "weaver-evidence-manifest-1", "files": dict(sorted(files.items()))}
     write_json(output / "evidence-manifest.json", manifest)
     commands = [
