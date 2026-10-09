@@ -6,7 +6,6 @@ reproduction, witness admission, source authentication, or merge permission.
 
 from __future__ import annotations
 
-import json
 from pathlib import Path
 
 import pytest
