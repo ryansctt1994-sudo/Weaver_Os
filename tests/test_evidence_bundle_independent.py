@@ -6,6 +6,7 @@ import hashlib
 import json
 import shutil
 from pathlib import Path
+from typing import Any
 
 import pytest
 
@@ -58,7 +59,7 @@ def fixture_bundle(tmp_path: Path, outside: bool = False) -> tuple[Path, Path]:
         "dist/local_fixture.whl": sha256(wheel.read_bytes()),
     }
 
-    verifiers = []
+    verifiers: list[dict[str, Any]] = []
     for name in VERIFIERS:
         log = f"{name}--run.log"
         log_path = output / log
