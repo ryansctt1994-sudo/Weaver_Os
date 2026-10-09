@@ -1,0 +1,119 @@
+{
+  "schema": "weaver-pr-review-snapshot-v1",
+  "observed_date": "2026-10-09",
+  "source": "provider-metadata-as-observed",
+  "repositories": [
+    {
+      "repository": "ryansctt1994-sudo/Weaver_Os",
+      "main_sha": "50ffc20917e4ca2748f3f647acaec23b3f724855",
+      "branch_protected": false,
+      "repository_rulesets": 0,
+      "organization_rulesets_checked": false,
+      "pull_requests": [
+        {
+          "number": 80,
+          "head_sha": "d0773c4c7d5172a69ca06acf18514421e2df99a7",
+          "base_sha": "50ffc20917e4ca2748f3f647acaec23b3f724855",
+          "state": "open",
+          "draft": false,
+          "merged": false,
+          "files": [
+            "docs/maintenance/2026-10-07-inventory.json",
+            "docs/maintenance/2026-10-07-review.md",
+            "tests/test_verification_report.py",
+            "tools/verify_all.py"
+          ]
+        },
+        {
+          "number": 82,
+          "head_sha": "0c3432fc37aad4c887aa2c813f5715ffc5c49367",
+          "base_sha": "50ffc20917e4ca2748f3f647acaec23b3f724855",
+          "state": "open",
+          "draft": true,
+          "merged": false,
+          "files": [
+            "docs/P0_002_UPSTREAM_REPAIR_CROSSWALK.md",
+            "tests/test_p0_002_rc1_action_boundary.py"
+          ]
+        },
+        {
+          "number": 83,
+          "head_sha": "6422531c14bb00f708c25b394a703b52b95285c1",
+          "base_sha": "50ffc20917e4ca2748f3f647acaec23b3f724855",
+          "state": "open",
+          "draft": true,
+          "merged": false,
+          "files": [
+            "tests/test_evidence_manifest_label_collisions.py",
+            "tests/test_evidence_manifest_rerun.py",
+            "tools/verify_all.py"
+          ]
+        },
+        {
+          "number": 84,
+          "head_sha": "2a7a77aaa2a078d3e95be24c7cee6361cf5e0af8",
+          "base_sha": "50ffc20917e4ca2748f3f647acaec23b3f724855",
+          "state": "open",
+          "draft": true,
+          "merged": false,
+          "files": [
+            ".github/workflows/verification.yml",
+            "docs/P0_004_EVIDENCE_BUNDLE_VERIFIER.md",
+            "tests/test_evidence_bundle_independent.py",
+            "tools/verify_evidence_bundle.py"
+          ]
+        }
+      ]
+    },
+    {
+      "repository": "ryansctt1994-sudo/Lumen",
+      "main_sha": "4efe4145059520f8ffa68c2374860f841879ce6e",
+      "branch_protected": false,
+      "repository_rulesets": 0,
+      "organization_rulesets_checked": false,
+      "pull_requests": [
+        {
+          "number": 4,
+          "head_sha": "2cee68b4ecc13021636c1721bb26d4c9072c7f55",
+          "base_sha": "4efe4145059520f8ffa68c2374860f841879ce6e",
+          "state": "open",
+          "draft": false,
+          "merged": false,
+          "files": [
+            "docs/VALIDATION.md",
+            "scripts/generate_e3_receipt.py",
+            "src/lumen/authority/verifier.py",
+            "src/lumen/receipt.py",
+            "src/lumen/replay_cache/sqlite_replay.py",
+            "tests/test_receipt_binding.py",
+            "tests/test_replay_single_writer.py"
+          ]
+        }
+      ]
+    },
+    {
+      "repository": "ryansctt1994-sudo/cathedral-verified",
+      "main_sha": "1c4181714b48dd9d9616a0bebbb4fef8532deff8",
+      "branch_protected": false,
+      "repository_rulesets": 0,
+      "organization_rulesets_checked": false,
+      "pull_requests": [
+        {
+          "number": 9,
+          "head_sha": "9e8eca3f7b750523edafb75aada4e9b40ff7d7c1",
+          "base_sha": "1c4181714b48dd9d9616a0bebbb4fef8532deff8",
+          "state": "open",
+          "draft": true,
+          "merged": false,
+          "files": [
+            ".github/workflows/ci.yml",
+            "chronicle/HARDENING_SCOPE.md",
+            "chronicle/chronicle.py",
+            "chronicle/test_chronicle.py",
+            "chronicle/test_chronicle_hardening.py"
+          ]
+        }
+      ]
+    }
+  ]
+}
