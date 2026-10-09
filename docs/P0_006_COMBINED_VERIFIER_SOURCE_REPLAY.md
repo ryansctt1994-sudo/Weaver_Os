@@ -21,3 +21,26 @@ python -m mypy .
 Check hosted CI **at this exact combined head** before any merge consideration. Separate green PRs do not imply an integrated green result. This does not include the distinct consumer-side PR #84.
 
 **Status E2; W0; O0 WITHHELD; production PROHIBITED.**
+
+## Additional consumer-side integration: PR #84
+
+The same review branch also transfers the **read-only** verifier from
+[PR #84](https://github.com/ryansctt1994-sudo/Weaver_Os/pull/84) at exact head
+`2a7a77aaa2a078d3e95be24c7cee6361cf5e0af8`:
+
+- `tools/verify_evidence_bundle.py`: standalone byte-level validation of final
+  manifests, outputs, logs and related report fields.
+- `tests/test_evidence_bundle_independent.py`: negative tests for tampering,
+  missing artifacts, dangerous paths and forged report fields.
+- `docs/P0_004_EVIDENCE_BUNDLE_VERIFIER.md`: bounded trust model.
+- `.github/workflows/verification.yml`: run the independent verifier only
+  after the complete existing verification producer.
+
+The composite therefore tests producer-side verdict guards, producer-side
+manifest integrity, and consumer-side bundle checking on **one commit**.
+Neither PR #84 nor its release authority is promoted or merged. No authenticated
+independent witness has been acquired.
+
+The producer/consumer full workflow must pass on this combined head. The
+consumer reports only locally consistent bytes; it is not a trusted
+attestation, nor is the reviewed composite a production release.
