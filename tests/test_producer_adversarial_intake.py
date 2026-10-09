@@ -22,10 +22,13 @@ def _cases() -> list[dict[str, object]]:
 
 def test_overflow_does_not_yield_passable_results(tmp_path: Path) -> None:
     path = tmp_path / "adversarial-results.json"
+    document = {
+        "schema": "weaver-adversarial-results-1",
+        "elapsed": 1,
+        "results": _cases(),
+    }
     path.write_text(
-        json.dumps({"schema": "weaver-adversarial-results-1", "elapsed": 1, "results": _cases()}).replace(
-            '"elapsed": 1', '"elapsed": 1e999'
-        ),
+        json.dumps(document).replace('"elapsed": 1', '"elapsed": 1e999'),
         encoding="utf-8",
     )
     assert load_adversarial_results(path) == []
