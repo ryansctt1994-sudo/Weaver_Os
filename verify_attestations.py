@@ -15,6 +15,7 @@ from __future__ import annotations
 
 import argparse
 import json
+import math
 import sys
 from pathlib import Path
 from typing import Any
@@ -49,6 +50,13 @@ def _reject_nonfinite(token: str) -> Any:
     raise ValueError(f"NONFINITE_JSON_CONSTANT:{token}")
 
 
+def _finite_float(token: str) -> float:
+    value = float(token)
+    if not math.isfinite(value):
+        raise ValueError(f"NONFINITE_JSON_NUMBER:{token}")
+    return value
+
+
 def load_json(path: Path) -> Any:
     if not path.exists():
         raise VerificationError(f"MISSING_ARTIFACT:{path.name}")
@@ -57,6 +65,7 @@ def load_json(path: Path) -> Any:
             path.read_text(encoding="utf-8"),
             object_pairs_hook=_unique_object,
             parse_constant=_reject_nonfinite,
+            parse_float=_finite_float,
         )
     except (ValueError, UnicodeError) as exc:
         raise VerificationError(f"INVALID_JSON:{path.name}:{exc}") from exc

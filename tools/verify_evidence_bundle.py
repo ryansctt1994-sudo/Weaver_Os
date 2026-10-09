@@ -10,6 +10,7 @@ from __future__ import annotations
 import argparse
 import hashlib
 import json
+import math
 import re
 import sys
 from pathlib import Path, PurePosixPath
@@ -47,12 +48,20 @@ def _pairs(items: list[tuple[str, Any]]) -> dict[str, Any]:
     return result
 
 
+def _finite_float(token: str) -> float:
+    value = float(token)
+    if not math.isfinite(value):
+        refuse(f"non-finite JSON number: {token}")
+    return value
+
+
 def _json_bytes(data: bytes, origin: str) -> dict[str, Any]:
     try:
         value = json.loads(
             data,
             object_pairs_hook=_pairs,
             parse_constant=lambda value: refuse(f"non-finite JSON value: {value}"),
+            parse_float=_finite_float,
         )
     except (UnicodeDecodeError, ValueError) as exc:
         refuse(f"invalid JSON in {origin}: {exc}")
