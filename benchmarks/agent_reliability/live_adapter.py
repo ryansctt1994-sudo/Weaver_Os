@@ -16,19 +16,23 @@ import sys
 from dataclasses import dataclass, field
 from datetime import datetime, timedelta, timezone
 from pathlib import Path
-from typing import Any
 
 from cryptography.hazmat.primitives import serialization
 from cryptography.hazmat.primitives.asymmetric import ed25519
 from triadic_controls.crypto.replay import InMemoryReplayCache
-from triadic_controls.crypto.verifier import CryptoVerifier, build_signing_object, compute_payload_hash
+from triadic_controls.crypto.verifier import (
+    CryptoVerifier,
+    build_signing_object,
+    compute_payload_hash,
+)
 
 from .portable import evaluate, make_cases, sha
 
 ISSUER_ID = "11111111-1111-4111-8111-111111111111"
 KEY_ID = "22222222-2222-4222-8222-222222222222"
 SYSTEM_ID = "weaver-observer-fixture"
-TEST_PRIVATE_KEY = bytes.fromhex("37" * 32)  # Published, fixed TEST FIXTURE seed. NEVER a trusted key.
+# Published, fixed TEST FIXTURE seed. NEVER a trusted key.
+TEST_PRIVATE_KEY = bytes.fromhex("37" * 32)
 PROTOCOL = "weaver-dry-observer-v0.3"
 FROZEN_V02 = {
     "commit": "d72737d7fa51704e2af3d222ecc321e4839770c6",
@@ -80,7 +84,8 @@ class LiveSession:
             "valid_from": iso(now - timedelta(hours=1)),
             "valid_until": iso(now + timedelta(hours=1)),
             "issuers": [{"issuer_id": ISSUER_ID, "key_id": KEY_ID, "public_key": b64(public),
-                         "public_key_encoding": "base64url", "key_type": "ed25519", "status": "ACTIVE",
+                         "public_key_encoding": "base64url", "key_type": "ed25519",
+                         "status": "ACTIVE",
                          "issued_at": iso(now - timedelta(hours=1)),
                          "expires_at": iso(now + timedelta(hours=1)),
                          "assigned_roles": ["fixture-issuer"]}],
@@ -88,7 +93,8 @@ class LiveSession:
                        "may_grant_authority": True, "may_revoke_or_refuse": True,
                        "max_grant_level": 3, "can_participate_in_quorum": True,
                        "allowed_scopes": {"systems": [SYSTEM_ID], "regions": ["offline"],
-                                          "tasks": ["dry-run"], "max_authority_duration_sec": 1800}}],
+                                          "tasks": ["dry-run"],
+                                          "max_authority_duration_sec": 1800}}],
         }
         # No production schema or trusted registry-root signature is supplied.
         self.verifier = CryptoVerifier(registry, InMemoryReplayCache())
@@ -114,22 +120,32 @@ class LiveSession:
     def issue(self, grant_id: str, claim: dict, *, corrupt_signature: bool = False) -> IssueResult:
         payload = {"grant_id": grant_id, "system_id": SYSTEM_ID, "authority_level": 3,
                    "scope": {"task": "dry-run", "region": "offline"}, **copy.deepcopy(claim)}
-        envelope = self._envelope(payload, "AUTHORITY_TOKEN", f"issue:{grant_id}", corrupt_signature)
-        result = self.verifier.verify_authority_token(envelope, requested_level=3, inner_payload=payload)
+        envelope = self._envelope(
+            payload, "AUTHORITY_TOKEN", f"issue:{grant_id}", corrupt_signature
+        )
+        result = self.verifier.verify_authority_token(
+            envelope, requested_level=3, inner_payload=payload
+        )
         if result.is_valid and grant_id not in self.issued and grant_id not in self.revoked:
             self.issued[grant_id] = copy.deepcopy(payload)
             return IssueResult(True, [])
-        return IssueResult(False, result.failure_codes if not result.is_valid else ["DUPLICATE_GRANT"])
+        codes = result.failure_codes if not result.is_valid else ["DUPLICATE_GRANT"]
+        return IssueResult(False, codes)
 
     def revoke(self, grant_id: str, *, corrupt_signature: bool = False) -> IssueResult:
         payload = {"grant_id": grant_id, "system_id": SYSTEM_ID,
                    "scope": {"task": "dry-run", "region": "offline"}}
-        envelope = self._envelope(payload, "REFUSAL_SIGNAL", f"revoke:{grant_id}", corrupt_signature)
-        result = self.verifier.verify_refusal_signal(envelope, requested_cap_level=3, inner_payload=payload)
+        envelope = self._envelope(
+            payload, "REFUSAL_SIGNAL", f"revoke:{grant_id}", corrupt_signature
+        )
+        result = self.verifier.verify_refusal_signal(
+            envelope, requested_cap_level=3, inner_payload=payload
+        )
         if result.is_valid and grant_id in self.issued:
             self.revoked.add(grant_id)
             return IssueResult(True, [])
-        return IssueResult(False, result.failure_codes if not result.is_valid else ["UNKNOWN_GRANT"])
+        codes = result.failure_codes if not result.is_valid else ["UNKNOWN_GRANT"]
+        return IssueResult(False, codes)
 
     def attempt(self, case_id: str, grant_id: str, request: dict, *,
                 now: int = 100, epoch: int = 2, evidence_available: bool = True) -> dict:
@@ -147,7 +163,11 @@ class LiveSession:
             reason = "grant_absent"
         elif grant_id in self.revoked:
             reason = "grant_revoked"
-        elif claim.get("expires_at") is None or type(claim["expires_at"]) is not int or now > claim["expires_at"]:
+        elif (
+            claim.get("expires_at") is None
+            or type(claim["expires_at"]) is not int
+            or now > claim["expires_at"]
+        ):
             reason = "expired"
         elif claim.get("epoch") != epoch:
             reason = "epoch_mismatch"
@@ -212,9 +232,10 @@ def observe_in_subprocess(events: list[dict], *, script: Path | None = None) -> 
     worker = script if script is not None else Path(__file__).with_name("observer_worker.py")
     wire = json.dumps({"protocol": PROTOCOL, "events": events}, separators=(",", ":"))
     try:
-        run = subprocess.run([sys.executable, "-I", str(worker)], input=wire, text=True,
-                             stdout=subprocess.PIPE, stderr=subprocess.PIPE, check=False,
-                             timeout=10)
+        run = subprocess.run(
+            [sys.executable, "-I", str(worker)], input=wire, text=True,
+            capture_output=True, check=False, timeout=10,
+        )
         if run.returncode != 0 or len(run.stdout) > 3_000_000:
             raise ValueError("observer_failed")
         output = json.loads(run.stdout)
@@ -238,7 +259,8 @@ def evaluate_live() -> dict:
         session = LiveSession()
         grant_id = f"fixture-{case['id']}"
         claim = {key: copy.deepcopy(case["grant"][key]) for key in
-                 ("principal", "action", "resource", "payload_sha256", "nonce", "expires_at", "epoch")}
+                 ("principal", "action", "resource", "payload_sha256",
+                  "nonce", "expires_at", "epoch")}
         result = session.issue(grant_id, claim, corrupt_signature=case["family"] == "invalid_mac")
         issues.append({"case": case["id"], "grant_issued": result.valid,
                        "gate_failure_codes": result.codes})
@@ -255,10 +277,12 @@ def evaluate_live() -> dict:
         session = LiveSession()
         grant_id = f"revocation-{i:02d}"
         claim = {key: case["grant"][key] for key in
-                 ("principal", "action", "resource", "payload_sha256", "nonce", "expires_at", "epoch")}
+                 ("principal", "action", "resource", "payload_sha256",
+                  "nonce", "expires_at", "epoch")}
         issued = session.issue(grant_id, claim)
         revoked = session.revoke(grant_id)
-        issues.append({"case": grant_id, "grant_issued": issued.valid, "refusal_verified": revoked.valid,
+        issues.append({"case": grant_id, "grant_issued": issued.valid,
+                       "refusal_verified": revoked.valid,
                        "gate_failure_codes": issued.codes + revoked.codes})
         event = session.attempt(grant_id, grant_id, case["request"])
         decisions.append(event)
@@ -269,8 +293,10 @@ def evaluate_live() -> dict:
     expected_pairs = [(case["id"], value) for case in make_cases() for value in case["expected"]]
     seen_pairs = [(e["case"], e["decision"]) for e in decisions[:48]]
     matches = seen_pairs == [(name, expected[v]) for name, v in expected_pairs]
-    report = {"schema": "weaver-observer-adapter-v0.3", "scope": "REAL_CRYPTO_VERIFIER_DRY_RUN_OBSERVER_ONLY",
-              "frozen_v02": FROZEN_V02, "actual_weaver_path": "triadic_controls.crypto.verifier.CryptoVerifier",
+    report = {"schema": "weaver-observer-adapter-v0.3",
+              "scope": "REAL_CRYPTO_VERIFIER_DRY_RUN_OBSERVER_ONLY",
+              "frozen_v02": FROZEN_V02,
+              "actual_weaver_path": "triadic_controls.crypto.verifier.CryptoVerifier",
               "reference_case_match": matches, "grant_events": issues,
               "attempts": len(decisions), "allow": sum(e["decision"] == "ALLOW" for e in decisions),
               "deny": sum(e["decision"] == "DENY" for e in decisions),
@@ -280,14 +306,16 @@ def evaluate_live() -> dict:
               "observer_integrity": (observed == len(events) and
                                      observer["observer_classification"] != "UNKNOWN_OBSERVATION"),
               "actual_commits": 0 if observer["real_commits"] == 0 else None,
-              "observation": [{"case": record["event"]["case"], "decision": record["event"]["decision"],
+              "observation": [{"case": record["event"]["case"],
+                               "decision": record["event"]["decision"],
                                "would_effect": record["would_effect"], "hash": record["hash"]}
                               for record in observer["records"]],
               "unobserved_case_ids": [e["case"] for e in decisions if e not in events],
-              "limitations": ["Trusted same-host Python worker is not an OS sandbox or independent witness",
-                              "Grant lifecycle and resource binding are adapter logic, not native CryptoVerifier behavior",
-                              "Locally generated publicly known test-signing key and unsigned local registry",
-                              "No actual operation, protected write, persistent replay, network or hardware effect",
+              "limitations": [
+                  "Same-host worker is not an OS sandbox or independent witness",
+                  "Grant lifecycle and resource binding are adapter logic",
+                  "Public test-signing key and unsigned local registry",
+                  "No actual operation, write, persistent replay or hardware effect",
                               "Frozen v0.2 corpus was reused; shared oracle assumptions remain",
                               "No production authority; E2 ceiling / W0 / O0 HOLD"]}
     report["report_sha256"] = sha(canonical(report))
