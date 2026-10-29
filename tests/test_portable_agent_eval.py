@@ -13,7 +13,7 @@ def test_frozen_case_count_and_family_coverage():
     assert len(cases) == 44
     assert len({c["id"] for c in cases}) == 44
     assert all(sum(c["family"] == family for c in cases) == 4 for family in FAMILIES)
-    assert sum(len(c["expected"]) for c in cases) == 48
+    assert sum(c["attempts"] for c in cases) == 48
 
 
 def test_reference_and_mutation_controls():
@@ -78,3 +78,10 @@ def test_namespace_traversal_denied_even_when_grant_matches():
         grant["resource"] = unsafe
         grant["mac"] = mac(grant)
         assert authorize(req, grant, 100, 2, False, True)[0] == "deny"
+
+
+def test_attempt_count_not_derived_from_oracle():
+    case = copy.deepcopy(make_cases()[0])
+    case["expected"] = ["deny"]
+    assert run_case(case, "governed")["observed"] == ["allow"]
+    assert case["attempts"] == 1
