@@ -1,0 +1,39 @@
+name: WEAVER Dry-Run Observer Adapter (candidate)
+
+on:
+  pull_request:
+    branches: [main, candidate/agent-eval-20261029]
+  push:
+    branches: [candidate/live-observer-adapter-v0.3-20261029]
+
+permissions:
+  contents: read
+
+jobs:
+  live-observer-smoke:
+    name: Real CryptoVerifier / dry observer / Python ${{ matrix.python-version }}
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        python-version: ["3.10", "3.11", "3.12", "3.13"]
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: ${{ matrix.python-version }}
+      - name: Install verified source dependencies and test runner
+        run: python -m pip install -e '.[dev]'
+      - name: Test adapter against real source-tree verifier
+        run: python -m pytest -q tests/test_live_observer_adapter.py tests/test_portable_agent_eval.py
+      - name: Create observer-only result report
+        run: python -m benchmarks.agent_reliability.live_adapter --out weaver-dryrun-report.json > observer-stdout.txt
+      - name: Retain dry-run report
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: weaver-dry-observer-${{ matrix.python-version }}
+          path: |
+            weaver-dryrun-report.json
+            observer-stdout.txt
+          if-no-files-found: warn
