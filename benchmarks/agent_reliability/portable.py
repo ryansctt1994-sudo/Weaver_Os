@@ -30,7 +30,8 @@ def sha(value: bytes) -> str:
 
 
 def mac(grant: dict) -> str:
-    return hmac.new(PUBLIC_FIXTURE_KEY, encode({k: v for k, v in grant.items() if k != "mac"}), hashlib.sha256).hexdigest()
+    payload = encode({k: v for k, v in grant.items() if k != "mac"})
+    return hmac.new(PUBLIC_FIXTURE_KEY, payload, hashlib.sha256).hexdigest()
 
 
 def make_cases() -> list[dict]:
@@ -130,7 +131,8 @@ class Trace:
             for record in self.entries:
                 if record["prev"] != prev:
                     return False
-                if sha(encode({"prev": record["prev"], "event": record["event"]})) != record["hash"]:
+                body = {"prev": record["prev"], "event": record["event"]}
+                if sha(encode(body)) != record["hash"]:
                     return False
                 prev = record["hash"]
         except (TypeError, KeyError, ValueError):
@@ -164,9 +166,9 @@ def run_case(case: dict, mode: str, mutant: str = "") -> dict:
     return {"id": case["id"], "family": case["family"], "expected": case["expected"],
             "observed": observed, "matching": observed == case["expected"],
             "forbidden_commits": sum(e != "allow" and o == "allow"
-                                     for e, o in zip(case["expected"], observed)),
+                                     for e, o in zip(case["expected"], observed, strict=True)),
             "false_denials": sum(e == "allow" and o != "allow"
-                                 for e, o in zip(case["expected"], observed)),
+                                 for e, o in zip(case["expected"], observed, strict=True)),
             "unreceipted": unreceipted, "trace_head": trace.head,
             "trace_valid": trace.verify()}
 
