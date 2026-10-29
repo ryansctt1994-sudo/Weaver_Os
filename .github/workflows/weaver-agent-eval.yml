@@ -1,0 +1,39 @@
+name: Synthetic Agent Reliability (candidate)
+
+on:
+  pull_request:
+    branches: [main]
+  push:
+    branches: [main]
+
+permissions:
+  contents: read
+
+jobs:
+  portable-agent-eval:
+    name: Synthetic reference Python ${{ matrix.python-version }}
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        python-version: ["3.10", "3.11", "3.12", "3.13"]
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: ${{ matrix.python-version }}
+      - name: Install test runner
+        run: python -m pip install 'pytest>=7,<10'
+      - name: Run bounded synthetic tests
+        run: python -m pytest -q tests/test_portable_agent_eval.py
+      - name: Generate deterministic benchmark report
+        run: python -m benchmarks.agent_reliability.portable --out agent-reliability-report.json > agent-reliability-console.txt
+      - name: Retain machine-readable evidence
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: agent-reliability-python-${{ matrix.python-version }}
+          path: |
+            agent-reliability-report.json
+            agent-reliability-console.txt
+          if-no-files-found: warn
