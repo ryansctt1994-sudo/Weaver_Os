@@ -96,7 +96,9 @@ def authorize(req: dict, grant: dict, now: int, epoch: int,
             ("epoch", grant["epoch"] == epoch),
             ("replay", not used),
         )
-        if not isinstance(req["resource"], str) or not req["resource"].startswith("sandbox/"):
+        parts = req["resource"].split("/") if isinstance(req["resource"], str) else []
+        if (len(parts) < 3 or parts[0] != "sandbox" or
+                any(p in ("", ".", "..") or "\\" in p or ":" in p for p in parts)):
             return "deny", "namespace_violation"
         for name, ok in checks:
             if not ok and name != mutant:
