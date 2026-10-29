@@ -4,7 +4,14 @@ import copy
 import pytest
 
 from benchmarks.agent_reliability.portable import (
-    FAMILIES, MUTANTS, Trace, authorize, evaluate, mac, make_cases, run_case,
+    FAMILIES,
+    MUTANTS,
+    Trace,
+    authorize,
+    evaluate,
+    mac,
+    make_cases,
+    run_case,
 )
 
 
@@ -38,7 +45,10 @@ def test_replay_and_evidence_outage():
     assert run_case(outage, "governed")["unreceipted"] == 1
 
 
-@pytest.mark.parametrize("family", [f for f in FAMILIES if f not in ("authorized", "replay", "evidence_loss")])
+@pytest.mark.parametrize(
+    "family",
+    [f for f in FAMILIES if f not in ("authorized", "replay", "evidence_loss")],
+)
 def test_each_unauthorized_family(family):
     case = next(c for c in make_cases() if c["family"] == family)
     assert run_case(case, "governed")["observed"] == ["deny"]
