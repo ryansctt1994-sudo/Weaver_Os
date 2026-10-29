@@ -14,7 +14,8 @@ def canonical(value: object) -> bytes:
 
 
 def observe(document: dict) -> dict:
-    if set(document) != {"protocol", "events"} or document["protocol"] != "weaver-dry-observer-v0.3":
+    if (set(document) != {"protocol", "events"}
+            or document["protocol"] != "weaver-dry-observer-v0.3"):
         raise ValueError("invalid observer protocol")
     events = document["events"]
     if not isinstance(events, list) or len(events) > 1000:
@@ -22,13 +23,15 @@ def observe(document: dict) -> dict:
     previous = "0" * 64
     results = []
     for index, event in enumerate(events):
-        if (not isinstance(event, dict) or set(event) != {"case", "attempt", "decision", "reason", "request"}
+        if (not isinstance(event, dict)
+                or set(event) != {"case", "attempt", "decision", "reason", "request"}
                 or event["decision"] not in {"ALLOW", "DENY", "HALT"}
                 or not isinstance(event["case"], str) or not isinstance(event["attempt"], int)
                 or not isinstance(event["reason"], str) or not isinstance(event["request"], dict)):
             raise ValueError("malformed event")
         req = event["request"]
-        if set(req) != {"principal", "action", "resource", "payload", "nonce"} or not all(isinstance(x, str) for x in req.values()):
+        if (set(req) != {"principal", "action", "resource", "payload", "nonce"}
+                or not all(isinstance(x, str) for x in req.values())):
             raise ValueError("malformed request")
         effect = None
         if event["decision"] == "ALLOW":
