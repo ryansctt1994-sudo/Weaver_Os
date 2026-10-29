@@ -117,9 +117,10 @@ class Trace:
 
     def append(self, event: dict) -> None:
         record = {"prev": self.head, "event": event}
-        record["hash"] = sha(encode(record))
+        new_head = sha(encode(record))
+        record["hash"] = new_head
         self.entries.append(record)
-        self.head = record["hash"]
+        self.head = new_head
 
     def verify(self) -> bool:
         prev = GENESIS
