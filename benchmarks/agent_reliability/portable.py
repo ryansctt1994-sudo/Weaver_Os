@@ -5,7 +5,7 @@ import argparse
 import hashlib
 import hmac
 import json
-from dataclasses import dataclass
+from dataclasses import dataclass, field
 from pathlib import Path
 
 PUBLIC_FIXTURE_KEY = b"PUBLIC-TEST-KEY-NOT-FOR-AUTHENTICATION"
@@ -113,11 +113,7 @@ def authorize(req: dict, grant: dict, now: int, epoch: int,
 @dataclass
 class Trace:
     head: str = GENESIS
-    entries: list | None = None
-
-    def __post_init__(self) -> None:
-        if self.entries is None:
-            self.entries = []
+    entries: list[dict] = field(default_factory=list)
 
     def append(self, event: dict) -> None:
         record = {"prev": self.head, "event": event}
