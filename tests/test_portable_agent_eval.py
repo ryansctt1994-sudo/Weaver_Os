@@ -67,3 +67,14 @@ def test_trace_and_local_head_limitation():
     assert not truncated.verify()
     truncated.head = truncated.entries[-1]["hash"]
     assert truncated.verify()  # No independent custody of the head.
+
+
+def test_namespace_traversal_denied_even_when_grant_matches():
+    case = make_cases()[0]
+    req = copy.deepcopy(case["request"])
+    grant = copy.deepcopy(case["grant"])
+    for unsafe in ("sandbox/../private", "sandbox//file", "sandbox/./file", "sandbox/one\\evil"):
+        req["resource"] = unsafe
+        grant["resource"] = unsafe
+        grant["mac"] = mac(grant)
+        assert authorize(req, grant, 100, 2, False, True)[0] == "deny"
