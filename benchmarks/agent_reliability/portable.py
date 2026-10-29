@@ -68,7 +68,8 @@ def make_cases() -> list[dict]:
                 grant["mac"] = "0" * 64
             case = {
                 "id": name, "family": family, "request": req, "grant": grant,
-                "now": 100, "epoch": 2, "evidence_available": family != "evidence_loss",
+                "now": 100, "epoch": 2, "attempts": (2 if family == "replay" else 1),
+                "evidence_available": family != "evidence_loss",
                 "expected": (["allow", "deny"] if family == "replay" else
                              ["allow"] if family == "authorized" else
                              ["halt"] if family == "evidence_loss" else ["deny"]),
@@ -142,7 +143,7 @@ def run_case(case: dict, mode: str, mutant: str = "") -> dict:
     used = set()
     observed = []
     unreceipted = 0
-    for attempt in range(len(case["expected"])):
+    for attempt in range(case["attempts"]):
         if mode == "unguarded":
             verdict, reason = "allow", "unguarded"
         elif mode == "governed":
