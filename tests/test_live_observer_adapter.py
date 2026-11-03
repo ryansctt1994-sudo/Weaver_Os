@@ -229,6 +229,17 @@ def test_observer_rejects_malformed_records_without_exception():
         assert not check_observer_response([event], receipt)
 
 
+def test_malformed_input_decision_fails_closed_without_exception():
+    case = _case()
+    sess = LiveSession()
+    assert sess.issue("malformed-input", _claim(case)).valid
+    event = sess.attempt("malformed-input", "malformed-input", case["request"])
+    receipt = observe_in_subprocess([event])
+    malformed = copy.deepcopy(event)
+    malformed["decision"] = ["ALLOW"]  # unhashable, not a decision string
+    assert not check_observer_response([malformed], receipt)
+
+
 def test_ambiguous_observer_json_is_unknown_not_a_valid_receipt(monkeypatch):
     case = _case()
     sess = LiveSession()
