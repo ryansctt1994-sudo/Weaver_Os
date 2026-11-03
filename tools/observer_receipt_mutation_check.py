@@ -24,6 +24,42 @@ EXPECTED_RED = {
     "test_ambiguous_observer_json_is_unknown_not_a_valid_receipt[float_zero]",
 }
 
+# Each mutation changes one expression in the hardened adapter; each expects
+# exactly one named failure in the *complete* regression suite.
+MICRO_MUTATIONS = (
+    (
+        "classification",
+        'or output.get("observer_classification") != OBSERVER_CLASSIFICATION',
+        "or False",
+        "test_observer_requires_exact_classification_and_root_fields",
+    ),
+    (
+        "record_sequence_type",
+        'or type(record.get("sequence")) is not int',
+        "or False",
+        "test_observer_rejects_malformed_records_without_exception",
+    ),
+    (
+        "event_decision_type",
+        'and isinstance(event["decision"], str)',
+        "and True",
+        "test_malformed_input_decision_fails_closed_without_exception",
+    ),
+    (
+        "duplicate_json",
+        "object_pairs_hook=_unique_json_object",
+        "object_pairs_hook=dict",
+        "test_ambiguous_observer_json_is_unknown_not_a_valid_receipt[duplicate_head]",
+    ),
+    (
+        "effect_count_type",
+        'or type(output.get("real_commits")) is not int',
+        "or False",
+        "test_ambiguous_observer_json_is_unknown_not_a_valid_receipt[float_zero]",
+    ),
+)
+
+
 
 def _git(*args: str) -> str:
     return subprocess.check_output(["git", *args], text=True).strip()
@@ -80,7 +116,40 @@ def main() -> int:
         if _git("status", "--porcelain", "--", str(ADAPTER)):
             raise RuntimeError("restored adapter differs from pinned source")
 
-    passed = mutant_rc == 1 and mutant_failures == EXPECTED_RED
+    original_text = original.decode("utf-8")
+    matrix = []
+    for name, needle, replacement, target in MICRO_MUTATIONS:
+        if original_text.count(needle) != 1:
+            raise RuntimeError(f"micro-mutant {name}: source anchor count not exactly one")
+        mutant_source = original_text.replace(needle, replacement, 1).encode("utf-8")
+        try:
+            ADAPTER.write_bytes(mutant_source)
+            rc, failures, count = _run_tests(f"micro_{name}", directory)
+        finally:
+            ADAPTER.write_bytes(original)
+            if ADAPTER.read_bytes() != original:
+                raise RuntimeError(f"micro-mutant {name}: restoration failed")
+            if _git("status", "--porcelain", "--", str(ADAPTER)):
+                raise RuntimeError(f"micro-mutant {name}: modified source remains")
+        matrix.append({
+            "name": name,
+            "source_anchor": needle,
+            "source_replacement": replacement,
+            "mutant_file_sha256": hashlib.sha256(mutant_source).hexdigest(),
+            "expected_red": target,
+            "actual_red": sorted(failures),
+            "testcases": count,
+            "exit": rc,
+            "exclusive_detection": (
+                rc == 1 and failures == {target} and count == baseline_count
+            ),
+        })
+
+    matrix_passed = (
+        len(matrix) == len(MICRO_MUTATIONS)
+        and all(row["exclusive_detection"] for row in matrix)
+    )
+    passed = mutant_rc == 1 and mutant_failures == EXPECTED_RED and matrix_passed
     report = {
         "schema": "weaver-observer-mutation-control-v0.1",
         "baseline_commit": head,
@@ -95,7 +164,10 @@ def main() -> int:
         "mutant_testcases": mutant_count,
         "expected_red": sorted(EXPECTED_RED),
         "actual_red": sorted(mutant_failures),
-        "mutant_sensitivity_confirmed": passed,
+        "mutant_sensitivity_confirmed": mutant_rc == 1 and mutant_failures == EXPECTED_RED,
+        "micro_mutation_matrix": matrix,
+        "five_target_independent_detection": matrix_passed,
+        "overall_control_pass": passed,
         "scope": (
             "Local CI-runner source substitution; frozen v0.3 source; "
             "no protected effects; no independent witness or authority"
