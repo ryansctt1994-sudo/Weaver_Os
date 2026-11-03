@@ -373,7 +373,8 @@ def evaluate_live() -> dict:
               "observer_records": observed, "observer_head": observer["head"],
               "unobserved": len(decisions) - observed,
               "observer_integrity": (observed == len(events) and
-                                     observer["observer_classification"] == OBSERVER_CLASSIFICATION),
+                                     observer["observer_classification"]
+                                     == OBSERVER_CLASSIFICATION),
               "actual_commits": 0 if observer["real_commits"] == 0 else None,
               "observation": [{"case": record["event"]["case"],
                                "decision": record["event"]["decision"],
