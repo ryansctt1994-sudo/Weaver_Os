@@ -10,7 +10,6 @@ import subprocess
 from pathlib import Path
 
 from benchmarks.agent_reliability import live_adapter
-
 from benchmarks.agent_reliability.live_adapter import (
     FROZEN_V02,
     LiveSession,
@@ -253,9 +252,9 @@ def test_ambiguous_observer_json_is_unknown_not_a_valid_receipt(monkeypatch):
     nonfinite = encoded.replace('"real_commits": 0', '"real_commits": 1e999')
     assert nonfinite != encoded
     for wire in (duplicate_head, nonfinite):
-        def fake_run(*_args, **_kwargs):
+        def fake_run(*_args, _wire=wire, **_kwargs):
             return subprocess.CompletedProcess(
-                args=["fake-worker"], returncode=0, stdout=wire, stderr=""
+                args=["fake-worker"], returncode=0, stdout=_wire, stderr=""
             )
 
         monkeypatch.setattr(live_adapter.subprocess, "run", fake_run)
