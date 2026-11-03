@@ -224,6 +224,7 @@ def _valid_observer_event(event: object) -> bool:
     return (
         isinstance(event["case"], str)
         and type(event["attempt"]) is int
+        and isinstance(event["decision"], str)
         and event["decision"] in {"ALLOW", "DENY", "HALT"}
         and isinstance(event["reason"], str)
         and isinstance(request, dict)
