@@ -5,8 +5,13 @@ Requires source-tree triadic_controls.crypto.verifier: no simulator stand-in.
 from __future__ import annotations
 
 import copy
+import json
+import subprocess
 from pathlib import Path
 
+import pytest
+
+from benchmarks.agent_reliability import live_adapter
 from benchmarks.agent_reliability.live_adapter import (
     FROZEN_V02,
     LiveSession,
@@ -173,3 +178,116 @@ def test_end_to_end_report_with_exact_reference_cases():
     assert report["actual_commits"] == 0
     assert report["observer_integrity"]
     assert len([x for x in report["grant_events"] if x.get("refusal_verified")]) == 4
+
+
+def test_observer_requires_exact_classification_and_root_fields():
+    case = _case()
+    sess = LiveSession()
+    assert sess.issue("shape-root", _claim(case)).valid
+    event = sess.attempt("shape-root", "shape-root", case["request"])
+    good = observe_in_subprocess([event])
+    assert check_observer_response([event], good)
+
+    invalid = []
+    spoofed = copy.deepcopy(good)
+    spoofed["observer_classification"] = "INDEPENDENT_WITNESS"
+    invalid.append(spoofed)
+    missing = copy.deepcopy(good)
+    missing.pop("observer_classification")
+    invalid.append(missing)
+    extra = copy.deepcopy(good)
+    extra["unauthenticated_extra"] = "hidden"
+    invalid.append(extra)
+    for receipt in invalid:
+        assert not check_observer_response([event], receipt)
+
+
+def test_observer_rejects_malformed_records_without_exception():
+    case = _case()
+    sess = LiveSession()
+    assert sess.issue("shape-record", _claim(case)).valid
+    event = sess.attempt("shape-record", "shape-record", case["request"])
+    good = observe_in_subprocess([event])
+    assert check_observer_response([event], good)
+
+    invalid = []
+    not_object = copy.deepcopy(good)
+    not_object["records"][0] = "not a record"
+    invalid.append(not_object)
+    bool_sequence = copy.deepcopy(good)
+    bool_sequence["records"][0]["sequence"] = False
+    invalid.append(bool_sequence)
+    extra_field = copy.deepcopy(good)
+    extra_field["records"][0]["shadow"] = "unaccounted"
+    invalid.append(extra_field)
+    missing_hash = copy.deepcopy(good)
+    missing_hash["records"][0].pop("hash")
+    invalid.append(missing_hash)
+    for receipt in invalid:
+        assert not check_observer_response([event], receipt)
+
+
+def test_malformed_input_decision_fails_closed_without_exception():
+    case = _case()
+    sess = LiveSession()
+    assert sess.issue("malformed-input", _claim(case)).valid
+    event = sess.attempt("malformed-input", "malformed-input", case["request"])
+    receipt = observe_in_subprocess([event])
+    malformed = copy.deepcopy(event)
+    malformed["decision"] = ["ALLOW"]  # unhashable, not a decision string
+
+    # A consistent-looking, forged hash chain must not make an invalid event valid.
+    forged = copy.deepcopy(receipt)
+    record = forged["records"][0]
+    record["event"] = malformed
+    record["would_effect"] = None
+    content = {
+        "sequence": 0,
+        "prev": "0" * 64,
+        "event": malformed,
+        "would_effect": None,
+        "actual_effect": "NONE",
+    }
+    record["hash"] = live_adapter.sha(live_adapter.canonical(content))
+    forged["head"] = record["hash"]
+    assert not check_observer_response([malformed], forged)
+
+
+@pytest.mark.parametrize("corruption", ["duplicate_head", "float_zero", "nonfinite"])
+def test_ambiguous_observer_json_is_unknown_not_a_valid_receipt(
+    monkeypatch, corruption: str,
+):
+    case = _case()
+    sess = LiveSession()
+    assert sess.issue("duplicate-json", _claim(case)).valid
+    event = sess.attempt("duplicate-json", "duplicate-json", case["request"])
+    good = observe_in_subprocess([event])
+    assert check_observer_response([event], good)
+
+    # Direct semantic check makes float-zero sensitive to the count-type guard
+    # even if a separate parser defense would also reject this wire input.
+    if corruption == "float_zero":
+        for invalid_count in (0.0, False):
+            wrong_type = copy.deepcopy(good)
+            wrong_type["real_commits"] = invalid_count
+            assert not check_observer_response([event], wrong_type)
+
+    encoded = json.dumps(good, sort_keys=True)
+    if corruption == "duplicate_head":
+        wire = encoded[:-1] + ',"head":' + json.dumps(good["head"]) + "}"
+    elif corruption == "float_zero":
+        wire = encoded.replace('"real_commits": 0', '"real_commits": 0.0')
+    else:
+        wire = encoded.replace('"real_commits": 0', '"real_commits": 1e999')
+    assert wire != encoded
+
+    def fake_run(*_args, **_kwargs):
+        return subprocess.CompletedProcess(
+            args=["fake-worker"], returncode=0, stdout=wire, stderr=""
+        )
+
+    monkeypatch.setattr(live_adapter.subprocess, "run", fake_run)
+    result = observe_in_subprocess([event])
+    assert result["observer_classification"] == "UNKNOWN_OBSERVATION"
+    assert result["real_commits"] is None
+    assert not check_observer_response([event], result)

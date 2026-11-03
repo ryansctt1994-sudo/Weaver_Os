@@ -197,26 +197,90 @@ class LiveSession:
         return event
 
 
+OBSERVER_CLASSIFICATION = "SAME_HOST_PROCESS_NOT_INDEPENDENT"
+
+
+def _unique_json_object(pairs: list[tuple[str, object]]) -> dict[str, object]:
+    """Reject duplicate names instead of accepting last-key-wins receipts."""
+    result: dict[str, object] = {}
+    for key, value in pairs:
+        if key in result:
+            raise ValueError("duplicate_observer_json_key")
+        result[key] = value
+    return result
+
+
+def _reject_non_integer_json_number(token: str) -> None:
+    # The v0.3 receipt protocol uses integer sequence/count fields only.
+    raise ValueError(f"non_integer_observer_json_number: {token}")
+
+
+def _valid_observer_event(event: object) -> bool:
+    if not isinstance(event, dict) or set(event) != {
+        "case", "attempt", "decision", "reason", "request"
+    }:
+        return False
+    request = event["request"]
+    return (
+        isinstance(event["case"], str)
+        and type(event["attempt"]) is int
+        and isinstance(event["decision"], str)
+        and event["decision"] in {"ALLOW", "DENY", "HALT"}
+        and isinstance(event["reason"], str)
+        and isinstance(request, dict)
+        and set(request) == {"principal", "action", "resource", "payload", "nonce"}
+        and all(isinstance(value, str) for value in request.values())
+    )
+
+
 def check_observer_response(inputs: list[dict], output: dict) -> bool:
-    """Confirm observer did not omit, reorder or change any requested record."""
-    if (not isinstance(output, dict) or output.get("protocol") != PROTOCOL
-            or output.get("real_commits") != 0 or not isinstance(output.get("records"), list)
-            or len(output["records"]) != len(inputs)):
+    """Validate the exact same-host, dry-run receipt protocol; fail closed."""
+    if (
+        not isinstance(inputs, list)
+        or not isinstance(output, dict)
+        or set(output) != {
+            "protocol", "records", "head", "real_commits", "observer_classification"
+        }
+        or output.get("protocol") != PROTOCOL
+        or output.get("observer_classification") != OBSERVER_CLASSIFICATION
+        or type(output.get("real_commits")) is not int
+        or output["real_commits"] != 0
+        or not isinstance(output.get("records"), list)
+        or len(output["records"]) != len(inputs)
+    ):
         return False
     previous = "0" * 64
     for i, (sent, record) in enumerate(zip(inputs, output["records"], strict=True)):
-        if (record.get("sequence") != i or record.get("prev") != previous
-                or record.get("event") != sent or record.get("actual_effect") != "NONE"):
+        if (
+            not _valid_observer_event(sent)
+            or not isinstance(record, dict)
+            or set(record) != {
+                "sequence", "prev", "event", "would_effect", "actual_effect", "hash"
+            }
+            or type(record.get("sequence")) is not int
+            or record["sequence"] != i
+            or record.get("prev") != previous
+            or record.get("event") != sent
+            or record.get("actual_effect") != "NONE"
+        ):
             return False
         expectation = None
         if sent["decision"] == "ALLOW":
             req = sent["request"]
-            expectation = {"kind": "WOULD_WRITE", "target_label": req["resource"],
-                           "payload_sha256": hashlib.sha256(req["payload"].encode()).hexdigest()}
+            expectation = {
+                "kind": "WOULD_WRITE",
+                "target_label": req["resource"],
+                "payload_sha256": hashlib.sha256(req["payload"].encode()).hexdigest(),
+            }
         if record.get("would_effect") != expectation:
             return False
-        content = {"sequence": i, "prev": previous, "event": sent,
-                   "would_effect": expectation, "actual_effect": "NONE"}
+        content = {
+            "sequence": i,
+            "prev": previous,
+            "event": sent,
+            "would_effect": expectation,
+            "actual_effect": "NONE",
+        }
         previous = sha(canonical(content))
         if record.get("hash") != previous:
             return False
@@ -239,7 +303,11 @@ def observe_in_subprocess(events: list[dict], *, script: Path | None = None) -> 
         )
         if run.returncode != 0 or len(run.stdout) > 3_000_000:
             raise ValueError("observer_failed")
-        output = json.loads(run.stdout)
+        output = json.loads(
+            run.stdout, object_pairs_hook=_unique_json_object,
+            parse_constant=_reject_non_integer_json_number,
+            parse_float=_reject_non_integer_json_number,
+        )
         if not check_observer_response(events, output):
             raise ValueError("observer_receipt_mismatch")
         return output
@@ -305,7 +373,8 @@ def evaluate_live() -> dict:
               "observer_records": observed, "observer_head": observer["head"],
               "unobserved": len(decisions) - observed,
               "observer_integrity": (observed == len(events) and
-                                     observer["observer_classification"] != "UNKNOWN_OBSERVATION"),
+                                     observer["observer_classification"]
+                                     == OBSERVER_CLASSIFICATION),
               "actual_commits": 0 if observer["real_commits"] == 0 else None,
               "observation": [{"case": record["event"]["case"],
                                "decision": record["event"]["decision"],
