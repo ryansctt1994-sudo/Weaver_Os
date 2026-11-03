@@ -9,6 +9,8 @@ import json
 import subprocess
 from pathlib import Path
 
+import pytest
+
 from benchmarks.agent_reliability import live_adapter
 from benchmarks.agent_reliability.live_adapter import (
     FROZEN_V02,
@@ -236,10 +238,28 @@ def test_malformed_input_decision_fails_closed_without_exception():
     receipt = observe_in_subprocess([event])
     malformed = copy.deepcopy(event)
     malformed["decision"] = ["ALLOW"]  # unhashable, not a decision string
-    assert not check_observer_response([malformed], receipt)
+
+    # A consistent-looking, forged hash chain must not make an invalid event valid.
+    forged = copy.deepcopy(receipt)
+    record = forged["records"][0]
+    record["event"] = malformed
+    record["would_effect"] = None
+    content = {
+        "sequence": 0,
+        "prev": "0" * 64,
+        "event": malformed,
+        "would_effect": None,
+        "actual_effect": "NONE",
+    }
+    record["hash"] = live_adapter.sha(live_adapter.canonical(content))
+    forged["head"] = record["hash"]
+    assert not check_observer_response([malformed], forged)
 
 
-def test_ambiguous_observer_json_is_unknown_not_a_valid_receipt(monkeypatch):
+@pytest.mark.parametrize("corruption", ["duplicate_head", "float_zero", "nonfinite"])
+def test_ambiguous_observer_json_is_unknown_not_a_valid_receipt(
+    monkeypatch, corruption: str,
+):
     case = _case()
     sess = LiveSession()
     assert sess.issue("duplicate-json", _claim(case)).valid
@@ -248,17 +268,21 @@ def test_ambiguous_observer_json_is_unknown_not_a_valid_receipt(monkeypatch):
     assert check_observer_response([event], good)
 
     encoded = json.dumps(good, sort_keys=True)
-    duplicate_head = encoded[:-1] + ',"head":' + json.dumps(good["head"]) + "}"
-    nonfinite = encoded.replace('"real_commits": 0', '"real_commits": 1e999')
-    assert nonfinite != encoded
-    for wire in (duplicate_head, nonfinite):
-        def fake_run(*_args, _wire=wire, **_kwargs):
-            return subprocess.CompletedProcess(
-                args=["fake-worker"], returncode=0, stdout=_wire, stderr=""
-            )
+    if corruption == "duplicate_head":
+        wire = encoded[:-1] + ',"head":' + json.dumps(good["head"]) + "}"
+    elif corruption == "float_zero":
+        wire = encoded.replace('"real_commits": 0', '"real_commits": 0.0')
+    else:
+        wire = encoded.replace('"real_commits": 0', '"real_commits": 1e999')
+    assert wire != encoded
 
-        monkeypatch.setattr(live_adapter.subprocess, "run", fake_run)
-        result = observe_in_subprocess([event])
-        assert result["observer_classification"] == "UNKNOWN_OBSERVATION"
-        assert result["real_commits"] is None
-        assert not check_observer_response([event], result)
+    def fake_run(*_args, **_kwargs):
+        return subprocess.CompletedProcess(
+            args=["fake-worker"], returncode=0, stdout=wire, stderr=""
+        )
+
+    monkeypatch.setattr(live_adapter.subprocess, "run", fake_run)
+    result = observe_in_subprocess([event])
+    assert result["observer_classification"] == "UNKNOWN_OBSERVATION"
+    assert result["real_commits"] is None
+    assert not check_observer_response([event], result)
