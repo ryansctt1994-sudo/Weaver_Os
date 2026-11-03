@@ -2,9 +2,9 @@ name: WEAVER Dry-Run Observer Adapter (candidate)
 
 on:
   pull_request:
-    branches: [main, candidate/agent-eval-20261029]
+    branches: [main, candidate/agent-eval-20261029, candidate/live-observer-adapter-v0.3-20261029]
   push:
-    branches: [candidate/live-observer-adapter-v0.3-20261029]
+    branches: [candidate/live-observer-adapter-v0.3-20261029, hardening/observer-receipt-validation-20261103]
 
 permissions:
   contents: read
