@@ -5,7 +5,11 @@ Requires source-tree triadic_controls.crypto.verifier: no simulator stand-in.
 from __future__ import annotations
 
 import copy
+import json
+import subprocess
 from pathlib import Path
+
+from benchmarks.agent_reliability import live_adapter
 
 from benchmarks.agent_reliability.live_adapter import (
     FROZEN_V02,
@@ -173,3 +177,78 @@ def test_end_to_end_report_with_exact_reference_cases():
     assert report["actual_commits"] == 0
     assert report["observer_integrity"]
     assert len([x for x in report["grant_events"] if x.get("refusal_verified")]) == 4
+
+
+def test_observer_requires_exact_classification_and_root_fields():
+    case = _case()
+    sess = LiveSession()
+    assert sess.issue("shape-root", _claim(case)).valid
+    event = sess.attempt("shape-root", "shape-root", case["request"])
+    good = observe_in_subprocess([event])
+    assert check_observer_response([event], good)
+
+    invalid = []
+    spoofed = copy.deepcopy(good)
+    spoofed["observer_classification"] = "INDEPENDENT_WITNESS"
+    invalid.append(spoofed)
+    missing = copy.deepcopy(good)
+    missing.pop("observer_classification")
+    invalid.append(missing)
+    forged_count = copy.deepcopy(good)
+    forged_count["real_commits"] = False  # bool compares equal to integer zero
+    invalid.append(forged_count)
+    extra = copy.deepcopy(good)
+    extra["unauthenticated_extra"] = "hidden"
+    invalid.append(extra)
+    for receipt in invalid:
+        assert not check_observer_response([event], receipt)
+
+
+def test_observer_rejects_malformed_records_without_exception():
+    case = _case()
+    sess = LiveSession()
+    assert sess.issue("shape-record", _claim(case)).valid
+    event = sess.attempt("shape-record", "shape-record", case["request"])
+    good = observe_in_subprocess([event])
+    assert check_observer_response([event], good)
+
+    invalid = []
+    not_object = copy.deepcopy(good)
+    not_object["records"][0] = "not a record"
+    invalid.append(not_object)
+    bool_sequence = copy.deepcopy(good)
+    bool_sequence["records"][0]["sequence"] = False
+    invalid.append(bool_sequence)
+    extra_field = copy.deepcopy(good)
+    extra_field["records"][0]["shadow"] = "unaccounted"
+    invalid.append(extra_field)
+    missing_hash = copy.deepcopy(good)
+    missing_hash["records"][0].pop("hash")
+    invalid.append(missing_hash)
+    for receipt in invalid:
+        assert not check_observer_response([event], receipt)
+
+
+def test_ambiguous_observer_json_is_unknown_not_a_valid_receipt(monkeypatch):
+    case = _case()
+    sess = LiveSession()
+    assert sess.issue("duplicate-json", _claim(case)).valid
+    event = sess.attempt("duplicate-json", "duplicate-json", case["request"])
+    good = observe_in_subprocess([event])
+    assert check_observer_response([event], good)
+
+    encoded = json.dumps(good, sort_keys=True)
+    duplicate_head = encoded[:-1] + ',"head":' + json.dumps(good["head"]) + "}"
+    nonfinite = encoded.replace('"real_commits": 0', '"real_commits": 1e999')
+    assert nonfinite != encoded
+    for wire in (duplicate_head, nonfinite):
+        def fake_run(*_args, **_kwargs):
+            return subprocess.CompletedProcess(
+                args=["fake-worker"], returncode=0, stdout=wire, stderr=""
+            )
+
+        monkeypatch.setattr(live_adapter.subprocess, "run", fake_run)
+        result = observe_in_subprocess([event])
+        assert result["observer_classification"] == "UNKNOWN_OBSERVATION"
+        assert result["real_commits"] is None
+        assert not check_observer_response([event], result)
