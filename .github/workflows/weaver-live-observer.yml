@@ -26,6 +26,12 @@ jobs:
         run: python -m pip install -e '.[dev]'
       - name: Test adapter against real source-tree verifier
         run: python -m pytest -q tests/test_live_observer_adapter.py tests/test_portable_agent_eval.py
+      - name: Run complete repository test suite
+        run: python -m pytest -q
+      - name: Static lint and type checks
+        run: |
+          python -m ruff check .
+          python -m mypy triadic_controls src
       - name: Create observer-only result report
         run: python -m benchmarks.agent_reliability.live_adapter --out weaver-dryrun-report.json > observer-stdout.txt
       - name: Retain dry-run report
