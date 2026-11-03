@@ -195,9 +195,6 @@ def test_observer_requires_exact_classification_and_root_fields():
     missing = copy.deepcopy(good)
     missing.pop("observer_classification")
     invalid.append(missing)
-    forged_count = copy.deepcopy(good)
-    forged_count["real_commits"] = False  # bool compares equal to integer zero
-    invalid.append(forged_count)
     extra = copy.deepcopy(good)
     extra["unauthenticated_extra"] = "hidden"
     invalid.append(extra)
@@ -266,6 +263,14 @@ def test_ambiguous_observer_json_is_unknown_not_a_valid_receipt(
     event = sess.attempt("duplicate-json", "duplicate-json", case["request"])
     good = observe_in_subprocess([event])
     assert check_observer_response([event], good)
+
+    # Direct semantic check makes float-zero sensitive to the count-type guard
+    # even if a separate parser defense would also reject this wire input.
+    if corruption == "float_zero":
+        for invalid_count in (0.0, False):
+            wrong_type = copy.deepcopy(good)
+            wrong_type["real_commits"] = invalid_count
+            assert not check_observer_response([event], wrong_type)
 
     encoded = json.dumps(good, sort_keys=True)
     if corruption == "duplicate_head":
