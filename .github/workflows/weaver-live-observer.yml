@@ -43,3 +43,29 @@ jobs:
             weaver-dryrun-report.json
             observer-stdout.txt
           if-no-files-found: warn
+
+  observer-mutation-control:
+    name: Mutation sensitivity / exact-head Python 3.12
+    runs-on: ubuntu-24.04
+    permissions:
+      contents: read
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+          # PR events normally check out a synthetic merge commit. Use the source head.
+          ref: ${{ github.event.pull_request.head.sha || github.sha }}
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - name: Install test dependencies
+        run: python -m pip install -e '.[dev]'
+      - name: Run exact-source baseline and ephemeral pre-hardening mutation
+        run: python -m tools.observer_receipt_mutation_check
+      - name: Preserve mutation run report, xUnit evidence and failure transcript
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: observer-mutation-control
+          path: mutation-receipts/
+          if-no-files-found: error
