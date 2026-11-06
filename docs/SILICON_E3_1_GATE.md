@@ -167,3 +167,19 @@ enforcement is still absent. No bitstream or hardware observation is bound by th
 source-only checkpoint; their later exact bytes need new anchors. The earlier
 source-anchor-pending statement is now superseded by this dated receipt, while
 its original evidence bytes remain unchanged. E3.1 and production remain unearned.
+
+## Admission discrimination and direct log verification — 2026-11-06
+
+See the [gate/log addendum](../evidence/silicon/2026-11-06/gate-discrimination/README.md).
+The real source bundle now refuses with machine code `AUTHORITY_POLICY_MISSING`,
+exit 2. `decision=READY`/exit 0 is demonstrated only by a complete synthetic trust
+domain exercising all implemented signature/inclusion/Chronicle/cache/policy/role
+checks. Production retains its fixed log pin and rejects that synthetic root.
+`READY_FOR_E3_1_REVIEW` continues to be a scoped role-gate state. Public quorum,
+physical reproduction and production authority remain unearned.
+
+A direct fetch of Rekor's own signed checkpoint and a verified consistency proof
+connect the retained root to the live log's later root. The raw responses, UTC
+observation times and a repeatable read-only CLI are public in the addendum.
+Log inclusion establishes publication of committed bytes; it does not establish
+compilation, executed tests, gate behavior or a running physical system.

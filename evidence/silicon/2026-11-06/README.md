@@ -51,3 +51,12 @@ Both public proofs, readback, all source hashes and original Chronicle prefix we
 verified. Earlier receipts and packet bytes are preserved unchanged. This is source
 publication only; a vendor build and physical results require future checkpoints.
 No silicon qualification, outsider reproduction, timing receipt or quorum is earned.
+
+## Gate discrimination and direct log checkpoint — 2026-11-06
+
+The [dated addendum](gate-discrimination/README.md) explicitly separates publication
+from compilation/execution, records a direct Rekor signed-checkpoint fetch and
+verified consistency proof, and supplies machine-coded gate refusals plus a full
+synthetic READY control. The actual bundle remains NOT_READY. Earlier checkpoints,
+archives and frozen packet bytes are preserved; new verifier code is not claimed
+to be covered by the earlier RTL anchor.

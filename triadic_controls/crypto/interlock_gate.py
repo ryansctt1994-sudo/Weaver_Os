@@ -6,6 +6,7 @@ import base64
 import hashlib
 from pathlib import Path
 
+from cryptography.exceptions import InvalidSignature
 from cryptography.hazmat.primitives.asymmetric.ed25519 import Ed25519PublicKey
 
 from .external_anchor import canonical, require, strict_json, verify_anchor
@@ -26,49 +27,79 @@ REQUIRED_CONTROLS = (
 )
 
 
+class GateRefusal(ValueError):
+    """A stable admission reason; human detail is not the machine interface."""
+
+    def __init__(self, code, detail):
+        self.code = code
+        super().__init__(detail)
+
+
+def demand(condition, code, detail):
+    if not condition:
+        raise GateRefusal(code, detail)
+
+
 def verify_physical_receipts(directory, policy, checkpoint_hash, bitstream_hash):
     """Pinned role keys authenticate declared observations; they cannot prove custody truth."""
     principals = {policy["author_principal"]}
     for role in REQUIRED_ROLES:
         authority = policy["authorities"][role]
         principal = authority["principal"]
-        require(principal and principal not in principals, "shared principal: " + role)
+        demand(
+            principal and principal not in principals,
+            "RECEIPT_PRINCIPAL_CONFLICT",
+            "shared principal: " + role,
+        )
         principals.add(principal)
-        require(
+        demand(
             len(bytes.fromhex(authority["custody_receipt_sha256"])) == 32,
+            "RECEIPT_CUSTODY_INVALID",
             "key custody claim missing",
         )
-        receipt = strict_json((directory / (role + ".json")).read_bytes())
+        try:
+            receipt = strict_json((directory / (role + ".json")).read_bytes())
+        except FileNotFoundError as error:
+            raise GateRefusal("PHYSICAL_RECEIPT_MISSING", "missing receipt: " + role) from error
         payload = receipt["payload"]
-        Ed25519PublicKey.from_public_bytes(bytes.fromhex(authority["public_key_hex"])).verify(
-            base64.b64decode(receipt["signature"], validate=True),
-            RECEIPT_DOMAIN + canonical(payload),
-        )
-        require(
+        try:
+            Ed25519PublicKey.from_public_bytes(bytes.fromhex(authority["public_key_hex"])).verify(
+                base64.b64decode(receipt["signature"], validate=True),
+                RECEIPT_DOMAIN + canonical(payload),
+            )
+        except (InvalidSignature, ValueError) as error:
+            raise GateRefusal("RECEIPT_SIGNATURE_INVALID", "invalid signature: " + role) from error
+        demand(
             payload["role"] == role and payload["principal"] == principal,
+            "RECEIPT_IDENTITY_MISMATCH",
             "receipt role/principal mismatch",
         )
-        require(
+        demand(
             payload["checkpoint_sha256"] == checkpoint_hash
             and payload["bitstream_sha256"] == bitstream_hash,
+            "RECEIPT_CANDIDATE_MISMATCH",
             "receipt belongs to another candidate",
         )
-        require(
+        demand(
             payload["custody_receipt_sha256"] == authority["custody_receipt_sha256"],
+            "RECEIPT_CUSTODY_MISMATCH",
             "custody receipt mismatch",
         )
-        require(
+        demand(
             payload["status"] == "OBSERVED_PASS" and payload["direct_execution"] is True,
+            "RECEIPT_EXECUTION_UNOBSERVED",
             "unobserved run",
         )
-        require(
+        demand(
             payload["board_model"] == "Arty A7-35T"
             and isinstance(payload["board_serial"], str)
             and 0 < len(payload["board_serial"]) <= 128,
+            "RECEIPT_BOARD_UNIDENTIFIED",
             "unidentified board",
         )
-        require(
+        demand(
             all(payload["controls"].get(name) is True for name in REQUIRED_CONTROLS),
+            "RECEIPT_CONTROLS_INCOMPLETE",
             "incomplete physical controls",
         )
 
@@ -114,9 +145,17 @@ def verify_chronicle(bundle, manifest):
 
 def check_evidence(bundle: Path, replay_db: Path, *, policy_path=None, policy_sha256=None):
     """Return NOT_READY on any missing, untrusted or mismatched prerequisite."""
-    checks, failures, bound_artifacts = {}, [], []
+    checks, failures, bound_artifacts, refusals = {}, [], [], []
+
+    def refuse(stage, code, error):
+        code = error.code if isinstance(error, GateRefusal) else code
+        detail = type(error).__name__ + ": " + str(error)
+        failures.append(stage + ": " + detail)
+        refusals.append({"code": code, "stage": stage, "detail": detail})
+
     bundle = bundle.resolve()
     checkpoint = bundle / "checkpoint.json"
+    code = "ANCHOR_INVALID"
     try:
         raw = checkpoint.read_bytes()
         manifest = strict_json(raw)
@@ -126,33 +165,42 @@ def check_evidence(bundle: Path, replay_db: Path, *, policy_path=None, policy_sh
             (bundle / "rekor-public-key.pem").read_bytes(),
         )
         checks["external_log_inclusion"] = True
+        code = "CHRONICLE_INVALID"
         bound_artifacts = verify_chronicle(bundle, manifest)
         checks["anchored_chronicle_and_artifacts"] = True
     except Exception as error:
-        failures.append("ANCHOR_OR_CHRONICLE: " + type(error).__name__ + ": " + str(error))
+        refuse("ANCHOR_OR_CHRONICLE", code, error)
     try:
         SQLiteReplayCache(replay_db, create=False)
         checks["persistent_replay_state_present"] = True
     except Exception as error:
-        failures.append("REPLAY_STATE: " + type(error).__name__ + ": " + str(error))
+        refuse("REPLAY_STATE", "REPLAY_STATE_UNAVAILABLE", error)
+    code = "AUTHORITY_POLICY_MISSING"
     try:
         require(
             policy_path is not None and policy_sha256 is not None,
             "external authority policy unconfigured",
         )
+        code = "AUTHORITY_POLICY_UNREADABLE"
         policy_bytes = Path(policy_path).read_bytes()
+        code = "AUTHORITY_POLICY_HASH_MISMATCH"
         require(
             hashlib.sha256(policy_bytes).hexdigest() == policy_sha256,
             "authority policy digest mismatch",
         )
+        code = "AUTHORITY_POLICY_INVALID"
         policy = strict_json(policy_bytes)
+        code = "POLICY_CANDIDATE_MISMATCH"
         require(
             hashlib.sha256(checkpoint.read_bytes()).hexdigest() == policy["checkpoint_sha256"],
             "wrong policy candidate",
         )
+        code = "BITSTREAM_UNAVAILABLE"
         bitstream = bundle / "lucifer_arty_a7.bit"
         bitstream_hash = hashlib.sha256(bitstream.read_bytes()).hexdigest()
+        code = "BITSTREAM_HASH_MISMATCH"
         require(bitstream_hash == policy["bitstream_sha256"], "unbound vendor bitstream")
+        code = "BITSTREAM_NOT_ANCHORED"
         require(
             any(
                 a["path"] == "lucifer_arty_a7.bit" and a["sha256"] == bitstream_hash
@@ -160,17 +208,22 @@ def check_evidence(bundle: Path, replay_db: Path, *, policy_path=None, policy_sh
             ),
             "vendor bitstream absent from external Chronicle anchor",
         )
+        code = "PHYSICAL_RECEIPTS_INVALID"
         verify_physical_receipts(
             bundle / "independent-receipts", policy, policy["checkpoint_sha256"], bitstream_hash
         )
         checks["physical_and_clean_room_receipts"] = True
     except Exception as error:
-        failures.append(
-            "PHYSICAL_OR_INDEPENDENT_RECEIPTS: " + type(error).__name__ + ": " + str(error)
-        )
+        refuse("PHYSICAL_OR_INDEPENDENT_RECEIPTS", code, error)
     return {
         "schema": "weaver-silicon-evidence-gate/1",
         "status": "READY_FOR_E3_1_REVIEW" if not failures else "NOT_READY",
+        "decision": "READY" if not failures else "NOT_READY",
+        "exit_code": 0 if not failures else 2,
+        "reason_codes": [item["code"] for item in refusals],
+        "refusals": refusals,
+        "silicon_E3_1": "NOT_READY",
+        "public_quorum_verified": False,
         "checks": checks,
         "missing_or_invalid": failures,
         "production_authority_earned": False,
@@ -197,7 +250,7 @@ def build_evidence_gated_verifier(
     )
 
 
-if __name__ == "__main__":
+def main(argv=None):
     import argparse
     import json
 
@@ -206,9 +259,13 @@ if __name__ == "__main__":
     parser.add_argument("--replay-db", type=Path, required=True)
     parser.add_argument("--policy", type=Path)
     parser.add_argument("--policy-sha256")
-    args = parser.parse_args()
+    args = parser.parse_args(argv)
     result = check_evidence(
         args.bundle, args.replay_db, policy_path=args.policy, policy_sha256=args.policy_sha256
     )
     print(json.dumps(result, indent=2))
-    raise SystemExit(0 if result["status"] == "READY_FOR_E3_1_REVIEW" else 2)
+    return result["exit_code"]
+
+
+if __name__ == "__main__":
+    raise SystemExit(main())
