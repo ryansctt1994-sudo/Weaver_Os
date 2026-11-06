@@ -1,0 +1,36 @@
+{
+  "schema": "silicon-candidate-followup-verification/1",
+  "tested_weaver_commit": "a7b141a2bad6309c3737201119fec6b1766ea955",
+  "tested_hardware_commit": "49fc0fdd61b2c8f5487b0aeebe38b219bdf512f3",
+  "source_tree_clean": true,
+  "weaver_overall_verdict": "PASS",
+  "required_verifiers": {
+    "unit_and_integration": "PASS",
+    "bound_witness": "PASS",
+    "mutation_suite": "PASS",
+    "adversarial_corpus": "PASS",
+    "static_analysis_strict": "PASS",
+    "installed_wheel": "PASS",
+    "formal_tlc": "PASS"
+  },
+  "weaver_tests": 178,
+  "first_attempt": {
+    "verdict": "FAIL",
+    "cause": "Local environment lacked setuptools build backend",
+    "source_changes_to_resolve": false,
+    "record_preserved": true
+  },
+  "locked_dependency_attempt": {
+    "verdict": "PASS",
+    "wheel_sha256": "1126acd6f20fb6408fccacaebb787aff5b0b35d920de02b46f9f33e4a63f680d",
+    "report_sha256": "d355816f4307a2945aed5e24815c5bcc53ebb93f311cbfa9e6e1309cce930f51"
+  },
+  "records_zip_sha256": "56bcf5e8863b06919e9cc9ccd92dad78380a7fb04dd56e5ec99ab61da1eb4906",
+  "hardware_checkout_simulations": "PASS",
+  "external_checkpoint_proof": "VERIFIED",
+  "silicon_E3_1": "NOT_READY",
+  "physical_board_programmed": false,
+  "independent_reproduction": false,
+  "production_authority_earned": false,
+  "hosted_software_verification_url": "https://github.com/ryansctt1994-sudo/Weaver_Os/actions/runs/42242737007"
+}
