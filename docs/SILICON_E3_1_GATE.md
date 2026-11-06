@@ -105,3 +105,47 @@ and its pending receipts are not silently rewritten or promoted by this change.
 The same author/machine ran these tests. Independent clean-room verification has
 not occurred. The public log is external publication, not a witness quorum or
 independent observation of hardware.
+
+
+## 2026-11-06 physical packet and stronger evidence requirements
+
+The published [physical reproduction packet at `0f3b0973`](https://github.com/ryansctt1994-sudo/cathedral-verified/tree/0f3b0973b95ecbadb49ca4f7d989ed1da8a2f6b9/hardware/lucifer_latch/arty_a7/qualification)
+adds continuous video, independently controlled raw timing capture, observer
+noninterference and unguarded-reference controls, nine physical coverage cases,
+and unsigned collection templates. Its checksum-list SHA-256 is
+`d668739d2db6c219a7bb6373807254f800434195f8a835ba38e67aba53bea8bd`.
+The packet also documents SRAM volatility and separately assessed mechanisms
+needed for persistent or permanent trip state. No such mechanism is implemented.
+
+A new startup simulation exposed the earlier board wrapper permitting before its
+initial reset input was qualified. The revised RTL requires initial stable-level
+qualification, and the original failing trace plus passing revised tests/mapping
+are public in that commit. **The earlier Rekor checkpoint still binds the earlier
+candidate.** It is not an anchor for the changed RTL or future bitstreams. Any
+hardware qualification must bind a new actual-build checkpoint and retain that
+prior history; this repository's original bundle has not been replaced.
+
+The packet proposes a public **2-of-3 outside-witness** policy. The three actual
+principals, their own keys/custody disclosures and adjudicator must be enrolled and
+published before qualifying runs. Both counted affirmative witnesses must directly
+rebuild and reproduce on independently controlled benches; independent timing
+receipts must accompany their raw evidence. No witnesses are enrolled and no
+physical reproduction has occurred. A text-only reviewer or another agent under
+the author's principal cannot substitute. The quorum is an attestation threshold,
+not a claim of Byzantine fork immunity or guaranteed availability.
+
+**Implementation boundary:** the existing `interlock_gate` checks two role receipts;
+it does not verify the new public quorum, independent timing formats or all raw
+physical evidence. Its `READY_FOR_E3_1_REVIEW` remains insufficient to satisfy this
+stronger review policy. It cannot authorize promotion to E3.1 or production.
+The new packet formats have no implemented quorum verifier in this change.
+Also, the current two-role policy binds one bitstream digest, while independent
+builds may legitimately differ: preserve and review each build's exact digest and
+provenance rather than pretending they are identical. A future machine-enforced
+cross-build/quorum policy needs a separately reviewed implementation.
+
+E3.1 remains **NOT_READY** until outsiders reproduce the silicon evidence and the
+public receipt set, custody, coverage, failure history and actual effect path are
+verified. The software factory and receipt signatures alone cannot establish that.
+No board access, flashing, video, physical measurements, outside receipt, witness
+enrollment or production transition is recorded by this documentation update.

@@ -34,3 +34,9 @@ physical debounce/metastability/irreversibility result was measured, and no outs
 operator has reproduced this package. The author/machine/principal are the same
 for all local checks. An Arty SRAM configuration can clear on power loss or JTAG
 reconfiguration; only a bounded software-input irreversibility claim is exercised.
+
+The later [physical packet status](physical-packet-status.json) records the revised
+startup-reset RTL and outside reproduction requirements. The old bundle and Rekor
+entry remain unchanged historical evidence for the prior source. Neither the
+revised hardware nor a physical run is qualified by that old entry. See the
+[updated integration limits](../../../docs/SILICON_E3_1_GATE.md#2026-11-06-physical-packet-and-stronger-evidence-requirements).
