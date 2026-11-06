@@ -1,0 +1,40 @@
+{
+  "schema": "revised-anchor-verifier-checks/1",
+  "observed_at_utc": "2026-11-06T16:16:57.893586+00:00",
+  "positive_original_restored": "VERIFIED",
+  "cases": [
+    {
+      "case": "revised RTL bytes changed",
+      "result": "REJECTED",
+      "error_type": "ValueError",
+      "reason": "artifact mismatch: source/hardware/lucifer_latch/arty_a7/lucifer_arty_a7.v"
+    },
+    {
+      "case": "original ledger prefix edited",
+      "result": "REJECTED",
+      "error_type": "ValueError",
+      "reason": "original ledger prefix changed"
+    },
+    {
+      "case": "original checkpoint link metadata altered",
+      "result": "REJECTED",
+      "error_type": "ValueError",
+      "reason": "wrong expected checkpoint"
+    },
+    {
+      "case": "old public log signature corrupted",
+      "result": "REJECTED",
+      "error_type": "InvalidSignature",
+      "reason": ""
+    },
+    {
+      "case": "new public readback signature corrupted",
+      "result": "REJECTED",
+      "error_type": "InvalidSignature",
+      "reason": ""
+    }
+  ],
+  "synthetic_local_mutations_only": true,
+  "independent_observation": false,
+  "production_authority_earned": false
+}

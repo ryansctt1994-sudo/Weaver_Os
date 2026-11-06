@@ -1,0 +1,19 @@
+{
+  "schema": "chronicle-rekor-verification/1",
+  "verification": "VERIFIED_LOG_INCLUSION",
+  "manifest_sha256": "b0439f7d0878dd8d888bd7fde2dc37baca645829d10e999609c79b38a3018332",
+  "uuid": "108e9186e8c5677a6cfe12dcdf288a3e1048689ef22977bed7d3880e55f77c74a740b8967e26296b",
+  "entry_url": "https://rekor.sigstore.dev/api/v1/log/entries/108e9186e8c5677a6cfe12dcdf288a3e1048689ef22977bed7d3880e55f77c74a740b8967e26296b",
+  "integrated_time": 1793981608,
+  "log_index": 3721019269,
+  "shard_log_index": 3599115007,
+  "tree_size": 3599115150,
+  "root_hash": "aae395c1b6ea7c4cd27375462c89a68d2183f766f54bc86e6cdc0a593fcf48f9",
+  "log_key_id": "c0d23d6ad406973f9559f3ba2d1ca01f84147d8ffc5b8445c224f98b9591801d",
+  "independent_hardware_observation": false,
+  "trust_bootstrap": "Pinned key matched HTTPS official Sigstore trusted_root and log publicKey. Full TUF chain not verified.",
+  "limits": "One log inclusion/checkpoint; no hardware behavior, event truth, witness independence, future consistency or fork immunity proved.",
+  "observed_at_utc": "2026-11-06T16:13:28.734183+00:00",
+  "http_status": 200,
+  "server_date": "Fri, 06 Nov 2026 16:13:28 GMT"
+}

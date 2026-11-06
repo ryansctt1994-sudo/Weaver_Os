@@ -1,0 +1,302 @@
+{
+  "schema": "revised-anchor-bundle-manifest/1",
+  "files": [
+    {
+      "path": "README.md",
+      "size": 5187,
+      "sha256": "3014419c35af5c4a6e847327e4512fbc3955a5ec42dd9c56d03402d7bb2afe37"
+    },
+    {
+      "path": "STATUS.json",
+      "size": 1059,
+      "sha256": "8ce3746c93971b3b764e35c6d417977249ad651ad6497841c0adba0bbc163a1b"
+    },
+    {
+      "path": "anchor-author.pub",
+      "size": 178,
+      "sha256": "16fd6b461a56c099702c713c700b913de76cb6f429a3696934271ffc07feff5e"
+    },
+    {
+      "path": "anchor-verification.json",
+      "size": 1027,
+      "sha256": "401ec348d611afeac83841afac7a6183458337893305e1c4739d85dc79338507"
+    },
+    {
+      "path": "checkpoint.json",
+      "size": 1717,
+      "sha256": "b0439f7d0878dd8d888bd7fde2dc37baca645829d10e999609c79b38a3018332"
+    },
+    {
+      "path": "interlock-gate.exit",
+      "size": 2,
+      "sha256": "53c234e5e8472b6ac51c1ae1cab3fe06fad053beb8ebfd8977b010655bfdd3c3"
+    },
+    {
+      "path": "interlock-gate.json",
+      "size": 526,
+      "sha256": "9cd5ba8d5b83c8e05dba85737ade85977720fbc0858dfdf47a6c0540505242f8"
+    },
+    {
+      "path": "previous/anchor-author.pub",
+      "size": 178,
+      "sha256": "16fd6b461a56c099702c713c700b913de76cb6f429a3696934271ffc07feff5e"
+    },
+    {
+      "path": "previous/checkpoint.json",
+      "size": 485,
+      "sha256": "cfbc72137d476a7c89817ba5e12f0104aa3e3b5be35079f8be295743a83fbd78"
+    },
+    {
+      "path": "previous/qualification.chronicle.jsonl",
+      "size": 2308,
+      "sha256": "2994aff50d59b15e2e5924c1f87276b1c4265739ea6e8382f1734a1fbfccf4ca"
+    },
+    {
+      "path": "previous/rekor-entry.json",
+      "size": 2978,
+      "sha256": "7feae658065d177c73d9a45924a4295238390f1096bd83944a56e9363c6774bc"
+    },
+    {
+      "path": "previous/rekor-public-key.pem",
+      "size": 178,
+      "sha256": "dce5ef715502ec9f3cdfd11f8cc384b31a6141023d3e7595e9908a81cb6241bd"
+    },
+    {
+      "path": "previous/sigstore-trusted-root.json",
+      "size": 6787,
+      "sha256": "6494e21ea73fa7ee769f85f57d5a3e6a08725eae1e38c755fc3517c9e6bc0b66"
+    },
+    {
+      "path": "qualification.chronicle.jsonl",
+      "size": 9651,
+      "sha256": "85bd4dc5c39a18c7566c0b459ba0d1517fba6052e4fdea406e02fd15a6e566b6"
+    },
+    {
+      "path": "readback-verification.json",
+      "size": 1156,
+      "sha256": "4631dd4a9019e6b43a73b69d92ad32fdaf62bb46e1e1a06a12915f8fb8f876da"
+    },
+    {
+      "path": "rekor-entry.json",
+      "size": 2773,
+      "sha256": "47a086a345c864a4226be6f667408f95c64a72a9782abb70ca110657b2b55b66"
+    },
+    {
+      "path": "rekor-public-key.pem",
+      "size": 178,
+      "sha256": "dce5ef715502ec9f3cdfd11f8cc384b31a6141023d3e7595e9908a81cb6241bd"
+    },
+    {
+      "path": "rekor-readback.json",
+      "size": 2773,
+      "sha256": "41b550664041237f8e672739ba21209880de274603024b0ecfc1e792d1f9bffd"
+    },
+    {
+      "path": "rekor-submission.json",
+      "size": 557,
+      "sha256": "0a6a5abae2bd1fa976d09d612f6d39101ea5d8e5b47b5e4b35feeedc17e7d85f"
+    },
+    {
+      "path": "revision-verification.json",
+      "size": 844,
+      "sha256": "8e0fa309cefab8362c1ec530b73bbcb345bbdb7e1f7a97f5de751433946ec451"
+    },
+    {
+      "path": "source/LICENSE",
+      "size": 1074,
+      "sha256": "97b3af70c8e3e83d46dac823681f443b55456a30c3b0e63b6ada280bf31d7bac"
+    },
+    {
+      "path": "source/Makefile",
+      "size": 883,
+      "sha256": "af520a372a35fdb6df729e7b57c2e2c4ae5220ef090a538e04459a2b2fc62964"
+    },
+    {
+      "path": "source/chronicle/chronicle.py",
+      "size": 5133,
+      "sha256": "22ea38402c9eb7c49408d7dc5d4007c9ee375551d6b0aad8251afc5651bce541"
+    },
+    {
+      "path": "source/chronicle/external_anchor.py",
+      "size": 6360,
+      "sha256": "d8a2f2eae6b85cd781b5aaec33d3d60abf7cb72c9b99f68777875b600ca6b995"
+    },
+    {
+      "path": "source/evidence/silicon/2026-11-06/startup-amendment/README.md",
+      "size": 1074,
+      "sha256": "1a3efc22047070eb49915caa5a77109cfaae369f728de337145a1509a9503240"
+    },
+    {
+      "path": "source/evidence/silicon/2026-11-06/startup-amendment/initial-diagnostic.v",
+      "size": 584,
+      "sha256": "cedd848707c3d287cac3ca2e61e53551b8a17deec2ad1e0a467d0fce5e6c1e17"
+    },
+    {
+      "path": "source/evidence/silicon/2026-11-06/startup-amendment/original-regression.log",
+      "size": 202,
+      "sha256": "5af4b56e0bd1d5999ef1a972729b80adea3154a5dae220681a2c9eb60762e899"
+    },
+    {
+      "path": "source/evidence/silicon/2026-11-06/startup-amendment/receipt.json",
+      "size": 3094,
+      "sha256": "72a089e739652a9fa91d80789403e24694f06f8f1bea866d61bc0a8c3c109a02"
+    },
+    {
+      "path": "source/evidence/silicon/2026-11-06/startup-amendment/revised-netlist.v",
+      "size": 65673,
+      "sha256": "3fcead06ef26566d679801d9b91d3a2b0c3468ba3ca539cedb77c46545a1e886"
+    },
+    {
+      "path": "source/evidence/silicon/2026-11-06/startup-amendment/revised-rtl.log",
+      "size": 3965,
+      "sha256": "b4ccc22714676a32f07b0770a1daad4a20f5b858d4fa7e045a4ca5410b1c5026"
+    },
+    {
+      "path": "source/evidence/silicon/2026-11-06/startup-amendment/revised-synthesis.log",
+      "size": 149016,
+      "sha256": "d496fc76bb7a4ff40e506189e0c5df52b29162769b932a104a50c90966c08692"
+    },
+    {
+      "path": "source/evidence/silicon/2026-11-06/startup-amendment/startup-reset.log",
+      "size": 144,
+      "sha256": "2030b64847521f5080f8bfbfe83ab3cc2bd9b5e3a5d9ca0cbadd7ea8144fb5bd"
+    },
+    {
+      "path": "source/hardware/lucifer_latch/arty_a7/README.md",
+      "size": 9756,
+      "sha256": "7226a71b57c22ef7c85f2ede8a5d1ee052fa32d086880ba955a002212c161438"
+    },
+    {
+      "path": "source/hardware/lucifer_latch/arty_a7/arty_a7_35.xdc",
+      "size": 1176,
+      "sha256": "d29de2ce192028eaa25ee44c3b7a4a26cf7324cc116765a7b93dae450e5770c4"
+    },
+    {
+      "path": "source/hardware/lucifer_latch/arty_a7/build.tcl",
+      "size": 1756,
+      "sha256": "cf9041433b26c9e30c5c2e59f601feecc7aa565f5fe84d998971af4b250a6f4e"
+    },
+    {
+      "path": "source/hardware/lucifer_latch/arty_a7/lucifer_arty_a7.v",
+      "size": 1583,
+      "sha256": "b141eeb3a4b8705e6d6f0b840da6702498ba9b5d9d3e7f4194cc95aec34e8e4b"
+    },
+    {
+      "path": "source/hardware/lucifer_latch/arty_a7/program.tcl",
+      "size": 1118,
+      "sha256": "82a552cc64e6cb760ef74dfdb6350c74803e7cbb4c23bfde732a3603398a7b5e"
+    },
+    {
+      "path": "source/hardware/lucifer_latch/arty_a7/qualification/PHYSICAL_RUN_PROTOCOL.md",
+      "size": 8345,
+      "sha256": "26acaf934cdda8a89c1de2c879a6d16d6d086dfbc89c211c460630653cb5604f"
+    },
+    {
+      "path": "source/hardware/lucifer_latch/arty_a7/qualification/PUBLIC_WITNESS_POLICY.md",
+      "size": 5218,
+      "sha256": "d3edeb737d88fbb3ae40851f23c0de407521c317bf93db5626c821a6d29d68e3"
+    },
+    {
+      "path": "source/hardware/lucifer_latch/arty_a7/qualification/README.md",
+      "size": 5793,
+      "sha256": "de9c78fc9e8261921112fff2efb9ebc0bb082b768a04108518ab56662260048c"
+    },
+    {
+      "path": "source/hardware/lucifer_latch/arty_a7/qualification/SRAM_AND_PERMANENCE.md",
+      "size": 3073,
+      "sha256": "2f0d9a3488bb65e8d807e026ef871cabe5fd764633ca52a12686ec8d90116bbe"
+    },
+    {
+      "path": "source/hardware/lucifer_latch/arty_a7/qualification/packet.sha256",
+      "size": 3730,
+      "sha256": "d668739d2db6c219a7bb6373807254f800434195f8a835ba38e67aba53bea8bd"
+    },
+    {
+      "path": "source/hardware/lucifer_latch/arty_a7/qualification/templates/authority-roster.json",
+      "size": 1528,
+      "sha256": "496d997298454d32a2c7b69e2a461c8fa0a16cae70ac06cdbaa12c54c1c0f214"
+    },
+    {
+      "path": "source/hardware/lucifer_latch/arty_a7/qualification/templates/outside-reproduction-receipt.json",
+      "size": 835,
+      "sha256": "cb453419db71b602fcbc20e0f9098131aeb3a1e2383c4533116555127b9d4a65"
+    },
+    {
+      "path": "source/hardware/lucifer_latch/arty_a7/qualification/templates/physical-measurements.csv",
+      "size": 1322,
+      "sha256": "ddbcb5435634d4457d4297b6b40bc59f1cd254e99dafd6e325ba818f38398042"
+    },
+    {
+      "path": "source/hardware/lucifer_latch/arty_a7/qualification/templates/quorum-evaluation.json",
+      "size": 722,
+      "sha256": "f445900ac396fe0e3d428b76633f4537901980764210087c0c313373a6a95308"
+    },
+    {
+      "path": "source/hardware/lucifer_latch/arty_a7/qualification/templates/run-manifest.json",
+      "size": 5669,
+      "sha256": "356e9ee90b8e86dfcb4f5800940f6b0cb8165ebc0b5f0cbf2f4f4e4f139f63ee"
+    },
+    {
+      "path": "source/hardware/lucifer_latch/arty_a7/qualification/templates/timing-receipt.json",
+      "size": 950,
+      "sha256": "cfc0a1a5ade3cde2591db3adfe57f238560ba9d6967feb7df2663de8f9f92d14"
+    },
+    {
+      "path": "source/hardware/lucifer_latch/arty_a7/sync_debounce.v",
+      "size": 1381,
+      "sha256": "68726d4a22e425940cbc693a0d5757c02d27a4bb17d520a2fa260efd686bd00f"
+    },
+    {
+      "path": "source/hardware/lucifer_latch/arty_a7/tb_arty_a7.v",
+      "size": 2481,
+      "sha256": "f832fc2058d2ba68299913661aa707e8a7ccd46c91349bf4e1004b9a61641afd"
+    },
+    {
+      "path": "source/hardware/lucifer_latch/arty_a7/tb_debounce_default.v",
+      "size": 1005,
+      "sha256": "e0374ff98c458942389d56dcf104d028484541fc81d093473efb13e0a8d56d39"
+    },
+    {
+      "path": "source/hardware/lucifer_latch/arty_a7/tb_startup_reset.v",
+      "size": 2186,
+      "sha256": "b387e852fc6ce3e697b91d20c75d6299a0e42cb2c79331d03d27cf9e79bf9de9"
+    },
+    {
+      "path": "source/hardware/lucifer_latch/lucifer_latch.v",
+      "size": 3782,
+      "sha256": "e699f02a156195fea19f28d71aecc21b480783c981f221913660735415037867"
+    },
+    {
+      "path": "source/hardware/lucifer_latch/tb_lucifer_latch.v",
+      "size": 4384,
+      "sha256": "f7e0bad7071736dc4599b28b5d0a9614ac7a089cc9522aee74a8b4691cb605ea"
+    },
+    {
+      "path": "source-manifest.json",
+      "size": 5816,
+      "sha256": "1e1f9a05b831f7edc991043134d77a3c8d81fd4165ca6be89dd3ccda3a3ec5cf"
+    },
+    {
+      "path": "submission-observation.json",
+      "size": 440,
+      "sha256": "66e77e6f7d8ccd6e17c5571f70f02ce11d1f5595d579c146c8507175725f8bcd"
+    },
+    {
+      "path": "verifier-checks.json",
+      "size": 1156,
+      "sha256": "e696a88cda77f01057160247f8be406077480beb6f0b4bc1f0d25591dc80cf93"
+    },
+    {
+      "path": "verifier_mutations.py",
+      "size": 2288,
+      "sha256": "3b2cb547684fdb0b991e5ff435b086faa44e658a836816713d7e9b1232a9e103"
+    },
+    {
+      "path": "verify_revision.py",
+      "size": 6794,
+      "sha256": "4de9a474b0be99a67c999d646785586406277b7046afd653b12ba055eefcc5f1"
+    }
+  ],
+  "scope": "Transport inventory; independently pin the public checkpoint digest/source commit",
+  "private_keys_included": false
+}

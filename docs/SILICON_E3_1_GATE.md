@@ -149,3 +149,21 @@ public receipt set, custody, coverage, failure history and actual effect path ar
 verified. The software factory and receipt signatures alone cannot establish that.
 No board access, flashing, video, physical measurements, outside receipt, witness
 enrollment or production transition is recorded by this documentation update.
+
+## Revised source anchor observed — 2026-11-06T16:13:28Z
+
+The revised RTL/reproduction packet now has its own [public source checkpoint](../evidence/silicon/2026-11-06/revised-anchor/README.md),
+Rekor index **3721019269**, checkpoint SHA-256
+`b0439f7d0878dd8d888bd7fde2dc37baca645829d10e999609c79b38a3018332`.
+It binds hardware source `0f3b0973b95ecbadb49ca4f7d989ed1da8a2f6b9` and preserves
+the original Chronicle entry as an exact prefix. Both public proofs and readback,
+source/packet hashes, and chain continuity verify. The proof bundle includes
+standalone instructions and the original proof; no private key is included.
+
+The existing gate was actually run against the revised bundle and existing local
+test replay state. It verified inclusion and Chronicle/artifacts, then returned
+**NOT_READY, exit 2**, with external authority/physical receipts missing. Quorum
+enforcement is still absent. No bitstream or hardware observation is bound by this
+source-only checkpoint; their later exact bytes need new anchors. The earlier
+source-anchor-pending statement is now superseded by this dated receipt, while
+its original evidence bytes remain unchanged. E3.1 and production remain unearned.

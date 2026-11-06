@@ -40,3 +40,14 @@ startup-reset RTL and outside reproduction requirements. The old bundle and Reko
 entry remain unchanged historical evidence for the prior source. Neither the
 revised hardware nor a physical run is qualified by that old entry. See the
 [updated integration limits](../../../docs/SILICON_E3_1_GATE.md#2026-11-06-physical-packet-and-stronger-evidence-requirements).
+
+## Revised source anchor — 2026-11-06T16:13:28Z
+
+The [revised-source receipt](revised-anchor/README.md) completes publication of the
+exact RTL/packet at hardware commit `0f3b0973b95ecbadb49ca4f7d989ed1da8a2f6b9`.
+Rekor index **3721019269** binds checkpoint
+`b0439f7d0878dd8d888bd7fde2dc37baca645829d10e999609c79b38a3018332`.
+Both public proofs, readback, all source hashes and original Chronicle prefix were
+verified. Earlier receipts and packet bytes are preserved unchanged. This is source
+publication only; a vendor build and physical results require future checkpoints.
+No silicon qualification, outsider reproduction, timing receipt or quorum is earned.

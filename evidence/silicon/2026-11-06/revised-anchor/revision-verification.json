@@ -1,0 +1,19 @@
+{
+  "verification": "VERIFIED_REVISED_SOURCE_PUBLICATION",
+  "checkpoint_sha256": "b0439f7d0878dd8d888bd7fde2dc37baca645829d10e999609c79b38a3018332",
+  "source_commit": "0f3b0973b95ecbadb49ca4f7d989ed1da8a2f6b9",
+  "rekor_entry_url": "https://rekor.sigstore.dev/api/v1/log/entries/108e9186e8c5677a6cfe12dcdf288a3e1048689ef22977bed7d3880e55f77c74a740b8967e26296b",
+  "log_index": 3721019269,
+  "source_artifacts_verified": 34,
+  "packet_files_verified": 30,
+  "chronicle_entries": 2,
+  "original_prefix_preserved": true,
+  "original_and_revised_inclusion_verified": true,
+  "retained_readback_verified": true,
+  "author_key_continuity_verified": true,
+  "rekor_tree_consistency_proof": "NOT_VERIFIED",
+  "full_TUF_chain": "NOT_VERIFIED",
+  "independent_witnessing": false,
+  "silicon_E3_1": "NOT_READY",
+  "production_authority_earned": false
+}

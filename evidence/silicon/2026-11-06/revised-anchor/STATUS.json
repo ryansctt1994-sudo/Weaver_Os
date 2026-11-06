@@ -1,0 +1,22 @@
+{
+  "schema": "lucifer-revised-source-anchor-status/1",
+  "observed_at_utc": "2026-11-06T16:18:12.454617+00:00",
+  "source_commit": "0f3b0973b95ecbadb49ca4f7d989ed1da8a2f6b9",
+  "source_tree": "b65401d12826ec3fe62c929982c588f51b055be9",
+  "checkpoint_sha256": "b0439f7d0878dd8d888bd7fde2dc37baca645829d10e999609c79b38a3018332",
+  "rekor_log_index": 3721019269,
+  "rekor_entry_url": "https://rekor.sigstore.dev/api/v1/log/entries/108e9186e8c5677a6cfe12dcdf288a3e1048689ef22977bed7d3880e55f77c74a740b8967e26296b",
+  "public_readback_verified": true,
+  "original_chronicle_prefix_preserved": true,
+  "anchor_scope": "Revised RTL and reproduction packet only; no vendor bitstream or physical run",
+  "independent_witnessing": false,
+  "board_programmed": false,
+  "physical_video_or_traces": false,
+  "independent_timing_receipts": [],
+  "outside_reproductions": [],
+  "enrolled_outside_witnesses": [],
+  "quorum_enforced_in_weaver": false,
+  "permanent_irreversibility": "NOT_IMPLEMENTED",
+  "silicon_E3_1": "NOT_READY",
+  "production_authority_earned": false
+}
