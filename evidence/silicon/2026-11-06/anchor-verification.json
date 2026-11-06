@@ -1,0 +1,16 @@
+{
+  "schema": "chronicle-rekor-verification/1",
+  "verification": "VERIFIED_LOG_INCLUSION",
+  "manifest_sha256": "cfbc72137d476a7c89817ba5e12f0104aa3e3b5be35079f8be295743a83fbd78",
+  "uuid": "108e9186e8c5677a94273e14be960ad44a21d0a146c2013b824b6e4209bcd8a87d1f7c08e56c03d3",
+  "entry_url": "https://rekor.sigstore.dev/api/v1/log/entries/108e9186e8c5677a94273e14be960ad44a21d0a146c2013b824b6e4209bcd8a87d1f7c08e56c03d3",
+  "integrated_time": 1793977682,
+  "log_index": 3719860200,
+  "shard_log_index": 3597955938,
+  "tree_size": 3597956049,
+  "root_hash": "30970ebe6cfb3bf821683d307311cd20c7b325068526f986575e7c2508e04213",
+  "log_key_id": "c0d23d6ad406973f9559f3ba2d1ca01f84147d8ffc5b8445c224f98b9591801d",
+  "independent_hardware_observation": false,
+  "trust_bootstrap": "Pinned key matched HTTPS official Sigstore trusted_root and log publicKey. Full TUF chain not verified.",
+  "limits": "One log inclusion/checkpoint; no hardware behavior, event truth, witness independence, future consistency or fork immunity proved."
+}

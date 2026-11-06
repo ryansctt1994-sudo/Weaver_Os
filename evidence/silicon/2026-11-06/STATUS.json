@@ -1,0 +1,31 @@
+{
+  "schema": "silicon-priority-status/1",
+  "checkpoint_sha256": "cfbc72137d476a7c89817ba5e12f0104aa3e3b5be35079f8be295743a83fbd78",
+  "candidate_bundle_sha256": "219e52ac6ff4f804beb94aebdcbd32f336ef60f525df0d3772f5cbad00e37f3d",
+  "hardware_source_base": "1c4181714b48dd9d9616a0bebbb4fef8532deff8",
+  "weaver_source_base": "50ffc20917e4ca2748f3f647acaec23b3f724855",
+  "observed": {
+    "chronicle_checks": 15,
+    "original_latch_checks": 8,
+    "board_wrapper_checks": 12,
+    "default_debounce_cycles": 500000,
+    "xc7_mapping_and_structural_check": "PASS",
+    "external_rekor_inclusion": "VERIFIED",
+    "weaver_tests_passed": 178,
+    "simultaneous_processes": 8,
+    "nonce_admissions": 1,
+    "evidence_gate": "NOT_READY",
+    "evidence_gate_exit": 2
+  },
+  "not_observed": [
+    "Vivado placement/routing and timing closure",
+    "board programming or flash",
+    "physical irreversibility/debounce/metastability measurements",
+    "independent receipt custody",
+    "outside clean-room reproduction"
+  ],
+  "E3_1_earned": false,
+  "production_authority_earned": false,
+  "operator_principal": "ryansctt1994-sudo",
+  "external_log_operator": "Sigstore Rekor, digest publication only"
+}

@@ -102,6 +102,12 @@ This package verifies cryptographic authorization claims. It does not prove huma
 
 ## Status
 
+The [hardware-first E3.1 candidate gate](docs/SILICON_E3_1_GATE.md) connects external
+Chronicle proof verification to strict persistent replay state and pinned operator
+receipt requirements. Its current observed result is **NOT_READY**: vendor/physical
+hardware evidence and independent receipts remain absent. The [candidate bundle](evidence/silicon/2026-11-06/)
+includes a verified public-log anchor; it does not promote production authority.
+
 ```text
 MVP_VERIFICATION_SPINE
 ARCHITECTURE_FROZEN
