@@ -1,0 +1,532 @@
+{
+  "adversarial_results": [
+    {
+      "case_id": "ADV-001",
+      "case_name": "byte-tamper",
+      "exit_code": 1,
+      "expected_verdict": "REJECT",
+      "failure_code": "event_hash mismatch",
+      "fixture": "tampered.jsonl",
+      "fixture_sha256": "987a96a06d9dd25a09a80804eaae00d4df31e9d59f3dde6419033fe9d30e8ee6",
+      "observed_verdict": "REJECT",
+      "status": "PASS"
+    },
+    {
+      "case_id": "ADV-002",
+      "case_name": "ledger-truncation",
+      "exit_code": 1,
+      "expected_verdict": "REJECT",
+      "failure_code": "head mismatch",
+      "fixture": "truncated.jsonl",
+      "fixture_sha256": "6c64e46784940aff71d8e1b996aa251818e23f9f98c0b11829d90887bb5f19e9",
+      "observed_verdict": "REJECT",
+      "status": "PASS"
+    },
+    {
+      "case_id": "ADV-003",
+      "case_name": "key-substitution",
+      "exit_code": 1,
+      "expected_verdict": "REJECT",
+      "failure_code": "untrusted key",
+      "fixture": "key-substitution.jsonl",
+      "fixture_sha256": "c0b91c6dc071b93b33c89916774b33d55072f24142cc1c47d4fdb8cfcf50c4f2",
+      "observed_verdict": "REJECT",
+      "status": "PASS"
+    },
+    {
+      "case_id": "ADV-004",
+      "case_name": "empty-ledger",
+      "exit_code": 1,
+      "expected_verdict": "REJECT",
+      "failure_code": "ledger is empty",
+      "fixture": "empty.jsonl",
+      "fixture_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "observed_verdict": "REJECT",
+      "status": "PASS"
+    },
+    {
+      "case_id": "ADV-005",
+      "case_name": "duplicate-json-key",
+      "exit_code": 1,
+      "expected_verdict": "REJECT",
+      "failure_code": "duplicate JSON key",
+      "fixture": "duplicate-key.jsonl",
+      "fixture_sha256": "13e33d08e930880b116bfd9c26759f17b1032d3a3c73a8992e911cf54a6deb11",
+      "observed_verdict": "REJECT",
+      "status": "PASS"
+    },
+    {
+      "case_id": "ADV-006",
+      "case_name": "malformed-receipt",
+      "exit_code": 1,
+      "expected_verdict": "REJECT",
+      "failure_code": "'receipt_hash' is a required property",
+      "fixture": "malformed-receipt.json",
+      "fixture_sha256": "1e0f62e22ee14d5de1c5e730fb68cb0c530127b27309ca95cff36a704d39fa6a",
+      "observed_verdict": "REJECT",
+      "status": "PASS"
+    }
+  ],
+  "artifact_hashes": {
+    "adversarial-results.json": "0ce86dabf58041a2af122c7a2320eba022dc1a05826fdb785b85a6612fdb7a16",
+    "adversarial_corpus--run.log": "8d50aece5212b60c8ad3c061e8fec7608ed534041b030f62ce89f17fdddfab87",
+    "bound_witness--run.log": "1e3bf30610e06d04ca2ecdcaf91ed696abd9e443cb72652c2f1f05c78ff15152",
+    "dist/weaver_os-0.5.0-py3-none-any.whl": "1126acd6f20fb6408fccacaebb787aff5b0b35d920de02b46f9f33e4a63f680d",
+    "formal_tlc--acquire-pinned-tlc.log": "a69deddf987db9f1492519464bce38c0b5c5e527ee021262b04de8121c0f1b42",
+    "formal_tlc--bounded-invariants.log": "e0d94308363cf31f2460c3c4656ba93df63ac0b1be1b619f3c2ea18a3d078ab9",
+    "installed_wheel--build.log": "b554f4639aad6c2ba7c4734820f6c0cb4ebe57122b37521ce89df7e91789c56e",
+    "installed_wheel--create-venv.log": "86ae269891a2d237446cb5afb5b1b65d543fceb48b07a241ad7d3ce4589d7cf3",
+    "installed_wheel--install-locked-dependencies.log": "9a2980a6a790b597070b44adab1fdf06a49c4765c5aedfc7259949c207ba83ae",
+    "installed_wheel--install-wheel.log": "f58c7dad4862447c328de5e0d76e063c77efb932f930137291abf2456cdb6c1f",
+    "installed_wheel--smoke.log": "bb82958ba8c16e06be5147a9a9fbdde9861e78bf508f46d5ef238bd6956055e6",
+    "mutation_suite--run.log": "39d4a8b7a71b238ac8ca1a86a829387452f703ba00384ca5720c8cd45613c952",
+    "pyproject.toml": "1085c51cdc1be4bab7cc474a974b791b5ece8db89bf7f999221c327cffd4fa09",
+    "releases/weaver-witness-signed-rc1/WEAVER_WITNESS_SIGNED_RC1.zip": "9d77db86e83482ee208c645c7db48ae43daf592f147e28b9d6fc5d3a3237d6f0",
+    "requirements-verification.lock": "c315be2e14d8a8c3e724f6c07c57a6c85a97101435211f657ebf3c5717e46abd",
+    "schemas/triad_receipt.schema.json": "ffcd44c1561cc245d096add18ffb17944fdcbb8a76ed243b6361e011d8d27883",
+    "schemas/verification_run.schema.json": "fe9be8cfd9f33dad4313dd6586ca23d1d2c5fa643c845dee489bfe893ab387c4",
+    "static_analysis_strict--mypy.log": "e382288e1e90f0f664ea990950ed1cb3c2f499cc905d3e654528968f1c2b9378",
+    "static_analysis_strict--ruff.log": "a70078eb34ab2604de9a7b4bbf3288c5c5eea62efb9005f24c6e65f8f5631cb5",
+    "tests/fixtures/verification/README.md": "50a18c92fc36f9903b7c5615a938ec759ef9d379fbba5793cebccdd7af3462b4",
+    "tests/fixtures/verification/duplicate-key.jsonl": "13e33d08e930880b116bfd9c26759f17b1032d3a3c73a8992e911cf54a6deb11",
+    "tests/fixtures/verification/empty.jsonl": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "tests/fixtures/verification/key-substitution.jsonl": "c0b91c6dc071b93b33c89916774b33d55072f24142cc1c47d4fdb8cfcf50c4f2",
+    "tests/fixtures/verification/malformed-receipt.json": "1e0f62e22ee14d5de1c5e730fb68cb0c530127b27309ca95cff36a704d39fa6a",
+    "tests/fixtures/verification/manifest.json": "a0f118d8961b0892f9c5fb9bff16d924be9a511f1538c3743895775219566274",
+    "tests/fixtures/verification/report-duplicate-check.json": "8320c1f3e77b59e4e5b725f92d7a964dcbc50f92da7a151e6d7af6b9fd28f171",
+    "tests/fixtures/verification/report-failed-check.json": "05d428d475f8546433c0b1a81964281c77069ba5b345f55edea958b4e12ef9b7",
+    "tests/fixtures/verification/report-missing-check.json": "67c91640f1734ee4ff8e83c62342b5b513abffec434b576211925c40b0de289b",
+    "tests/fixtures/verification/report-unknown-field.json": "950a75e8177a23bdd1d1269bf93fc62257a097896e55af75c4451ca066d5ea6a",
+    "tests/fixtures/verification/report-valid.json": "ac4055c2ab4c49a98704878f64b43d55d4e3fb2c73f1b269b55e71c48470c14e",
+    "tests/fixtures/verification/tampered.jsonl": "987a96a06d9dd25a09a80804eaae00d4df31e9d59f3dde6419033fe9d30e8ee6",
+    "tests/fixtures/verification/truncated.jsonl": "6c64e46784940aff71d8e1b996aa251818e23f9f98c0b11829d90887bb5f19e9",
+    "tests/fixtures/verification/valid.jsonl": "93b08500eb2f0e39fc45e056a5973263d518370d88b536bffc879e5776891fb6",
+    "unit_and_integration--run.log": "3183fb9dca9e258660e64d0881d6ac1274ae9340d55fcdc056b3d7d31a761f74"
+  },
+  "base_sha": "50ffc20917e4ca2748f3f647acaec23b3f724855",
+  "commands": [
+    {
+      "command": [
+        "/workspace/weaver-silicon-venv/bin/python",
+        "-m",
+        "pytest",
+        "-q"
+      ],
+      "exit_code": 0,
+      "status": "PASS",
+      "step": "run",
+      "verifier": "unit_and_integration"
+    },
+    {
+      "command": [
+        "/workspace/weaver-silicon-venv/bin/python",
+        "-m",
+        "tools.run_verified_witness",
+        "releases/weaver-witness-signed-rc1/WEAVER_WITNESS_SIGNED_RC1.zip",
+        "--expected-key-sha256",
+        "5ac8e9d25de8d37cd9165d4a7458c34634aeded53c1709573ddf4cc122bcefb9"
+      ],
+      "exit_code": 0,
+      "status": "PASS",
+      "step": "run",
+      "verifier": "bound_witness"
+    },
+    {
+      "command": [
+        "/workspace/weaver-silicon-venv/bin/python",
+        "-m",
+        "tools.check_verifier_mutations"
+      ],
+      "exit_code": 0,
+      "status": "PASS",
+      "step": "run",
+      "verifier": "mutation_suite"
+    },
+    {
+      "command": [
+        "/workspace/weaver-silicon-venv/bin/python",
+        "-m",
+        "tools.run_adversarial_corpus",
+        "--output",
+        "/workspace/silicon-weaver-full-verification-locked/adversarial-results.json"
+      ],
+      "exit_code": 0,
+      "status": "PASS",
+      "step": "run",
+      "verifier": "adversarial_corpus"
+    },
+    {
+      "command": [
+        "/workspace/weaver-silicon-venv/bin/python",
+        "-m",
+        "ruff",
+        "check",
+        "."
+      ],
+      "exit_code": 0,
+      "status": "PASS",
+      "step": "ruff",
+      "verifier": "static_analysis_strict"
+    },
+    {
+      "command": [
+        "/workspace/weaver-silicon-venv/bin/python",
+        "-m",
+        "mypy",
+        "."
+      ],
+      "exit_code": 0,
+      "status": "PASS",
+      "step": "mypy",
+      "verifier": "static_analysis_strict"
+    },
+    {
+      "command": [
+        "/workspace/weaver-silicon-venv/bin/python",
+        "-m",
+        "build",
+        "--no-isolation",
+        "--wheel"
+      ],
+      "exit_code": 0,
+      "status": "PASS",
+      "step": "build",
+      "verifier": "installed_wheel"
+    },
+    {
+      "command": [
+        "/workspace/weaver-silicon-venv/bin/python",
+        "-m",
+        "venv",
+        "/tmp/weaver-wheel-r6o70a21/venv"
+      ],
+      "exit_code": 0,
+      "status": "PASS",
+      "step": "create-venv",
+      "verifier": "installed_wheel"
+    },
+    {
+      "command": [
+        "/tmp/weaver-wheel-r6o70a21/venv/bin/python",
+        "-m",
+        "pip",
+        "install",
+        "-r",
+        "/workspace/weaver-silicon-verify/requirements-verification.lock"
+      ],
+      "exit_code": 0,
+      "status": "PASS",
+      "step": "install-locked-dependencies",
+      "verifier": "installed_wheel"
+    },
+    {
+      "command": [
+        "/tmp/weaver-wheel-r6o70a21/venv/bin/python",
+        "-m",
+        "pip",
+        "install",
+        "--no-deps",
+        "/workspace/weaver-silicon-verify/dist/weaver_os-0.5.0-py3-none-any.whl"
+      ],
+      "exit_code": 0,
+      "status": "PASS",
+      "step": "install-wheel",
+      "verifier": "installed_wheel"
+    },
+    {
+      "command": [
+        "/tmp/weaver-wheel-r6o70a21/venv/bin/python",
+        "-I",
+        "/tmp/weaver-wheel-r6o70a21/wheel_smoke.py",
+        "/tmp/weaver-wheel-r6o70a21/valid.jsonl"
+      ],
+      "exit_code": 0,
+      "status": "PASS",
+      "step": "smoke",
+      "verifier": "installed_wheel"
+    },
+    {
+      "command": [
+        "/workspace/weaver-silicon-venv/bin/python",
+        "-m",
+        "tools.fetch_tlc",
+        "/tmp/weaver-tlc-z7y10btz/tla2tools.jar"
+      ],
+      "exit_code": 0,
+      "status": "PASS",
+      "step": "acquire-pinned-tlc",
+      "verifier": "formal_tlc"
+    },
+    {
+      "command": [
+        "java",
+        "-cp",
+        "/tmp/weaver-tlc-z7y10btz/tla2tools.jar",
+        "tlc2.TLC",
+        "-deadlock",
+        "-config",
+        "WitnessBoundary.cfg",
+        "WitnessBoundary.tla"
+      ],
+      "exit_code": 0,
+      "status": "PASS",
+      "step": "bounded-invariants",
+      "verifier": "formal_tlc"
+    }
+  ],
+  "created_at": "2026-11-06T15:26:36.469215+00:00",
+  "dirty": false,
+  "environment": {
+    "os": "posix",
+    "platform": "Linux-6.18.57-x86_64-with-glibc2.41",
+    "python_version": "3.12.14 (main, Aug 25 2026, 14:00:49) [Clang 22.1.3 ]",
+    "runner": "local"
+  },
+  "evidence_manifest_sha256": "a95daba8894b911cb32e0f29f13d1c03855376812d73915c8f4c500726b90c2c",
+  "github_run_id": "local",
+  "implementation_status": {
+    "chronicle": "DEFERRED_TO_BOUND_WITNESS",
+    "kernel": "DEFERRED_TO_BOUND_WITNESS",
+    "receipt": "DEFERRED_TO_BOUND_WITNESS"
+  },
+  "lockfile_sha256": "c315be2e14d8a8c3e724f6c07c57a6c85a97101435211f657ebf3c5717e46abd",
+  "overall_verdict": "PASS",
+  "repository": "ryansctt1994-sudo/Weaver_Os",
+  "schema_version": "1.0",
+  "scope": "local-checks-not-independent-reproduction",
+  "source_head_sha": "a7b141a2bad6309c3737201119fec6b1766ea955",
+  "verified_commit_sha": "a7b141a2bad6309c3737201119fec6b1766ea955",
+  "verifiers": [
+    {
+      "exit_code": 0,
+      "name": "unit_and_integration",
+      "status": "PASS",
+      "steps": [
+        {
+          "command": [
+            "/workspace/weaver-silicon-venv/bin/python",
+            "-m",
+            "pytest",
+            "-q"
+          ],
+          "exit_code": 0,
+          "log": "unit_and_integration--run.log",
+          "log_sha256": "3183fb9dca9e258660e64d0881d6ac1274ae9340d55fcdc056b3d7d31a761f74",
+          "status": "PASS",
+          "step": "run"
+        }
+      ]
+    },
+    {
+      "exit_code": 0,
+      "name": "bound_witness",
+      "status": "PASS",
+      "steps": [
+        {
+          "command": [
+            "/workspace/weaver-silicon-venv/bin/python",
+            "-m",
+            "tools.run_verified_witness",
+            "releases/weaver-witness-signed-rc1/WEAVER_WITNESS_SIGNED_RC1.zip",
+            "--expected-key-sha256",
+            "5ac8e9d25de8d37cd9165d4a7458c34634aeded53c1709573ddf4cc122bcefb9"
+          ],
+          "exit_code": 0,
+          "log": "bound_witness--run.log",
+          "log_sha256": "1e3bf30610e06d04ca2ecdcaf91ed696abd9e443cb72652c2f1f05c78ff15152",
+          "status": "PASS",
+          "step": "run"
+        }
+      ]
+    },
+    {
+      "exit_code": 0,
+      "name": "mutation_suite",
+      "status": "PASS",
+      "steps": [
+        {
+          "command": [
+            "/workspace/weaver-silicon-venv/bin/python",
+            "-m",
+            "tools.check_verifier_mutations"
+          ],
+          "exit_code": 0,
+          "log": "mutation_suite--run.log",
+          "log_sha256": "39d4a8b7a71b238ac8ca1a86a829387452f703ba00384ca5720c8cd45613c952",
+          "status": "PASS",
+          "step": "run"
+        }
+      ]
+    },
+    {
+      "exit_code": 0,
+      "name": "adversarial_corpus",
+      "status": "PASS",
+      "steps": [
+        {
+          "command": [
+            "/workspace/weaver-silicon-venv/bin/python",
+            "-m",
+            "tools.run_adversarial_corpus",
+            "--output",
+            "/workspace/silicon-weaver-full-verification-locked/adversarial-results.json"
+          ],
+          "exit_code": 0,
+          "log": "adversarial_corpus--run.log",
+          "log_sha256": "8d50aece5212b60c8ad3c061e8fec7608ed534041b030f62ce89f17fdddfab87",
+          "status": "PASS",
+          "step": "run"
+        }
+      ]
+    },
+    {
+      "exit_code": 0,
+      "name": "static_analysis_strict",
+      "status": "PASS",
+      "steps": [
+        {
+          "command": [
+            "/workspace/weaver-silicon-venv/bin/python",
+            "-m",
+            "ruff",
+            "check",
+            "."
+          ],
+          "exit_code": 0,
+          "log": "static_analysis_strict--ruff.log",
+          "log_sha256": "a70078eb34ab2604de9a7b4bbf3288c5c5eea62efb9005f24c6e65f8f5631cb5",
+          "status": "PASS",
+          "step": "ruff"
+        },
+        {
+          "command": [
+            "/workspace/weaver-silicon-venv/bin/python",
+            "-m",
+            "mypy",
+            "."
+          ],
+          "exit_code": 0,
+          "log": "static_analysis_strict--mypy.log",
+          "log_sha256": "e382288e1e90f0f664ea990950ed1cb3c2f499cc905d3e654528968f1c2b9378",
+          "status": "PASS",
+          "step": "mypy"
+        }
+      ]
+    },
+    {
+      "exit_code": 0,
+      "name": "installed_wheel",
+      "status": "PASS",
+      "steps": [
+        {
+          "command": [
+            "/workspace/weaver-silicon-venv/bin/python",
+            "-m",
+            "build",
+            "--no-isolation",
+            "--wheel"
+          ],
+          "exit_code": 0,
+          "log": "installed_wheel--build.log",
+          "log_sha256": "b554f4639aad6c2ba7c4734820f6c0cb4ebe57122b37521ce89df7e91789c56e",
+          "status": "PASS",
+          "step": "build"
+        },
+        {
+          "command": [
+            "/workspace/weaver-silicon-venv/bin/python",
+            "-m",
+            "venv",
+            "/tmp/weaver-wheel-r6o70a21/venv"
+          ],
+          "exit_code": 0,
+          "log": "installed_wheel--create-venv.log",
+          "log_sha256": "86ae269891a2d237446cb5afb5b1b65d543fceb48b07a241ad7d3ce4589d7cf3",
+          "status": "PASS",
+          "step": "create-venv"
+        },
+        {
+          "command": [
+            "/tmp/weaver-wheel-r6o70a21/venv/bin/python",
+            "-m",
+            "pip",
+            "install",
+            "-r",
+            "/workspace/weaver-silicon-verify/requirements-verification.lock"
+          ],
+          "exit_code": 0,
+          "log": "installed_wheel--install-locked-dependencies.log",
+          "log_sha256": "9a2980a6a790b597070b44adab1fdf06a49c4765c5aedfc7259949c207ba83ae",
+          "status": "PASS",
+          "step": "install-locked-dependencies"
+        },
+        {
+          "command": [
+            "/tmp/weaver-wheel-r6o70a21/venv/bin/python",
+            "-m",
+            "pip",
+            "install",
+            "--no-deps",
+            "/workspace/weaver-silicon-verify/dist/weaver_os-0.5.0-py3-none-any.whl"
+          ],
+          "exit_code": 0,
+          "log": "installed_wheel--install-wheel.log",
+          "log_sha256": "f58c7dad4862447c328de5e0d76e063c77efb932f930137291abf2456cdb6c1f",
+          "status": "PASS",
+          "step": "install-wheel"
+        },
+        {
+          "command": [
+            "/tmp/weaver-wheel-r6o70a21/venv/bin/python",
+            "-I",
+            "/tmp/weaver-wheel-r6o70a21/wheel_smoke.py",
+            "/tmp/weaver-wheel-r6o70a21/valid.jsonl"
+          ],
+          "exit_code": 0,
+          "log": "installed_wheel--smoke.log",
+          "log_sha256": "bb82958ba8c16e06be5147a9a9fbdde9861e78bf508f46d5ef238bd6956055e6",
+          "status": "PASS",
+          "step": "smoke"
+        }
+      ]
+    },
+    {
+      "exit_code": 0,
+      "name": "formal_tlc",
+      "status": "PASS",
+      "steps": [
+        {
+          "command": [
+            "/workspace/weaver-silicon-venv/bin/python",
+            "-m",
+            "tools.fetch_tlc",
+            "/tmp/weaver-tlc-z7y10btz/tla2tools.jar"
+          ],
+          "exit_code": 0,
+          "log": "formal_tlc--acquire-pinned-tlc.log",
+          "log_sha256": "a69deddf987db9f1492519464bce38c0b5c5e527ee021262b04de8121c0f1b42",
+          "status": "PASS",
+          "step": "acquire-pinned-tlc"
+        },
+        {
+          "command": [
+            "java",
+            "-cp",
+            "/tmp/weaver-tlc-z7y10btz/tla2tools.jar",
+            "tlc2.TLC",
+            "-deadlock",
+            "-config",
+            "WitnessBoundary.cfg",
+            "WitnessBoundary.tla"
+          ],
+          "exit_code": 0,
+          "log": "formal_tlc--bounded-invariants.log",
+          "log_sha256": "e0d94308363cf31f2460c3c4656ba93df63ac0b1be1b619f3c2ea18a3d078ab9",
+          "status": "PASS",
+          "step": "bounded-invariants"
+        }
+      ]
+    }
+  ],
+  "wheel_sha256": "1126acd6f20fb6408fccacaebb787aff5b0b35d920de02b46f9f33e4a63f680d"
+}

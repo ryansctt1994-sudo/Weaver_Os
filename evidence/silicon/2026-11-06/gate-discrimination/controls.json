@@ -1,0 +1,178 @@
+{
+  "schema": "gate-discrimination-controls/1",
+  "record_kind": "SYNTHETIC_GATE_CONTROL",
+  "observed_at_utc": "2026-11-06T23:14:30.100886+00:00",
+  "fixture_source_sha256": "f3393f1447435392181d6e144f086c7db873ae2ff7194dd13620d747a72723c0",
+  "all_crypto_and_admission_checks_executed": true,
+  "verification_functions_stubbed": false,
+  "production_pin_override_added": false,
+  "independent_witnessing": false,
+  "cases": [
+    {
+      "case": "complete",
+      "synthetic_trust_domain": true,
+      "actual_hardware_observed": false,
+      "exit_code": 0,
+      "output": {
+        "schema": "weaver-silicon-evidence-gate/1",
+        "status": "READY_FOR_E3_1_REVIEW",
+        "decision": "READY",
+        "exit_code": 0,
+        "reason_codes": [],
+        "refusals": [],
+        "silicon_E3_1": "NOT_READY",
+        "public_quorum_verified": false,
+        "checks": {
+          "external_log_inclusion": true,
+          "anchored_chronicle_and_artifacts": true,
+          "persistent_replay_state_present": true,
+          "physical_and_clean_room_receipts": true
+        },
+        "missing_or_invalid": [],
+        "production_authority_earned": false,
+        "scope": "Deployment evidence gate; live effect prevention must be physically wired. Named principal/custody claims require external review."
+      }
+    },
+    {
+      "case": "missing_policy",
+      "synthetic_trust_domain": true,
+      "actual_hardware_observed": false,
+      "exit_code": 2,
+      "output": {
+        "schema": "weaver-silicon-evidence-gate/1",
+        "status": "NOT_READY",
+        "decision": "NOT_READY",
+        "exit_code": 2,
+        "reason_codes": [
+          "AUTHORITY_POLICY_MISSING"
+        ],
+        "refusals": [
+          {
+            "code": "AUTHORITY_POLICY_MISSING",
+            "stage": "PHYSICAL_OR_INDEPENDENT_RECEIPTS",
+            "detail": "ValueError: external authority policy unconfigured"
+          }
+        ],
+        "silicon_E3_1": "NOT_READY",
+        "public_quorum_verified": false,
+        "checks": {
+          "external_log_inclusion": true,
+          "anchored_chronicle_and_artifacts": true,
+          "persistent_replay_state_present": true
+        },
+        "missing_or_invalid": [
+          "PHYSICAL_OR_INDEPENDENT_RECEIPTS: ValueError: external authority policy unconfigured"
+        ],
+        "production_authority_earned": false,
+        "scope": "Deployment evidence gate; live effect prevention must be physically wired. Named principal/custody claims require external review."
+      }
+    },
+    {
+      "case": "corrupt_signature",
+      "synthetic_trust_domain": true,
+      "actual_hardware_observed": false,
+      "exit_code": 2,
+      "output": {
+        "schema": "weaver-silicon-evidence-gate/1",
+        "status": "NOT_READY",
+        "decision": "NOT_READY",
+        "exit_code": 2,
+        "reason_codes": [
+          "RECEIPT_SIGNATURE_INVALID"
+        ],
+        "refusals": [
+          {
+            "code": "RECEIPT_SIGNATURE_INVALID",
+            "stage": "PHYSICAL_OR_INDEPENDENT_RECEIPTS",
+            "detail": "GateRefusal: invalid signature: hardware_operator"
+          }
+        ],
+        "silicon_E3_1": "NOT_READY",
+        "public_quorum_verified": false,
+        "checks": {
+          "external_log_inclusion": true,
+          "anchored_chronicle_and_artifacts": true,
+          "persistent_replay_state_present": true
+        },
+        "missing_or_invalid": [
+          "PHYSICAL_OR_INDEPENDENT_RECEIPTS: GateRefusal: invalid signature: hardware_operator"
+        ],
+        "production_authority_earned": false,
+        "scope": "Deployment evidence gate; live effect prevention must be physically wired. Named principal/custody claims require external review."
+      }
+    },
+    {
+      "case": "incomplete_control",
+      "synthetic_trust_domain": true,
+      "actual_hardware_observed": false,
+      "exit_code": 2,
+      "output": {
+        "schema": "weaver-silicon-evidence-gate/1",
+        "status": "NOT_READY",
+        "decision": "NOT_READY",
+        "exit_code": 2,
+        "reason_codes": [
+          "RECEIPT_CONTROLS_INCOMPLETE"
+        ],
+        "refusals": [
+          {
+            "code": "RECEIPT_CONTROLS_INCOMPLETE",
+            "stage": "PHYSICAL_OR_INDEPENDENT_RECEIPTS",
+            "detail": "GateRefusal: incomplete physical controls"
+          }
+        ],
+        "silicon_E3_1": "NOT_READY",
+        "public_quorum_verified": false,
+        "checks": {
+          "external_log_inclusion": true,
+          "anchored_chronicle_and_artifacts": true,
+          "persistent_replay_state_present": true
+        },
+        "missing_or_invalid": [
+          "PHYSICAL_OR_INDEPENDENT_RECEIPTS: GateRefusal: incomplete physical controls"
+        ],
+        "production_authority_earned": false,
+        "scope": "Deployment evidence gate; live effect prevention must be physically wired. Named principal/custody claims require external review."
+      }
+    },
+    {
+      "case": "production_pin",
+      "synthetic_trust_domain": true,
+      "actual_hardware_observed": false,
+      "exit_code": 2,
+      "output": {
+        "schema": "weaver-silicon-evidence-gate/1",
+        "status": "NOT_READY",
+        "decision": "NOT_READY",
+        "exit_code": 2,
+        "reason_codes": [
+          "ANCHOR_INVALID",
+          "BITSTREAM_NOT_ANCHORED"
+        ],
+        "refusals": [
+          {
+            "code": "ANCHOR_INVALID",
+            "stage": "ANCHOR_OR_CHRONICLE",
+            "detail": "ValueError: unpinned log key"
+          },
+          {
+            "code": "BITSTREAM_NOT_ANCHORED",
+            "stage": "PHYSICAL_OR_INDEPENDENT_RECEIPTS",
+            "detail": "ValueError: vendor bitstream absent from external Chronicle anchor"
+          }
+        ],
+        "silicon_E3_1": "NOT_READY",
+        "public_quorum_verified": false,
+        "checks": {
+          "persistent_replay_state_present": true
+        },
+        "missing_or_invalid": [
+          "ANCHOR_OR_CHRONICLE: ValueError: unpinned log key",
+          "PHYSICAL_OR_INDEPENDENT_RECEIPTS: ValueError: vendor bitstream absent from external Chronicle anchor"
+        ],
+        "production_authority_earned": false,
+        "scope": "Deployment evidence gate; live effect prevention must be physically wired. Named principal/custody claims require external review."
+      }
+    }
+  ]
+}

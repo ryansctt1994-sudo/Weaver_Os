@@ -1,0 +1,54 @@
+{
+  "schema": "gate-discrimination-full-verification/1",
+  "observed_at_utc": "2026-11-06T23:17:55.126034+00:00",
+  "tested_commit": "c8c8380da9794eda2eb31f00e28dc76e7b0588b8",
+  "dirty": false,
+  "overall_verdict": "PASS",
+  "verifiers": [
+    {
+      "name": "unit_and_integration",
+      "status": "PASS",
+      "exit_code": 0
+    },
+    {
+      "name": "bound_witness",
+      "status": "PASS",
+      "exit_code": 0
+    },
+    {
+      "name": "mutation_suite",
+      "status": "PASS",
+      "exit_code": 0
+    },
+    {
+      "name": "adversarial_corpus",
+      "status": "PASS",
+      "exit_code": 0
+    },
+    {
+      "name": "static_analysis_strict",
+      "status": "PASS",
+      "exit_code": 0
+    },
+    {
+      "name": "installed_wheel",
+      "status": "PASS",
+      "exit_code": 0
+    },
+    {
+      "name": "formal_tlc",
+      "status": "PASS",
+      "exit_code": 0
+    }
+  ],
+  "report_sha256": "a8c5a618f5eafb78901015d34007f9f23901fd1fe970a132704f1cee0509e39a",
+  "records_zip_sha256": "0b709e3a4d344c98dab55fcdad4fbb2ee137332e14dfe462b39ef560c787e0d8",
+  "excluded_attempt": {
+    "source": "a7b141a2bad6309c3737201119fec6b1766ea955",
+    "overall": "FAIL",
+    "reason": "Initial command used the previous checkout, whose ignored build/lib caused duplicate-module mypy failure; not evidence for current candidate. Raw records retained."
+  },
+  "silicon_E3_1": "NOT_READY",
+  "independent_witnessing": false,
+  "production_authority_earned": false
+}

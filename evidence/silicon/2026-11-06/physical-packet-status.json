@@ -1,0 +1,29 @@
+{
+  "schema": "weaver-physical-packet-status/1",
+  "observed_at_utc": "2026-11-06T15:56:47.239302+00:00",
+  "hardware_packet_commit": "0f3b0973b95ecbadb49ca4f7d989ed1da8a2f6b9",
+  "hardware_packet_url": "https://github.com/ryansctt1994-sudo/cathedral-verified/tree/0f3b0973b95ecbadb49ca4f7d989ed1da8a2f6b9/hardware/lucifer_latch/arty_a7/qualification",
+  "packet_checksum_list_sha256": "d668739d2db6c219a7bb6373807254f800434195f8a835ba38e67aba53bea8bd",
+  "revised_rtl_regression": "PASS_AUTHOR_SIMULATION_ONLY",
+  "revised_xc7_mapping": "PASS_NO_ROUTING",
+  "old_candidate_rekor_log_index": 3719860200,
+  "old_anchor_covers_revised_rtl": false,
+  "board_programmed": false,
+  "physical_measurements": null,
+  "physical_video": null,
+  "independent_timing_receipts": [],
+  "outside_reproductions": [],
+  "public_witness_roster": [],
+  "proposed_quorum": {
+    "threshold": 2,
+    "roster_size": 3,
+    "enrolled": 0,
+    "affirmative_direct_reproductions": 0
+  },
+  "new_quorum_protocol_enforced_in_current_interlock_gate": false,
+  "existing_factory_review_result_sufficient_for_silicon_E3_1": false,
+  "silicon_E3_1": "NOT_READY",
+  "permanent_irreversibility": "NOT_IMPLEMENTED",
+  "production_authority_earned": false,
+  "change_scope": "Documentation and status only; no runtime change or fabricated receipt"
+}

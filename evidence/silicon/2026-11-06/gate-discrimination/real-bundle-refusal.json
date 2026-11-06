@@ -1,0 +1,28 @@
+{
+  "schema": "weaver-silicon-evidence-gate/1",
+  "status": "NOT_READY",
+  "decision": "NOT_READY",
+  "exit_code": 2,
+  "reason_codes": [
+    "AUTHORITY_POLICY_MISSING"
+  ],
+  "refusals": [
+    {
+      "code": "AUTHORITY_POLICY_MISSING",
+      "stage": "PHYSICAL_OR_INDEPENDENT_RECEIPTS",
+      "detail": "ValueError: external authority policy unconfigured"
+    }
+  ],
+  "silicon_E3_1": "NOT_READY",
+  "public_quorum_verified": false,
+  "checks": {
+    "external_log_inclusion": true,
+    "anchored_chronicle_and_artifacts": true,
+    "persistent_replay_state_present": true
+  },
+  "missing_or_invalid": [
+    "PHYSICAL_OR_INDEPENDENT_RECEIPTS: ValueError: external authority policy unconfigured"
+  ],
+  "production_authority_earned": false,
+  "scope": "Deployment evidence gate; live effect prevention must be physically wired. Named principal/custody claims require external review."
+}

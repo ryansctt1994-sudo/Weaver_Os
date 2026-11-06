@@ -1,0 +1,9 @@
+{
+  "started_at_utc": "2026-11-06T16:13:27.732151+00:00",
+  "observed_at_utc": "2026-11-06T16:13:28.532147+00:00",
+  "http_status": 201,
+  "server_date": "Fri, 06 Nov 2026 16:13:28 GMT",
+  "location": "/api/v1/log/entries/108e9186e8c5677a6cfe12dcdf288a3e1048689ef22977bed7d3880e55f77c74a740b8967e26296b",
+  "operation": "public hashedrekord checkpoint submission",
+  "key_custody": "author-controlled key reused; not independent witness"
+}
