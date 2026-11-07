@@ -311,11 +311,18 @@ Portfolio state after the merge is unchanged until evidence says otherwise:
 6. **Runtime-state digest from the in-tree ledger.** Retire the RC1 deferrals. Keep
    `verify-e35` red until its gates are actually met.
    *Done as WNS-S6-001: `weaver_verifier.state` ([WX-STATE-DIGEST-1](../../governance/specs/WX-STATE-DIGEST-1.md)). The RC1 deferrals were **not** retired: the in-tree projection differs from RC1's, and the runtime-state contract forbids a different projection from silently replacing it. E3.5 stays HOLD. Custody is open as `C-CUSTODY-001`.*
-7. **Learning on the gate.** Route skill promotion through PG-001R.
-8. **One end-to-end demo.** Weaver's four boundary-integrity cases + Lumen's full loop,
-   producing one spine receipt per run.
-9. **Then independence.** Clean-clone non-origin reproductions (Nexus #11/#12, Weaver
-   Milestone F), and a second verifier implementation (R5 / Milestone E).
+7. **Independent evidence custody.** Witness-signed checkpoints, pinned witness keys, and a
+   verifier that refuses forks, truncation and split views.
+   *Implemented with a simulated witness: [WX-CHECKPOINT-1](../../governance/specs/WX-CHECKPOINT-1.md), the `witness` trust domain, acceptance tests A1–A8 ([GD-0005](../../governance/decisions/GD-0005.md) D14). Still W0: no independently controlled witness exists, so `C-CUSTODY-001` stays open.*
+8. **Physical interlock validation.** Not started.
+9. **Learning on the gate.** Route skill promotion through PG-001R.
+10. **One end-to-end demo, then independence.** Weaver's four boundary-integrity cases +
+    Lumen's full loop, producing one spine receipt per run. Then clean-clone non-origin
+    reproductions (Nexus #11/#12, Weaver Milestone F), and a second verifier implementation
+    (R5 / Milestone E).
 
-Steps 1–8 can raise components to R2/R3[self] in the new tree. Only step 9 can move
-anything to R4, and no step here touches the O axis.
+*Numbering adopted by [GD-0005](../../governance/decisions/GD-0005.md) D13. The earlier
+outline steps 7 (learning), 8 (demo) and 9 (independence) are steps 9, 10 and 10.*
+
+Steps 1–9 can raise components to R2/R3[self] in the new tree. Only step 10's independence
+work can move anything to R4, and no step here touches the O axis.
