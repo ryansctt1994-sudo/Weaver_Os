@@ -22,8 +22,10 @@ implementations). The verifier domain itself holds no state and imports no I/O-c
 
 Moved from `ryansctt1994-sudo/Lumen-Nexus` (MIT, same owner), `packages/verifier/lumen_verifier/pg001r.py`,
 together with its conformance suite (now `tests/verifier/test_pg001r_conformance.py`). Only the
-import line and the CLI usage string changed. `tests/verifier/test_pg001r_identity.py` reverses
-exactly those edits and checks the Nexus source-manifest SHA-256 of both files.
+import lines, the CLI usage string, and one `# type: ignore[arg-type]` in the suite's helper
+(this repository type-checks tests with `mypy .`; Lumen-Nexus does not) changed.
+`tests/verifier/test_pg001r_identity.py` reverses exactly those edits and checks the Nexus
+source-manifest SHA-256 of both files.
 
 Without an anchor, a verdict covers internal consistency only. Truncation and full rewrites
 need an anchor held outside the operator's control, and the verdict says so.

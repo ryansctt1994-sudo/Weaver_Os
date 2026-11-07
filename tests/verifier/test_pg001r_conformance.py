@@ -34,7 +34,7 @@ def request(**overrides: object) -> PromotionRequest:
         clinical_scope=False,
         clinical_safety_level="NOT_APPLICABLE",
     )
-    return replace(base, **overrides)
+    return replace(base, **overrides)  # type: ignore[arg-type]
 
 
 def blocker_codes(candidate: PromotionRequest) -> set[str]:

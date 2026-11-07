@@ -1,5 +1,8 @@
 """PG-001R evaluator and conformance suite were moved from Lumen-Nexus with only listed edits.
 
+The edits are import paths, the CLI usage string, and one ``type: ignore`` for this
+repository's whole-repo mypy run. None changes test logic.
+
 Reversing exactly these line edits must reproduce the bytes recorded in the Nexus
 ``evidence/manifests/pg-001r-source-manifest.json``. Any other change breaks this test.
 """
@@ -37,6 +40,11 @@ MOVES = {
             (
                 "from weaver_verifier.pg001r import evaluate",
                 "from packages.verifier.lumen_verifier.pg001r import evaluate",
+            ),
+            (
+                # This repository type-checks tests (mypy .); Lumen-Nexus does not.
+                "    return replace(base, **overrides)  # type: ignore[arg-type]\n",
+                "    return replace(base, **overrides)\n",
             ),
         ],
     ),
