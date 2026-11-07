@@ -67,7 +67,11 @@ recomputes in a **fresh process** with no site-packages and only `packages/contr
 `packages/verifier` on the path. A test checks that runtime code is not importable there, and that
 the fresh process reproduces the in-process digest on repeated runs.
 
-A fresh process on the same machine from the same checkout is **not independent witnessing.**
+A fresh process on the same machine from the same checkout is **not independent witnessing.** It
+is also **not implementation-independent**: it runs the same `weaver_contracts.canonical` and
+`weaver_verifier.ledger` code. A bug shared by both runs would be reproduced, not caught. This is
+process-separated reproduction only. An independent check would need a second implementation of
+the canonicalizer, the chain verifier and the reducer (outline step 9, R5).
 
 ## Relationship to the existing digests
 

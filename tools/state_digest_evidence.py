@@ -161,6 +161,9 @@ def main(argv: list[str] | None = None) -> int:
         "fresh_process_digests": fresh_digests,
         "fresh_process_matches_in_process": fresh_digests == [in_process.digest],
         "fresh_process_cannot_import_runtime": probe["exit_code"] != 0,
+        # Same canonicalizer, same chain verifier, same checkout: process-separated
+        # reproduction, not an independent implementation.
+        "fresh_process_implementation_independent": False,
         "e35": run([sys.executable, "verify_attestations.py", "--scope", "e35"]),
     }
     record["controls"] = [asdict(result) for result in controls]
@@ -192,6 +195,8 @@ def main(argv: list[str] | None = None) -> int:
         "Origin-controlled run: same machine, same operator, same checkout. "
         "Not independent witnessing.",
         "A fresh process reproducing a digest shows determinism, not authenticity.",
+        "The fresh process reuses the same canonicalization and ledger-verification code: it is "
+        "process-separated reproduction, not implementation-independent verification.",
         "Without an anchor held outside the operator's control, a complete self-consistent rewrite "
         "is indistinguishable from authentic history (control C4).",
         "An anchor or expected digest supplied by the same party proves nothing more (control C8); "
