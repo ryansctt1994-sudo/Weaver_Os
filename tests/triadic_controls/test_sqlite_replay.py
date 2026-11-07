@@ -1,7 +1,7 @@
 import concurrent.futures
 import time
 
-from triadic_controls.crypto.sqlite_replay import SQLiteReplayCache
+from weaver_runtime.replay_cache import SQLiteReplayCache
 
 
 def test_sqlite_cache_check_and_record_first_insert(tmp_path):

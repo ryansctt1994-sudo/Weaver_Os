@@ -39,25 +39,26 @@ They agree on all 19.
 Any other runtime claiming WX-CJSON-1 must reproduce all 19 canonical outputs byte for byte
 and reject all 14 reject vectors.
 
-## Legacy canonicalizers (C-CANON-001)
+## Legacy serializers (C-CANON-001)
 
-Running the vectors through Weaver's three existing canonicalizers found real differences:
+Weaver code that hashes or signs JSON mostly uses `json.dumps(..., sort_keys=True)` rather than a
+canonical profile. **Correction:** step 2 of the outline listed three such serializers. A
+repository-wide search in step 4 found about a dozen. The full inventory is in
+`governance/CONTRADICTIONS.yaml` under `C-CANON-001`. They fall into two classes:
 
-| Canonicalizer | Diverging vectors | Cause |
-|---|---|---|
-| `triadic_controls.crypto.verifier.canonicalize_json` | `V12-key-order-utf16` | Sorts keys by code point, not UTF-16 code units. Only differs when keys mix astral-plane characters (e.g. emoji) with BMP characters at U+E000 or above |
-| `tools.spine_hash.canonical` | V09, V10, V11, V12, V13, V17 | `ensure_ascii=True` escapes every non-ASCII character as `\uXXXX`, plus the same key-order difference |
-| `tools.mathos_bench.mathos_bench_v0_1.canonical_json` | `V12-key-order-utf16` | Same as `triadic_controls`. It also accepts floats, which WX-CJSON-1 rejects |
+| Class | Diverges on | Cause | Examples (pinned in tests where importable) |
+|---|---|---|---|
+| `ensure_ascii=False` | `V12-key-order-utf16` | Keys sorted by code point, not UTF-16 code units | `weaver_verifier.crypto.canonicalize_json`, `triadic_controls.ledger.canonical_json`, `tools.mathos_bench…canonical_json` |
+| default `ensure_ascii=True` | V09–V13, V17 | Every non-ASCII character escaped as `\uXXXX`, plus the same key order | `tools.spine_hash.canonical`, `weaver_verifier.claim_transition._canonical_bytes`, `witness_py/sign_attestation.py`, release-guard provenance, and others |
 
-All three produce identical bytes for integer-only data in which every string, keys and values
-alike, is ASCII. A scan of every
-committed `.json`/`.jsonl` file found that this holds everywhere **except MathOS bench**:
-`mathos_bench_claimset_key_v0_1.json` and `mathos_bench_smoke_input_v0_1.json` contain non-ASCII
-strings, and `mathos_bench_smoke_receipt_v0_1.json` contains floats. Those MathOS digests cannot be
-reproduced under WX-CJSON-1 at all, because floats are out of profile.
+All of them produce identical bytes for integer-only data in which every string, keys and values
+alike, is ASCII. MathOS bench data and triad ledger events contain floats, so their digests are
+outside WX-CJSON-1 entirely.
 
-None of the three is **changed** in this step, because their digests are pinned in existing
-fixtures and receipts. The divergence sets are pinned in tests, so any
-change in either direction shows up in review. Migrating them is open as `C-CANON-001`.
+None of them is **changed** by the outline steps so far, because their digests and signatures are
+pinned in existing fixtures and receipts. `tests/contracts/test_canonical.py` pins the five
+importable divergence sets, and a guard test fails if a pinned entry has no test.
+`tools/check_trust_domains.py` rejects any new `json.dumps(sort_keys=True)` under `packages/`
+outside a three-file allowlist. Migrating or freezing each one is open as `C-CANON-001`.
 
 `PG001R-JSON-1` (Lumen-Nexus) remains a separate, named diagnostic profile for PG-001R fingerprints.

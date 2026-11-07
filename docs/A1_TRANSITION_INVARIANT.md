@@ -72,7 +72,8 @@ must request the exact proposed new scope.
 
 ## Current implementation
 
-- `policy/claim_transition.py`
+- `policy/claim_transition.py` (a re-export shim since outline step 4; the implementation is
+  `packages/verifier/weaver_verifier/claim_transition.py`)
 - `tests/test_claim_transition.py`
 
 This is a bounded reference invariant. It is not yet the frozen Codex A1, a

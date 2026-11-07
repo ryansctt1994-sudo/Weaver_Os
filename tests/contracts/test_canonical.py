@@ -13,10 +13,12 @@ from weaver_contracts.canonical import (
     parse_strict,
     sha256_hex,
 )
+from weaver_verifier.claim_transition import _canonical_bytes as claim_canonical
+from weaver_verifier.crypto import canonicalize_json as triadic_canonicalize
 
 from tools.mathos_bench.mathos_bench_v0_1 import canonical_json as mathos_canonical
 from tools.spine_hash import canonical as spine_canonical
-from triadic_controls.crypto.verifier import canonicalize_json as triadic_canonicalize
+from triadic_controls.ledger import canonical_json as triad_ledger_canonical
 
 VECTORS_PATH = (
     Path(__file__).resolve().parents[2]
@@ -57,17 +59,19 @@ def test_reject_vector_is_rejected(vector):
     assert vector["reason_contains"].lower() in str(info.value).lower()
 
 
-@pytest.mark.parametrize(
-    "name, fn",
-    [
-        ("triadic_controls.canonicalize_json", triadic_canonicalize),
-        ("tools.spine_hash.canonical", spine_canonical),
-        (
-            "tools.mathos_bench.mathos_bench_v0_1.canonical_json",
-            lambda value: mathos_canonical(value).encode("utf-8"),
-        ),
-    ],
-)
+LEGACY_CANONICALIZERS = [
+    ("weaver_verifier.crypto.canonicalize_json", triadic_canonicalize),
+    ("triadic_controls.ledger.canonical_json", triad_ledger_canonical),
+    ("weaver_verifier.claim_transition._canonical_bytes", claim_canonical),
+    ("tools.spine_hash.canonical", spine_canonical),
+    (
+        "tools.mathos_bench.mathos_bench_v0_1.canonical_json",
+        lambda value: mathos_canonical(value).encode("utf-8"),
+    ),
+]
+
+
+@pytest.mark.parametrize("name, fn", LEGACY_CANONICALIZERS)
 def test_legacy_canonicalizer_divergence_is_pinned(name, fn):
     """C-CANON-001: legacy canonicalizers differ from WX-CJSON-1 on known vectors.
 
@@ -82,7 +86,15 @@ def test_legacy_canonicalizer_divergence_is_pinned(name, fn):
 
 
 def test_triadic_divergence_is_key_order_only():
-    assert VECTORS["divergence"]["triadic_controls.canonicalize_json"] == ["V12-key-order-utf16"]
+    divergence = VECTORS["divergence"]
+    assert divergence["weaver_verifier.crypto.canonicalize_json"] == ["V12-key-order-utf16"]
+    assert divergence["triadic_controls.ledger.canonical_json"] == ["V12-key-order-utf16"]
+
+
+def test_every_pinned_divergence_has_a_test():
+    """A divergence entry without a parametrized test above would never be checked."""
+    tested = {name for name, _ in LEGACY_CANONICALIZERS}
+    assert set(VECTORS["divergence"]) == tested
 
 
 @pytest.mark.parametrize(

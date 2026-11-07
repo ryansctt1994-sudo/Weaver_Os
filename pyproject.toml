@@ -51,6 +51,9 @@ exclude = ["releases/weaver-witness-signed-rc1"]
 [tool.ruff.lint.per-file-ignores]
 # Moved verbatim from Lumen-Nexus; byte identity with its source manifest is tested.
 "packages/contracts/weaver_contracts/pg001r.py" = ["UP035", "UP037"]
+# Moved from Lumen-Nexus with listed import edits only; identity tested in
+# tests/verifier/test_pg001r_identity.py.
+"packages/verifier/weaver_verifier/pg001r.py" = ["UP035"]
 
 [tool.ruff.lint]
 select = ["E", "F", "I", "UP", "B"]

@@ -18,15 +18,16 @@ This repo currently contains:
 
 | Module or directory | Purpose |
 | --- | --- |
-| `triadic_controls/` | Signature verification, replay cache, and authority schemas |
+| `packages/` | Unified trust domains (UADR-0001): `contracts` (WX-CJSON-1, receipt and anchor shapes, PG-001R contracts), `runtime` (ReceiptLedger, replay caches), `verifier` (CryptoVerifier, ledger verifier, claim transition, PG-001R evaluator) |
+| `triadic_controls/` | Triad ledger and authority schemas; `crypto/` is a re-export shim for `packages/` |
 | `src/weaver_release_guard/` | Release provenance CLI, OIDC verification, and utilities |
-| `canonical/` | Canonical serialization |
-| `chronicle/` | Hash-chained event history |
+| `canonical/` | Re-export of WX-CJSON-1 (`weaver_contracts.canonical`) |
+| `chronicle/` | Defers to the RC1 witness archive; the in-tree successor is `weaver_runtime.ledger` |
 | `chronicle-raft/` | Go HTTP attestation snippet |
 | `compression/` | Residual monitoring |
-| `kernel/` | Deterministic state reduction |
-| `policy/` | Policy gate and signed-verifier adapter |
-| `receipt/` | Receipt construction and verification |
+| `kernel/` | Defers to the RC1 witness archive |
+| `policy/` | `claim_transition` re-export shim; `policy_gate.py` and `signed_verifier_adapter.py` are TODO stubs (C-STUB-001) |
+| `receipt/` | Defers to the RC1 witness archive; the receipt contract is `weaver_contracts.receipt` |
 | `weaver_auth/` | Identity resolution and bedrock admission/pathology checks |
 | `witness_py/` | Attestation signing helper |
 | `tools/` | Archive and ledger verification, verified witness runner, mutation checks, and MathOS benchmark |

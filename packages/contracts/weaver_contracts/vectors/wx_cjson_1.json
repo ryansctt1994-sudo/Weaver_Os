@@ -190,7 +190,7 @@
     }
   ],
   "divergence": {
-    "triadic_controls.canonicalize_json": [
+    "tools.mathos_bench.mathos_bench_v0_1.canonical_json": [
       "V12-key-order-utf16"
     ],
     "tools.spine_hash.canonical": [
@@ -201,7 +201,18 @@
       "V13-key-order-latin1",
       "V17-unicode-escape-equivalence"
     ],
-    "tools.mathos_bench.mathos_bench_v0_1.canonical_json": [
+    "triadic_controls.ledger.canonical_json": [
+      "V12-key-order-utf16"
+    ],
+    "weaver_verifier.claim_transition._canonical_bytes": [
+      "V09-unicode-literal",
+      "V10-u2028-literal",
+      "V11-del-literal",
+      "V12-key-order-utf16",
+      "V13-key-order-latin1",
+      "V17-unicode-escape-equivalence"
+    ],
+    "weaver_verifier.crypto.canonicalize_json": [
       "V12-key-order-utf16"
     ]
   }

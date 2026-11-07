@@ -88,3 +88,79 @@ def test_learning_may_use_runtime_but_not_verifier(tmp_path):
     assert check(tmp_path)[0] == []
     _write(tmp_path, "packages/learning/wx_learning/bad.py", "import wx_verifier\n")
     assert _rules(check(tmp_path)[0]) == ["FORBIDDEN_DOMAIN_IMPORT"]
+
+
+# --- step 4 extensions ------------------------------------------------------
+
+
+def test_contracts_must_be_stdlib_only(tmp_path):
+    _tree(tmp_path)
+    _write(tmp_path, "packages/contracts/wx_contracts/bad.py", "import jsonschema\n")
+    assert _rules(check(tmp_path)[0]) == ["NON_STDLIB_IMPORT"]
+
+
+def test_verifier_may_use_third_party_libraries(tmp_path):
+    _tree(tmp_path)
+    _write(tmp_path, "packages/verifier/wx_verifier/ok.py", "import cryptography\nimport json\n")
+    assert check(tmp_path)[0] == []
+
+
+def test_contracts_cannot_do_io(tmp_path):
+    _tree(tmp_path)
+    _write(tmp_path, "packages/contracts/wx_contracts/bad.py", "import sqlite3\n")
+    assert _rules(check(tmp_path)[0]) == ["IO_CAPABLE_IMPORT"]
+
+
+def test_verifier_cannot_spawn_processes_or_open_databases(tmp_path):
+    _tree(tmp_path)
+    _write(
+        tmp_path,
+        "packages/verifier/wx_verifier/bad.py",
+        "import subprocess\nfrom sqlite3 import connect\nimport urllib.request\n",
+    )
+    assert _rules(check(tmp_path)[0]) == ["IO_CAPABLE_IMPORT"] * 3
+
+
+def test_runtime_may_open_databases(tmp_path):
+    _tree(tmp_path)
+    _write(tmp_path, "packages/runtime/wx_runtime/ok.py", "import sqlite3\n")
+    assert check(tmp_path)[0] == []
+
+
+def test_new_legacy_canonicalizer_is_rejected(tmp_path):
+    _tree(tmp_path)
+    _write(
+        tmp_path,
+        "packages/runtime/wx_runtime/bad.py",
+        "import json\ndigest = json.dumps({}, sort_keys=True)\n",
+    )
+    assert _rules(check(tmp_path)[0]) == ["LEGACY_CANONICALIZER"]
+
+
+def test_aliased_json_dumps_is_caught(tmp_path):
+    _tree(tmp_path)
+    _write(
+        tmp_path,
+        "packages/runtime/wx_runtime/bad.py",
+        "from json import dumps as d\nx = d({}, sort_keys=True)\n",
+    )
+    assert _rules(check(tmp_path)[0]) == ["LEGACY_CANONICALIZER"]
+
+
+def test_display_json_without_sort_keys_is_allowed(tmp_path):
+    _tree(tmp_path)
+    _write(
+        tmp_path,
+        "packages/runtime/wx_runtime/ok.py",
+        "import json\nprint(json.dumps({}, indent=2))\n",
+    )
+    assert check(tmp_path)[0] == []
+
+
+def test_allowlisted_legacy_canonicalizer_passes_and_stale_entry_fails(tmp_path):
+    _tree(tmp_path)
+    path = "packages/verifier/weaver_verifier/crypto.py"
+    _write(tmp_path, path, "import json\nx = json.dumps({}, sort_keys=True)\n")
+    assert check(tmp_path)[0] == []
+    _write(tmp_path, path, "x = 1\n")
+    assert _rules(check(tmp_path)[0]) == ["STALE_ALLOWLIST"]
