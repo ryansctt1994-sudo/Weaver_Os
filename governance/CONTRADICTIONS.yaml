@@ -33,6 +33,12 @@ contradictions:
     progress:
       - "canonical/canonical.py: replaced by a re-export of WX-CJSON-1 (step 2)."
       - "Receipt contract wx-receipt-1 added; supersedes schemas/receipt.v1.json for new work (step 2)."
+      - >-
+        Step 6: the three RC1 deferral stubs (kernel/reducer.py, chronicle/chronicle.py, receipt/verify.py)
+        could not be imported as submodules at all, because their __getattr__ raised NotImplementedError
+        for dunder probes such as __path__. Fixed so importing works and implementation symbols still
+        fail loudly. kernel/reducer.py keeps its RC1 deferral on purpose: the in-tree reducer
+        (wx-runtime-state-1) is a different projection and may not silently replace it.
     required_disposition:
       - "Replace with the implementations chosen in UNIFIED_SYSTEM_OUTLINE.md sections 5.1-5.5, or delete."
       - "No stub may ship under packages/."
@@ -126,6 +132,20 @@ contradictions:
     required_disposition:
       - "Decide the closing mechanism: serialize the veto and revocations through the same transaction as the commit, or rely on the hardware veto gating the actuator and record the software gate as advisory."
       - "Until then, keep the characterization tests and state the limit wherever the gate is described."
+
+  - id: "C-CUSTODY-001"
+    title: "No external custody for ledger anchors or expected state digests"
+    severity: "HIGH"
+    status: "OPEN"
+    domain: "evidence"
+    statement: >-
+      The ledger produces anchors and wx-state-digest-1 digests, but whoever holds the ledger can produce
+      both. A complete self-consistent rewrite plus a matching anchor and digest from the same party
+      verifies as ANCHOR_MATCHED (Step 6 control C8). Every report therefore states
+      custody NOT_ESTABLISHED and witness W0.
+    required_disposition:
+      - "Publish anchors to a store the ledger's operator cannot rewrite, or to independent witnesses (outline Step 7)."
+      - "Until then, no state digest may be described as authentic or independently witnessed."
 
   - id: "C-DUAL-001"
     title: "Dual-steward authorization is not enforceable (mirror)"

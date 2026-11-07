@@ -310,6 +310,7 @@ Portfolio state after the merge is unchanged until evidence says otherwise:
    *Veto twin done: `weaver_runtime.veto`, the RTL copied from cathedral-verified, and shared vectors replayed by both in CI (`hardware-sim.yml`). The TOCTOU execution gate followed in `weaver_runtime.gate` ([WX-EXECUTION-GATE-1](../../governance/specs/WX-EXECUTION-GATE-1.md)).*
 6. **Runtime-state digest from the in-tree ledger.** Retire the RC1 deferrals. Keep
    `verify-e35` red until its gates are actually met.
+   *Done as WNS-S6-001: `weaver_verifier.state` ([WX-STATE-DIGEST-1](../../governance/specs/WX-STATE-DIGEST-1.md)). The RC1 deferrals were **not** retired: the in-tree projection differs from RC1's, and the runtime-state contract forbids a different projection from silently replacing it. E3.5 stays HOLD. Custody is open as `C-CUSTODY-001`.*
 7. **Learning on the gate.** Route skill promotion through PG-001R.
 8. **One end-to-end demo.** Weaver's four boundary-integrity cases + Lumen's full loop,
    producing one spine receipt per run.

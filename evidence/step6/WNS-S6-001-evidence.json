@@ -1,0 +1,236 @@
+{
+  "after": {
+    "e35": {
+      "command": [
+        "/usr/local/bin/python",
+        "verify_attestations.py",
+        "--scope",
+        "e35"
+      ],
+      "exit_code": 1,
+      "stderr": "",
+      "stdout": "PASS authority_ledger_hash\nPASS manifest_hash\nPASS expected_head_hash\nPASS expected_state_digest\nPASS state_digest_method\nderived_chain_head: e3ff77f12b8663c1fe1ac14bf1e1bd7d675e969f54e49462f4abcf1f41f97e85\nderived_local_state_digest: 39a5996b1bba7a0ed4f0a5c549ad58af5300b5abb5890ddf9eb47c9d039c5a0e\nderived_local_state: {\"receipt_id\":\"AL-ADOC-2026-001\",\"state\":\"EXECUTED\"}\nFAIL release_commit: UNBOUND\nFAIL environment_status: DECLARED_NOT_REPLAYED\nFAIL state_digest_status: LOCAL_REDUCER_COMPUTED (runtime replay required)\nFAIL independent_reproduction: NOT_IMPLEMENTED_BY_LOCAL_VERIFIER\nRESULT: E3.5_WITHHELD\n"
+    },
+    "export": {
+      "exit_code": 0,
+      "stderr": ""
+    },
+    "fresh_process_cannot_import_runtime": true,
+    "fresh_process_digests": [
+      "wx-state-digest-1:e25198615b1279494b7374faddb351880a616a7dc31c11bf5c6df79b46d13f69"
+    ],
+    "fresh_process_implementation_independent": false,
+    "fresh_process_matches_in_process": true,
+    "fresh_process_runs": [
+      {
+        "command": [
+          "/usr/local/bin/python",
+          "-S",
+          "-m",
+          "weaver_verifier.state",
+          "--snapshot",
+          "s.json",
+          "--anchor",
+          "a.json"
+        ],
+        "exit_code": 0,
+        "stderr": "",
+        "stdout": "{\"authenticity\":\"NOT_ESTABLISHED\",\"custody\":\"NOT_ESTABLISHED\",\"digest\":\"wx-state-digest-1:e25198615b1279494b7374faddb351880a616a7dc31c11bf5c6df79b46d13f69\",\"reason\":\"history matches the supplied anchor; the anchor's custody is not checked\",\"reducer_source_sha256\":\"1ba63dcb31b4b28190694f7ea3543dcac5a8129e7e56b4f357213594231fe3bc\",\"state\":{\"executions\":{\"p-1\":{\"action\":\"SET_CONFIG\",\"actor_id\":\"agent-7\",\"decision_id\":\"dec-p-1\",\"payload_sha256\":\"22c6afb0783bb7a1389481f5cf9893091ad924bcc444fc1ddd9bae89ac6acef0\",\"policy_version\":\"policy-v1\",\"receipt_digest\":\"7c6cd187d8b976f4b2142205c2e69a34d6da8a5113e4a7a4943aa7e67ad36710\",\"result_sha256\":\"530165cbf7778339833d1d511b469161e4bf2ccd06a8822618a698a9bac7a3eb\",\"revalidation_decision_id\":\"dec-p-1\",\"sequence\":0},\"p-2\":{\"action\":\"SET_CONFIG\",\"actor_id\":\"agent-7\",\"decision_id\":\"dec-p-2\",\"payload_sha256\":\"0b652e7fd47e5f4d3ab3091a3dc7514e3f15d025e8236258399c41b5b9c15fd0\",\"policy_version\":\"policy-v1\",\"receipt_digest\":\"dc6d84ad5754d6a9df1529a223794674995801a1d33e47c354f414f2a12c4e17\",\"result_sha256\":\"7557ef13e51f8d788a6aef1a7765b2e540c8268153ba1ee7ccb5d36a53058288\",\"revalidation_decision_id\":\"dec-p-2\",\"sequence\":1},\"p-3\":{\"action\":\"SET_CONFIG\",\"actor_id\":\"agent-7\",\"decision_id\":\"dec-p-3\",\"payload_sha256\":\"a8e22f1f66082a51c0e8f999cfbd2f9135077cc665b63abfc3b5b9bcde745e5e\",\"policy_version\":\"policy-v1\",\"receipt_digest\":\"a3fce1e60181dd50226b92448df5b7f9649bb5f241ef82e775234097c5fabe4d\",\"result_sha256\":\"302e1ebbf0a3f9e084ed1eb28f199ea793ff320273c64a48d0d03ed50d7ca63c\",\"revalidation_decision_id\":\"dec-p-3\",\"sequence\":2}},\"projection\":\"wx-runtime-state-1\"},\"status\":\"ANCHOR_MATCHED\",\"witness\":\"W0\"}\n"
+      },
+      {
+        "command": [
+          "/usr/local/bin/python",
+          "-S",
+          "-m",
+          "weaver_verifier.state",
+          "--snapshot",
+          "s.json",
+          "--anchor",
+          "a.json"
+        ],
+        "exit_code": 0,
+        "stderr": "",
+        "stdout": "{\"authenticity\":\"NOT_ESTABLISHED\",\"custody\":\"NOT_ESTABLISHED\",\"digest\":\"wx-state-digest-1:e25198615b1279494b7374faddb351880a616a7dc31c11bf5c6df79b46d13f69\",\"reason\":\"history matches the supplied anchor; the anchor's custody is not checked\",\"reducer_source_sha256\":\"1ba63dcb31b4b28190694f7ea3543dcac5a8129e7e56b4f357213594231fe3bc\",\"state\":{\"executions\":{\"p-1\":{\"action\":\"SET_CONFIG\",\"actor_id\":\"agent-7\",\"decision_id\":\"dec-p-1\",\"payload_sha256\":\"22c6afb0783bb7a1389481f5cf9893091ad924bcc444fc1ddd9bae89ac6acef0\",\"policy_version\":\"policy-v1\",\"receipt_digest\":\"7c6cd187d8b976f4b2142205c2e69a34d6da8a5113e4a7a4943aa7e67ad36710\",\"result_sha256\":\"530165cbf7778339833d1d511b469161e4bf2ccd06a8822618a698a9bac7a3eb\",\"revalidation_decision_id\":\"dec-p-1\",\"sequence\":0},\"p-2\":{\"action\":\"SET_CONFIG\",\"actor_id\":\"agent-7\",\"decision_id\":\"dec-p-2\",\"payload_sha256\":\"0b652e7fd47e5f4d3ab3091a3dc7514e3f15d025e8236258399c41b5b9c15fd0\",\"policy_version\":\"policy-v1\",\"receipt_digest\":\"dc6d84ad5754d6a9df1529a223794674995801a1d33e47c354f414f2a12c4e17\",\"result_sha256\":\"7557ef13e51f8d788a6aef1a7765b2e540c8268153ba1ee7ccb5d36a53058288\",\"revalidation_decision_id\":\"dec-p-2\",\"sequence\":1},\"p-3\":{\"action\":\"SET_CONFIG\",\"actor_id\":\"agent-7\",\"decision_id\":\"dec-p-3\",\"payload_sha256\":\"a8e22f1f66082a51c0e8f999cfbd2f9135077cc665b63abfc3b5b9bcde745e5e\",\"policy_version\":\"policy-v1\",\"receipt_digest\":\"a3fce1e60181dd50226b92448df5b7f9649bb5f241ef82e775234097c5fabe4d\",\"result_sha256\":\"302e1ebbf0a3f9e084ed1eb28f199ea793ff320273c64a48d0d03ed50d7ca63c\",\"revalidation_decision_id\":\"dec-p-3\",\"sequence\":2}},\"projection\":\"wx-runtime-state-1\"},\"status\":\"ANCHOR_MATCHED\",\"witness\":\"W0\"}\n"
+      }
+    ],
+    "in_process": {
+      "digest": "wx-state-digest-1:e25198615b1279494b7374faddb351880a616a7dc31c11bf5c6df79b46d13f69",
+      "status": "ANCHOR_MATCHED"
+    }
+  },
+  "authority": "NONE",
+  "before": {
+    "git_show_state_py_at_base": {
+      "exit_code": 128,
+      "stderr": "fatal: path 'packages/verifier/weaver_verifier/state.py' exists on disk, but not in '7b4c30a1dedd5b7a8f887e61ba0b998bae8f488c'\n"
+    },
+    "in_tree_runtime_state_digest_at_base": "ABSENT",
+    "kernel_reducer_symbol_access": {
+      "exit_code": 1,
+      "stderr": "Traceback (most recent call last):\n  File \"<string>\", line 1, in <module>\n    import kernel.reducer as m; m.reduce\n                                ^^^^^^^^\n  File \"/home/user/Weaver_Os/kernel/reducer.py\", line 19, in __getattr__\n    raise NotImplementedError(\n    ...<2 lines>...\n    )\nNotImplementedError: kernel.reducer.reduce is not implemented in the source tree; the current verification claim is bound to the RC1 witness archive\n"
+    },
+    "manifest_state_digest": {
+      "expected_state_digest": "39a5996b1bba7a0ed4f0a5c549ad58af5300b5abb5890ddf9eb47c9d039c5a0e",
+      "state_digest_method": "authority-transition-reducer-v1",
+      "state_digest_status": "LOCAL_REDUCER_COMPUTED"
+    }
+  },
+  "controls": [
+    {
+      "control": "C1",
+      "description": "alter an event without updating its hash",
+      "expected": "REJECT",
+      "observed_reason": "history rejected: AUTHORITY[1]: event digest mismatch (event content changed)",
+      "observed_status": "REFUSED",
+      "ok": true
+    },
+    {
+      "control": "C2",
+      "description": "reorder two ledger entries",
+      "expected": "REJECT",
+      "observed_reason": "history rejected: AUTHORITY[0]: sequence mismatch (receipt says 1)",
+      "observed_status": "REFUSED",
+      "ok": true
+    },
+    {
+      "control": "C3",
+      "description": "truncate against a trusted external anchor",
+      "expected": "REJECT",
+      "observed_reason": "history rejected: AUTHORITY: length 2 != anchored 3 (truncation or insertion detected)",
+      "observed_status": "REFUSED",
+      "ok": true
+    },
+    {
+      "control": "C4",
+      "description": "fully recomputed chain, no external reference",
+      "expected": "EXPOSE LIMITATION (UNANCHORED, authenticity not established)",
+      "observed_reason": "chains internally consistent; without an external anchor a full rewrite is indistinguishable from authentic history",
+      "observed_status": "UNANCHORED",
+      "ok": true
+    },
+    {
+      "control": "C5",
+      "description": "change the canonical serialization",
+      "expected": "DIGEST MISMATCH / REJECT",
+      "observed_reason": "history rejected: AUTHORITY[2]: event bytes are not WX-CJSON-1 canonical; other schema: expected digest is not a wx-state-digest-1 digest; refusing to reinterpret it",
+      "observed_status": "REFUSED",
+      "ok": true
+    },
+    {
+      "control": "C6",
+      "description": "change a committed proposal's outcome",
+      "expected": "REJECT OR DIGEST MISMATCH",
+      "observed_reason": "history rejected: AUTHORITY: head != anchored head (rewrite detected); vs digest: digest mismatch: the ledger does not reproduce the expected digest",
+      "observed_status": "REFUSED",
+      "ok": true
+    },
+    {
+      "control": "C7",
+      "description": "present an uncommitted action as committed",
+      "expected": "REJECT",
+      "observed_reason": "claimed state is not supported by the ledger; moved entry: history rejected: AUTHORITY[3]: receipt is for root REJECTION",
+      "observed_status": "REFUSED",
+      "ok": true
+    },
+    {
+      "control": "C8",
+      "description": "forged expected digest and anchor from the same attacker",
+      "expected": "EXPOSE CUSTODY LIMITATION (matches; custody not established)",
+      "observed_reason": "history matches the supplied anchor; the anchor's custody is not checked",
+      "observed_status": "ANCHOR_MATCHED",
+      "ok": true
+    },
+    {
+      "control": "C9",
+      "description": "replay the same valid ledger twice",
+      "expected": "IDENTICAL DIGEST",
+      "observed_reason": "digest wx-state-digest-1:e25198615b1279494b7374faddb351880a616a7dc31c11bf5c6df79b46d13f69",
+      "observed_status": "ANCHOR_MATCHED",
+      "ok": true
+    }
+  ],
+  "environment": {
+    "implementation": "CPython",
+    "machine": "x86_64",
+    "platform": "Linux-6.18.44-fc-v310-x86_64-with-glibc2.39",
+    "python": "3.13.18 (main, Oct 26 2026, 14:08:19) [Clang 23.1.3 ]",
+    "sqlite": "3.53.1"
+  },
+  "evidence_level": "R2[self]",
+  "generated_at_utc": "2026-11-07T10:46:40Z",
+  "milestone": "WNS-S6-001",
+  "mutations": {
+    "detected": 33,
+    "exit_code": 0,
+    "state_mutations": [
+      {
+        "detected": true,
+        "mutation": "state-chain-validation",
+        "returncode": 1
+      },
+      {
+        "detected": true,
+        "mutation": "state-reconstruction",
+        "returncode": 1
+      },
+      {
+        "detected": true,
+        "mutation": "state-source-binding",
+        "returncode": 1
+      },
+      {
+        "detected": true,
+        "mutation": "state-digest-comparison",
+        "returncode": 1
+      },
+      {
+        "detected": true,
+        "mutation": "state-duplicate-commit",
+        "returncode": 1
+      },
+      {
+        "detected": true,
+        "mutation": "state-claim-comparison",
+        "returncode": 1
+      }
+    ],
+    "total": 33
+  },
+  "schema": "wns-s6-001-evidence-1",
+  "source": {
+    "base_before_step6": "7b4c30a1dedd5b7a8f887e61ba0b998bae8f488c",
+    "commit": "7580942e2a1fd718e7a96c76c0f59eb41ef8ee01",
+    "dirty_paths": [],
+    "files_sha256": {
+      "kernel/reducer.py": "c5d4bb287c97f394ced5079de040c583643e0e2d4e7d5da9fb3f91edea6d3dae",
+      "packages/contracts/weaver_contracts/canonical.py": "1ef5d7582dff987e2e6e16a49020346d2fd982f7e548f41b74b433d7e77a2b27",
+      "packages/contracts/weaver_contracts/ledger.py": "d0beebe44cb2e5a6b934e5a2f42088ac6bf8eaf47b7c4b6d3f3b840826bbf9aa",
+      "packages/contracts/weaver_contracts/receipt.py": "8423046182bb2906f9139515f89b789122d26ac450b068dafd782241369b5fa1",
+      "packages/runtime/weaver_runtime/gate.py": "9887dccb51070715701052d284812c538b7d9530cf3387b107ff0fe6fd6b2c72",
+      "packages/runtime/weaver_runtime/ledger.py": "8d279582c90203dc1a5f3d8111c829f7bbc9d0ad170e493fead5e91c96659173",
+      "packages/verifier/weaver_verifier/ledger.py": "b3db589a2ec20d8741ffa3b7588fb63201993c057b98adc235d062c7146d9e36",
+      "packages/verifier/weaver_verifier/state.py": "1ba63dcb31b4b28190694f7ea3543dcac5a8129e7e56b4f357213594231fe3bc",
+      "published_manifest.json": "a1dbb4e67a3c0cffb08c0875c7f0ef292644a3a82bb2e14e9a33a0c74f78c11a",
+      "tools/export_ledger.py": "da9ee90923cb3a65bc0f52d6a9e86f7c96c35b5791191b6eaa7cf4d2fc97e5c9",
+      "tools/state_controls.py": "59af71d7d070426969df290e3d0d7191000301b9ca11ca31cc8a4ebd741f43bd"
+    },
+    "reducer_source_sha256": "1ba63dcb31b4b28190694f7ea3543dcac5a8129e7e56b4f357213594231fe3bc",
+    "tree_clean": true
+  },
+  "status": {
+    "C-CUSTODY-001": "OPEN",
+    "C-GATE-001": "OPEN",
+    "E3.5": "HOLD",
+    "all_controls_ok": true
+  },
+  "trust_boundaries": [
+    "Origin-controlled run: same machine, same operator, same checkout. Not independent witnessing.",
+    "A fresh process reproducing a digest shows determinism, not authenticity.",
+    "The fresh process reuses the same canonicalization and ledger-verification code: it is process-separated reproduction, not implementation-independent verification.",
+    "Without an anchor held outside the operator's control, a complete self-consistent rewrite is indistinguishable from authentic history (control C4).",
+    "An anchor or expected digest supplied by the same party proves nothing more (control C8); custody is never established by this check.",
+    "The projection covers gate executions only; other Authority Root event types refuse.",
+    "C-GATE-001 is untouched: a commit that slipped through the commit-boundary race is a valid ledger entry and is included in the state."
+  ],
+  "witness": "W0"
+}
