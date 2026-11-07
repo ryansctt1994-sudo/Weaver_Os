@@ -19,6 +19,7 @@
     "fresh_process_digests": [
       "wx-state-digest-1:e25198615b1279494b7374faddb351880a616a7dc31c11bf5c6df79b46d13f69"
     ],
+    "fresh_process_implementation_independent": false,
     "fresh_process_matches_in_process": true,
     "fresh_process_runs": [
       {
@@ -156,7 +157,7 @@
     "sqlite": "3.53.1"
   },
   "evidence_level": "R2[self]",
-  "generated_at_utc": "2026-11-07T10:42:42Z",
+  "generated_at_utc": "2026-11-07T10:46:40Z",
   "milestone": "WNS-S6-001",
   "mutations": {
     "detected": 33,
@@ -198,7 +199,7 @@
   "schema": "wns-s6-001-evidence-1",
   "source": {
     "base_before_step6": "7b4c30a1dedd5b7a8f887e61ba0b998bae8f488c",
-    "commit": "af296ff3b441f823ab185093847f7f82578d27ca",
+    "commit": "7580942e2a1fd718e7a96c76c0f59eb41ef8ee01",
     "dirty_paths": [],
     "files_sha256": {
       "kernel/reducer.py": "c5d4bb287c97f394ced5079de040c583643e0e2d4e7d5da9fb3f91edea6d3dae",
@@ -225,6 +226,7 @@
   "trust_boundaries": [
     "Origin-controlled run: same machine, same operator, same checkout. Not independent witnessing.",
     "A fresh process reproducing a digest shows determinism, not authenticity.",
+    "The fresh process reuses the same canonicalization and ledger-verification code: it is process-separated reproduction, not implementation-independent verification.",
     "Without an anchor held outside the operator's control, a complete self-consistent rewrite is indistinguishable from authentic history (control C4).",
     "An anchor or expected digest supplied by the same party proves nothing more (control C8); custody is never established by this check.",
     "The projection covers gate executions only; other Authority Root event types refuse.",
