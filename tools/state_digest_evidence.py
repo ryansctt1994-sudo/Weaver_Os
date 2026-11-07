@@ -43,6 +43,10 @@ SOURCES = [
     "published_manifest.json",
     "kernel/reducer.py",
 ]
+# Explicit import path for subprocesses, so they work whether or not the package is installed.
+REPO_PYTHONPATH = os.pathsep.join(
+    str(p) for p in [ROOT] + [ROOT / "packages" / d for d in ("contracts", "runtime", "verifier")]
+)
 STATE_MUTATIONS = {
     "state-chain-validation",
     "state-reconstruction",
@@ -129,7 +133,8 @@ def main(argv: list[str] | None = None) -> int:
                 sys.executable, "-m", "tools.export_ledger", "--db", str(db),
                 "--ledger-id", LEDGER_ID, "--snapshot-out", str(work / "s.json"),
                 "--anchor-out", str(work / "a.json"),
-            ]
+            ],
+            env={**os.environ, "PYTHONPATH": REPO_PYTHONPATH},
         )
         fresh_env = {
             "PATH": os.environ.get("PATH", ""),

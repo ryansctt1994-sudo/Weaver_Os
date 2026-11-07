@@ -185,6 +185,12 @@ def test_supported_reports_never_claim_authenticity_or_custody(demo):
 # --- S6-D: independent verification in a fresh process ------------------------
 
 
+def _repo_env() -> dict:
+    """Explicit import path, so the subprocess works whether or not the package is installed."""
+    paths = [REPO] + [REPO / "packages" / d for d in ("contracts", "runtime", "verifier")]
+    return {**os.environ, "PYTHONPATH": os.pathsep.join(str(p) for p in paths)}
+
+
 def _verify_in_fresh_process(tmp_path: Path, *args: str) -> tuple[int, dict]:
     env = {
         "PATH": os.environ.get("PATH", ""),
@@ -213,6 +219,7 @@ def test_fresh_process_reproduces_the_digest(tmp_path):
             "--snapshot-out", str(tmp_path / "s.json"), "--anchor-out", str(tmp_path / "a.json"),
         ],
         cwd=REPO,
+        env=_repo_env(),
         timeout=60,
     )
     assert export.returncode == 0
