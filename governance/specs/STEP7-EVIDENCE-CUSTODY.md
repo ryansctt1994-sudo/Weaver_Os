@@ -20,6 +20,7 @@ that exist are the unsigned, self-produced anchor and digest from Step 6.
 | Publication cadence and absence reporting | yes | no | no |
 | Acceptance tests A1-A8 | yes | none written | none run |
 | Independent witness (a second party) | required | does not exist | no |
+| Custody rules: anchor control, replacement and rotation, comparison, disagreement | proposed (section "Custody rules") | no; rotation procedure undefined | no |
 
 What exists today: the anchor and Chronicle Root (`weaver_contracts.ledger`) and the
 `wx-state-digest-1` digest. Both are produced by whoever holds the ledger, so they are W0.
@@ -125,6 +126,59 @@ blocker as C-DUAL-001.
 Until a second party exists, the implementation can still be built and tested. In that case
 every report must say the witness is **simulated by a key holder inside the test harness**, and the
 status must remain W0.
+
+## Custody rules (proposed)
+
+These rules answer four questions raised in review. They are proposals. None is implemented, and
+none is witnessed.
+
+### Who controls the anchors
+
+- The ledger operator controls its own copy of the ledger. It may **submit** anchors to witnesses,
+  but it cannot sign a checkpoint.
+- A checkpoint has authority only if a pinned witness key signed it (design section 1). The
+  operator's copy of a checkpoint carries no weight in verification.
+
+### Who can replace them
+
+- No party can replace a checkpoint a witness has signed. A witness refuses any state that does not
+  extend its last signed checkpoint (design section 3). A replacement would be a fork, and forks are
+  refused.
+- Witness keys change only by rotation. Rotation must be signed by the existing witness set, be
+  published, and be recorded in the ledger's governance log. **The rotation procedure is not defined
+  yet; this is an open requirement.**
+- The operator cannot rotate witness keys. With more than one pinned witness, no single witness can
+  either.
+
+### How independently held evidence is compared
+
+- The verifier fetches checkpoints from witness-controlled channels, never from the snapshot under
+  test. It needs at least two channels the operator does not control. With one channel, the result
+  is UNCORROBORATED.
+- Comparison is by prefix consistency: the snapshot must extend each fetched checkpoint's Chronicle
+  Root. Fetched checkpoints are also compared with each other.
+- **Independence is a property of people and organisations, not of code.** A second person with
+  access is not automatically independent custody. Independence requires that the witness takes no
+  instructions from the operator, that the witness's key material is not on the operator's systems,
+  that the operator cannot write the witness's storage, and that these facts are attested by the
+  witness operator. Code can verify signatures and consistency. It cannot prove independence.
+
+### What happens when the evidence disagrees
+
+Every row is reported. No row is repaired automatically.
+
+| Observation | Report | Required action |
+|---|---|---|
+| Snapshot extends the latest checkpoint, corroborated by at least two independent channels | WITNESSED (candidate; needs real witnesses) | none |
+| Snapshot is shorter than, or forks from, a signed checkpoint | FORKED or REGRESSED, REFUSED | freeze ledger extension; escalate to witnesses and steward |
+| Two witnesses sign conflicting checkpoints at the same length | SPLIT_VIEW, REFUSED | freeze; investigate fork or key compromise |
+| A witness refuses a checkpoint the operator submitted | refusal logged and reported | the operator must explain; a refusal is evidence, not noise |
+| No checkpoint newer than N intervals | ABSENT_SINCE(N); never CURRENT | escalate |
+| Only one channel corroborates | UNCORROBORATED | not witnessed |
+
+- Resolution is a governance decision, recorded in the governance log with the disagreement
+  evidence attached. The code can detect and report disagreement. It cannot decide which party is
+  honest.
 
 ## 6. Acceptance tests (required before any closure claim)
 

@@ -37,6 +37,7 @@ The gate records decisions made by others. It grants no authority itself.
 
 from __future__ import annotations
 
+import sqlite3
 import threading
 import time
 from collections.abc import Callable, Mapping
@@ -47,7 +48,7 @@ from weaver_contracts.canonical import CanonicalizationError, parse_strict
 from weaver_contracts.gate import AuthorizationDecision, GateContractError, Proposal
 from weaver_contracts.receipt import Receipt
 
-from .ledger import AdmissionError, LedgerDuplicate, ReceiptLedger
+from .ledger import AdmissionError, CommitRefused, LedgerDuplicate, ReceiptLedger
 from .veto import STATE_ARMED, LuciferLatchTwin
 
 COMMITTED = "COMMITTED"
@@ -67,6 +68,14 @@ class TwinVeto:
 
     def vetoed(self) -> bool:
         return self._twin.current_state != STATE_ARMED or self._twin.veto_signal == 1
+
+
+VETO_CONTROL = "veto"
+
+
+def revocation_control(proposal_id: str) -> str:
+    """Name of the ledger control that records a revocation of one proposal's authority."""
+    return f"revoked:{proposal_id}"
 
 
 class GateAbort(Exception):
@@ -150,6 +159,27 @@ class ExecutionGate:
         return GateOutcome(status=status, reason_code=reason_code, receipt=receipt)
 
     # ------------------------------------------------------------------ checks
+
+    def _ledger_guard(self, proposal: Proposal) -> Callable[[sqlite3.Connection], None]:
+        """Authoritative veto and revocation check, run inside the commit transaction.
+
+        It reads ledger-recorded controls after ``BEGIN IMMEDIATE`` and before the append,
+        so a control change either committed before this transaction (and is seen) or
+        waits for it (and is ordered after the commit). The in-memory veto source is not
+        consulted here. Only what the ledger records counts.
+        """
+        revocation = revocation_control(proposal.proposal_id)
+
+        def guard(conn: sqlite3.Connection) -> None:
+            for name, refused_value, reason in (
+                (VETO_CONTROL, "active", "VETO_RECORDED_BEFORE_COMMIT"),
+                (revocation, "revoked", "REVOKED_RECORDED_BEFORE_COMMIT"),
+            ):
+                row = conn.execute("SELECT value FROM controls WHERE name = ?", (name,)).fetchone()
+                if row is not None and row[0] == refused_value:
+                    raise CommitRefused(reason, f"control {name} is {refused_value} in the ledger")
+
+        return guard
 
     def _check_live(self, expires_at: int, *, stage: str) -> None:
         if self._veto.vetoed():
@@ -252,7 +282,12 @@ class ExecutionGate:
                     actor_id=self._gate_id,
                     policy_version=self._policy_version,
                     unique_key=f"EXECUTION_COMMITTED:{proposal.proposal_id}",
+                    guard=self._ledger_guard(proposal),
                 )
+            except CommitRefused as exc:
+                # A veto or revocation recorded in the ledger before the commit's
+                # serialization point. Nothing was written.
+                return self._reject(proposal, "COMMIT", exc.reason_code, exc.detail, ABORTED)
             except LedgerDuplicate as exc:
                 # Another gate (or process) committed this proposal first.
                 with self._lock:

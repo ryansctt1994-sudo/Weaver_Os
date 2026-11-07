@@ -53,6 +53,33 @@ two commit-boundary characterization tests. `tools/check_verifier_mutations.py` 
 check, pre-commit re-authorization, checkpoint re-authorization, the EVALUATING-is-veto rule, and
 the replay guard. Each is caught by a named test.
 
+## Ledger-authoritative commit guard (candidate for C-GATE-001)
+
+**Status:** candidate, implemented on this branch. **C-GATE-001 is not closed.** This is the
+ledger-recorded form of the same-transaction direction chosen in GD-0003 (D8).
+
+- `ReceiptLedger.set_control` writes the `veto` control and `revoked:<proposal_id>` controls under the
+  commit's own serialization lock, logged in `control_log`.
+- `ReceiptLedger.admit(..., guard=...)` runs the guard after `BEGIN IMMEDIATE` and before any write.
+  A `CommitRefused` rolls the transaction back and nothing is written.
+- The gate's guard refuses with `VETO_RECORDED_BEFORE_COMMIT` when `veto` is `active`, and with
+  `REVOKED_RECORDED_BEFORE_COMMIT` when `revoked:<proposal_id>` is `revoked`.
+- **Defined ordering.** A control committed before the commit's transaction is seen and refuses the
+  commit. A control written after the commit is ordered after it and does not undo it.
+- **Closure criterion status.** `test_veto_recorded_in_the_ledger_before_commit_aborts` commits on the
+  gate without this guard, and aborts with it. The mutation `commit-boundary-gate-guard-unwired` shows
+  the test depends on the guard. The pre-candidate gate had no `set_control`, so the test cannot run
+  against it unmodified. The behaviour, not the API, is what it tests.
+
+**Still open (why this is not closure):**
+
+- The physical latch does not write into the ledger. Until a bridge does, the hardware veto is not
+  covered by this path.
+- The in-memory twin veto stays advisory. Its characterization tests still commit.
+- Controls are outside the verified chains and the state digest. A verifier cannot check control history
+  independently, so control history is not evidence until it is anchored.
+- Scope is one SQLite store on a local file system. A second store is not covered.
+
 ## Limits
 
 - **The commit boundary is not atomic with the veto or the authorizer (C-GATE-001).** Revalidation

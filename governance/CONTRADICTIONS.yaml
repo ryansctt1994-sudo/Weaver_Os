@@ -136,6 +136,10 @@ contradictions:
       closure_criteria: "A test that fails on the current code and passes on the new design, showing that a conflicting veto or revocation in the pre-commit window cannot be missed under the defined commit semantics."
       not_closed_by: "Adding another check, which only shrinks the window; recording a veto without evaluating it inside the commit."
       hardware_note: "The hardware veto remains a separate fail-closed physical mechanism. RTL/twin equivalence is modeled behaviour only."
+    candidate:
+      status: "Ledger-authoritative guard implemented on the candidate branch (WX-EXECUTION-GATE-1). Not closed."
+      mechanism: "Veto and revocation controls written under the commit's serialization lock; the commit guard checks them inside the commit transaction."
+      not_yet_covered: "The physical latch does not write into the ledger; the in-memory twin veto stays advisory; controls are outside the verified chains and digest."
     required_disposition:
       - "Implement the same-transaction design and meet the closure criteria above."
       - "Until then, keep the characterization tests and state the limit wherever the gate is described. The software gate is advisory for the final-gap race."
@@ -155,6 +159,7 @@ contradictions:
       mechanism: "Witness-signed checkpoints with append-only, fork-refusing witnesses and pinned witness keys."
       blocker: "An independently controlled witness is a second party. The repository cannot supply one. Same organizational blocker as C-DUAL-001."
       acceptance_tests: "A1-A8 in the design document; none implemented."
+      comparison_and_disagreement_rules: "Proposed in the design document under 'Custody rules (proposed)'. Not implemented, not witnessed."
     required_disposition:
       - "Implement the witness checkpoint design and meet acceptance tests A1-A8."
       - "Obtain an independently controlled witness, which needs a second party."
