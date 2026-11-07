@@ -5,7 +5,8 @@ this domain may import only `contracts`.
 
 | Module | What it is | Spec | Evidence here |
 |---|---|---|---|
-| `weaver_runtime.ledger` | `ReceiptLedger`: single-owner, SQLite-backed Dual Ledger (Lumen-Nexus ADR-0006) | [`WX-RECEIPT-LEDGER-1`](../../governance/specs/WX-RECEIPT-LEDGER-1.md) | R2[self] |
+| `weaver_runtime.ledger` | `ReceiptLedger`: single-owner, SQLite-backed Dual Ledger (Lumen-Nexus ADR-0006, accepted by GD-0002) | [`WX-RECEIPT-LEDGER-1`](../../governance/specs/WX-RECEIPT-LEDGER-1.md) | R2[self] |
+| `weaver_runtime.replay_cache` | `InMemoryReplayCache` (tests and simulation only) and `SQLiteReplayCache` | `docs/triadic-controls/ARCHITECTURE.md` | R2[self]; moved from `triadic_controls/crypto/` |
 
 ```python
 from weaver_runtime.ledger import ReceiptLedger

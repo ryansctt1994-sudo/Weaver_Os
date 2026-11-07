@@ -1,12 +1,26 @@
-"""Fail-closed trust-domain import checker for the unified layout (UADR-0001).
+"""Fail-closed trust-domain checker for the unified layout (UADR-0001).
 
-Each directory directly under ``packages/`` is a trust domain. Python files in a
-domain may import only from the domains UADR-0001 allows. Nothing under
-``packages/`` may import from the non-runtime zones. An unknown domain
-directory is a violation, not something skipped.
+Each directory directly under ``packages/`` is a trust domain. The checker enforces:
 
-Until code moves into ``packages/``, the checker passes and reports that
-no domains are present.
+``FORBIDDEN_DOMAIN_IMPORT``
+    A domain imports another domain that UADR-0001 does not allow.
+``NON_RUNTIME_IMPORT``
+    Code under ``packages/`` imports ``research``, ``archive``, ``legacy`` or ``evidence``.
+``NON_STDLIB_IMPORT``
+    ``contracts`` imports anything outside the Python standard library.
+``IO_CAPABLE_IMPORT``
+    ``contracts`` or ``verifier`` imports a module that runs processes, opens network
+    connections, or writes databases (``sqlite3``, ``subprocess``, ``socket``, ...).
+    Verification stays read-only, and effects reach it only through injected objects.
+``LEGACY_CANONICALIZER``
+    Code under ``packages/`` hashes ``json.dumps(..., sort_keys=True)`` output outside the
+    named allowlist. New code uses WX-CJSON-1 (``weaver_contracts.canonical``); see C-CANON-001.
+``STALE_ALLOWLIST``
+    An allowlisted file no longer contains a legacy canonicalizer, so its entry must go.
+``UNKNOWN_DOMAIN`` / ``UNPARSEABLE``
+    Fail closed on anything the checker cannot classify.
+
+Until a domain exists, there is nothing to check for it.
 """
 
 from __future__ import annotations
@@ -29,6 +43,41 @@ ALLOWED: dict[str, frozenset[str]] = {
     "adapters": frozenset({"contracts"}),
 }
 NON_RUNTIME_ZONES = frozenset({"research", "archive", "legacy", "evidence"})
+STDLIB_ONLY = frozenset({"contracts"})
+NO_IO_DOMAINS = frozenset({"contracts", "verifier"})
+IO_CAPABLE_MODULES = frozenset(
+    {
+        "asyncio",
+        "ctypes",
+        "ftplib",
+        "http",
+        "imaplib",
+        "multiprocessing",
+        "poplib",
+        "shutil",
+        "smtplib",
+        "socket",
+        "socketserver",
+        "sqlite3",
+        "subprocess",
+        "urllib",
+        "xmlrpc",
+    }
+)
+STDLIB = frozenset(sys.stdlib_module_names) | {"__future__"}
+
+# Paths relative to packages/. Each entry names why the legacy canonicalizer stays.
+LEGACY_CANONICALIZER_ALLOWLIST: dict[str, str] = {
+    "verifier/weaver_verifier/crypto.py": (
+        "C-CANON-001: triadic_controls canonicalize_json; signatures in fixtures depend on it"
+    ),
+    "verifier/weaver_verifier/claim_transition.py": (
+        "C-CANON-001: claim_state_hash moved unchanged in step 4"
+    ),
+    "verifier/weaver_verifier/pg001r.py": (
+        "PG001R-JSON-1: Lumen-Nexus named diagnostic profile, moved verbatim"
+    ),
+}
 
 
 @dataclass(frozen=True)
@@ -79,6 +128,42 @@ def _imported_modules(tree: ast.AST) -> Iterable[tuple[int, str]]:
                 yield node.lineno, node.args[0].value
 
 
+def _json_dump_aliases(tree: ast.AST) -> set[str]:
+    """Names bound to json.dump/json.dumps by ``from json import ...``."""
+    aliases: set[str] = set()
+    for node in ast.walk(tree):
+        if isinstance(node, ast.ImportFrom) and node.module == "json" and node.level == 0:
+            for alias in node.names:
+                if alias.name in {"dump", "dumps"}:
+                    aliases.add(alias.asname or alias.name)
+    return aliases
+
+
+def _legacy_canonicalizer_lines(tree: ast.AST) -> list[int]:
+    aliases = _json_dump_aliases(tree)
+    lines = []
+    for node in ast.walk(tree):
+        if not isinstance(node, ast.Call):
+            continue
+        func = node.func
+        is_json_dump = (
+            isinstance(func, ast.Attribute)
+            and func.attr in {"dump", "dumps"}
+            and isinstance(func.value, ast.Name)
+            and func.value.id == "json"
+        ) or (isinstance(func, ast.Name) and func.id in aliases)
+        if not is_json_dump:
+            continue
+        for keyword in node.keywords:
+            if (
+                keyword.arg == "sort_keys"
+                and isinstance(keyword.value, ast.Constant)
+                and keyword.value.value is True
+            ):
+                lines.append(node.lineno)
+    return lines
+
+
 def _owner(module: str, owners: dict[str, str]) -> str | None:
     parts = module.split(".")
     for size in (2, 1):
@@ -86,6 +171,60 @@ def _owner(module: str, owners: dict[str, str]) -> str | None:
         if candidate in owners:
             return owners[candidate]
     return None
+
+
+def _check_file(
+    path: Path, domain: str, owners: dict[str, str], relative: str
+) -> list[Violation]:
+    try:
+        tree = ast.parse(path.read_text(encoding="utf-8"), filename=str(path))
+    except (SyntaxError, UnicodeDecodeError) as exc:
+        return [Violation(path, 0, "UNPARSEABLE", str(exc))]
+    violations: list[Violation] = []
+    for line, module in _imported_modules(tree):
+        top = module.split(".")[0]
+        if top in NON_RUNTIME_ZONES:
+            violations.append(
+                Violation(path, line, "NON_RUNTIME_IMPORT", f"{domain} imports {module}")
+            )
+            continue
+        target = _owner(module, owners)
+        if target is not None:
+            if target != domain and target not in ALLOWED[domain]:
+                violations.append(
+                    Violation(
+                        path,
+                        line,
+                        "FORBIDDEN_DOMAIN_IMPORT",
+                        f"{domain} may not import {target} ({module})",
+                    )
+                )
+            continue
+        if domain in NO_IO_DOMAINS and top in IO_CAPABLE_MODULES:
+            violations.append(
+                Violation(path, line, "IO_CAPABLE_IMPORT", f"{domain} imports {module}")
+            )
+        if domain in STDLIB_ONLY and top not in STDLIB:
+            violations.append(
+                Violation(path, line, "NON_STDLIB_IMPORT", f"{domain} imports {module}")
+            )
+    legacy = _legacy_canonicalizer_lines(tree)
+    if relative in LEGACY_CANONICALIZER_ALLOWLIST:
+        if not legacy:
+            violations.append(
+                Violation(path, 0, "STALE_ALLOWLIST", "no legacy canonicalizer left; remove entry")
+            )
+    else:
+        violations.extend(
+            Violation(
+                path,
+                line,
+                "LEGACY_CANONICALIZER",
+                "json.dumps(sort_keys=True); use weaver_contracts.canonical (C-CANON-001)",
+            )
+            for line in legacy
+        )
+    return violations
 
 
 def check(root: Path) -> tuple[list[Violation], int]:
@@ -104,30 +243,8 @@ def check(root: Path) -> tuple[list[Violation], int]:
             )
             continue
         for path in sorted(domain_dir.rglob("*.py")):
-            try:
-                tree = ast.parse(path.read_text(encoding="utf-8"), filename=str(path))
-            except (SyntaxError, UnicodeDecodeError) as exc:
-                violations.append(Violation(path, 0, "UNPARSEABLE", str(exc)))
-                continue
-            for line, module in _imported_modules(tree):
-                top = module.split(".")[0]
-                if top in NON_RUNTIME_ZONES:
-                    violations.append(
-                        Violation(path, line, "NON_RUNTIME_IMPORT", f"{domain} imports {module}")
-                    )
-                    continue
-                target = _owner(module, owners)
-                if target is None or target == domain:
-                    continue
-                if target not in ALLOWED[domain]:
-                    violations.append(
-                        Violation(
-                            path,
-                            line,
-                            "FORBIDDEN_DOMAIN_IMPORT",
-                            f"{domain} may not import {target} ({module})",
-                        )
-                    )
+            relative = path.relative_to(packages_dir).as_posix()
+            violations.extend(_check_file(path, domain, owners, relative))
     return violations, len(domains)
 
 

@@ -2,7 +2,7 @@
 
 Schemas, canonicalization, and frozen data shapes. Under
 [UADR-0001](../../governance/adr/UADR-0001-trust-domain-layout.md) this domain imports
-nothing else in the project. `tools/check_trust_domains.py` enforces that in `pytest`.
+nothing else in the project and nothing outside the Python standard library. `tools/check_trust_domains.py` enforces that in `pytest`.
 
 Contracts define data rules only. They grant no authority and create no evidence.
 
@@ -10,7 +10,9 @@ Contracts define data rules only. They grant no authority and create no evidence
 |---|---|---|---|
 | `weaver_contracts.canonical` | WX-CJSON-1 canonical JSON (RFC 8785, integer-only) | [`WX-CJSON-1`](../../governance/specs/WX-CJSON-1.md) | R2[self]: 19 valid + 14 reject vectors, cross-checked against `rfc8785` |
 | `weaver_contracts.receipt` | wx-receipt-1 commit receipt contract | [`WX-RECEIPT-1`](../../governance/specs/WX-RECEIPT-1.md) | R2[self] for the contract; no ledger issues it yet |
-| `weaver_contracts.pg001r` | PG-001R promotion-request contracts | Lumen-Nexus `governance/specs/PG-001R.md` | R1 here (see below) |
+| `weaver_contracts.pg001r` | PG-001R promotion-request contracts | Lumen-Nexus `governance/specs/PG-001R.md` | R2[self] here since step 4 (see below) |
+| `weaver_contracts.ledger` | Root heads, Chronicle Root, `wx-chronicle-anchor-1` | [`WX-RECEIPT-LEDGER-1`](../../governance/specs/WX-RECEIPT-LEDGER-1.md) | R2[self] |
+| `weaver_contracts.replay` | `ReplayCacheProtocol`, `generate_replay_key` | `docs/triadic-controls/ARCHITECTURE.md` | R2[self]; moved from `triadic_controls/crypto/replay.py` |
 
 ## Provenance: `pg001r.py`
 
@@ -21,10 +23,9 @@ Nexus `pg-001r-source-manifest.json` entry, and `tests/contracts/test_pg001r_con
 asserts that it still does. Ruff's `UP035`/`UP037` are ignored for this one file so it can
 stay byte-identical.
 
-Under outline §7, moved code arrives at R1 in its new location. The contract-level tests here
-check parsing only. PG-001R's canonical 19-test conformance suite needs the evaluator, which
-moves into `packages/verifier` in step 4. PG-001R's R2[self] status is earned in Lumen-Nexus,
-and that status does not transfer by the move.
+Under outline §7, moved code arrives at R1 in its new location. In step 4 the evaluator and the
+canonical 19-test conformance suite moved too and pass here, so PG-001R is R2[self] in this
+repository on its own evidence, not by inheritance from Lumen-Nexus.
 
 ## Running
 

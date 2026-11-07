@@ -1,7 +1,6 @@
 import pytest
-
-from triadic_controls.crypto.replay import InMemoryReplayCache
-from triadic_controls.crypto.verifier import CryptoVerifier
+from weaver_runtime.replay_cache import InMemoryReplayCache
+from weaver_verifier.crypto import CryptoVerifier
 
 
 @pytest.fixture

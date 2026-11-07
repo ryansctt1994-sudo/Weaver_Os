@@ -2,7 +2,7 @@ from __future__ import annotations
 
 import copy
 
-from policy.claim_transition import claim_state_hash, validate_transition
+from weaver_verifier.claim_transition import claim_state_hash, validate_transition
 
 POLICY_HEAD = "b" * 64
 BINDINGS = {"source": "a" * 64}

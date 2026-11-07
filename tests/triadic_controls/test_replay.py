@@ -1,6 +1,7 @@
 import time
 
-from triadic_controls.crypto.replay import InMemoryReplayCache, generate_replay_key
+from weaver_contracts.replay import generate_replay_key
+from weaver_runtime.replay_cache import InMemoryReplayCache
 
 
 def test_generate_replay_key_determinism():

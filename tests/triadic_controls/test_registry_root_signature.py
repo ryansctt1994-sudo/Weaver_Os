@@ -5,9 +5,8 @@ from datetime import datetime, timedelta, timezone
 import pytest
 from cryptography.hazmat.primitives import serialization
 from cryptography.hazmat.primitives.asymmetric import ed25519
-
-from triadic_controls.crypto.replay import InMemoryReplayCache
-from triadic_controls.crypto.verifier import CryptoVerifier, canonicalize_json
+from weaver_runtime.replay_cache import InMemoryReplayCache
+from weaver_verifier.crypto import CryptoVerifier, canonicalize_json
 
 
 def b64url_nopad(data: bytes) -> str:

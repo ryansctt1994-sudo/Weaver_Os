@@ -304,6 +304,7 @@ Portfolio state after the merge is unchanged until evidence says otherwise:
    *Done: `packages/runtime` + `packages/verifier` ([WX-RECEIPT-LEDGER-1](../../governance/specs/WX-RECEIPT-LEDGER-1.md)). `C-RCPT-001` stays open pending ADR-0006 acceptance and a repair receipt.*
 4. **Verifier domain.** Move CryptoVerifier, claim transition, PG-001R, and replay verify.
    Extend the boundary checker. CI fails on cross-domain imports.
+   *Done, except the triad ledger (`triadic_controls/ledger.py`), which stays put: its schema path and pinned fixtures need their own migration, and its appender has the C-RCPT-001 race recorded in the registry. ADR-0006 accepted by [GD-0002](../../governance/decisions/GD-0002.md).*
 5. **Execution gate + veto twin.** TOCTOU gate, a Python veto matching the RTL, and
    shared test vectors with the Verilog testbench in CI (`iverilog`).
 6. **Runtime-state digest from the in-tree ledger.** Retire the RC1 deferrals. Keep

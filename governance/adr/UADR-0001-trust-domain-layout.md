@@ -38,6 +38,14 @@ The rules fail closed:
 - a file that cannot be parsed is a violation;
 - `importlib.import_module("…")` and `__import__("…")` with literal names are checked too.
 
+Added in outline step 4 (same ratified layout, stricter enforcement; the checker also has its own CI step):
+
+- `contracts` may import only the Python standard library (`NON_STDLIB_IMPORT`);
+- `contracts` and `verifier` may not import process, network, or database modules such as
+  `sqlite3`, `subprocess`, `socket`, `urllib` (`IO_CAPABLE_IMPORT`);
+- no `json.dumps(..., sort_keys=True)` under `packages/` outside a named allowlist
+  (`LEGACY_CANONICALIZER`), and an allowlist entry whose file no longer needs it fails (`STALE_ALLOWLIST`).
+
 Today `packages/` does not exist, and the checker reports that and passes. The rules apply
 as soon as the first package moves in (outline step 2).
 
@@ -57,8 +65,9 @@ decisions reach it as data produced elsewhere.
 
 - The checker sees static and literal dynamic imports. It does not see imports built from
   computed strings, `exec`, or path manipulation. Review still has to cover those.
-- Existing top-level Weaver modules (`triadic_controls/`, `tools/`, `policy/`, …) are not
-  yet inside `packages/`, so this rule does not cover them until they move.
+- Top-level Weaver modules outside `packages/` are not covered. After step 4, `triadic_controls/crypto/*`
+  and `policy/claim_transition.py` are re-export shims. `triadic_controls/ledger.py` (the triad ledger),
+  `tools/`, and the other top-level modules have not moved.
 
 ## Consequences
 

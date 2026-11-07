@@ -38,22 +38,42 @@ contradictions:
       - "No stub may ship under packages/."
 
   - id: "C-CANON-001"
-    title: "Legacy canonicalizers diverge from WX-CJSON-1"
+    title: "Legacy JSON serializers used for hashing or signing diverge from WX-CJSON-1"
     severity: "MEDIUM"
     status: "OPEN"
     domain: "canonicalization"
     statement: >-
-      triadic_controls.crypto.verifier.canonicalize_json and
-      tools.mathos_bench.mathos_bench_v0_1.canonical_json sort keys by code point (diverge on
-      V12); tools.spine_hash.canonical also escapes all non-ASCII (diverges on V09-V13, V17).
-      All three match WX-CJSON-1 on integer-only data whose strings (keys and values) are all
-      ASCII, which holds for every
-      committed JSON file except MathOS bench (non-ASCII strings in two files, floats in its
-      smoke receipt, so its digests are outside WX-CJSON-1 entirely).
-    evidence: "tests/contracts/test_canonical.py pins all three divergence sets."
+      About a dozen places hash or sign json.dumps(sort_keys=True) output instead of a
+      canonical profile. Step 2 recorded three; a repository-wide search in step 4 found the rest.
+    inventory:
+      pinned_in_tests:
+        - "weaver_verifier.crypto.canonicalize_json (moved from triadic_controls): diverges on V12 (key order by code point)"
+        - "triadic_controls.ledger.canonical_json (also inline at its append path): V12"
+        - "tools.mathos_bench.mathos_bench_v0_1.canonical_json: V12; also accepts floats"
+        - "tools.spine_hash.canonical: V09-V13, V17 (escapes all non-ASCII; same key order)"
+        - "weaver_verifier.claim_transition._canonical_bytes: V09-V13, V17"
+      not_importable_same_class_as_spine_hash:
+        - "witness_py/sign_attestation.py canonical_json (signing input)"
+        - "inject_ledger.py"
+        - "verify_attestations.py"
+        - "src/weaver_release_guard/provenance.py (SLSA attestation_digest)"
+        - "demo/boundary_integrity_demo.py"
+        - "weaver_auth/bedrock/tests/test_all_harnesses.py"
+      named_profiles_not_legacy:
+        - "PG001R-JSON-1 (weaver_verifier.pg001r._canonical_bytes): Lumen-Nexus diagnostic fingerprints only"
+      out_of_scope: "Pretty-printed (indent=2) outputs written to files or stdout, e.g. tools/verify_all.py and tools/emit_spine_receipt.py."
+    data_note: >-
+      Every serializer agrees with WX-CJSON-1 on integer-only data whose strings are all ASCII.
+      MathOS bench data and triad ledger events contain floats, so their digests are outside
+      WX-CJSON-1 entirely.
+    enforcement: >-
+      tools/check_trust_domains.py rejects json.dumps(sort_keys=True) anywhere under packages/
+      except three allowlisted files (crypto, claim_transition, pg001r), and rejects a stale
+      allowlist entry.
+    evidence: "tests/contracts/test_canonical.py pins the five importable divergence sets."
     required_disposition:
-      - "Decide per canonicalizer: migrate to WX-CJSON-1 (re-pin affected digests with a recorded migration) or freeze it as a named legacy profile."
-      - "No new authority-bearing code may use either legacy canonicalizer."
+      - "Decide per serializer: migrate to WX-CJSON-1 (re-pin affected digests and signatures with a recorded migration) or freeze it as a named legacy profile."
+      - "No new authority-bearing code may use a legacy serializer."
 
   - id: "C-RCPT-001"
     title: "Receipt and hash-chain semantic incompatibility (mirror)"
@@ -66,8 +86,13 @@ contradictions:
       - "Single-owner ReceiptLedger implemented in packages/runtime (step 3), following Lumen-Nexus ADR-0006."
       - "Reproduced the defect class in Lumen's Chronicle: two instances on one file fork the chain."
       - "Positive, negative, mutation-isolation, concurrency and interrupted-transaction tests in tests/ledger; 8 ledger mutations in tools/check_verifier_mutations.py, all detected."
+      - "ADR-0006 accepted for Weaver_Os by GD-0002 (single steward; C-DUAL-001 limitation recorded)."
+      - >-
+        Step 4 found a second appender with the same defect class: triadic_controls.ledger.TriadLedger.append_event
+        takes caller-supplied index and prev_hash and does an unlocked load, check, append. With two writers
+        interleaved after load, both appends succeed and the ledger then fails to load (LedgerChainError).
     remaining:
-      - "Accept ADR-0006 (a decision; it is PROPOSED in Lumen-Nexus)."
+      - "Migrate TriadLedger appends onto ReceiptLedger, or serialize them, without breaking pinned triad fixtures."
       - "Issue a reproducible clean-clone repair receipt under an approved receipt profile (blocked on Lumen-Nexus #13)."
 
   - id: "C-DUAL-001"

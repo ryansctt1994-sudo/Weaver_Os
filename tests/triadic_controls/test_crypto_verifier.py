@@ -5,9 +5,8 @@ from typing import Any
 import pytest
 from cryptography.hazmat.primitives import serialization
 from cryptography.hazmat.primitives.asymmetric import ed25519
-
-from triadic_controls.crypto.replay import InMemoryReplayCache
-from triadic_controls.crypto.verifier import (
+from weaver_runtime.replay_cache import InMemoryReplayCache
+from weaver_verifier.crypto import (
     CryptoVerifier,
     build_signing_object,
     compute_payload_hash,

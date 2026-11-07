@@ -110,6 +110,35 @@ MUTATIONS = [
         "if False:",
         "tests/ledger/test_ledger_adversarial.py::test_X3_rejection_cannot_be_moved_onto_authority_root",
     ),
+    (
+        "crypto-signature",
+        "packages/verifier/weaver_verifier/crypto.py",
+        "            if not verify_signature(",
+        "            if False and not verify_signature(",
+        "tests/triadic_controls/test_crypto_verifier.py::test_invalid_signature_does_not_poison_replay_cache",
+    ),
+    (
+        "crypto-replay-record",
+        "packages/verifier/weaver_verifier/crypto.py",
+        "            if not self.replay_cache.check_and_record(",
+        "            if False and not self.replay_cache.check_and_record(",
+        "tests/triadic_controls/test_crypto_verifier.py::test_valid_envelope_then_replay_detected",
+    ),
+    (
+        "crypto-registry-root-signature",
+        "packages/verifier/weaver_verifier/crypto.py",
+        "if root_public_key_b64url is not None and not verify_registry_root_signature(",
+        "if False and not verify_registry_root_signature(",
+        "tests/triadic_controls/test_registry_root_signature.py::test_tampered_registry_rejected_after_root_signature",
+    ),
+    (
+        "crypto-quorum",
+        "packages/verifier/weaver_verifier/crypto.py",
+        "        if not verify_quorum(verified_groups, requested_level):",
+        "        if False:",
+        # Asserts INSUFFICIENT_QUORUM for a single-signer level-4 request.
+        "tests/triadic_controls/test_crypto_verifier.py::test_valid_envelope_then_replay_detected",
+    ),
 ]
 
 
@@ -124,6 +153,7 @@ def main() -> None:
             "tests/test_witness_archive.py",
             "tests/test_triad_multiblock.py",
             "tests/ledger",
+            "tests/triadic_controls",
         ],
         cwd=root,
         capture_output=True,
