@@ -129,9 +129,16 @@ contradictions:
     resolved_in_review:
       - "Two gates sharing a ledger could both commit one proposal; fixed with a transactional ledger unique_key."
       - "A re-issued decision that had already expired was accepted; fixed in c9c8635."
+    direction:
+      decision: "GD-0003 (D8)"
+      chosen: "Same-transaction design for software-governed commits: the commit transaction evaluates the authoritative veto and revocation state under the same serialization boundary."
+      open_question: "The veto source is an in-process software twin that a SQLite transaction cannot read. Either the veto state moves into the commit database, or it is captured under one shared serialization point."
+      closure_criteria: "A test that fails on the current code and passes on the new design, showing that a conflicting veto or revocation in the pre-commit window cannot be missed under the defined commit semantics."
+      not_closed_by: "Adding another check, which only shrinks the window; recording a veto without evaluating it inside the commit."
+      hardware_note: "The hardware veto remains a separate fail-closed physical mechanism. RTL/twin equivalence is modeled behaviour only."
     required_disposition:
-      - "Decide the closing mechanism: serialize the veto and revocations through the same transaction as the commit, or rely on the hardware veto gating the actuator and record the software gate as advisory."
-      - "Until then, keep the characterization tests and state the limit wherever the gate is described."
+      - "Implement the same-transaction design and meet the closure criteria above."
+      - "Until then, keep the characterization tests and state the limit wherever the gate is described. The software gate is advisory for the final-gap race."
 
   - id: "C-CUSTODY-001"
     title: "No external custody for ledger anchors or expected state digests"
@@ -143,8 +150,14 @@ contradictions:
       both. A complete self-consistent rewrite plus a matching anchor and digest from the same party
       verifies as ANCHOR_MATCHED (Step 6 control C8). Every report therefore states
       custody NOT_ESTABLISHED and witness W0.
+    design:
+      document: "governance/specs/STEP7-EVIDENCE-CUSTODY.md (DRAFT, GD-0003 D10)"
+      mechanism: "Witness-signed checkpoints with append-only, fork-refusing witnesses and pinned witness keys."
+      blocker: "An independently controlled witness is a second party. The repository cannot supply one. Same organizational blocker as C-DUAL-001."
+      acceptance_tests: "A1-A8 in the design document; none implemented."
     required_disposition:
-      - "Publish anchors to a store the ledger's operator cannot rewrite, or to independent witnesses (outline Step 7)."
+      - "Implement the witness checkpoint design and meet acceptance tests A1-A8."
+      - "Obtain an independently controlled witness, which needs a second party."
       - "Until then, no state digest may be described as authentic or independently witnessed."
 
   - id: "C-DUAL-001"
