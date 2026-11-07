@@ -139,6 +139,27 @@ MUTATIONS = [
         # Asserts INSUFFICIENT_QUORUM for a single-signer level-4 request.
         "tests/triadic_controls/test_crypto_verifier.py::test_valid_envelope_then_replay_detected",
     ),
+    (
+        "triad-ledger-append-lock",
+        "triadic_controls/ledger.py",
+        "            fcntl.flock(lock_handle.fileno(), fcntl.LOCK_EX)",
+        "            pass",
+        "tests/test_triad_ledger_concurrency.py::test_interleaved_writers_cannot_both_append",
+    ),
+    (
+        "veto-twin-threshold",
+        "packages/runtime/weaver_runtime/veto.py",
+        "            if trigger_in or threat_level >= THREAT_THRESHOLD:",
+        "            if trigger_in or threat_level > THREAT_THRESHOLD:",
+        "tests/hardware/test_veto_twin.py::test_threshold_is_191",
+    ),
+    (
+        "veto-twin-irreversible",
+        "packages/runtime/weaver_runtime/veto.py",
+        "            self.status_led = 1\n            self.latch_state = 1",
+        "            self.status_led = 1\n            self.latch_state = trigger_in",
+        "tests/hardware/test_veto_twin.py::test_triggered_is_irreversible_without_reset",
+    ),
 ]
 
 
@@ -154,6 +175,8 @@ def main() -> None:
             "tests/test_triad_multiblock.py",
             "tests/ledger",
             "tests/triadic_controls",
+            "tests/test_triad_ledger_concurrency.py",
+            "tests/hardware",
         ],
         cwd=root,
         capture_output=True,

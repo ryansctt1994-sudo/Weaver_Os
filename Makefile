@@ -20,3 +20,11 @@ verify:
 check-frame:
 	python -m tools.check_evidence_crosswalk
 	python -m tools.check_trust_domains
+
+.PHONY: test-hw
+test-hw:
+	iverilog -g2012 -o /tmp/tb.vvp hardware/lucifer_latch/tb_lucifer_latch.v hardware/lucifer_latch/lucifer_latch.v
+	cd /tmp && vvp -n tb.vvp | tee /tmp/tb.log && grep -q "PASSED: 8   FAILED: 0" /tmp/tb.log
+	iverilog -g2012 -o /tmp/tbv.vvp hardware/lucifer_latch/tb_lucifer_latch_vectors.v hardware/lucifer_latch/lucifer_latch.v
+	vvp -n /tmp/tbv.vvp +VECTORS=hardware/lucifer_latch/vectors/lucifer_latch_vectors.txt
+	python -m tools.gen_latch_vectors --check

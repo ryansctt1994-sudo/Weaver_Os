@@ -307,6 +307,7 @@ Portfolio state after the merge is unchanged until evidence says otherwise:
    *Done, except the triad ledger (`triadic_controls/ledger.py`), which stays put: its schema path and pinned fixtures need their own migration, and its appender has the C-RCPT-001 race recorded in the registry. ADR-0006 accepted by [GD-0002](../../governance/decisions/GD-0002.md).*
 5. **Execution gate + veto twin.** TOCTOU gate, a Python veto matching the RTL, and
    shared test vectors with the Verilog testbench in CI (`iverilog`).
+   *Veto twin done: `weaver_runtime.veto`, the RTL copied from cathedral-verified, and shared vectors replayed by both in CI (`hardware-sim.yml`). The TOCTOU execution gate is still to do.*
 6. **Runtime-state digest from the in-tree ledger.** Retire the RC1 deferrals. Keep
    `verify-e35` red until its gates are actually met.
 7. **Learning on the gate.** Route skill promotion through PG-001R.
