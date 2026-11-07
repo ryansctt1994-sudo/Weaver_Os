@@ -2,10 +2,13 @@
 // Differential testbench: replays the shared vectors against the RTL.
 //
 // Each line of the vector file is
-//   cycles rst_n trigger_in threat_level exp_state exp_latch exp_veto exp_led
+//   cycles rst_n trigger_in threat_level exp_state exp_latch exp_veto exp_led exp_checksum
 // Inputs change half a cycle before a rising edge and are held for `cycles` edges.
-// One time unit after the last edge, state, latch, veto and LED are compared with the
-// expected values, which come from the Python twin (weaver_runtime.veto). Any
+// One time unit after EVERY edge, {state, latch, veto, led} + 1 is folded into a 32-bit
+// checksum (acc = acc * 31 + sample, restarting at 0 per segment), exactly as
+// weaver_runtime.veto.fold does. At the end of the segment, the final four values and the
+// checksum are compared with the expected values, which come from the Python twin. A
+// difference on any cycle therefore fails, barring a 32-bit checksum collision. Any
 // mismatch is printed and the run ends with $fatal, so a disagreement fails CI.
 //
 // Run from the repository root:
@@ -25,6 +28,7 @@ module tb_lucifer_latch_vectors;
 
     integer fd, n, segments, mismatches, k;
     integer cycles, r, t, th, es, el, ev, ed;
+    reg [31:0] ecs, acc;
     reg [8*512-1:0] path;
     longint total_cycles;
 
@@ -37,18 +41,21 @@ module tb_lucifer_latch_vectors;
         segments = 0; mismatches = 0; total_cycles = 0;
         @(negedge clk);
         while (!$feof(fd)) begin
-            n = $fscanf(fd, "%d %d %d %d %d %d %d %d\n", cycles, r, t, th, es, el, ev, ed);
-            if (n == 8) begin
+            n = $fscanf(fd, "%d %d %d %d %d %d %d %d %d\n", cycles, r, t, th, es, el, ev, ed, ecs);
+            if (n == 9) begin
                 rst_n = r[0]; trigger_in = t[0]; threat_level = th[7:0];
-                if (r == 0) #1;  // async reset takes effect before the first edge
-                for (k = 0; k < cycles; k = k + 1) @(posedge clk);
-                #1;
+                acc = 32'd0;
+                for (k = 0; k < cycles; k = k + 1) begin
+                    @(posedge clk);
+                    #1;
+                    acc = acc * 32'd31 + {27'd0, dut.current_state, latch_state, veto_signal, status_led} + 32'd1;
+                end
                 if (dut.current_state !== es[1:0] || latch_state !== el[0] ||
-                    veto_signal !== ev[0] || status_led !== ed[0]) begin
+                    veto_signal !== ev[0] || status_led !== ed[0] || acc !== ecs) begin
                     mismatches = mismatches + 1;
-                    $display("MISMATCH segment %0d: got state=%0d latch=%0d veto=%0d led=%0d, expected %0d %0d %0d %0d",
-                             segments, dut.current_state, latch_state, veto_signal, status_led,
-                             es, el, ev, ed);
+                    $display("MISMATCH segment %0d: got state=%0d latch=%0d veto=%0d led=%0d checksum=%0d, expected %0d %0d %0d %0d %0d",
+                             segments, dut.current_state, latch_state, veto_signal, status_led, acc,
+                             es, el, ev, ed, ecs);
                 end
                 segments = segments + 1;
                 total_cycles = total_cycles + cycles;
@@ -58,7 +65,7 @@ module tb_lucifer_latch_vectors;
             end
         end
         $fclose(fd);
-        $display("SEGMENTS: %0d  CYCLES: %0d  MISMATCHES: %0d", segments, total_cycles, mismatches);
+        $display("SEGMENTS: %0d  CYCLES SAMPLED: %0d  MISMATCHES: %0d", segments, total_cycles, mismatches);
         if (segments == 0) $fatal(1, "no segments read");
         if (mismatches != 0) $fatal(1, "RTL and twin disagree");
         $display("VERDICT: RTL MATCHES TWIN ON ALL SEGMENTS");

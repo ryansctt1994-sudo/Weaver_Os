@@ -12,6 +12,7 @@ Contracts define data rules only. They grant no authority and create no evidence
 | `weaver_contracts.receipt` | wx-receipt-1 commit receipt contract | [`WX-RECEIPT-1`](../../governance/specs/WX-RECEIPT-1.md) | R2[self] for the contract; no ledger issues it yet |
 | `weaver_contracts.pg001r` | PG-001R promotion-request contracts | Lumen-Nexus `governance/specs/PG-001R.md` | R2[self] here since step 4 (see below) |
 | `weaver_contracts.ledger` | Root heads, Chronicle Root, `wx-chronicle-anchor-1` | [`WX-RECEIPT-LEDGER-1`](../../governance/specs/WX-RECEIPT-LEDGER-1.md) | R2[self] |
+| `weaver_contracts.gate` | `Proposal`, `AuthorizationDecision` | [`WX-EXECUTION-GATE-1`](../../governance/specs/WX-EXECUTION-GATE-1.md) | R2[self] |
 | `weaver_contracts.replay` | `ReplayCacheProtocol`, `generate_replay_key` | `docs/triadic-controls/ARCHITECTURE.md` | R2[self]; moved from `triadic_controls/crypto/replay.py` |
 
 ## Provenance: `pg001r.py`

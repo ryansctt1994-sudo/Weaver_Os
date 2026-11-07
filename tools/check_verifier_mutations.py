@@ -147,6 +147,13 @@ MUTATIONS = [
         "tests/test_triad_ledger_concurrency.py::test_interleaved_writers_cannot_both_append",
     ),
     (
+        "receipt-ledger-unique-key",
+        "packages/runtime/weaver_runtime/ledger.py",
+        "                    self._claim_unique_key(unique_key, receipt)",
+        "                    pass",
+        "tests/ledger/test_receipt_ledger.py::test_unique_key_is_enforced_across_instances",
+    ),
+    (
         "veto-twin-threshold",
         "packages/runtime/weaver_runtime/veto.py",
         "            if trigger_in or threat_level >= THREAT_THRESHOLD:",
@@ -159,6 +166,42 @@ MUTATIONS = [
         "            self.status_led = 1\n            self.latch_state = 1",
         "            self.status_led = 1\n            self.latch_state = trigger_in",
         "tests/hardware/test_veto_twin.py::test_triggered_is_irreversible_without_reset",
+    ),
+    (
+        "gate-revalidate-live",
+        "packages/runtime/weaver_runtime/gate.py",
+        '                self._check_live(expires_at, stage="REVALIDATE")',
+        "                pass",
+        "tests/gate/test_execution_gate.py::test_veto_tripping_during_execution_aborts_before_commit",
+    ),
+    (
+        "gate-reauthorize",
+        "packages/runtime/weaver_runtime/gate.py",
+        "        if isinstance(again, str) or not again.allowed:",
+        "        if isinstance(again, str):",
+        "tests/gate/test_execution_gate.py::test_revocation_between_authorize_and_commit_aborts[REVOKED]",
+    ),
+    (
+        "gate-checkpoint-reauthorize",
+        "packages/runtime/weaver_runtime/gate.py",
+        '        self._gate._check_still_authorized(self.proposal, stage="CHECKPOINT")',
+        "        pass",
+        "tests/gate/test_execution_gate.py::"
+        "test_revocation_mid_action_is_caught_at_the_next_checkpoint",
+    ),
+    (
+        "gate-evaluating-is-veto",
+        "packages/runtime/weaver_runtime/gate.py",
+        "return self._twin.current_state != STATE_ARMED or self._twin.veto_signal == 1",
+        "return self._twin.veto_signal == 1",
+        "tests/gate/test_execution_gate.py::test_observe_comes_before_authorize",
+    ),
+    (
+        "gate-replay-guard",
+        "packages/runtime/weaver_runtime/gate.py",
+        "            if proposal.proposal_id in self._committed:",
+        "            if False:",
+        "tests/gate/test_execution_gate.py::test_committed_proposal_cannot_run_again_even_after_restart",
     ),
 ]
 
@@ -177,6 +220,7 @@ def main() -> None:
             "tests/triadic_controls",
             "tests/test_triad_ledger_concurrency.py",
             "tests/hardware",
+            "tests/gate",
         ],
         cwd=root,
         capture_output=True,

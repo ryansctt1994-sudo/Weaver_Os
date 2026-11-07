@@ -13,7 +13,7 @@ jobs:
   lucifer-latch:
     name: Lucifer Latch RTL (Icarus Verilog)
     runs-on: ubuntu-24.04
-    timeout-minutes: 15
+    timeout-minutes: 25
     steps:
       - name: Checkout
         uses: actions/checkout@v4
@@ -35,3 +35,6 @@ jobs:
           iverilog -g2012 -o /tmp/tbv.vvp hardware/lucifer_latch/tb_lucifer_latch_vectors.v hardware/lucifer_latch/lucifer_latch.v
           vvp -n /tmp/tbv.vvp +VECTORS=hardware/lucifer_latch/vectors/lucifer_latch_vectors.txt | tee /tmp/tbv.log
           grep -q "VERDICT: RTL MATCHES TWIN ON ALL SEGMENTS" /tmp/tbv.log
+
+      - name: Negative controls (the differential testbench must catch each broken copy)
+        run: python3 tools/hw_negative_controls.py

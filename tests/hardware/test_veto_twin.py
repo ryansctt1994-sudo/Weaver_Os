@@ -18,6 +18,8 @@ from weaver_runtime.veto import (
     THREAT_THRESHOLD,
     TIMING_FLOOR_CYCLES,
     LuciferLatchTwin,
+    fold,
+    sample,
 )
 
 from tools import gen_latch_vectors
@@ -75,14 +77,11 @@ def test_twin_replays_shared_vectors():
     lines = VECTORS.read_text(encoding="ascii").splitlines()
     assert len(lines) > 1500
     for number, line in enumerate(lines):
-        cycles, rst_n, trig, threat, state, latch, veto, led = map(int, line.split())
-        out = twin.run(cycles, rst_n=rst_n, trigger_in=trig, threat_level=threat)
-        assert (out.state, out.latch_state, out.veto_signal, out.status_led) == (
-            state,
-            latch,
-            veto,
-            led,
-        ), f"segment {number}"
+        cycles, rst_n, trig, threat, state, latch, veto, led, checksum = map(int, line.split())
+        out, got = twin.run_traced(cycles, rst_n=rst_n, trigger_in=trig, threat_level=threat)
+        final = (out.state, out.latch_state, out.veto_signal, out.status_led)
+        assert final == (state, latch, veto, led), f"segment {number}"
+        assert got == checksum, f"segment {number} checksum"
 
 
 def test_vectors_cover_every_state_and_the_blink_bit():
@@ -165,7 +164,7 @@ def test_inputs_are_validated(kwargs):
 # --- fast path equivalence ------------------------------------------------------
 
 
-def test_skip_ahead_matches_plain_stepping():
+def test_skip_ahead_matches_plain_stepping_including_checksum():
     rng = random.Random(20261107)
     fast, slow = LuciferLatchTwin(), LuciferLatchTwin()
     for _ in range(400):
@@ -175,6 +174,21 @@ def test_skip_ahead_matches_plain_stepping():
             "trigger_in": 1 if rng.random() < 0.05 else 0,
             "threat_level": rng.randint(0, 255),
         }
-        fast.run(cycles, **inputs)
-        slow.run_stepwise(cycles, **inputs)
+        _, fast_sum = fast.run_traced(cycles, **inputs)
+        _, slow_sum = slow.run_stepwise_traced(cycles, **inputs)
         assert vars(fast) == vars(slow)
+        assert fast_sum == slow_sum
+
+
+def test_checksum_sees_a_change_that_ends_where_it_started():
+    """Two runs that end in the same state but differ mid-segment get different checksums."""
+    steady, glitched = LuciferLatchTwin(), LuciferLatchTwin()
+    _, a = steady.run_stepwise_traced(5, rst_n=1, trigger_in=0, threat_level=0)
+    acc = 0
+    for cycle in range(5):
+        out = glitched.step(rst_n=1, trigger_in=0, threat_level=0)
+        if cycle == 2:
+            out = type(out)(out.state, out.latch_state, 1, out.status_led)  # one-cycle veto
+        acc = fold(acc, sample(out))
+    assert glitched.outputs() == steady.outputs()
+    assert acc != a

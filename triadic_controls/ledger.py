@@ -190,6 +190,19 @@ class TriadLedger:
         index/prev_hash check, and both append, leaving a ledger that no longer
         loads (C-RCPT-001). ``flock`` locks are released by the OS when the
         holding process exits, so a crashed writer cannot block later ones.
+
+        Trust boundary. The lock serializes *cooperating* writers only, and only when:
+
+        - every writer goes through ``TriadLedger.append_event``. Anything that writes
+          the ledger file directly is not serialized;
+        - all writers use the same lock file. Deleting or replacing ``<ledger>.lock``
+          while a writer holds it lets the next writer lock a new inode and run
+          concurrently, so the lock file must never be cleaned up while the ledger is in use;
+        - the file system gives ``flock`` its local semantics. Network file systems
+          are not tested here.
+
+        Releasing the lock on a crash is not recovery from a torn last line: a crash
+        mid-write can still leave a ledger that refuses to load.
         """
         if sys.platform == "win32":
             raise LedgerLockError("TriadLedger appends need POSIX flock; refusing to append")

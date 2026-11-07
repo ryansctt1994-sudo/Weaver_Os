@@ -40,6 +40,10 @@ as the core of the new tests.
   `COMMIT`.
 - **One total order.** Concurrent writers (threads or processes) are serialized by SQLite.
   Each append either commits with the next sequence or raises `LedgerBusy`.
+- **Optional uniqueness.** `admit(..., unique_key=...)` claims a key in the same transaction as the
+  append. A second admit with the same key, from any instance or process sharing the store, fails with
+  `LedgerDuplicate` and changes nothing. A failed append does not consume its key. The execution gate
+  uses this so that a proposal commits at most once.
 - **Fail closed on a corrupted store.** Before extending a root, the ledger checks that the head
   row matches the root's entry count and last receipt digest, and raises `LedgerCorrupted`
   otherwise. This is a local guard only. Full re-verification is the verifier's job.
@@ -109,6 +113,11 @@ root check. All 14 mutations in the tool, the 6 existing ones and the 8 new ones
   profile is blocked on Lumen-Nexus #13. Until both exist, `C-RCPT-001` stays OPEN, and nothing
   here is above R2[self].
 - **Signatures.** Receipts carry integrity digests, not signatures.
+- **Storage assumptions.** The single-owner guarantee covers writers that go through `ReceiptLedger`.
+  A process writing the SQLite file directly bypasses it. The head guard catches some such edits, and
+  the verifier catches the rest only against an external anchor. Concurrency relies on SQLite's file
+  locking and WAL shared memory, so the store must be on a local file system (SQLite documents that
+  WAL does not work over network file systems). Network file systems are not tested.
 - **External anchoring.** The ledger produces anchors, but no external append-only store or
   witness set holds them yet.
 - **Retiring the old Chronicles.** `chronicle/` in this repository still defers to the RC1 witness

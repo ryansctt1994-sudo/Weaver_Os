@@ -1,14 +1,19 @@
 """Generate the shared Lucifer Latch vectors replayed by the RTL testbench and the twin.
 
-Each output line is one segment, as eight integers:
+Each output line is one segment, as nine integers:
 
-    cycles rst_n trigger_in threat_level  exp_state exp_latch exp_veto exp_led
+    cycles rst_n trigger_in threat_level  exp_state exp_latch exp_veto exp_led  exp_checksum
 
-The inputs are held for ``cycles`` rising edges, and then the four expected values are
-checked. Expected values come from ``weaver_runtime.veto.LuciferLatchTwin``. The RTL
-testbench (``tb_lucifer_latch_vectors.v``) checks the same file against the Verilog, so
-the twin and the RTL must agree at every segment boundary. Spec properties such as the
-exact 68,001-edge delay are asserted separately, in ``tests/hardware``.
+The inputs are held for ``cycles`` rising edges. After every edge, the outputs
+(state, latch, veto, LED) are folded into a 32-bit checksum that restarts at 0 for each
+segment (``weaver_runtime.veto.fold``). At the segment's end, the final four values and
+the checksum are compared. So a difference on *any* cycle shows up, not only on the
+last one, unless it collides in the 32-bit checksum.
+
+Expected values come from ``weaver_runtime.veto.LuciferLatchTwin``. The RTL testbench
+(``tb_lucifer_latch_vectors.v``) checks the same file against the Verilog. Spec
+properties such as the exact 68,001-edge delay are asserted separately, in
+``tests/hardware``.
 
 The output is deterministic: a fixed seed and no wall-clock input.
 """
@@ -69,8 +74,10 @@ def build() -> list[tuple[int, ...]]:
     twin = LuciferLatchTwin()
     rows: list[tuple[int, ...]] = []
     for cycles, rst_n, trigger, threat in directed() + randomized(random.Random(SEED)):
-        out = twin.run(cycles, rst_n=rst_n, trigger_in=trigger, threat_level=threat)
-        expected = (out.state, out.latch_state, out.veto_signal, out.status_led)
+        out, checksum = twin.run_traced(
+            cycles, rst_n=rst_n, trigger_in=trigger, threat_level=threat
+        )
+        expected = (out.state, out.latch_state, out.veto_signal, out.status_led, checksum)
         rows.append((cycles, rst_n, trigger, threat, *expected))
     return rows
 

@@ -28,3 +28,7 @@ test-hw:
 	iverilog -g2012 -o /tmp/tbv.vvp hardware/lucifer_latch/tb_lucifer_latch_vectors.v hardware/lucifer_latch/lucifer_latch.v
 	vvp -n /tmp/tbv.vvp +VECTORS=hardware/lucifer_latch/vectors/lucifer_latch_vectors.txt
 	python -m tools.gen_latch_vectors --check
+
+.PHONY: test-hw-negative
+test-hw-negative:
+	python3 tools/hw_negative_controls.py
