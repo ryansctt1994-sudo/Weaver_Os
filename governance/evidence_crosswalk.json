@@ -1,0 +1,224 @@
+{
+  "schema_version": "1.0",
+  "crosswalk_id": "WX-CROSSWALK-0001",
+  "status": "PROPOSED",
+  "ratification": {
+    "decision_id": null,
+    "ratified_by": [],
+    "ratified_at": null
+  },
+  "rule": "A legacy label maps to the highest R level whose proof obligation it is guaranteed to meet (floor). Anything stronger needs the named condition to be evidenced separately.",
+  "target_ladder": {
+    "id": "R",
+    "source": "Lumen-Nexus governance/EVIDENCE_LADDER.md",
+    "levels": [
+      {
+        "level": "R0",
+        "name": "Concept",
+        "proof_obligation": "Identifiable idea or proposal"
+      },
+      {
+        "level": "R1",
+        "name": "Specification",
+        "proof_obligation": "Written, reviewable specification with explicit claims and boundaries"
+      },
+      {
+        "level": "R2",
+        "name": "Implemented and self-tested",
+        "proof_obligation": "Inspectable implementation plus origin-controlled tests"
+      },
+      {
+        "level": "R3",
+        "name": "Cryptographically receipted execution",
+        "proof_obligation": "Reproducible local execution bound to canonical hashes and a valid origin receipt"
+      },
+      {
+        "level": "R4",
+        "name": "Independent reproduction",
+        "proof_obligation": "Two valid receipts from distinct screened witnesses on non-origin hardware"
+      },
+      {
+        "level": "R5",
+        "name": "Independent reimplementation",
+        "proof_obligation": "Implementation produced from the specification by an independent party and shown equivalent under the defined challenge suite"
+      },
+      {
+        "level": "R6",
+        "name": "Production-authorized",
+        "proof_obligation": "Sustained operational evidence, applicable safety/regulatory gates, accountable human authority, rollback and incident controls"
+      }
+    ]
+  },
+  "orthogonal_axes": [
+    {
+      "id": "W",
+      "name": "Witness",
+      "source": "Weaver_Os PORTFOLIO_STATUS.md",
+      "defined_levels": [
+        {
+          "level": "W0",
+          "meaning": "No admitted independent witness"
+        }
+      ],
+      "open_question": "No repository defines W1 or above. Rungs must be specified before any artifact may claim them."
+    },
+    {
+      "id": "O",
+      "name": "Operational authority",
+      "source": "Weaver_Os PORTFOLIO_STATUS.md",
+      "defined_levels": [
+        {
+          "level": "O0",
+          "meaning": "Operational authority withheld"
+        }
+      ],
+      "open_question": "No repository defines O1 or above. Rungs must be specified before any artifact may claim them."
+    }
+  ],
+  "source_ladders": [
+    {
+      "id": "lumen_e",
+      "source": "Lumen docs/EVIDENCE_POLICY.md",
+      "mappings": [
+        {
+          "label": "E0",
+          "meaning": "Concept only",
+          "maps_to": "R0",
+          "equivalence": "exact"
+        },
+        {
+          "label": "E1",
+          "meaning": "Claimed output or design text",
+          "maps_to": "R1",
+          "equivalence": "exact"
+        },
+        {
+          "label": "E2",
+          "meaning": "Local executable run",
+          "maps_to": "R2",
+          "equivalence": "exact"
+        },
+        {
+          "label": "E3",
+          "meaning": "Signed or hashed receipt package",
+          "maps_to": "R3",
+          "equivalence": "exact"
+        },
+        {
+          "label": "E4",
+          "meaning": "Independent replay",
+          "maps_to": "R3",
+          "equivalence": "floor",
+          "condition_for_higher": "R4 only with two receipts from distinct screened witnesses; Lumen E4 requires one independent machine"
+        },
+        {
+          "label": "E5",
+          "meaning": "Independent production or hardware verification",
+          "maps_to": "R4",
+          "equivalence": "floor",
+          "condition_for_higher": "R5 needs independent reimplementation; R6 needs explicit production authorization, which E5 does not include"
+        }
+      ],
+      "ordering": "Mappings are listed in order of proof strength"
+    },
+    {
+      "id": "weaver_e",
+      "source": "Weaver_Os PORTFOLIO_STATUS.md, E3.5_REPRODUCTION_KIT_SPEC.md, PORTFOLIO_EVIDENCE_STATUS.md (historical)",
+      "mappings": [
+        {
+          "label": "E2",
+          "meaning": "Local executable evidence",
+          "maps_to": "R2",
+          "equivalence": "exact"
+        },
+        {
+          "label": "E2.5",
+          "meaning": "Locally reproducible primitive",
+          "maps_to": "R2",
+          "equivalence": "floor",
+          "condition_for_higher": "R3 needs a valid origin receipt bound to canonical hashes"
+        },
+        {
+          "label": "E3.1",
+          "meaning": "Receipted replay review package structured",
+          "maps_to": "R2",
+          "equivalence": "floor",
+          "condition_for_higher": "Package structure alone is not a receipted execution",
+          "note": "Numbered above E3 but proves less (structure, not a receipted run); listed by proof strength, not label order"
+        },
+        {
+          "label": "E3",
+          "meaning": "Publisher-controlled receipted run",
+          "maps_to": "R3",
+          "equivalence": "exact"
+        },
+        {
+          "label": "E3.5",
+          "meaning": "Runtime-state-qualified reproduction kit",
+          "maps_to": "R3",
+          "equivalence": "partial",
+          "condition_for_higher": "Adds runtime-state qualification inside R3; still origin-controlled"
+        },
+        {
+          "label": "E4",
+          "meaning": "Independent reproduction",
+          "maps_to": "R3",
+          "equivalence": "floor",
+          "condition_for_higher": "R4 only with two receipts from distinct screened witnesses on non-origin hardware"
+        }
+      ],
+      "ordering": "Mappings are listed in order of proof strength; label numbering is not authoritative"
+    },
+    {
+      "id": "triad_labels",
+      "source": "Weaver_Os docs/triad/EVIDENCE_LABELS.md",
+      "mappings": [
+        {
+          "label": "HYPOTHESIS",
+          "meaning": "Proposed, not exercised",
+          "maps_to": "R0",
+          "equivalence": "exact"
+        },
+        {
+          "label": "REPORTED",
+          "meaning": "Claimed, not verified from repository state",
+          "maps_to": "R1",
+          "equivalence": "floor",
+          "condition_for_higher": "A claim is not a specification unless its boundaries are written down"
+        },
+        {
+          "label": "VERIFIED-LOCAL",
+          "meaning": "Observed locally without committed tests or receipts",
+          "maps_to": "R1",
+          "equivalence": "floor",
+          "condition_for_higher": "R2 needs committed, origin-controlled tests"
+        },
+        {
+          "label": "VERIFIED-REPO",
+          "meaning": "Committed code, deterministic instructions, reproducible tests",
+          "maps_to": "R2",
+          "equivalence": "exact"
+        },
+        {
+          "label": "FAILED",
+          "meaning": "Tested and did not satisfy the claim",
+          "maps_to": "STATUS_FLAG",
+          "equivalence": "none"
+        },
+        {
+          "label": "SUPERSEDED",
+          "meaning": "Replaced by a newer version",
+          "maps_to": "STATUS_FLAG",
+          "equivalence": "none"
+        },
+        {
+          "label": "UNVERIFIED",
+          "meaning": "Present but not evaluated",
+          "maps_to": "STATUS_FLAG",
+          "equivalence": "none"
+        }
+      ],
+      "ordering": "Mappings are listed in order of proof strength"
+    }
+  ]
+}

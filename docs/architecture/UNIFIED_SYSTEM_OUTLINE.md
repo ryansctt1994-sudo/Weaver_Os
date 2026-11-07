@@ -89,17 +89,12 @@ therefore **not** pick one silently. Proposal:
 4. **Publish an explicit crosswalk** as a ratified governance artifact. Until it is
    ratified, legacy labels stay in place, annotated with "legacy, unmapped".
 
-Draft crosswalk (to be ratified, not automatic):
-
-| Nexus | Lumen | Weaver | Meaning |
-|---|---|---|---|
-| R0 | E0 | HYPOTHESIS | concept |
-| R1 | E1 | REPORTED | written specification / claim |
-| R2 | E2 | VERIFIED-REPO | implementation + origin tests |
-| R3 | E3 | E3 / E3.5 (runtime-state qualified) | receipted execution under a fixed profile |
-| R4 | E4 | E4 | two independent, non-origin reproductions |
-| R5 | — | second verifier implementation (Milestone E) | independent reimplementation |
-| R6 | E5 (partly) | O-axis grant | production-authorized, scoped |
+Draft crosswalk: now prepared as `governance/evidence_crosswalk.json` and
+[`governance/EVIDENCE_CROSSWALK.md`](../../governance/EVIDENCE_CROSSWALK.md) (PROPOSED).
+Legacy labels map to the highest R level they are guaranteed to meet (floor). Building it
+corrected two rows of the first draft: Lumen and Weaver **E4 map to R3, not R4** (neither
+requires two distinct witnesses), and Lumen **E5 maps to R4, not R6** (no production
+authorization). No legacy label may map to R6.
 
 Evidence moves only through the promotion gate (§5.6). Breaking a reproduction
 path moves the claim down (Weaver downgrade rule).
