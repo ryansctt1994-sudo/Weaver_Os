@@ -157,10 +157,10 @@
     "sqlite": "3.53.1"
   },
   "evidence_level": "R2[self]",
-  "generated_at_utc": "2026-11-07T10:46:40Z",
+  "generated_at_utc": "2026-11-07T15:52:11Z",
   "milestone": "WNS-S6-001",
   "mutations": {
-    "detected": 33,
+    "detected": 35,
     "exit_code": 0,
     "state_mutations": [
       {
@@ -194,20 +194,20 @@
         "returncode": 1
       }
     ],
-    "total": 33
+    "total": 35
   },
   "schema": "wns-s6-001-evidence-1",
   "source": {
     "base_before_step6": "7b4c30a1dedd5b7a8f887e61ba0b998bae8f488c",
-    "commit": "7580942e2a1fd718e7a96c76c0f59eb41ef8ee01",
+    "commit": "8032c63968ff3ae6ad950ce02846a749a84c5eef",
     "dirty_paths": [],
     "files_sha256": {
       "kernel/reducer.py": "c5d4bb287c97f394ced5079de040c583643e0e2d4e7d5da9fb3f91edea6d3dae",
       "packages/contracts/weaver_contracts/canonical.py": "1ef5d7582dff987e2e6e16a49020346d2fd982f7e548f41b74b433d7e77a2b27",
       "packages/contracts/weaver_contracts/ledger.py": "d0beebe44cb2e5a6b934e5a2f42088ac6bf8eaf47b7c4b6d3f3b840826bbf9aa",
       "packages/contracts/weaver_contracts/receipt.py": "8423046182bb2906f9139515f89b789122d26ac450b068dafd782241369b5fa1",
-      "packages/runtime/weaver_runtime/gate.py": "9887dccb51070715701052d284812c538b7d9530cf3387b107ff0fe6fd6b2c72",
-      "packages/runtime/weaver_runtime/ledger.py": "8d279582c90203dc1a5f3d8111c829f7bbc9d0ad170e493fead5e91c96659173",
+      "packages/runtime/weaver_runtime/gate.py": "fd1c33c5da5e7459e47766966d6f8e00e75eb91f7b823d9ae9cc7b01d2b2b1af",
+      "packages/runtime/weaver_runtime/ledger.py": "da8ffcd7f84098fb4a526a7222f7dff33cada27c49f2dabdb7f67f035fc5ab42",
       "packages/verifier/weaver_verifier/ledger.py": "b3db589a2ec20d8741ffa3b7588fb63201993c057b98adc235d062c7146d9e36",
       "packages/verifier/weaver_verifier/state.py": "1ba63dcb31b4b28190694f7ea3543dcac5a8129e7e56b4f357213594231fe3bc",
       "published_manifest.json": "a1dbb4e67a3c0cffb08c0875c7f0ef292644a3a82bb2e14e9a33a0c74f78c11a",

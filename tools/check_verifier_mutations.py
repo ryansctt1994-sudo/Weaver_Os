@@ -196,6 +196,20 @@ MUTATIONS = [
         "tests/state/test_state_controls.py::test_negative_control[C7]",
     ),
     (
+        "commit-boundary-gate-guard-unwired",
+        "packages/runtime/weaver_runtime/gate.py",
+        "                    guard=self._ledger_guard(proposal),",
+        "                    guard=None,",
+        "tests/gate/test_commit_boundary.py::test_veto_recorded_in_the_ledger_before_commit_aborts",
+    ),
+    (
+        "commit-boundary-ledger-guard-skipped",
+        "packages/runtime/weaver_runtime/ledger.py",
+        "                    guard(self._conn)",
+        "                    pass",
+        "tests/gate/test_commit_boundary.py::test_revocation_recorded_in_the_ledger_before_commit_aborts",
+    ),
+    (
         "veto-twin-threshold",
         "packages/runtime/weaver_runtime/veto.py",
         "            if trigger_in or threat_level >= THREAT_THRESHOLD:",
