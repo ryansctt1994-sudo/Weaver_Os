@@ -2,8 +2,27 @@
 
 **Status:** DRAFT. Not implemented. Proposed under GD-0003 (D10), not yet ratified.
 **Closes (when implemented and witnessed):** C-CUSTODY-001
-**Evidence now:** none. This document is a design, not an result.
+**Evidence now:** none. This document is a design, not a result.
 **Authority:** NONE. Witness: W0.
+
+## Status of each control
+
+Nothing below is implemented or independently witnessed today. The only custody-related items
+that exist are the unsigned, self-produced anchor and digest from Step 6.
+
+| Control | Proposed | Implemented | Independently witnessed |
+|---|---|---|---|
+| Witness-signed checkpoints (`wx-checkpoint-1`) | yes | no | no |
+| Pinned witness public-key set, supplied out of band | yes | no | no |
+| Append-only, fork-refusing witness (prefix check) | yes | no | no |
+| Verifier witness path and prefix check | yes | no | no |
+| Status `WITNESSED` | yes, as a future status | no. Step 6 forbids any "witnessed" status until this path exists | no |
+| Publication cadence and absence reporting | yes | no | no |
+| Acceptance tests A1-A8 | yes | none written | none run |
+| Independent witness (a second party) | required | does not exist | no |
+
+What exists today: the anchor and Chronicle Root (`weaver_contracts.ledger`) and the
+`wx-state-digest-1` digest. Both are produced by whoever holds the ledger, so they are W0.
 
 ## Goal
 
@@ -60,8 +79,8 @@ if:
 - the snapshot extends that checkpoint (the same prefix check as the witness);
 - the checkpoint's Chronicle Root matches the snapshot.
 
-A report based on this path can say `WITNESSED` only when the witnesses named in the report are
-independent of the operator. The report must state which keys were pinned and where they came
+A future report could say `WITNESSED`, but only when the witnesses named in the report are
+independent of the operator. The code has no such status today. The report must state which keys were pinned and where they came
 from.
 
 ### 5. Publication cadence
@@ -74,6 +93,8 @@ verifier must report "no checkpoint since N" and never report the history as cur
 
 ## What this detects
 
+These are design claims. None has been tested.
+
 - Truncation or rewriting **after** a signed checkpoint, provided the witness saw the honest
   history before the rewrite.
 - A complete recomputation that disagrees with any signed head at or before the checkpoint.
@@ -81,6 +102,8 @@ verifier must report "no checkpoint since N" and never report the history as cur
   witnesses compare notes or the pinned set has more than one member.
 
 ## What this does not detect (stated limitations)
+
+These limitations are also design statements, not measurements.
 
 - **A rewrite before the first checkpoint.** If no witness ever saw the honest history, a
   self-consistent alternative is indistinguishable from it. That case must be reported as
