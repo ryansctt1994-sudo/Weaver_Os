@@ -38,6 +38,9 @@ ALLOWED: dict[str, frozenset[str]] = {
     "contracts": frozenset(),
     "runtime": frozenset({"contracts"}),
     "verifier": frozenset({"contracts"}),
+    # A witness checks what it signs with the verifier's read-only code and must
+    # never reach the operator's runtime (UADR-0001, amended by GD-0005 D14).
+    "witness": frozenset({"contracts", "verifier"}),
     "learning": frozenset({"contracts", "runtime"}),
     "release_guard": frozenset({"contracts"}),
     "adapters": frozenset({"contracts"}),

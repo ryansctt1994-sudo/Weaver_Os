@@ -90,6 +90,20 @@ def test_learning_may_use_runtime_but_not_verifier(tmp_path):
     assert _rules(check(tmp_path)[0]) == ["FORBIDDEN_DOMAIN_IMPORT"]
 
 
+def test_witness_may_use_verifier_but_never_runtime(tmp_path):
+    # GD-0005 D14: a witness checks what it signs with read-only code and must not
+    # be able to reach the operator's ledger.
+    _tree(tmp_path)
+    _write(
+        tmp_path,
+        "packages/witness/wx_witness/__init__.py",
+        "import cryptography\nimport wx_contracts\nimport wx_verifier\n",
+    )
+    assert check(tmp_path)[0] == []
+    _write(tmp_path, "packages/witness/wx_witness/bad.py", "from wx_runtime import ledger\n")
+    assert _rules(check(tmp_path)[0]) == ["FORBIDDEN_DOMAIN_IMPORT"]
+
+
 # --- step 4 extensions ------------------------------------------------------
 
 
