@@ -13,7 +13,10 @@ from __future__ import annotations
 
 import hashlib
 import json
-from collections.abc import Iterable
+import os
+import sys
+from collections.abc import Iterable, Iterator
+from contextlib import contextmanager
 from pathlib import Path
 from typing import Any
 
@@ -21,6 +24,9 @@ from cryptography.exceptions import InvalidSignature
 from cryptography.hazmat.primitives.asymmetric.ed25519 import Ed25519PublicKey
 from jsonschema import Draft202012Validator
 from jsonschema.exceptions import ValidationError
+
+if sys.platform != "win32":
+    import fcntl
 
 GENESIS_PREV_HASH = "genesis"
 DEFAULT_EVENT_SCHEMA_PATH = (
@@ -34,6 +40,10 @@ class LedgerValidationError(ValueError):
 
 class LedgerChainError(LedgerValidationError):
     """Raised when ledger ordering or prior-hash continuity fails."""
+
+
+class LedgerLockError(LedgerValidationError):
+    """Raised when appends cannot be serialized on this platform."""
 
 
 def canonical_json(data: dict[str, Any]) -> bytes:
@@ -169,7 +179,27 @@ class TriadLedger:
 
     def __init__(self, path: str | Path, schema_path: Path = DEFAULT_EVENT_SCHEMA_PATH):
         self.path = Path(path)
+        self.lock_path = self.path.with_name(self.path.name + ".lock")
         self.validator = build_event_validator(schema_path)
+
+    @contextmanager
+    def _exclusive(self) -> Iterator[None]:
+        """Hold an exclusive advisory lock for the whole load, check, append sequence.
+
+        Without it, two writers can both read the same head, both pass the
+        index/prev_hash check, and both append, leaving a ledger that no longer
+        loads (C-RCPT-001). ``flock`` locks are released by the OS when the
+        holding process exits, so a crashed writer cannot block later ones.
+        """
+        if sys.platform == "win32":
+            raise LedgerLockError("TriadLedger appends need POSIX flock; refusing to append")
+        self.path.parent.mkdir(parents=True, exist_ok=True)
+        with open(self.lock_path, "a", encoding="utf-8") as lock_handle:
+            fcntl.flock(lock_handle.fileno(), fcntl.LOCK_EX)
+            try:
+                yield
+            finally:
+                fcntl.flock(lock_handle.fileno(), fcntl.LOCK_UN)
 
     def load_events(self) -> list[dict[str, Any]]:
         if not self.path.exists():
@@ -194,27 +224,27 @@ class TriadLedger:
         return verify_chain(events, validator=self.validator)
 
     def append_event(self, event: dict[str, Any]) -> dict[str, Any]:
-        events = self.load_events()
-        expected_index = len(events)
-        expected_prev_hash = events[-1]["event_hash"] if events else GENESIS_PREV_HASH
+        with self._exclusive():
+            events = self.load_events()
+            expected_index = len(events)
+            expected_prev_hash = events[-1]["event_hash"] if events else GENESIS_PREV_HASH
 
-        if event.get("index") != expected_index:
-            raise LedgerChainError(
-                f"event index mismatch: got {event.get('index')!r} expected {expected_index!r}"
-            )
-        if event.get("prev_hash") != expected_prev_hash:
-            raise LedgerChainError(
-                f"prev_hash mismatch: got {event.get('prev_hash')!r} "
-                f"expected {expected_prev_hash!r}"
-            )
+            if event.get("index") != expected_index:
+                raise LedgerChainError(
+                    f"event index mismatch: got {event.get('index')!r} expected {expected_index!r}"
+                )
+            if event.get("prev_hash") != expected_prev_hash:
+                raise LedgerChainError(
+                    f"prev_hash mismatch: got {event.get('prev_hash')!r} "
+                    f"expected {expected_prev_hash!r}"
+                )
 
-        validate_event_integrity(event, validator=self.validator)
+            validate_event_integrity(event, validator=self.validator)
 
-        self.path.parent.mkdir(parents=True, exist_ok=True)
-        with self.path.open("a", encoding="utf-8") as handle:
-            handle.write(
-                json.dumps(event, ensure_ascii=False, sort_keys=True, separators=(",", ":"))
-            )
-            handle.write("\n")
+            line = json.dumps(event, ensure_ascii=False, sort_keys=True, separators=(",", ":"))
+            with self.path.open("a", encoding="utf-8") as handle:
+                handle.write(line + "\n")
+                handle.flush()
+                os.fsync(handle.fileno())
 
         return event

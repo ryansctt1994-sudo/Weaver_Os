@@ -139,6 +139,13 @@ MUTATIONS = [
         # Asserts INSUFFICIENT_QUORUM for a single-signer level-4 request.
         "tests/triadic_controls/test_crypto_verifier.py::test_valid_envelope_then_replay_detected",
     ),
+    (
+        "triad-ledger-append-lock",
+        "triadic_controls/ledger.py",
+        "            fcntl.flock(lock_handle.fileno(), fcntl.LOCK_EX)",
+        "            pass",
+        "tests/test_triad_ledger_concurrency.py::test_interleaved_writers_cannot_both_append",
+    ),
 ]
 
 
@@ -154,6 +161,7 @@ def main() -> None:
             "tests/test_triad_multiblock.py",
             "tests/ledger",
             "tests/triadic_controls",
+            "tests/test_triad_ledger_concurrency.py",
         ],
         cwd=root,
         capture_output=True,

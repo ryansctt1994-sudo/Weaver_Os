@@ -91,8 +91,16 @@ contradictions:
         Step 4 found a second appender with the same defect class: triadic_controls.ledger.TriadLedger.append_event
         takes caller-supplied index and prev_hash and does an unlocked load, check, append. With two writers
         interleaved after load, both appends succeed and the ledger then fails to load (LedgerChainError).
+      - >-
+        TriadLedger appends are now serialized with an exclusive flock around load, check and append, and fsynced.
+        The reproducer is kept as tests/test_triad_ledger_concurrency.py: two interleaved writers (one is refused),
+        4 unpatched processes x 10 appends, and a writer killed while holding the lock. Without the lock the
+        interleaving test and the unpatched 4-process test both fail; the lock removal is a mutation in
+        tools/check_verifier_mutations.py (19/19 detected). The on-disk line format is unchanged.
     remaining:
-      - "Migrate TriadLedger appends onto ReceiptLedger, or serialize them, without breaking pinned triad fixtures."
+      - "TriadLedger still takes caller-supplied index and prev_hash (now checked under the lock). Migrating it onto ReceiptLedger is open."
+      - "A crash mid-write can leave a torn last line, which makes the triad ledger refuse to load (fail closed, but no recovery path)."
+      - "On non-POSIX platforms TriadLedger refuses to append (LedgerLockError)."
       - "Issue a reproducible clean-clone repair receipt under an approved receipt profile (blocked on Lumen-Nexus #13)."
 
   - id: "C-DUAL-001"
