@@ -8,7 +8,7 @@ import sqlite3
 import pytest
 from weaver_contracts.canonical import canonicalize
 from weaver_contracts.receipt import GENESIS_DIGEST, Receipt
-from weaver_runtime.ledger import AdmissionError, LedgerCorrupted, LedgerError
+from weaver_runtime.ledger import AdmissionError, LedgerCorrupted, LedgerDuplicate, LedgerError
 from weaver_verifier.ledger import verify_snapshot
 
 from tests.ledger.helpers import admit_n, open_ledger
@@ -242,3 +242,29 @@ def test_refuses_to_extend_when_head_digest_is_swapped(tmp_path):
     _tamper(path, "UPDATE heads SET head = ? WHERE root = 'AUTHORITY'", ("ab" * 32,))
     with open_ledger(path) as ledger, pytest.raises(LedgerCorrupted):
         admit_n(ledger, 1, start=3)
+
+
+# --- unique keys ------------------------------------------------------------------
+
+
+def test_unique_key_is_enforced_across_instances(tmp_path):
+    path = tmp_path / "ledger.db"
+    with open_ledger(path) as first, open_ledger(path) as second:
+        first.admit("E", {"n": 1}, actor_id="op-1", policy_version="p1", unique_key="k-1")
+        before = second.anchor()
+        with pytest.raises(LedgerDuplicate):
+            second.admit("E", {"n": 2}, actor_id="op-1", policy_version="p1", unique_key="k-1")
+        assert second.anchor() == before
+        second.admit("E", {"n": 3}, actor_id="op-1", policy_version="p1", unique_key="k-2")
+
+
+def test_failed_append_does_not_consume_its_unique_key(ledger):
+    with pytest.raises(AdmissionError):
+        ledger.admit("E", {"x": 1.5}, actor_id="op-1", policy_version="p1", unique_key="k")
+    assert ledger.admit("E", {"x": 1}, actor_id="op-1", policy_version="p1", unique_key="k")
+
+
+@pytest.mark.parametrize("key", ["", 7])
+def test_unique_key_must_be_a_non_empty_string(ledger, key):
+    with pytest.raises(AdmissionError):
+        ledger.admit("E", {"x": 1}, actor_id="op-1", policy_version="p1", unique_key=key)

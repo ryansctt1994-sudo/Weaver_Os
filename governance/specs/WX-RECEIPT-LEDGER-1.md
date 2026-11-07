@@ -40,6 +40,10 @@ as the core of the new tests.
   `COMMIT`.
 - **One total order.** Concurrent writers (threads or processes) are serialized by SQLite.
   Each append either commits with the next sequence or raises `LedgerBusy`.
+- **Optional uniqueness.** `admit(..., unique_key=...)` claims a key in the same transaction as the
+  append. A second admit with the same key, from any instance or process sharing the store, fails with
+  `LedgerDuplicate` and changes nothing. A failed append does not consume its key. The execution gate
+  uses this so that a proposal commits at most once.
 - **Fail closed on a corrupted store.** Before extending a root, the ledger checks that the head
   row matches the root's entry count and last receipt digest, and raises `LedgerCorrupted`
   otherwise. This is a local guard only. Full re-verification is the verifier's job.

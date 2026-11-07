@@ -108,6 +108,25 @@ contradictions:
         lock file is deleted or replaced while in use. Network file systems are not tested.
       - "Issue a reproducible clean-clone repair receipt under an approved receipt profile (blocked on Lumen-Nexus #13)."
 
+  - id: "C-GATE-001"
+    title: "Execution gate commit boundary is not atomic with the veto or the authorizer"
+    severity: "HIGH"
+    status: "OPEN"
+    domain: "execution"
+    statement: >-
+      The gate revalidates the veto, the window and authority immediately before the ledger append,
+      but a veto or revocation in that interval is not seen and the commit succeeds. Reproduced and
+      pinned by tests/gate/test_execution_gate.py::test_known_limit_veto_in_the_commit_interval_still_commits
+      and ::test_known_limit_revocation_in_the_commit_interval_still_commits. Effect confinement is
+      not claimed.
+    found_by: "External review of PR #102, 2026-11-07; reproduced locally the same day."
+    resolved_in_review:
+      - "Two gates sharing a ledger could both commit one proposal; fixed with a transactional ledger unique_key."
+      - "A re-issued decision that had already expired was accepted; fixed in c9c8635."
+    required_disposition:
+      - "Decide the closing mechanism: serialize the veto and revocations through the same transaction as the commit, or rely on the hardware veto gating the actuator and record the software gate as advisory."
+      - "Until then, keep the characterization tests and state the limit wherever the gate is described."
+
   - id: "C-DUAL-001"
     title: "Dual-steward authorization is not enforceable (mirror)"
     severity: "HIGH"

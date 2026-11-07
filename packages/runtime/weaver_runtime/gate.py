@@ -47,7 +47,7 @@ from weaver_contracts.canonical import CanonicalizationError, parse_strict
 from weaver_contracts.gate import AuthorizationDecision, GateContractError, Proposal
 from weaver_contracts.receipt import Receipt
 
-from .ledger import AdmissionError, ReceiptLedger
+from .ledger import AdmissionError, LedgerDuplicate, ReceiptLedger
 from .veto import STATE_ARMED, LuciferLatchTwin
 
 COMMITTED = "COMMITTED"
@@ -251,7 +251,13 @@ class ExecutionGate:
                     },
                     actor_id=self._gate_id,
                     policy_version=self._policy_version,
+                    unique_key=f"EXECUTION_COMMITTED:{proposal.proposal_id}",
                 )
+            except LedgerDuplicate as exc:
+                # Another gate (or process) committed this proposal first.
+                with self._lock:
+                    self._committed.add(proposal.proposal_id)
+                return self._reject(proposal, "COMMIT", "ALREADY_COMMITTED", str(exc), ABORTED)
             except AdmissionError as exc:
                 return self._reject(proposal, "COMMIT", "RESULT_NOT_RECORDABLE", str(exc), ABORTED)
             with self._lock:

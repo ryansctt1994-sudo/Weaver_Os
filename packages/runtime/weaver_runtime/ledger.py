@@ -79,6 +79,10 @@ class LedgerCorrupted(LedgerError):
     """The stored head disagrees with the stored entries; the ledger refuses to extend it."""
 
 
+class LedgerDuplicate(LedgerError):
+    """An admit carried a ``unique_key`` that this store has already admitted."""
+
+
 def utc_now_seconds() -> str:
     return time.strftime("%Y-%m-%dT%H:%M:%SZ", time.gmtime())
 
@@ -91,6 +95,8 @@ _SCHEMA_SQL = (
     " PRIMARY KEY (root, sequence))",
     "CREATE TABLE IF NOT EXISTS heads ("
     " root TEXT PRIMARY KEY, length INTEGER NOT NULL, head TEXT NOT NULL)",
+    "CREATE TABLE IF NOT EXISTS unique_keys ("
+    " key TEXT PRIMARY KEY, root TEXT NOT NULL, sequence INTEGER NOT NULL)",
 )
 
 
@@ -186,8 +192,16 @@ class ReceiptLedger:
         *,
         actor_id: str,
         policy_version: str,
+        unique_key: str | None = None,
     ) -> Receipt:
-        """Record an admitted event on the Authority Root."""
+        """Record an admitted event on the Authority Root.
+
+        With ``unique_key``, the append fails with ``LedgerDuplicate`` if this store has
+        already admitted that key. The check runs inside the append's own transaction, so
+        it holds across every ``ReceiptLedger`` instance and process sharing the store.
+        """
+        if unique_key is not None and (not isinstance(unique_key, str) or not unique_key):
+            raise AdmissionError("unique_key must be a non-empty string")
         return self._commit(
             root="AUTHORITY",
             event_type=event_type,
@@ -196,6 +210,7 @@ class ReceiptLedger:
             policy_version=policy_version,
             admissibility="ADMITTED",
             reason_code=None,
+            unique_key=unique_key,
         )
 
     def reject(
@@ -229,6 +244,7 @@ class ReceiptLedger:
         policy_version: str,
         admissibility: str,
         reason_code: str | None,
+        unique_key: str | None = None,
     ) -> Receipt:
         if not isinstance(event, Mapping):
             raise AdmissionError("event content must be a JSON object")
@@ -258,6 +274,8 @@ class ReceiptLedger:
                     )
                 except ReceiptError as exc:
                     raise AdmissionError(str(exc)) from exc
+                if unique_key is not None:
+                    self._claim_unique_key(unique_key, receipt)
                 self._insert_entry(receipt, event_bytes)
                 self._advance_head(receipt)
                 self._conn.execute("COMMIT")
@@ -292,6 +310,15 @@ class ReceiptLedger:
             return RootHead(length, head)
         except ValueError as exc:
             raise LedgerCorrupted(f"{root} head row is malformed: {exc}") from exc
+
+    def _claim_unique_key(self, key: str, receipt: Receipt) -> None:
+        try:
+            self._conn.execute(
+                "INSERT INTO unique_keys (key, root, sequence) VALUES (?, ?, ?)",
+                (key, receipt.root, receipt.sequence),
+            )
+        except sqlite3.IntegrityError as exc:
+            raise LedgerDuplicate(f"unique key already admitted: {key}") from exc
 
     def _insert_entry(self, receipt: Receipt, event_bytes: bytes) -> None:
         self._conn.execute(

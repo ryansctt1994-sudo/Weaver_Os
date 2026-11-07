@@ -147,6 +147,13 @@ MUTATIONS = [
         "tests/test_triad_ledger_concurrency.py::test_interleaved_writers_cannot_both_append",
     ),
     (
+        "receipt-ledger-unique-key",
+        "packages/runtime/weaver_runtime/ledger.py",
+        "                    self._claim_unique_key(unique_key, receipt)",
+        "                    pass",
+        "tests/ledger/test_receipt_ledger.py::test_unique_key_is_enforced_across_instances",
+    ),
+    (
         "veto-twin-threshold",
         "packages/runtime/weaver_runtime/veto.py",
         "            if trigger_in or threat_level >= THREAT_THRESHOLD:",

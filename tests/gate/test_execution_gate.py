@@ -11,6 +11,7 @@ from weaver_runtime.gate import (
     ExecutionGate,
     TwinVeto,
 )
+from weaver_runtime.ledger import LedgerBusy
 from weaver_runtime.veto import LuciferLatchTwin
 from weaver_verifier.ledger import verify_snapshot
 
@@ -236,8 +237,10 @@ def test_revocation_mid_action_is_caught_at_the_next_checkpoint(env):
 
 
 def test_reissued_decision_that_has_already_expired_aborts(env):
+    """First decision valid until t=2000, re-issued one only until t=999, clock at t=1000."""
     outcome = make_gate(env, Authorizer("allow", ("allow", 999))).execute(proposal(), staged())
     assert (outcome.status, outcome.reason_code) == (ABORTED, "WINDOW_EXPIRED")
+    assert roots(env) == (0, 1)
 
 
 def test_one_shot_authorizer_cannot_commit(env):
@@ -363,3 +366,105 @@ def test_malformed_proposals_are_rejected(kwargs):
 def test_malformed_decisions_are_rejected(args):
     with pytest.raises(GateContractError):
         AuthorizationDecision(*args)
+
+
+# --- review follow-ups: multiple gates, commit boundary, ledger failure --------
+
+
+def test_two_gates_sharing_a_ledger_cannot_both_commit(tmp_path):
+    """Each gate's in-memory guards are local; the ledger's unique key is shared."""
+    path = tmp_path / "shared.db"
+    open_ledger(path).close()
+    ledgers = [open_ledger(path) for _ in range(2)]
+    gates = [
+        ExecutionGate(shared, veto=TwinVeto(armed_twin()), authorize=Authorizer(), clock=Clock())
+        for shared in ledgers
+    ]
+    both_inside = threading.Barrier(2)
+    outcomes = {}
+
+    def run(index):
+        def action(context):
+            both_inside.wait(timeout=10)  # both gates are past Reserve at the same time
+            return {}
+
+        outcomes[index] = gates[index].execute(proposal(), action)
+
+    threads = [threading.Thread(target=run, args=(i,)) for i in range(2)]
+    for thread in threads:
+        thread.start()
+    for thread in threads:
+        thread.join(timeout=30)
+    statuses = sorted((o.status, o.reason_code) for o in outcomes.values())
+    assert statuses == [(ABORTED, "ALREADY_COMMITTED"), (COMMITTED, None)]
+    snapshot = ledgers[0].snapshot()["roots"]
+    assert (len(snapshot["AUTHORITY"]), len(snapshot["REJECTION"])) == (1, 1)
+    for ledger in ledgers:
+        ledger.close()
+
+
+def test_known_limit_veto_in_the_commit_interval_still_commits(env):
+    """C-GATE-001: characterization of an open limit, not a desired behaviour.
+
+    A veto that trips after revalidation but before the ledger append is not seen,
+    and the commit goes through. No software check is atomic with a veto source that
+    changes independently of the ledger. If this test starts failing because the
+    boundary was closed, update it and C-GATE-001 together.
+    """
+    ledger, twin, _ = env
+    real_admit = ledger.admit
+
+    def admit_after_veto(*args, **kwargs):
+        twin.run(1, rst_n=1, trigger_in=1, threat_level=0)
+        return real_admit(*args, **kwargs)
+
+    ledger.admit = admit_after_veto
+    outcome = make_gate(env, Authorizer()).execute(proposal(), staged())
+    assert outcome.status == COMMITTED
+    assert TwinVeto(twin).vetoed()
+
+
+def test_known_limit_revocation_in_the_commit_interval_still_commits(env):
+    """C-GATE-001: the same limit for a revocation after revalidation, before the append."""
+    ledger = env[0]
+    authorizer = Authorizer("allow", "allow", "REVOKED")
+    real_admit = ledger.admit
+
+    def admit_after_revocation(*args, **kwargs):
+        assert authorizer(proposal()).allowed is False  # authority is now revoked
+        return real_admit(*args, **kwargs)
+
+    ledger.admit = admit_after_revocation
+    outcome = make_gate(env, authorizer).execute(proposal(), staged())
+    assert outcome.status == COMMITTED
+
+
+def test_ledger_failure_while_refusing_raises_and_records_nothing(env):
+    """'One receipt per call' holds only while the ledger can record."""
+    ledger = env[0]
+
+    def broken(*args, **kwargs):
+        raise LedgerBusy("simulated")
+
+    ledger.reject = broken
+    action = staged()
+    with pytest.raises(LedgerBusy):
+        make_gate(env, Authorizer("NO")).execute(proposal(), action)
+    assert action.calls == []
+    assert roots(env) == (0, 0)
+
+
+def test_ledger_failure_while_committing_raises_and_releases_the_reservation(env):
+    ledger = env[0]
+    real_admit = ledger.admit
+    gate = make_gate(env, Authorizer())
+
+    def broken(*args, **kwargs):
+        raise LedgerBusy("simulated")
+
+    ledger.admit = broken
+    with pytest.raises(LedgerBusy):
+        gate.execute(proposal(), staged())
+    assert roots(env) == (0, 0)
+    ledger.admit = real_admit
+    assert gate.execute(proposal(), staged()).status == COMMITTED
