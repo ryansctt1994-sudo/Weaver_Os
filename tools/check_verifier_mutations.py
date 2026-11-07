@@ -50,6 +50,66 @@ MUTATIONS = [
         "events = events",
         "tests/test_triad_multiblock.py::test_three_events_and_middle_byte_tamper",
     ),
+    (
+        "receipt-ledger-head-guard",
+        "packages/runtime/weaver_runtime/ledger.py",
+        "if count != length or actual != expected:",
+        "if False:",
+        "tests/ledger/test_receipt_ledger.py::test_refuses_to_extend_when_head_row_is_rewound",
+    ),
+    (
+        "receipt-ledger-rollback",
+        "packages/runtime/weaver_runtime/ledger.py",
+        '                self._conn.execute("ROLLBACK")\n'
+        "                raise\n"
+        "        return receipt",
+        '                self._conn.execute("COMMIT")\n'
+        "                raise\n"
+        "        return receipt",
+        "tests/ledger/test_receipt_ledger.py::test_failure_inside_transaction_rolls_back",
+    ),
+    (
+        "receipt-ledger-sequence-owner",
+        "packages/runtime/weaver_runtime/ledger.py",
+        "sequence=head.length,",
+        "sequence=0,",
+        "tests/ledger/test_receipt_ledger.py::test_append_assigns_sequence_and_links",
+    ),
+    (
+        "ledger-verifier-link",
+        "packages/verifier/weaver_verifier/ledger.py",
+        "if receipt.predecessor_digest != previous:",
+        "if False:",
+        "tests/ledger/test_ledger_adversarial.py::test_T3_local_reseal_breaks_downstream_link",
+    ),
+    (
+        "ledger-verifier-canonical-bytes",
+        "packages/verifier/weaver_verifier/ledger.py",
+        "if not is_canonical(event_bytes):",
+        "if False:",
+        "tests/ledger/test_ledger_adversarial.py::test_X2_non_canonical_event_bytes_rejected_even_with_matching_digest",
+    ),
+    (
+        "ledger-verifier-event-digest",
+        "packages/verifier/weaver_verifier/ledger.py",
+        "if receipt.event_digest != hashlib.sha256(event_bytes).hexdigest():",
+        "if False:",
+        "tests/ledger/test_ledger_adversarial.py::test_T2_payload_edit_detected",
+    ),
+    (
+        "ledger-verifier-anchor-length",
+        "packages/verifier/weaver_verifier/ledger.py",
+        "if got.length != want.length:",
+        "if False:",
+        "tests/ledger/test_ledger_adversarial.py::test_T11_anchor_detects_truncation",
+    ),
+    (
+        "ledger-verifier-root",
+        "packages/verifier/weaver_verifier/ledger.py",
+        "if receipt.root != root:",
+        "if False:",
+        "tests/ledger/test_ledger_adversarial.py::test_X3_rejection_cannot_be_moved_onto_authority_root",
+    ),
 ]
 
 
@@ -63,6 +123,7 @@ def main() -> None:
             "-q",
             "tests/test_witness_archive.py",
             "tests/test_triad_multiblock.py",
+            "tests/ledger",
         ],
         cwd=root,
         capture_output=True,
