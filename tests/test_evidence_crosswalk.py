@@ -16,10 +16,34 @@ def _mapping(doc, ladder_id, label):
     return next(item for item in ladder["mappings"] if item["label"] == label)
 
 
-def test_committed_crosswalk_is_valid_and_only_proposed(doc):
+def _proposed(doc):
+    out = copy.deepcopy(doc)
+    out["status"] = "PROPOSED"
+    out["ratification"] = {"decision_id": None, "ratified_by": [], "ratified_at": None}
+    return out
+
+
+def _dual(doc, stewards):
+    out = copy.deepcopy(doc)
+    out["status"] = "RATIFIED"
+    out["ratification"] = {
+        "decision_id": "GD-X",
+        "mode": "DUAL_STEWARD",
+        "ratified_by": stewards,
+        "ratified_at": "2026-11-07",
+    }
+    return out
+
+
+def test_committed_crosswalk_is_ratified_single_steward_with_limitation(doc):
     assert check(doc) == []
-    assert doc["status"] == "PROPOSED"
     assert main([str(DEFAULT_PATH)]) == 0
+    ratification = doc["ratification"]
+    assert doc["status"] == "RATIFIED"
+    assert ratification["decision_id"] == "GD-0001"
+    assert ratification["mode"] == "SINGLE_STEWARD"
+    assert ratification["ratified_by"] == ["ryansctt1994-sudo"]
+    assert "C-DUAL-001" in ratification["limitation"]
 
 
 def test_single_independent_replay_does_not_reach_r4(doc):
@@ -27,36 +51,50 @@ def test_single_independent_replay_does_not_reach_r4(doc):
     assert _mapping(doc, "weaver_e", "E4")["maps_to"] == "R3"
 
 
+def test_proposed_baseline_is_valid(doc):
+    assert check(_proposed(doc)) == []
+
+
 def test_ratified_without_decision_is_rejected(doc):
     bad = copy.deepcopy(doc)
-    bad["status"] = "RATIFIED"
+    bad["ratification"]["decision_id"] = None
     assert any("decision_id" in e for e in check(bad))
 
 
-def test_ratified_by_one_steward_is_rejected(doc):
+def test_ratified_without_mode_is_rejected(doc):
     bad = copy.deepcopy(doc)
-    bad["status"] = "RATIFIED"
-    bad["ratification"] = {
-        "decision_id": "GD-1",
-        "ratified_by": ["steward-a", "steward-a"],
-        "ratified_at": "2026-11-07",
-    }
-    assert any("distinct stewards" in e for e in check(bad))
+    del bad["ratification"]["mode"]
+    assert any("mode" in e for e in check(bad))
 
 
-def test_ratified_with_two_stewards_passes(doc):
-    good = copy.deepcopy(doc)
-    good["status"] = "RATIFIED"
-    good["ratification"] = {
-        "decision_id": "GD-1",
-        "ratified_by": ["steward-a", "steward-b"],
-        "ratified_at": "2026-11-07",
-    }
-    assert check(good) == []
+def test_single_steward_without_limitation_is_rejected(doc):
+    bad = copy.deepcopy(doc)
+    del bad["ratification"]["limitation"]
+    assert any("C-DUAL-001" in e for e in check(bad))
+
+
+def test_single_steward_limitation_must_name_blocker(doc):
+    bad = copy.deepcopy(doc)
+    bad["ratification"]["limitation"] = "approved alone"
+    assert any("C-DUAL-001" in e for e in check(bad))
+
+
+def test_single_steward_with_two_names_is_rejected(doc):
+    bad = copy.deepcopy(doc)
+    bad["ratification"]["ratified_by"] = ["steward-a", "steward-b"]
+    assert any("exactly one steward" in e for e in check(bad))
+
+
+def test_dual_steward_with_one_distinct_name_is_rejected(doc):
+    assert any("distinct stewards" in e for e in check(_dual(doc, ["a", "a"])))
+
+
+def test_dual_steward_with_two_stewards_passes(doc):
+    assert check(_dual(doc, ["steward-a", "steward-b"])) == []
 
 
 def test_proposed_with_ratification_data_is_rejected(doc):
-    bad = copy.deepcopy(doc)
+    bad = _proposed(doc)
     bad["ratification"]["ratified_by"] = ["steward-a"]
     assert any("must not carry ratification" in e for e in check(bad))
 

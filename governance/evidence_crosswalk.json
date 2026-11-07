@@ -1,11 +1,15 @@
 {
   "schema_version": "1.0",
   "crosswalk_id": "WX-CROSSWALK-0001",
-  "status": "PROPOSED",
+  "status": "RATIFIED",
   "ratification": {
-    "decision_id": null,
-    "ratified_by": [],
-    "ratified_at": null
+    "decision_id": "GD-0001",
+    "mode": "SINGLE_STEWARD",
+    "ratified_by": [
+      "ryansctt1994-sudo"
+    ],
+    "ratified_at": "2026-11-07",
+    "limitation": "C-DUAL-001 open: the second documented steward (@LastingCzardd) holds read-only repository access, so dual-steward ratification was not performed. The owner ratified alone and recorded this limitation."
   },
   "rule": "A legacy label maps to the highest R level whose proof obligation it is guaranteed to meet (floor). Anything stronger needs the named condition to be evidenced separately.",
   "target_ladder": {

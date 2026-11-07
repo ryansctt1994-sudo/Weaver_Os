@@ -1,13 +1,13 @@
 # Evidence Crosswalk (WX-CROSSWALK-0001)
 
-**Status:** PROPOSED — awaiting steward ratification
+**Status:** RATIFIED by [GD-0001](decisions/GD-0001.md), single steward; `C-DUAL-001` limitation recorded
 **Machine-readable source:** [`evidence_crosswalk.json`](evidence_crosswalk.json)
 **Checker:** `python -m tools.check_evidence_crosswalk` (structure only; it cannot ratify)
 **Authority:** O0
 
 This is step 1a of [`UNIFIED_SYSTEM_OUTLINE.md`](../docs/architecture/UNIFIED_SYSTEM_OUTLINE.md) §3.
 It maps the four evidence vocabularies used across the portfolio onto one target ladder.
-Until it is ratified, legacy labels stay where they are and are read as "legacy, unmapped".
+Legacy labels already written in documents are not rewritten; they are read through this crosswalk.
 
 ## Rule
 
@@ -61,7 +61,7 @@ Status is written as a tuple: `R2[self] · W0 · O0`.
    rule rejected a mapping that followed the label order. Ladders are therefore listed
    by proof strength, and label numbering is recorded as non-authoritative.
 3. **W and O have only a zero rung.** No repository defines W1+ or O1+. Defining them is
-   decision D2 in [`RATIFICATION.md`](RATIFICATION.md). Until then nothing can claim them.
+   decision D2, which GD-0001 deferred. Until a later decision defines them, nothing can claim them.
 
 ## What the checker enforces
 
@@ -71,6 +71,7 @@ Status is written as a tuple: `R2[self] · W0 · O0`.
 - `floor` and `partial` mappings state their `condition_for_higher`;
 - no legacy label maps to R6;
 - a `PROPOSED` file carries no ratification data;
-- a `RATIFIED` file needs a decision ID, a date, and at least two distinct stewards.
+- a `RATIFIED` file needs a decision ID, a date, and a mode: `DUAL_STEWARD` (two distinct
+  stewards) or `SINGLE_STEWARD` (exactly one, plus a limitation naming `C-DUAL-001`).
 
 It does not judge whether a mapping is *correct*. That is the stewards' call.

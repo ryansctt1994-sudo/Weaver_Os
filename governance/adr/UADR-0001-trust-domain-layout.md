@@ -1,8 +1,8 @@
 # UADR-0001: Unified trust-domain layout and import rules
 
-- **Status:** PROPOSED — not ratified
+- **Status:** ACCEPTED by [GD-0001](../decisions/GD-0001.md) (single steward; `C-DUAL-001` limitation recorded)
 - **Date:** 2026-11-07
-- **Decision authority:** stewards (see `governance/RATIFICATION.md`, D3)
+- **Decision authority:** GD-0001, D3
 - **Enforcement:** `python -m tools.check_trust_domains` (also run by `pytest`)
 - **Numbering:** `UADR-` is used so this record does not collide with Lumen-Nexus `ADR-0006`
   when the Nexus governance records are merged in.

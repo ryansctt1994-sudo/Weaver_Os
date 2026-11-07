@@ -21,6 +21,9 @@ STATUS_FLAG = "STATUS_FLAG"
 EQUIVALENCES = {"exact", "floor", "partial", "none"}
 STATUSES = {"PROPOSED", "RATIFIED"}
 MIN_RATIFYING_STEWARDS = 2
+RATIFICATION_MODES = {"DUAL_STEWARD", "SINGLE_STEWARD"}
+# A single-steward ratification is legal only while it names the open blocker.
+SINGLE_STEWARD_BLOCKER = "C-DUAL-001"
 
 
 def _is_placeholder(value: Any) -> bool:
@@ -51,13 +54,24 @@ def check(doc: Any) -> list[str]:
             errors.append("RATIFIED requires a non-placeholder decision_id")
         if _is_placeholder(ratification.get("ratified_at")):
             errors.append("RATIFIED requires ratified_at")
+        mode = ratification.get("mode")
         stewards = ratification.get("ratified_by")
-        if not isinstance(stewards, list) or any(_is_placeholder(s) for s in stewards):
+        if mode not in RATIFICATION_MODES:
+            errors.append(f"RATIFIED requires mode in {sorted(RATIFICATION_MODES)}")
+        elif not isinstance(stewards, list) or any(_is_placeholder(s) for s in stewards):
             errors.append("ratified_by must be a list of steward identifiers")
-        elif len(set(stewards)) < MIN_RATIFYING_STEWARDS:
+        elif mode == "DUAL_STEWARD" and len(set(stewards)) < MIN_RATIFYING_STEWARDS:
             errors.append(
-                f"RATIFIED requires at least {MIN_RATIFYING_STEWARDS} distinct stewards"
+                f"DUAL_STEWARD requires at least {MIN_RATIFYING_STEWARDS} distinct stewards"
             )
+        elif mode == "SINGLE_STEWARD":
+            if len(stewards) != 1:
+                errors.append("SINGLE_STEWARD requires exactly one steward")
+            limitation = ratification.get("limitation")
+            if not isinstance(limitation, str) or SINGLE_STEWARD_BLOCKER not in limitation:
+                errors.append(
+                    f"SINGLE_STEWARD requires a limitation naming {SINGLE_STEWARD_BLOCKER}"
+                )
     elif status == "PROPOSED" and (
         ratification.get("decision_id") or ratification.get("ratified_by")
     ):

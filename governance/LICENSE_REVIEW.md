@@ -1,6 +1,6 @@
 # License Review for the Consolidation
 
-**Status:** FACTUAL REVIEW, 2026-11-07 — one decision open (D4 in `RATIFICATION.md`)
+**Status:** FACTUAL REVIEW, 2026-11-07 — D4 decided by [GD-0001](decisions/GD-0001.md): **path A**
 **Not legal advice.** This records what the repositories contain. It does not give an opinion
 that would replace counsel.
 

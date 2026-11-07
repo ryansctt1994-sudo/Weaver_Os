@@ -90,7 +90,7 @@ therefore **not** pick one silently. Proposal:
    ratified, legacy labels stay in place, annotated with "legacy, unmapped".
 
 Draft crosswalk: now prepared as `governance/evidence_crosswalk.json` and
-[`governance/EVIDENCE_CROSSWALK.md`](../../governance/EVIDENCE_CROSSWALK.md) (PROPOSED).
+[`governance/EVIDENCE_CROSSWALK.md`](../../governance/EVIDENCE_CROSSWALK.md) (RATIFIED by GD-0001).
 Legacy labels map to the highest R level they are guaranteed to meet (floor). Building it
 corrected two rows of the first draft: Lumen and Weaver **E4 map to R3, not R4** (neither
 requires two distinct witnesses), and Lumen **E5 maps to R4, not R6** (no production
@@ -284,8 +284,8 @@ layer. They have no authority and no direct ledger writes.
 | C-PR006-001 | historical PG-001 missing | stays open. PG-001R is a successor, not a recovery |
 | C-ANCHOR-001 | placeholder E4 anchors | full SHA identifiers in spine receipts (§5.8) |
 | C-DUAL-001 | dual-steward approval not enforceable | governance work. Code cannot close it |
-| (new) C-LADDER-001 | four evidence vocabularies | §3, by ratification |
-| (new) C-STUB-001 | anchor-repo stubs for core primitives | §5.1–5.5 |
+| C-LADDER-001 | four evidence vocabularies | RESOLVED by GD-0001 (single steward) |
+| C-STUB-001 | anchor-repo stubs for core primitives | §5.1–5.5 (OPEN, `governance/CONTRADICTIONS.yaml`) |
 
 Portfolio state after the merge is unchanged until evidence says otherwise:
 `E2 / R2[self] · W0 · O0 · production prohibited · E4 not earned`.
@@ -295,6 +295,7 @@ Portfolio state after the merge is unchanged until evidence says otherwise:
 ## 9. Build order
 
 1. **Ratify the frame.** Evidence crosswalk (§3), layout and import rules (§4), license check (§7).
+   *Done: [GD-0001](../../governance/decisions/GD-0001.md), single steward, `C-DUAL-001` limitation recorded.*
 2. **Contracts first.** Canonicalization profile + test vectors, receipt schema, PG-001R contracts.
 3. **ReceiptLedger.** Merge the Chronicles into one single-owner Dual-Ledger ReceiptLedger.
    Port all 15 Cathedral adversarial cases plus Lumen's tests, then add the ADR-0006
