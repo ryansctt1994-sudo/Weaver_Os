@@ -11,9 +11,17 @@ Cathedral ordering (Observe before Authorize) and the Dual Ledger:
    proposal that has already committed cannot run again.
 4. **Execute.** Run the caller's action. It *stages* a result and must not apply
    irreversible effects. Long actions call ``context.checkpoint()``, which
-   revalidates the veto and the window and aborts if either has failed.
+   rechecks the veto, the window and authority (the authorizer is asked again), and
+   aborts if any of them has failed.
 5. **Revalidate.** Immediately before commit: veto still clear, window still open,
-   and the authorizer, asked again, still allows.
+   and the authorizer, asked again, still allows with a decision that has not expired.
+
+The authorizer is called at least twice per execution, and once more at every
+checkpoint. It must answer "is this proposal authorized right now?" without side
+effects. A one-shot verifier, one that consumes a token or records a replay key on each
+call as ``CryptoVerifier`` does, cannot be passed in directly: its second answer would be
+a replay refusal, so every execution would abort. That fails closed, but such a verifier
+needs an adapter that verifies once and then answers revocation and expiry queries.
 6. **Commit or safe-abort.** On commit the result is recorded on the Authority Root,
    and that record *is* the commit. Callers apply external effects only after a
    ``COMMITTED`` outcome. Anything else records a receipt on the Rejection Root.
@@ -91,7 +99,9 @@ class ExecutionContext:
         self.expires_at = expires_at
 
     def checkpoint(self) -> None:
+        """Recheck the veto, the window, and authority; raise ``GateAbort`` if any failed."""
         self._gate._check_live(self.expires_at, stage="CHECKPOINT")
+        self._gate._check_still_authorized(self.proposal, stage="CHECKPOINT")
 
 
 class ExecutionGate:
@@ -146,6 +156,15 @@ class ExecutionGate:
             raise GateAbort("VETO_DURING_EXECUTION", f"veto active at {stage}")
         if self._clock() >= expires_at:
             raise GateAbort("WINDOW_EXPIRED", f"authority window closed at {stage}")
+
+    def _check_still_authorized(self, proposal: Proposal, *, stage: str) -> AuthorizationDecision:
+        again = self._ask(proposal)
+        if isinstance(again, str) or not again.allowed:
+            detail = again if isinstance(again, str) else again.decision_id
+            raise GateAbort("REVALIDATION_DENIED", f"{stage}: {detail}")
+        if again.valid_until <= self._clock():
+            raise GateAbort("WINDOW_EXPIRED", f"{stage}: re-issued decision already expired")
+        return again
 
     def _ask(self, proposal: Proposal) -> AuthorizationDecision | str:
         try:
@@ -214,14 +233,11 @@ class ExecutionGate:
             # 5. Revalidate before the irreversible step
             try:
                 self._check_live(expires_at, stage="REVALIDATE")
+                again = self._check_still_authorized(proposal, stage="REVALIDATE")
             except GateAbort as abort:
                 return self._reject(
                     proposal, "REVALIDATE", abort.reason_code, abort.detail, ABORTED
                 )
-            again = self._ask(proposal)
-            if isinstance(again, str) or not again.allowed:
-                detail = again if isinstance(again, str) else again.decision_id
-                return self._reject(proposal, "REVALIDATE", "REVALIDATION_DENIED", detail, ABORTED)
 
             # 6. Commit
             try:

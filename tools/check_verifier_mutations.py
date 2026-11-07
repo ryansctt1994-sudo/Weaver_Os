@@ -170,9 +170,17 @@ MUTATIONS = [
     (
         "gate-reauthorize",
         "packages/runtime/weaver_runtime/gate.py",
-        "            if isinstance(again, str) or not again.allowed:",
-        "            if isinstance(again, str):",
+        "        if isinstance(again, str) or not again.allowed:",
+        "        if isinstance(again, str):",
         "tests/gate/test_execution_gate.py::test_revocation_between_authorize_and_commit_aborts[REVOKED]",
+    ),
+    (
+        "gate-checkpoint-reauthorize",
+        "packages/runtime/weaver_runtime/gate.py",
+        '        self._gate._check_still_authorized(self.proposal, stage="CHECKPOINT")',
+        "        pass",
+        "tests/gate/test_execution_gate.py::"
+        "test_revocation_mid_action_is_caught_at_the_next_checkpoint",
     ),
     (
         "gate-evaluating-is-veto",

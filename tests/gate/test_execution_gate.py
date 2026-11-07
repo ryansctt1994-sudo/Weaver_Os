@@ -39,6 +39,8 @@ class Authorizer:
             raise answer
         if answer == "allow":
             return AuthorizationDecision(True, f"dec-{self.calls}", valid_until=2000)
+        if isinstance(answer, tuple):  # ("allow", valid_until)
+            return AuthorizationDecision(True, f"dec-{self.calls}", valid_until=answer[1])
         if answer == "garbage":
             return {"allowed": True}
         return AuthorizationDecision(
@@ -211,6 +213,36 @@ def test_window_expiring_during_execution_aborts(env):
 @pytest.mark.parametrize("second", ["REVOKED", RuntimeError("down"), "garbage"])
 def test_revocation_between_authorize_and_commit_aborts(env, second):
     outcome = make_gate(env, Authorizer("allow", second)).execute(proposal(), staged())
+    assert (outcome.status, outcome.reason_code) == (ABORTED, "REVALIDATION_DENIED")
+    assert roots(env) == (0, 1)
+
+
+def test_revocation_mid_action_is_caught_at_the_next_checkpoint(env):
+    steps = []
+
+    def action(context):
+        for step in range(5):
+            context.checkpoint()
+            steps.append(step)
+        return {}
+
+    authorizer = Authorizer("allow", "allow", "REVOKED")
+    outcome = make_gate(env, authorizer).execute(proposal(), action)
+    assert (outcome.status, outcome.reason_code) == (ABORTED, "REVALIDATION_DENIED")
+    assert steps == [0]
+    event = env[0].snapshot()["roots"]["REJECTION"][0]["event"]
+    assert '"detail":"CHECKPOINT: dec-3"' in event
+    assert roots(env) == (0, 1)
+
+
+def test_reissued_decision_that_has_already_expired_aborts(env):
+    outcome = make_gate(env, Authorizer("allow", ("allow", 999))).execute(proposal(), staged())
+    assert (outcome.status, outcome.reason_code) == (ABORTED, "WINDOW_EXPIRED")
+
+
+def test_one_shot_authorizer_cannot_commit(env):
+    """An authorizer that refuses its second call (replay-consuming) fails closed."""
+    outcome = make_gate(env, Authorizer("allow", "REPLAY_DETECTED")).execute(proposal(), staged())
     assert (outcome.status, outcome.reason_code) == (ABORTED, "REVALIDATION_DENIED")
     assert roots(env) == (0, 1)
 
