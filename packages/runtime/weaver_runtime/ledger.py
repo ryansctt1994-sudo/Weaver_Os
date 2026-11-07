@@ -37,6 +37,7 @@ This module records evidence. It grants no authority.
 
 from __future__ import annotations
 
+import re
 import sqlite3
 import threading
 import time
@@ -79,6 +80,19 @@ class LedgerCorrupted(LedgerError):
     """The stored head disagrees with the stored entries; the ledger refuses to extend it."""
 
 
+class CommitRefused(LedgerError):
+    """A commit guard refused the append inside the commit transaction.
+
+    Raised before anything is written, so the append does not happen and the head
+    does not move.
+    """
+
+    def __init__(self, reason_code: str, detail: str) -> None:
+        super().__init__(f"{reason_code}: {detail}")
+        self.reason_code = reason_code
+        self.detail = detail
+
+
 class LedgerDuplicate(LedgerError):
     """An admit carried a ``unique_key`` that this store has already admitted."""
 
@@ -97,7 +111,16 @@ _SCHEMA_SQL = (
     " root TEXT PRIMARY KEY, length INTEGER NOT NULL, head TEXT NOT NULL)",
     "CREATE TABLE IF NOT EXISTS unique_keys ("
     " key TEXT PRIMARY KEY, root TEXT NOT NULL, sequence INTEGER NOT NULL)",
+    # Controls (veto, revocations) are ledger-recorded inputs to the commit guard. They are
+    # NOT part of the verified chains or the state digest: see WX-EXECUTION-GATE-1.
+    "CREATE TABLE IF NOT EXISTS controls ("
+    " name TEXT PRIMARY KEY, value TEXT NOT NULL, log_seq INTEGER NOT NULL)",
+    "CREATE TABLE IF NOT EXISTS control_log ("
+    " seq INTEGER PRIMARY KEY AUTOINCREMENT, name TEXT NOT NULL, value TEXT NOT NULL,"
+    " actor_id TEXT NOT NULL, policy_version TEXT NOT NULL, recorded_at TEXT NOT NULL)",
 )
+
+_CONTROL_NAME = re.compile(r"^[a-z][a-z0-9_:.-]{0,127}$")
 
 
 class ReceiptLedger:
@@ -193,12 +216,17 @@ class ReceiptLedger:
         actor_id: str,
         policy_version: str,
         unique_key: str | None = None,
+        guard: Callable[[Any], None] | None = None,
     ) -> Receipt:
         """Record an admitted event on the Authority Root.
 
         With ``unique_key``, the append fails with ``LedgerDuplicate`` if this store has
         already admitted that key. The check runs inside the append's own transaction, so
         it holds across every ``ReceiptLedger`` instance and process sharing the store.
+
+        With ``guard``, the callable receives the open connection after ``BEGIN IMMEDIATE``
+        and before anything is written. It reads ledger-recorded state in the same
+        serialized transaction. Raising ``CommitRefused`` rolls back and refuses the append.
         """
         if unique_key is not None and (not isinstance(unique_key, str) or not unique_key):
             raise AdmissionError("unique_key must be a non-empty string")
@@ -211,7 +239,57 @@ class ReceiptLedger:
             admissibility="ADMITTED",
             reason_code=None,
             unique_key=unique_key,
+            guard=guard,
         )
+
+    def set_control(
+        self, name: str, value: str, *, actor_id: str, policy_version: str
+    ) -> int:
+        """Record a control value (for example the veto) in the serialized store.
+
+        Every change is appended to ``control_log``. The write takes the same
+        ``BEGIN IMMEDIATE`` lock as a commit, so a control change and a commit cannot
+        interleave: one is ordered before the other. Returns the control-log sequence.
+
+        Controls are not part of the verified chains or the state digest.
+        """
+        if not isinstance(name, str) or not _CONTROL_NAME.match(name):
+            raise AdmissionError("control name must be a lowercase identifier")
+        if not isinstance(value, str) or not value or len(value) > 64:
+            raise AdmissionError(
+                "control value must be a non-empty string of at most 64 characters"
+            )
+        if not isinstance(actor_id, str) or not actor_id:
+            raise AdmissionError("actor_id must be a non-empty string")
+        with self._lock:
+            self._begin()
+            try:
+                cursor = self._conn.execute(
+                    "INSERT INTO control_log (name, value, actor_id, policy_version, recorded_at)"
+                    " VALUES (?, ?, ?, ?, ?)",
+                    (name, value, actor_id, policy_version, self._clock()),
+                )
+                seq = cursor.lastrowid
+                self._conn.execute(
+                    "INSERT INTO controls (name, value, log_seq) VALUES (?, ?, ?)"
+                    " ON CONFLICT(name) DO UPDATE SET value = excluded.value,"
+                    " log_seq = excluded.log_seq",
+                    (name, value, seq),
+                )
+                self._conn.execute("COMMIT")
+            except BaseException:
+                self._conn.execute("ROLLBACK")
+                raise
+        assert seq is not None
+        return int(seq)
+
+    def control(self, name: str) -> str | None:
+        """Current value of a control, or ``None`` if it was never set."""
+        with self._lock:
+            row = self._conn.execute(
+                "SELECT value FROM controls WHERE name = ?", (name,)
+            ).fetchone()
+        return None if row is None else str(row[0])
 
     def reject(
         self,
@@ -245,6 +323,7 @@ class ReceiptLedger:
         admissibility: str,
         reason_code: str | None,
         unique_key: str | None = None,
+        guard: Callable[[Any], None] | None = None,
     ) -> Receipt:
         if not isinstance(event, Mapping):
             raise AdmissionError("event content must be a JSON object")
@@ -258,6 +337,8 @@ class ReceiptLedger:
             self._begin()
             try:
                 head = self._checked_head(root)
+                if guard is not None:
+                    guard(self._conn)
                 try:
                     receipt = build(
                         ledger_id=self._ledger_id,
