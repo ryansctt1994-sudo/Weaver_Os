@@ -106,36 +106,92 @@ class LuciferLatchTwin:
     def run(
         self, cycles: int, *, rst_n: int, trigger_in: int, threat_level: int
     ) -> LatchOutputs:
-        """Advance ``cycles`` edges with constant inputs.
+        """Advance ``cycles`` edges with constant inputs; see ``run_traced``."""
+        return self.run_traced(
+            cycles, rst_n=rst_n, trigger_in=trigger_in, threat_level=threat_level
+        )[0]
+
+    def run_traced(
+        self, cycles: int, *, rst_n: int, trigger_in: int, threat_level: int, checksum: int = 0
+    ) -> tuple[LatchOutputs, int]:
+        """Advance ``cycles`` edges with constant inputs and fold every edge's outputs.
+
+        Returns the outputs after the last edge and the running ``segment_checksum``
+        (see ``fold``), so per-cycle behaviour inside a segment is compared too, not
+        only its last cycle.
 
         Two cases are skipped ahead exactly, because each edge in them changes only the
-        blink counter: TRIGGERED with reset high, and ARMED with neither arming
-        condition. Everything else is stepped edge by edge. ``tests/hardware`` checks
-        that the skip-ahead matches plain stepping.
+        blink counter and leaves every output fixed: TRIGGERED with reset high, and
+        ARMED with neither arming condition. The checksum for those edges is computed
+        in closed form. Everything else is stepped edge by edge. ``tests/hardware``
+        checks that the skip-ahead matches plain stepping, checksum included.
         """
         if not isinstance(cycles, int) or cycles < 1:
             raise ValueError("cycles must be a positive integer")
         self._check_inputs(rst_n, trigger_in, threat_level)
         remaining = cycles
+        acc = checksum
         while remaining:
             idle_armed = (
                 self.current_state == STATE_ARMED
                 and not trigger_in
                 and threat_level < THREAT_THRESHOLD
             )
-            if rst_n and (self.current_state == STATE_TRIGGERED or idle_armed) and remaining > 1:
-                self.step(rst_n=rst_n, trigger_in=trigger_in, threat_level=threat_level)
-                remaining -= 1
-                self.blink_counter = (self.blink_counter + remaining) & BLINK_MASK
-                return self.outputs()
-            self.step(rst_n=rst_n, trigger_in=trigger_in, threat_level=threat_level)
+            constant = rst_n and (self.current_state == STATE_TRIGGERED or idle_armed)
+            out = self.step(rst_n=rst_n, trigger_in=trigger_in, threat_level=threat_level)
+            acc = fold(acc, sample(out))
             remaining -= 1
-        return self.outputs()
+            if constant and remaining:
+                self.blink_counter = (self.blink_counter + remaining) & BLINK_MASK
+                acc = fold_repeated(acc, sample(out), remaining)
+                remaining = 0
+        return self.outputs(), acc
 
     def run_stepwise(
         self, cycles: int, *, rst_n: int, trigger_in: int, threat_level: int
     ) -> LatchOutputs:
         """Reference path with no skip-ahead, for equivalence tests."""
+        return self.run_stepwise_traced(
+            cycles, rst_n=rst_n, trigger_in=trigger_in, threat_level=threat_level
+        )[0]
+
+    def run_stepwise_traced(
+        self, cycles: int, *, rst_n: int, trigger_in: int, threat_level: int, checksum: int = 0
+    ) -> tuple[LatchOutputs, int]:
+        acc = checksum
         for _ in range(cycles):
-            self.step(rst_n=rst_n, trigger_in=trigger_in, threat_level=threat_level)
-        return self.outputs()
+            out = self.step(rst_n=rst_n, trigger_in=trigger_in, threat_level=threat_level)
+            acc = fold(acc, sample(out))
+        return self.outputs(), acc
+
+
+# --- per-cycle checksum, shared with tb_lucifer_latch_vectors.v -----------------
+
+CHECKSUM_MULTIPLIER = 31
+CHECKSUM_MASK = 0xFFFFFFFF
+
+
+def sample(out: LatchOutputs) -> int:
+    """One edge's outputs as {state[1:0], latch, veto, led} + 1 (the +1 keeps zeros visible)."""
+    return ((out.state << 3) | (out.latch_state << 2) | (out.veto_signal << 1) | out.status_led) + 1
+
+
+def fold(acc: int, value: int) -> int:
+    """acc * 31 + value, modulo 2**32. The testbench computes the same thing in Verilog."""
+    return (acc * CHECKSUM_MULTIPLIER + value) & CHECKSUM_MASK
+
+
+def _geometric(count: int) -> int:
+    """sum(31**i for i in range(count)) modulo 2**32, in O(log count) steps."""
+    if count == 0:
+        return 0
+    if count % 2:
+        return (1 + CHECKSUM_MULTIPLIER * _geometric(count - 1)) & CHECKSUM_MASK
+    half = _geometric(count // 2)
+    return (half * (1 + pow(CHECKSUM_MULTIPLIER, count // 2, 1 << 32))) & CHECKSUM_MASK
+
+
+def fold_repeated(acc: int, value: int, count: int) -> int:
+    """``fold`` applied ``count`` times with the same value, in closed form."""
+    scaled = acc * pow(CHECKSUM_MULTIPLIER, count, 1 << 32)
+    return (scaled + value * _geometric(count)) & CHECKSUM_MASK

@@ -109,6 +109,11 @@ root check. All 14 mutations in the tool, the 6 existing ones and the 8 new ones
   profile is blocked on Lumen-Nexus #13. Until both exist, `C-RCPT-001` stays OPEN, and nothing
   here is above R2[self].
 - **Signatures.** Receipts carry integrity digests, not signatures.
+- **Storage assumptions.** The single-owner guarantee covers writers that go through `ReceiptLedger`.
+  A process writing the SQLite file directly bypasses it. The head guard catches some such edits, and
+  the verifier catches the rest only against an external anchor. Concurrency relies on SQLite's file
+  locking and WAL shared memory, so the store must be on a local file system (SQLite documents that
+  WAL does not work over network file systems). Network file systems are not tested.
 - **External anchoring.** The ledger produces anchors, but no external append-only store or
   witness set holds them yet.
 - **Retiring the old Chronicles.** `chronicle/` in this repository still defers to the RC1 witness

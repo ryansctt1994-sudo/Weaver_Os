@@ -7,7 +7,7 @@ this domain may import only `contracts`.
 |---|---|---|---|
 | `weaver_runtime.ledger` | `ReceiptLedger`: single-owner, SQLite-backed Dual Ledger (Lumen-Nexus ADR-0006, accepted by GD-0002) | [`WX-RECEIPT-LEDGER-1`](../../governance/specs/WX-RECEIPT-LEDGER-1.md) | R2[self] |
 | `weaver_runtime.gate` | `ExecutionGate`: Observe, Authorize, Reserve, Execute, Revalidate, then Commit or safe-abort; one receipt per call | [`WX-EXECUTION-GATE-1`](../../governance/specs/WX-EXECUTION-GATE-1.md) | R2[self] |
-| `weaver_runtime.veto` | `LuciferLatchTwin`: register-level model of the Lucifer Latch RTL | [`hardware/lucifer_latch/README.md`](../../hardware/lucifer_latch/README.md) | R2[self]: matches the RTL on 13.2M cycles of shared vectors (simulation only) |
+| `weaver_runtime.veto` | `LuciferLatchTwin`: register-level model of the Lucifer Latch RTL | [`hardware/lucifer_latch/README.md`](../../hardware/lucifer_latch/README.md) | R2[self]: same four outputs as the RTL on every cycle of the shared vectors (13.2M simulated cycles; per-cycle 32-bit checksum plus exact final values; simulation only) |
 | `weaver_runtime.replay_cache` | `InMemoryReplayCache` (tests and simulation only) and `SQLiteReplayCache` | `docs/triadic-controls/ARCHITECTURE.md` | R2[self]; moved from `triadic_controls/crypto/` |
 
 ```python

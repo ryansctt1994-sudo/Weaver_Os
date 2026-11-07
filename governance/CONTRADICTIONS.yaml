@@ -101,6 +101,11 @@ contradictions:
       - "TriadLedger still takes caller-supplied index and prev_hash (now checked under the lock). Migrating it onto ReceiptLedger is open."
       - "A crash mid-write can leave a torn last line, which makes the triad ledger refuse to load (fail closed, but no recovery path)."
       - "On non-POSIX platforms TriadLedger refuses to append (LedgerLockError)."
+      - >-
+        Lock trust boundary: flock serializes cooperating writers only, those that use
+        TriadLedger.append_event and the same <ledger>.lock on a file system with local flock
+        semantics. It does not stop a process that writes the ledger directly, and it breaks if the
+        lock file is deleted or replaced while in use. Network file systems are not tested.
       - "Issue a reproducible clean-clone repair receipt under an approved receipt profile (blocked on Lumen-Nexus #13)."
 
   - id: "C-DUAL-001"

@@ -25,6 +25,13 @@ Before extending a root, the ledger checks that the stored head row agrees with
 the root's last entry. That is a local guard. It does not re-verify the whole
 chain, which is the verifier's job (``weaver_verifier.ledger``).
 
+Storage assumptions: the single-owner guarantee holds for writers that go through
+``ReceiptLedger``. A process that writes the SQLite file directly bypasses it. The head
+guard catches some such edits, and the verifier catches the rest only with an external
+anchor. Serialization relies on SQLite's file locking, and WAL mode needs shared memory,
+so the store must be on a local file system: SQLite documents that WAL does not work over
+network file systems.
+
 This module records evidence. It grants no authority.
 """
 
