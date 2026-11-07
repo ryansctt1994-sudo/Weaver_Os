@@ -1,0 +1,37 @@
+name: Hardware simulation
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+
+permissions:
+  contents: read
+
+jobs:
+  lucifer-latch:
+    name: Lucifer Latch RTL (Icarus Verilog)
+    runs-on: ubuntu-24.04
+    timeout-minutes: 15
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Install Icarus Verilog
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y iverilog
+          iverilog -V 2>&1 | head -1
+
+      - name: Cathedral testbench (8 checks, carried over verbatim)
+        run: |
+          iverilog -g2012 -o /tmp/tb.vvp hardware/lucifer_latch/tb_lucifer_latch.v hardware/lucifer_latch/lucifer_latch.v
+          (cd /tmp && vvp -n tb.vvp) | tee /tmp/tb.log
+          grep -q "PASSED: 8   FAILED: 0" /tmp/tb.log
+
+      - name: Differential testbench (RTL vs Python twin, shared vectors)
+        run: |
+          iverilog -g2012 -o /tmp/tbv.vvp hardware/lucifer_latch/tb_lucifer_latch_vectors.v hardware/lucifer_latch/lucifer_latch.v
+          vvp -n /tmp/tbv.vvp +VECTORS=hardware/lucifer_latch/vectors/lucifer_latch_vectors.txt | tee /tmp/tbv.log
+          grep -q "VERDICT: RTL MATCHES TWIN ON ALL SEGMENTS" /tmp/tbv.log
