@@ -9,6 +9,7 @@ reach runtime code to append, latch, or repair anything. `tools/check_trust_doma
 | `weaver_verifier.ledger` | `verify_snapshot(snapshot, anchor=None)` for ReceiptLedger snapshots | [`WX-RECEIPT-LEDGER-1`](../../governance/specs/WX-RECEIPT-LEDGER-1.md) | R2[self] |
 | `weaver_verifier.crypto` | `CryptoVerifier`: Ed25519 envelopes, pinned-root key registry, roles, quorum, replay | `docs/triadic-controls/ARCHITECTURE.md` | R2[self]; moved from `triadic_controls/crypto/verifier.py` |
 | `weaver_verifier.claim_transition` | A1 claim-state transition rule | `docs/A1_TRANSITION_INVARIANT.md` | R2[self]; moved from `policy/claim_transition.py` |
+| `weaver_verifier.state` | Rebuilds `wx-runtime-state-1` from a verified ReceiptLedger snapshot; `wx-state-digest-1`; fresh-process CLI | [`WX-STATE-DIGEST-1`](../../governance/specs/WX-STATE-DIGEST-1.md) | R2[self]; custody and authenticity not established |
 | `weaver_verifier.pg001r` | PG-001R promotion-gate evaluator | Lumen-Nexus `governance/specs/PG-001R.md` | R2[self] here: 19-test conformance suite passes in this repository |
 
 ## Effects

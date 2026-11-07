@@ -69,3 +69,17 @@ def test_timeout_preserved(monkeypatch):
     assert receipt["returncode"] is None
     assert receipt["timed_out"]
     assert receipt["stdout"] == "partial"
+
+
+def test_deferral_stubs_import_but_refuse_implementation_symbols():
+    """The stubs' docstrings promise importing is allowed; only real symbols fail loudly."""
+    import importlib
+
+    import pytest
+
+    for name in ("kernel.reducer", "chronicle.chronicle", "receipt.verify"):
+        module = importlib.import_module(name)
+        assert module.IMPLEMENTATION_STATUS == "DEFERRED_TO_BOUND_WITNESS"
+        assert not hasattr(module, "__path__")
+        with pytest.raises(NotImplementedError):
+            module.reduce_state  # noqa: B018 - any implementation symbol

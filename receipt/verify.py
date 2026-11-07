@@ -13,6 +13,10 @@ __all__ = ["IMPLEMENTATION_STATUS", "WITNESS_ARCHIVE"]
 
 
 def __getattr__(name: str):
+    if name.startswith("__") and name.endswith("__"):
+        # Import machinery and introspection probe dunder names; they must see a
+        # normal missing attribute, or the module cannot even be imported.
+        raise AttributeError(name)
     raise NotImplementedError(
         f"receipt.verify.{name} is not implemented in the source tree; "
         "the current verification claim is bound to the RC1 witness archive"
