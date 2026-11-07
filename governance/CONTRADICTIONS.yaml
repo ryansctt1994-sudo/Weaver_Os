@@ -55,6 +55,21 @@ contradictions:
       - "Decide per canonicalizer: migrate to WX-CJSON-1 (re-pin affected digests with a recorded migration) or freeze it as a named legacy profile."
       - "No new authority-bearing code may use either legacy canonicalizer."
 
+  - id: "C-RCPT-001"
+    title: "Receipt and hash-chain semantic incompatibility (mirror)"
+    severity: "CRITICAL"
+    status: "OPEN"
+    domain: "receipt-chain"
+    source: "Lumen-Nexus governance/CONTRADICTIONS.yaml"
+    statement: "receipt.py and hashchain.py assign incompatible linkage semantics and permit caller-owned state."
+    progress:
+      - "Single-owner ReceiptLedger implemented in packages/runtime (step 3), following Lumen-Nexus ADR-0006."
+      - "Reproduced the defect class in Lumen's Chronicle: two instances on one file fork the chain."
+      - "Positive, negative, mutation-isolation, concurrency and interrupted-transaction tests in tests/ledger; 8 ledger mutations in tools/check_verifier_mutations.py, all detected."
+    remaining:
+      - "Accept ADR-0006 (a decision; it is PROPOSED in Lumen-Nexus)."
+      - "Issue a reproducible clean-clone repair receipt under an approved receipt profile (blocked on Lumen-Nexus #13)."
+
   - id: "C-DUAL-001"
     title: "Dual-steward authorization is not enforceable (mirror)"
     severity: "HIGH"

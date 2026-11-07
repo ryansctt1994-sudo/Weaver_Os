@@ -26,8 +26,14 @@ dev = [
 weaver-release-guard = "weaver_release_guard.cli:main"
 
 [tool.setuptools.packages.find]
-where = [".", "src", "packages/contracts"]
-include = ["triadic_controls*", "weaver_release_guard*", "weaver_contracts*"]
+where = [".", "src", "packages/contracts", "packages/runtime", "packages/verifier"]
+include = [
+  "triadic_controls*",
+  "weaver_release_guard*",
+  "weaver_contracts*",
+  "weaver_runtime*",
+  "weaver_verifier*",
+]
 
 [tool.setuptools.package-data]
 triadic_controls = ["schemas/*.json"]
@@ -35,7 +41,7 @@ weaver_contracts = ["vectors/*.json", "schemas/*.json"]
 
 [tool.pytest.ini_options]
 testpaths = ["tests", "weaver_auth/bedrock/tests"]
-pythonpath = [".", "src", "packages/contracts"]
+pythonpath = [".", "src", "packages/contracts", "packages/runtime", "packages/verifier"]
 
 [tool.ruff]
 line-length = 100

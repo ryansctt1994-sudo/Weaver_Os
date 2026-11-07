@@ -301,6 +301,7 @@ Portfolio state after the merge is unchanged until evidence says otherwise:
 3. **ReceiptLedger.** Merge the Chronicles into one single-owner Dual-Ledger ReceiptLedger.
    Port all 15 Cathedral adversarial cases plus Lumen's tests, then add the ADR-0006
    mutation and concurrency tests.
+   *Done: `packages/runtime` + `packages/verifier` ([WX-RECEIPT-LEDGER-1](../../governance/specs/WX-RECEIPT-LEDGER-1.md)). `C-RCPT-001` stays open pending ADR-0006 acceptance and a repair receipt.*
 4. **Verifier domain.** Move CryptoVerifier, claim transition, PG-001R, and replay verify.
    Extend the boundary checker. CI fails on cross-domain imports.
 5. **Execution gate + veto twin.** TOCTOU gate, a Python veto matching the RTL, and
