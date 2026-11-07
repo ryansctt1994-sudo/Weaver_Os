@@ -259,6 +259,53 @@ MUTATIONS = [
         "            if False:",
         "tests/gate/test_execution_gate.py::test_committed_proposal_cannot_run_again_even_after_restart",
     ),
+    # Step 7 custody (wx-checkpoint-1): prefix check, pinned keys, signatures, split
+    # view, and the witness's refusal path.
+    (
+        "custody-prefix-regressed",
+        "packages/verifier/weaver_verifier/checkpoint.py",
+        "        if len(chain) < want.length:",
+        "        if False:",
+        "tests/custody/test_acceptance.py::test_a7_truncation_after_a_signed_checkpoint_is_refused",
+    ),
+    (
+        "custody-prefix-forked",
+        "packages/verifier/weaver_verifier/checkpoint.py",
+        "        if 0 < want.length <= len(chain) and chain[want.length - 1] != want.head:",
+        "        if False:",
+        "tests/custody/test_acceptance.py"
+        "::test_a2_full_recompute_after_a_signed_checkpoint_is_refused_as_a_fork",
+    ),
+    (
+        "custody-pinned-key",
+        "packages/verifier/weaver_verifier/checkpoint.py",
+        "    if key is None:",
+        "    if False:",
+        "tests/custody/test_acceptance.py::test_a5_checkpoint_from_an_unpinned_key_is_rejected",
+    ),
+    (
+        "custody-signature",
+        "packages/verifier/weaver_verifier/checkpoint.py",
+        "        key.verify(checkpoint.signature, statement.signing_bytes())",
+        "        pass  # intentionally disabled by mutation probe",
+        "tests/custody/test_acceptance.py"
+        "::test_a6_attacker_signing_as_a_pinned_witness_fails_the_signature",
+    ),
+    (
+        "custody-split-view",
+        "packages/verifier/weaver_verifier/checkpoint.py",
+        "            if seen != head.head:",
+        "            if False:",
+        "tests/custody/test_acceptance.py::test_split_view_between_witnesses_is_refused",
+    ),
+    (
+        "witness-fork-refusal",
+        "packages/witness/weaver_witness/witness.py",
+        "            if problem is not None:",
+        "            if False:",
+        "tests/custody/test_acceptance.py"
+        "::test_a4_witness_refuses_a_forked_state_and_logs_the_refusal",
+    ),
 ]
 
 
@@ -278,6 +325,7 @@ def main() -> None:
             "tests/hardware",
             "tests/gate",
             "tests/state",
+            "tests/custody",
         ],
         cwd=root,
         capture_output=True,

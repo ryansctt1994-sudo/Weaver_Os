@@ -71,7 +71,7 @@ A fresh process on the same machine from the same checkout is **not independent 
 is also **not implementation-independent**: it runs the same `weaver_contracts.canonical` and
 `weaver_verifier.ledger` code. A bug shared by both runs would be reproduced, not caught. This is
 process-separated reproduction only. An independent check would need a second implementation of
-the canonicalizer, the chain verifier and the reducer (outline step 9, R5).
+the canonicalizer, the chain verifier and the reducer (step 10 since GD-0005 D13; outline step 9 before, R5).
 
 ## Relationship to the existing digests
 

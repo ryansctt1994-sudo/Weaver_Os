@@ -155,10 +155,24 @@ contradictions:
       verifies as ANCHOR_MATCHED (Step 6 control C8). Every report therefore states
       custody NOT_ESTABLISHED and witness W0.
     design:
-      document: "governance/specs/STEP7-EVIDENCE-CUSTODY.md (DRAFT, GD-0003 D10)"
+      document: "governance/specs/STEP7-EVIDENCE-CUSTODY.md (implemented with a simulated witness, GD-0005 D14)"
       mechanism: "Witness-signed checkpoints with append-only, fork-refusing witnesses and pinned witness keys."
       blocker: "An independently controlled witness is a second party. The repository cannot supply one. Same organizational blocker as C-DUAL-001."
-      acceptance_tests: "A1-A8 in the design document; none implemented."
+      acceptance_tests: "A1-A8 implemented in tests/custody/test_acceptance.py; run only with witnesses simulated by the test harness."
+    progress:
+      - >-
+        GD-0005 D14: wx-checkpoint-1 (weaver_contracts.checkpoint), custody_report with pinned keys,
+        split-view and prefix checks (weaver_verifier.checkpoint), and a reference witness in a new
+        `witness` trust domain (weaver_witness). Six mutations in tools/check_verifier_mutations.py,
+        all detected (the pinned-key one by a crash).
+      - >-
+        There is no WITNESSED status. A consistent result is CHECKPOINT_CONSISTENT with a corroboration
+        count and independence NOT_ESTABLISHED, because code cannot establish who holds the keys.
+    remaining:
+      - "An independently controlled witness (second party). Until then everything here is W0."
+      - "Fetching checkpoints from at least two channels the operator does not control."
+      - "Key rotation procedure (STEP7 'Custody rules')."
+      - "Publication cadence: getting checkpoints from witnesses to verifiers is not implemented."
       comparison_and_disagreement_rules: "Proposed in the design document under 'Custody rules (proposed)'. Not implemented, not witnessed."
     required_disposition:
       - "Implement the witness checkpoint design and meet acceptance tests A1-A8."

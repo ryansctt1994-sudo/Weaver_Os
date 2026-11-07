@@ -23,6 +23,7 @@ Each directory directly under `packages/` is a trust domain:
 | `contracts` | nothing in the project | schemas, frozen dataclasses, canonicalization profile |
 | `runtime` | `contracts` | ReceiptLedger, replay cache, execution gate (stateful) |
 | `verifier` | `contracts` | PG-001R, CryptoVerifier, claim transition, replay verify (read-only) |
+| `witness` | `contracts`, `verifier` | reference wx-checkpoint-1 witness: signs checkpoints with its own key (added by GD-0005 D14) |
 | `learning` | `contracts`, `runtime` | continual-learning pipeline; promotion goes through `verifier` decisions passed in as data |
 | `release_guard` | `contracts` | SLSA / OIDC provenance |
 | `adapters` | `contracts` | FreeLattice, provider mesh, skill manifests: may only build proposals |
@@ -54,6 +55,16 @@ as soon as the first package moves in (outline step 2).
 Verification must stay read-only. If the verifier can reach the ledger's code, it can
 mutate the ledger. This is the same reasoning as Nexus's checker and ADR-0006's
 "verification remains read-only and cannot latch, execute, or repair the ledger".
+
+## Why `witness` may import `verifier` but not `runtime`
+
+Added by [GD-0005](../decisions/GD-0005.md) D14 for Step 7. A witness has to check what it
+signs, so it uses the verifier's read-only snapshot and prefix checks. It must never be able
+to reach the operator's ledger code: a witness that can write the ledger it attests to is not a
+witness. It is not a no-I/O domain, because it keeps its own append-only log.
+
+The code location says nothing about who runs it. A witness is independent only if someone
+the operator does not control holds its key and its log, and this checker cannot see that.
 
 ## Why `learning` may import `runtime` but not `verifier`
 
