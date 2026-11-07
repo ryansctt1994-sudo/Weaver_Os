@@ -160,6 +160,34 @@ MUTATIONS = [
         "            self.status_led = 1\n            self.latch_state = trigger_in",
         "tests/hardware/test_veto_twin.py::test_triggered_is_irreversible_without_reset",
     ),
+    (
+        "gate-revalidate-live",
+        "packages/runtime/weaver_runtime/gate.py",
+        '                self._check_live(expires_at, stage="REVALIDATE")',
+        "                pass",
+        "tests/gate/test_execution_gate.py::test_veto_tripping_during_execution_aborts_before_commit",
+    ),
+    (
+        "gate-reauthorize",
+        "packages/runtime/weaver_runtime/gate.py",
+        "            if isinstance(again, str) or not again.allowed:",
+        "            if isinstance(again, str):",
+        "tests/gate/test_execution_gate.py::test_revocation_between_authorize_and_commit_aborts[REVOKED]",
+    ),
+    (
+        "gate-evaluating-is-veto",
+        "packages/runtime/weaver_runtime/gate.py",
+        "return self._twin.current_state != STATE_ARMED or self._twin.veto_signal == 1",
+        "return self._twin.veto_signal == 1",
+        "tests/gate/test_execution_gate.py::test_observe_comes_before_authorize",
+    ),
+    (
+        "gate-replay-guard",
+        "packages/runtime/weaver_runtime/gate.py",
+        "            if proposal.proposal_id in self._committed:",
+        "            if False:",
+        "tests/gate/test_execution_gate.py::test_committed_proposal_cannot_run_again_even_after_restart",
+    ),
 ]
 
 
@@ -177,6 +205,7 @@ def main() -> None:
             "tests/triadic_controls",
             "tests/test_triad_ledger_concurrency.py",
             "tests/hardware",
+            "tests/gate",
         ],
         cwd=root,
         capture_output=True,
