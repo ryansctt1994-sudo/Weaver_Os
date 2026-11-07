@@ -4,8 +4,9 @@
 **Evidence:** R2[self] (implementation plus origin-controlled tests in this repository)
 **Authority:** O0
 **Outline step:** 3 (§5.2)
-**Implements:** Lumen-Nexus ADR-0006 "Single-Owner ReceiptLedger". That ADR is still
-**PROPOSED** in Lumen-Nexus. Accepting it is a separate decision (see "What is still open").
+**Implements:** Lumen-Nexus ADR-0006 "Single-Owner ReceiptLedger", **accepted for this
+repository by [GD-0002](../decisions/GD-0002.md)** (single steward). It is still PROPOSED in
+Lumen-Nexus itself.
 
 ## Why
 
@@ -102,8 +103,7 @@ root check. All 14 mutations in the tool, the 6 existing ones and the 8 new ones
 
 ## What is still open
 
-- **ADR-0006 acceptance.** The ADR lives in Lumen-Nexus with status PROPOSED. This
-  implementation does not accept it.
+- **ADR-0006 acceptance.** Done for this repository by GD-0002. It is still PROPOSED in Lumen-Nexus.
 - **Repair receipt.** `C-RCPT-001` requires a reproducible repair receipt from a clean clone,
   bound to full source and environment hashes, under an approved receipt profile. The signed
   profile is blocked on Lumen-Nexus #13. Until both exist, `C-RCPT-001` stays OPEN, and nothing
