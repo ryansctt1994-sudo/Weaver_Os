@@ -1,0 +1,43 @@
+schema_version: "1.0"
+registry_id: "WX-CONTRADICTIONS"
+format_source: "Lumen-Nexus governance/CONTRADICTIONS.yaml"
+default_disposition: "FAIL_CLOSED"
+note: >-
+  Contradictions raised by the unified-system consolidation. Lumen-Nexus entries
+  (C-RCPT-001, C-EVID-001, C-PR006-001, C-ANCHOR-001, C-DUAL-001) stay authoritative
+  in that repository's registry until it is merged in; C-DUAL-001 is mirrored here
+  because GD-0001 depends on it.
+
+contradictions:
+  - id: "C-LADDER-001"
+    title: "Four incompatible evidence vocabularies"
+    severity: "HIGH"
+    status: "RESOLVED"
+    domain: "evidence"
+    statement: "Lumen E0-E5, Weaver E-levels, Nexus R0-R6 and triad labels were used side by side without a mapping."
+    disposition:
+      decision: "GD-0001"
+      artifact: "governance/evidence_crosswalk.json"
+      limitation: "Ratified in SINGLE_STEWARD mode while C-DUAL-001 is open."
+
+  - id: "C-STUB-001"
+    title: "Anchor repository stubs for core primitives"
+    severity: "HIGH"
+    status: "OPEN"
+    domain: "implementation"
+    statement: >-
+      canonical/canonical.py, policy/policy_gate.py, policy/signed_verifier_adapter.py and
+      compression/residual_monitor.py are TODO stubs; chronicle/, receipt/verify.py and
+      kernel/reducer.py defer to the RC1 witness archive.
+    required_disposition:
+      - "Replace with the implementations chosen in UNIFIED_SYSTEM_OUTLINE.md sections 5.1-5.5, or delete."
+      - "No stub may ship under packages/."
+
+  - id: "C-DUAL-001"
+    title: "Dual-steward authorization is not enforceable (mirror)"
+    severity: "HIGH"
+    status: "OPEN"
+    domain: "stewardship"
+    statement: "The documented Void steward has read-only repository permission."
+    source: "Lumen-Nexus governance/CONTRADICTIONS.yaml"
+    consequence: "GD-0001 was ratified in SINGLE_STEWARD mode with this limitation recorded."

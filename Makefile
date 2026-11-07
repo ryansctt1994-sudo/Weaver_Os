@@ -15,3 +15,8 @@ verify-spine:
 .PHONY: verify
 verify:
 	python -m tools.verify_all
+
+.PHONY: check-frame
+check-frame:
+	python -m tools.check_evidence_crosswalk
+	python -m tools.check_trust_domains
