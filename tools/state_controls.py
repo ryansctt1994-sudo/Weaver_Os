@@ -109,6 +109,7 @@ def _result(
 
 
 def run_controls(workdir: Path) -> list[ControlResult]:
+    workdir.mkdir(parents=True, exist_ok=True)
     honest_snapshot, honest_anchor = build_demo_ledger(workdir / "honest.db")
     attacker_snapshot, attacker_anchor = build_demo_ledger(
         workdir / "attacker.db", tampered_result=True
