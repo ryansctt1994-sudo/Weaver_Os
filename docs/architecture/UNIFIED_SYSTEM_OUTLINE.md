@@ -297,6 +297,7 @@ Portfolio state after the merge is unchanged until evidence says otherwise:
 1. **Ratify the frame.** Evidence crosswalk (§3), layout and import rules (§4), license check (§7).
    *Done: [GD-0001](../../governance/decisions/GD-0001.md), single steward, `C-DUAL-001` limitation recorded.*
 2. **Contracts first.** Canonicalization profile + test vectors, receipt schema, PG-001R contracts.
+   *Done: `packages/contracts` (WX-CJSON-1, wx-receipt-1, PG-001R contracts moved verbatim). Found `C-CANON-001`.*
 3. **ReceiptLedger.** Merge the Chronicles into one single-owner Dual-Ledger ReceiptLedger.
    Port all 15 Cathedral adversarial cases plus Lumen's tests, then add the ADR-0006
    mutation and concurrency tests.

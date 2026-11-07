@@ -18,6 +18,7 @@ dev = [
   "build>=1.2.0",
   "mypy>=1.8.0",
   "pytest>=7.0.0",
+  "rfc8785>=0.1.4",
   "ruff>=0.6.0"
 ]
 
@@ -25,20 +26,25 @@ dev = [
 weaver-release-guard = "weaver_release_guard.cli:main"
 
 [tool.setuptools.packages.find]
-where = [".", "src"]
-include = ["triadic_controls*", "weaver_release_guard*"]
+where = [".", "src", "packages/contracts"]
+include = ["triadic_controls*", "weaver_release_guard*", "weaver_contracts*"]
 
 [tool.setuptools.package-data]
 triadic_controls = ["schemas/*.json"]
+weaver_contracts = ["vectors/*.json", "schemas/*.json"]
 
 [tool.pytest.ini_options]
 testpaths = ["tests", "weaver_auth/bedrock/tests"]
-pythonpath = [".", "src"]
+pythonpath = [".", "src", "packages/contracts"]
 
 [tool.ruff]
 line-length = 100
 target-version = "py310"
 exclude = ["releases/weaver-witness-signed-rc1"]
+
+[tool.ruff.lint.per-file-ignores]
+# Moved verbatim from Lumen-Nexus; byte identity with its source manifest is tested.
+"packages/contracts/weaver_contracts/pg001r.py" = ["UP035", "UP037"]
 
 [tool.ruff.lint]
 select = ["E", "F", "I", "UP", "B"]

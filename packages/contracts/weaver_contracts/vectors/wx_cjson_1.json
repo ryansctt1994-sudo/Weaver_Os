@@ -1,0 +1,208 @@
+{
+  "profile": "WX-CJSON-1",
+  "generated_by": "WX-CJSON-1 reference, cross-checked against rfc8785 0.1.4",
+  "valid": [
+    {
+      "id": "V01-empty-object",
+      "input": "{}",
+      "canonical": "{}",
+      "sha256": "44136fa355b3678a1146ad16f7e8649e94fb4fc21fe77e8310c060f61caaff8a"
+    },
+    {
+      "id": "V02-empty-array",
+      "input": "[]",
+      "canonical": "[]",
+      "sha256": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945"
+    },
+    {
+      "id": "V03-scalars",
+      "input": "[true,false,null,0,-1,1]",
+      "canonical": "[true,false,null,0,-1,1]",
+      "sha256": "1bff0ade196f5e876d138b1c987624db0bf631c0078fcbb24a97cbb5bba2b110"
+    },
+    {
+      "id": "V04-key-order-ascii",
+      "input": "{\"b\":2,\"a\":1,\"c\":{\"z\":0,\"y\":[]}}",
+      "canonical": "{\"a\":1,\"b\":2,\"c\":{\"y\":[],\"z\":0}}",
+      "sha256": "8ac18dee67259a4c8eab9d4551e589bb01a608604045bf5009107e305b4fa06c"
+    },
+    {
+      "id": "V05-whitespace-removed",
+      "input": " { \"a\" : [ 1 , 2 ] ,\n \"b\" : \"x\" } ",
+      "canonical": "{\"a\":[1,2],\"b\":\"x\"}",
+      "sha256": "d0f56dda38d34376527524ddd98f7ec117d5cbfb240f86e11bfb9d2d01a717d9"
+    },
+    {
+      "id": "V06-escapes",
+      "input": "\"quote\\\" backslash\\\\ nl\\n tab\\t cr\\r bs\\b ff\\f\"",
+      "canonical": "\"quote\\\" backslash\\\\ nl\\n tab\\t cr\\r bs\\b ff\\f\"",
+      "sha256": "01431f9cc01f80d8813a8c2dd7628153003d8c1867d1e9580b2b3b9e716c4fb7"
+    },
+    {
+      "id": "V07-control-chars",
+      "input": "\"\\u0000\\u001f\\u0007\"",
+      "canonical": "\"\\u0000\\u001f\\u0007\"",
+      "sha256": "5e1ef3e383f9194999df3aa0c9e764f7decef75cd5e11cbf770fa5895db2a8fc"
+    },
+    {
+      "id": "V08-solidus-not-escaped",
+      "input": "\"a/b\\/c\"",
+      "canonical": "\"a/b/c\"",
+      "sha256": "96a51dd2414a58ec2b74a4be98c5a509810d0551063b1e77cb8bfb2f85594bc9"
+    },
+    {
+      "id": "V09-unicode-literal",
+      "input": "\"\\u00e9 é € \\ud83d\\ude00\"",
+      "canonical": "\"é é € 😀\"",
+      "sha256": "7378e457966e20a657f9f8883c3a967dde84c8f9dca35d582c8979b75cafc2a2"
+    },
+    {
+      "id": "V10-u2028-literal",
+      "input": "\"\\u2028\\u2029\"",
+      "canonical": "\"  \"",
+      "sha256": "e3a0e2262ac7790f4df36b522a8fbdd4ee3370d568eb15dc25c5f1775f14ed6c"
+    },
+    {
+      "id": "V11-del-literal",
+      "input": "\"\\u007f\"",
+      "canonical": "\"\"",
+      "sha256": "6fe76740e12a93d5598fe685cb6ad3d3c94e44609065a56866b69647772026ec"
+    },
+    {
+      "id": "V12-key-order-utf16",
+      "input": "{\"\\ue000\":1,\"\\ud83d\\ude00\":2,\"a\":3}",
+      "canonical": "{\"a\":3,\"😀\":2,\"\":1}",
+      "sha256": "84495633024b0992798250783e7ccb01ab2875649ab22f353f14c0d6a8389fc2"
+    },
+    {
+      "id": "V13-key-order-latin1",
+      "input": "{\"\\u00e9\":1,\"z\":2,\"\\u00c0\":3}",
+      "canonical": "{\"z\":2,\"À\":3,\"é\":1}",
+      "sha256": "f7f05b656d8b08af7eb7416370b6251db0be8a2189b22ad03362d4b9e35d0b75"
+    },
+    {
+      "id": "V14-max-safe-int",
+      "input": "[9007199254740991,-9007199254740991]",
+      "canonical": "[9007199254740991,-9007199254740991]",
+      "sha256": "84bad60c1793654a7cdca854230af90af531ecc8f7656e2c7b2bd91890017b37"
+    },
+    {
+      "id": "V15-nested",
+      "input": "{\"a\":{\"b\":{\"c\":[{\"d\":null}]}}}",
+      "canonical": "{\"a\":{\"b\":{\"c\":[{\"d\":null}]}}}",
+      "sha256": "66a1ee3648dadd40c9de5e24696e1736679addf5b054bcbe475a28a395d78050"
+    },
+    {
+      "id": "V16-escaped-key",
+      "input": "{\"a\\nb\":1,\"a\":2}",
+      "canonical": "{\"a\":2,\"a\\nb\":1}",
+      "sha256": "c22faab0bf7d3c86a8d1ee93296c8ec6be3c9d0e4aa181394d4c899dad822a95"
+    },
+    {
+      "id": "V17-unicode-escape-equivalence",
+      "input": "\"\\u0041\\u00df\"",
+      "canonical": "\"Aß\"",
+      "sha256": "8e28744e14304b8878b07fba91d500610cff670a5dc7baee22d68ba1c02fcdc1"
+    },
+    {
+      "id": "V18-negative-zero-int",
+      "input": "-0",
+      "canonical": "0",
+      "sha256": "5feceb66ffc86f38d952786c6d696c79c2dbc239dd4e91b46729d73a27fb57e9"
+    },
+    {
+      "id": "V19-receipt-shaped",
+      "input": "{\"sequence\":0,\"root\":\"AUTHORITY\",\"event_digest\":\"abababababababababababababababababababababababababababababababab\",\"actor_id\":\"op-1\"}",
+      "canonical": "{\"actor_id\":\"op-1\",\"event_digest\":\"abababababababababababababababababababababababababababababababab\",\"root\":\"AUTHORITY\",\"sequence\":0}",
+      "sha256": "a2833e1a16453894c6dc5ab8128e851c28ae7639df4cc372157fe66745209927"
+    }
+  ],
+  "reject": [
+    {
+      "id": "X01-float",
+      "input_hex": "312e35",
+      "reason_contains": "float"
+    },
+    {
+      "id": "X02-float-integral",
+      "input_hex": "312e30",
+      "reason_contains": "float"
+    },
+    {
+      "id": "X03-exponent",
+      "input_hex": "316533",
+      "reason_contains": "float"
+    },
+    {
+      "id": "X04-nan",
+      "input_hex": "4e614e",
+      "reason_contains": "non-finite"
+    },
+    {
+      "id": "X05-infinity",
+      "input_hex": "5b496e66696e6974795d",
+      "reason_contains": "non-finite"
+    },
+    {
+      "id": "X06-duplicate-key",
+      "input_hex": "7b2261223a312c2261223a327d",
+      "reason_contains": "duplicate"
+    },
+    {
+      "id": "X07-bom",
+      "input_hex": "efbbbf7b7d",
+      "reason_contains": "byte-order"
+    },
+    {
+      "id": "X08-invalid-utf8",
+      "input_hex": "22ff22",
+      "reason_contains": "UTF-8"
+    },
+    {
+      "id": "X09-lone-surrogate",
+      "input_hex": "225c756438303022",
+      "reason_contains": "surrogate"
+    },
+    {
+      "id": "X10-int-over-safe",
+      "input_hex": "39303037313939323534373430393932",
+      "reason_contains": "safe range"
+    },
+    {
+      "id": "X11-int-under-safe",
+      "input_hex": "2d39303037313939323534373430393932",
+      "reason_contains": "safe range"
+    },
+    {
+      "id": "X12-trailing-data",
+      "input_hex": "7b7d207b7d",
+      "reason_contains": "invalid JSON"
+    },
+    {
+      "id": "X13-not-json",
+      "input_hex": "7b613a317d",
+      "reason_contains": "invalid JSON"
+    },
+    {
+      "id": "X14-dup-key-nested",
+      "input_hex": "7b2278223a7b226b223a312c226b223a317d7d",
+      "reason_contains": "duplicate"
+    }
+  ],
+  "divergence": {
+    "triadic_controls.canonicalize_json": [
+      "V12-key-order-utf16"
+    ],
+    "tools.spine_hash.canonical": [
+      "V09-unicode-literal",
+      "V10-u2028-literal",
+      "V11-del-literal",
+      "V12-key-order-utf16",
+      "V13-key-order-latin1",
+      "V17-unicode-escape-equivalence"
+    ],
+    "tools.mathos_bench.mathos_bench_v0_1.canonical_json": [
+      "V12-key-order-utf16"
+    ]
+  }
+}
