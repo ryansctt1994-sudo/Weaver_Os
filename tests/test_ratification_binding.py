@@ -7,7 +7,6 @@ import json
 
 from tools.check_ratification_binding import check_binding, check_repository
 
-
 GOOD = {
     "status": "RATIFIED",
     "ratification": {
@@ -44,11 +43,15 @@ def test_missing_decision_is_not_ratification():
 
 
 def test_mismatched_decision_identifier():
-    assert "Decision ID" in " ".join(_errors(lambda d: d["ratification"].update(decision_id="GD-0002")))
+    assert "Decision ID" in " ".join(
+        _errors(lambda d: d["ratification"].update(decision_id="GD-0002"))
+    )
 
 
 def test_invalid_decision_id_cannot_escape_directory():
-    assert "GD-NNNN" in " ".join(_errors(lambda d: d["ratification"].update(decision_id="../other")))
+    assert "GD-NNNN" in " ".join(
+        _errors(lambda d: d["ratification"].update(decision_id="../other"))
+    )
 
 
 def test_different_ratification_date_is_rejected():
@@ -60,7 +63,9 @@ def test_different_ratification_mode_is_rejected():
 
 
 def test_missing_named_signatory_is_rejected():
-    assert "does not name steward" in " ".join(_errors(lambda d: d["ratification"].update(ratified_by=["other-user"])))
+    assert "does not name steward" in " ".join(
+        _errors(lambda d: d["ratification"].update(ratified_by=["other-user"]))
+    )
 
 
 def test_single_steward_decision_without_limit_is_rejected():
@@ -68,11 +73,15 @@ def test_single_steward_decision_without_limit_is_rejected():
 
 
 def test_cannot_invent_witness_rung_without_policy_revision():
-    assert "only W0" in " ".join(_errors(lambda d: d["orthogonal_axes"][0]["defined_levels"].append({"level": "W1"})))
+    assert "only W0" in " ".join(
+        _errors(lambda d: d["orthogonal_axes"][0]["defined_levels"].append({"level": "W1"}))
+    )
 
 
 def test_cannot_invent_operational_authority_rung():
-    assert "only O0" in " ".join(_errors(lambda d: d["orthogonal_axes"][1]["defined_levels"].append({"level": "O1"})))
+    assert "only O0" in " ".join(
+        _errors(lambda d: d["orthogonal_axes"][1]["defined_levels"].append({"level": "O1"}))
+    )
 
 
 def test_missing_or_duplicated_axis_rejected():
