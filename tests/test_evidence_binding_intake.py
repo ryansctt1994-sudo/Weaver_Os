@@ -40,7 +40,11 @@ def record_fixture(tmp_path):
 def _run(root: Path, record: Path) -> int:
     with (
         patch.object(audit, "ROOT", root),
-        patch.object(subprocess, "run", return_value=subprocess.CompletedProcess(["git"], 0, "", "")),
+        patch.object(
+            subprocess,
+            "run",
+            return_value=subprocess.CompletedProcess(["git"], 0, "", ""),
+        ),
     ):
         return audit.main([str(record)])
 
