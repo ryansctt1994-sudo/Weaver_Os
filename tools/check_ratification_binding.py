@@ -38,7 +38,7 @@ def check_binding(doc: Any, decision_text: str | None) -> list[str]:
         errors.append("orthogonal_axes must contain exactly W and O")
     else:
         ids = [axis.get("id") if isinstance(axis, dict) else None for axis in axes]
-        if set(ids) != {"W", "O"} or len(set(ids)) != 2:
+        if any(not isinstance(identifier, str) for identifier in ids) or set(ids) != {"W", "O"}:
             errors.append("orthogonal_axes must contain unique W and O axes")
         else:
             for axis in axes:
