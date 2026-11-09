@@ -56,7 +56,9 @@ def _record_source(path: Path) -> tuple[str, bool, dict[str, str]]:
     if not isinstance(document, dict) or not isinstance(document.get("source"), dict):
         raise ValueError("missing evidence source object")
     source = document["source"]
-    commit, clean, files = source.get("commit"), source.get("tree_clean"), source.get("files_sha256")
+    commit = source.get("commit")
+    clean = source.get("tree_clean")
+    files = source.get("files_sha256")
     if not isinstance(commit, str) or _COMMIT.fullmatch(commit) is None:
         raise ValueError("invalid source commit identity")
     if type(clean) is not bool:
