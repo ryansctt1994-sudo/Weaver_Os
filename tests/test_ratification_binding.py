@@ -5,7 +5,7 @@ from __future__ import annotations
 import copy
 import json
 
-from tools.check_ratification_binding import check_binding, check_repository
+from tools.check_ratification_binding import check_binding, check_repository, main
 
 GOOD = {
     "status": "RATIFIED",
@@ -94,3 +94,15 @@ def test_repo_check_reports_missing_decision(tmp_path):
     (root / "governance").mkdir()
     (root / "governance/evidence_crosswalk.json").write_text(json.dumps(GOOD), encoding="utf-8")
     assert any("missing or unreadable" in error for error in check_repository(root))
+
+
+def test_committed_crosswalk_and_gd0001_are_consistent():
+    # Exercise actual repository files, not only hand-written positive fixtures.
+    assert check_repository() == []
+    assert main([]) == 0
+
+
+def test_malformed_axis_identifier_is_a_negative_verdict_not_a_crash():
+    doc = copy.deepcopy(GOOD)
+    doc["orthogonal_axes"][0]["id"] = ["W"]
+    assert "unique W and O" in " ".join(check_binding(doc, DECISION))
