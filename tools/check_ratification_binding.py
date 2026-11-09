@@ -15,7 +15,8 @@ import sys
 from pathlib import Path
 from typing import Any
 
-from tools.check_evidence_crosswalk import ROOT, check as check_crosswalk
+from tools.check_evidence_crosswalk import ROOT
+from tools.check_evidence_crosswalk import check as check_crosswalk
 
 ID_RE = re.compile(r"GD-[0-9]{4}\Z")
 
@@ -49,7 +50,9 @@ def check_binding(doc: Any, decision_text: str | None) -> list[str]:
                     or not isinstance(levels[0], dict)
                     or levels[0].get("level") != expected
                 ):
-                    errors.append(f"{axis['id']}: only {expected} is currently defined (GD-0001 D2)")
+                    errors.append(
+                        f"{axis['id']}: only {expected} is currently defined (GD-0001 D2)"
+                    )
 
     if doc.get("status") != "RATIFIED":
         return errors
@@ -99,7 +102,11 @@ def check_repository(root: Path = ROOT) -> list[str]:
     decision_text = None
     rat = doc.get("ratification")
     decision_id = rat.get("decision_id") if isinstance(rat, dict) else None
-    if doc.get("status") == "RATIFIED" and isinstance(decision_id, str) and ID_RE.fullmatch(decision_id):
+    if (
+        doc.get("status") == "RATIFIED"
+        and isinstance(decision_id, str)
+        and ID_RE.fullmatch(decision_id)
+    ):
         path = root / "governance" / "decisions" / f"{decision_id}.md"
         try:
             decision_text = path.read_text(encoding="utf-8")
@@ -117,7 +124,10 @@ def main(argv: list[str] | None = None) -> int:
         print(f"FAIL: {error}")
     if errors:
         return 1
-    print("OK: ratification text and W/O axis declarations consistent; independent approval NOT verified")
+    print(
+        "OK: ratification text and W/O axis declarations consistent; "
+        "independent approval NOT verified"
+    )
     return 0
 
 
