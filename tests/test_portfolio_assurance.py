@@ -56,6 +56,19 @@ class PortfolioAssuranceTests(unittest.TestCase):
         self.doc["inventory"]["live_inventory_enforced"] = True
         self.reject(self.doc, "live inventory")
 
+    def test_co_delete_with_recount_is_rejected(self):
+        self.doc["inventory"]["repositories"].pop()
+        self.doc["inventory"]["observed_count"] -= 1
+        self.reject(self.doc, "frozen inventory count")
+
+    def test_full_length_subject_rebinding_rejected(self):
+        self.doc["subjects"][0]["commit"] = "0" * 40
+        self.reject(self.doc, "frozen subject identity")
+
+    def test_policy_claim_sha_rebinding_rejected(self):
+        self.doc["claim_register"][0]["subject_sha"] = "0" * 40
+        self.reject(self.doc, "policy source differs")
+
     def test_subject_partial_sha_rejected(self):
         self.doc["subjects"][0]["commit"] = "55bdfb9"
         self.reject(self.doc, "40-character")
