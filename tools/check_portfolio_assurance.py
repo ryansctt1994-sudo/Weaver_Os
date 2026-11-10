@@ -121,19 +121,28 @@ def check(doc: dict) -> list[str]:
             errors.append(f"{cid}: evidence and explicit limitations required")
         if c.get("disposition") in {"PASS", "INDEPENDENT", "PRODUCTION", "RATIFIED"}:
             errors.append(f"{cid}: claim promotion not admissible in candidate snapshot")
-        if c.get("kind") == "RESEARCH_HYPOTHESIS" and c.get("disposition") != "UNTESTED_AS_PORTFOLIO_WIDE_CLAIM":
+        if (c.get("kind") == "RESEARCH_HYPOTHESIS"
+                and c.get("disposition") != "UNTESTED_AS_PORTFOLIO_WIDE_CLAIM"):
             errors.append(f"{cid}: research hypothesis silently promoted")
         if c.get("kind") == "DOCUMENTED_POLICY":
             if not _SHA.fullmatch(str(c.get("subject_sha", ""))):
                 errors.append(f"{cid}: policy source SHA missing")
-        for number_field in ("reported_pass", "reported_killed", "network_states", "distinct_snapshots"):
-            if number_field in c and (not _SHA.fullmatch(str(c.get("subject_sha", ""))) or not c.get("denominator_scope")):
+        for number_field in (
+            "reported_pass", "reported_killed", "network_states", "distinct_snapshots"
+        ):
+            if number_field in c and (
+                not _SHA.fullmatch(str(c.get("subject_sha", "")))
+                or not c.get("denominator_scope")
+            ):
                 errors.append(f"{cid}: unpinned numerical metric {number_field}")
     if identifiers != {"WNS-PORT-001", "WNS-PORT-002", "WNS-PORT-003"}:
         errors.append("frozen claim set changed; require new review snapshot")
 
     gates = doc.get("gates") or []
-    if {g.get("id") for g in gates if isinstance(g, dict)} != _GATE_IDS or len(gates) != len(_GATE_IDS):
+    if (
+        {g.get("id") for g in gates if isinstance(g, dict)} != _GATE_IDS
+        or len(gates) != len(_GATE_IDS)
+    ):
         errors.append("incomplete/duplicate G0-G5 gate register")
     for g in gates:
         if not isinstance(g, dict):
@@ -147,13 +156,20 @@ def check(doc: dict) -> list[str]:
             errors.append(f"{g.get('id')}: unsigned evidence cannot auto-close gate")
 
     risks = doc.get("risk_register") or []
-    if len(risks) != len(_RISK_IDS) or {r.get("id") for r in risks if isinstance(r, dict)} != _RISK_IDS:
+    if (
+        len(risks) != len(_RISK_IDS)
+        or {r.get("id") for r in risks if isinstance(r, dict)} != _RISK_IDS
+    ):
         errors.append("critical portfolio risk entries missing")
     for risk in risks:
         if not isinstance(risk, dict):
             errors.append("invalid risk")
             continue
-        if risk.get("status") != "OPEN" or not risk.get("owner") or not risk.get("required_evidence"):
+        if (
+            risk.get("status") != "OPEN"
+            or not risk.get("owner")
+            or not risk.get("required_evidence")
+        ):
             errors.append(f"{risk.get('id')}: risk silently closed or unowned")
     falsification = doc.get("falsification") or {}
     if (falsification.get("experiment") != "AIX-001"
@@ -166,7 +182,11 @@ def check(doc: dict) -> list[str]:
     if not inv.get("rule") or not inv.get("dependencies"):
         errors.append("gate invalidation rule absent")
     for dep in inv.get("dependencies") or []:
-        if not dep.get("artifact") or not dep.get("gates") or not set(dep.get("gates", [])).issubset(_GATE_IDS):
+        if (
+            not dep.get("artifact")
+            or not dep.get("gates")
+            or not set(dep.get("gates", [])).issubset(_GATE_IDS)
+        ):
             errors.append("invalid gate dependency")
     return errors
 
@@ -184,7 +204,10 @@ def main(argv=None) -> int:
         print(f"FAIL: {error}", file=sys.stderr)
     if errors:
         return 1
-    print("PASS: candidate metadata internally consistent; NOT a witness, promotion or live-inventory check")
+    print(
+        "PASS: candidate metadata internally consistent; "
+        "NOT a witness, promotion or live-inventory check"
+    )
     return 0
 
 
