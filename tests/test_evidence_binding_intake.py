@@ -133,3 +133,14 @@ def test_dirty_record_cannot_pass_even_when_file_hash_matches(record_fixture):
     data["source"]["tree_clean"] = False
     record.write_text(json.dumps(data))
     assert _run(root, record) == 1
+
+
+def test_symlinked_parent_directory_inside_checkout_refused(record_fixture, capsys):
+    """A safe-resolving alias still violates the no-symlink source-path contract."""
+    root, source, record, data = record_fixture
+    (root / "alias").symlink_to(source.parent, target_is_directory=True)
+    digest = hashlib.sha256(source.read_bytes()).hexdigest()
+    data["source"]["files_sha256"] = {"alias/example.py": digest}
+    record.write_text(json.dumps(data), encoding="utf-8")
+    assert _run(root, record) == 1
+    assert "MATCH" not in capsys.readouterr().out
