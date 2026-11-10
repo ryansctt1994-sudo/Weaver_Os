@@ -6,12 +6,11 @@ independent witnessing, real source provenance, or the 75 remote repositories.
 from __future__ import annotations
 
 import copy
-import json
 import tempfile
 import unittest
 from pathlib import Path
 
-from tools.check_portfolio_assurance import DEFAULT, check, read, main
+from tools.check_portfolio_assurance import DEFAULT, check, main, read
 
 
 class PortfolioAssuranceTests(unittest.TestCase):
@@ -45,7 +44,8 @@ class PortfolioAssuranceTests(unittest.TestCase):
         self.reject(self.doc, "observed_count")
 
     def test_inventory_duplicate_rejected(self):
-        self.doc["inventory"]["repositories"][1] = copy.deepcopy(self.doc["inventory"]["repositories"][0])
+        entries = self.doc["inventory"]["repositories"]
+        entries[1] = copy.deepcopy(entries[0])
         self.reject(self.doc, "duplicate repository")
 
     def test_inventory_false_coverage_rejected(self):
