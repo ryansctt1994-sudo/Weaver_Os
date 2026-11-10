@@ -42,9 +42,15 @@ def _source_file(root: Path, value: str) -> Path:
         or str(rel) != value or not rel.parts
     ):
         raise ValueError(f"noncanonical or escaping source path: {value!r}")
-    target = root / value
-    if target.is_symlink() or not target.resolve(strict=False).is_relative_to(root.resolve()):
-        raise ValueError(f"symlinked or escaping source path: {value!r}")
+    target = root
+    # Check every segment, not only the final file: an in-checkout directory
+    # symlink can otherwise alias a different source path while hashes match.
+    for component in rel.parts:
+        target = target / component
+        if target.is_symlink():
+            raise ValueError(f"symlinked source path component: {value!r}")
+    if not target.resolve(strict=False).is_relative_to(root.resolve()):
+        raise ValueError(f"escaping source path: {value!r}")
     return target
 
 
