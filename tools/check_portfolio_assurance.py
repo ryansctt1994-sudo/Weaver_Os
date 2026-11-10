@@ -17,6 +17,21 @@ _SHA = re.compile(r"^[0-9a-f]{40}$")
 _REPO = re.compile(r"^ryansctt1994-sudo/[A-Za-z0-9_.-]+$")
 _GATE_IDS = {"G0", "G1", "G2", "G3", "G4", "G5"}
 _RISK_IDS = {"PORT-RISK-001", "PORT-RISK-002", "PORT-RISK-003", "PORT-RISK-004"}
+_FROZEN_INVENTORY_COUNT = 75
+_FROZEN_SUBJECTS = {
+    ("ryansctt1994-sudo/Weaver_Os", "main"):
+        "55bdfb9fce42065a0c97b3249e9887454b58a23b",
+    ("ryansctt1994-sudo/Assurance-Lab", "main"):
+        "ba10a0c3d58e9ea2663e6b73dc763bee4bc29404",
+    ("ryansctt1994-sudo/Assurance-Lab", "pull/2/head"):
+        "80dac3b6d67ca0e0305c8d27c2a073413715b002",
+    ("ryansctt1994-sudo/Weaver--Cathedral-", "main"):
+        "2d905e6771cf0e5c6fbd4e289a8044b8fdfdf674",
+    ("ryansctt1994-sudo/cathedral-verified", "main"):
+        "1c4181714b48dd9d9616a0bebbb4fef8532deff8",
+    ("ryansctt1994-sudo/Lumen-Nexus", "main"):
+        "93689d76431e796a63379a7019e4528d384a87be",
+}
 
 
 def _unique_object(pairs):
@@ -63,6 +78,8 @@ def check(doc: dict) -> list[str]:
         repos = []
     if inventory.get("observed_count") != len(repos):
         errors.append("inventory observed_count differs from entries")
+    if len(repos) != _FROZEN_INVENTORY_COUNT:
+        errors.append("frozen inventory count changed; issue new subject snapshot")
     seen = set()
     for item in repos:
         if not isinstance(item, dict):
@@ -93,6 +110,10 @@ def check(doc: dict) -> list[str]:
             errors.append("subject outside observed inventory")
     if "ryansctt1994-sudo/Weaver_Os" not in subject_repos:
         errors.append("canonical Weaver subject absent")
+    pinned = {(s.get("repository"), s.get("ref")): s.get("commit")
+              for s in subjects if isinstance(s, dict)}
+    if pinned != _FROZEN_SUBJECTS or len(subjects) != len(_FROZEN_SUBJECTS):
+        errors.append("frozen subject identity changed; issue new review snapshot")
 
     ceiling = doc.get("portfolio_ceiling") or {}
     required_ceiling = {
@@ -127,6 +148,8 @@ def check(doc: dict) -> list[str]:
         if c.get("kind") == "DOCUMENTED_POLICY":
             if not _SHA.fullmatch(str(c.get("subject_sha", ""))):
                 errors.append(f"{cid}: policy source SHA missing")
+            if c.get("subject_sha") != _FROZEN_SUBJECTS[("ryansctt1994-sudo/Weaver_Os", "main")]:
+                errors.append(f"{cid}: policy source differs from frozen Weaver subject")
         for number_field in (
             "reported_pass", "reported_killed", "network_states", "distinct_snapshots"
         ):
