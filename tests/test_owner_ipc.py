@@ -5,14 +5,17 @@ root live in tests/isolation/. Nothing here claims OS-level confinement.
 """
 from __future__ import annotations
 
+import json
 import os
 import socket
 import struct
 import sys
 
 import pytest
+from weaver_runtime import owner_ipc
 from weaver_runtime.owner_ipc import (
     MAX_FRAME_BYTES,
+    MAX_JSON_DEPTH,
     FrameError,
     UntrustedPathError,
     assert_trusted_path,
@@ -37,6 +40,57 @@ def test_frame_round_trip():
     with a, b:
         a.sendall(encode_frame({"op": "rows", "n": [1, 2, 3]}))
         assert recv_frame(b) == {"op": "rows", "n": [1, 2, 3]}
+
+
+def _nested_arrays(n):
+    return "[" * n + "]" * n
+
+
+def _nested_objects(n, leaf='"x[{]}\\"y"'):
+    # n nested objects around a leaf string that is itself full of structural characters.
+    return '{"k":' * n + leaf + "}" * n
+
+
+def test_json_nesting_depth_32_is_accepted_and_33_is_refused():
+    # The boundary is exact. Depth 32 is the deepest accepted; the 33rd open container is
+    # refused the moment it opens. Strings carrying brackets and an escaped quote sit inside
+    # the nesting to prove they do not shift where the boundary falls.
+    assert MAX_JSON_DEPTH == 32
+    assert load_strict_json(_nested_arrays(32)) == json.loads(_nested_arrays(32))
+    assert load_strict_json(_nested_objects(32))  # 32 objects around a bracket-laden string
+    with pytest.raises(FrameError, match="deeper than 32"):
+        load_strict_json(_nested_arrays(33))
+    with pytest.raises(FrameError, match="deeper than 32"):
+        load_strict_json(_nested_objects(33))
+
+
+def test_structural_characters_inside_strings_do_not_count_toward_depth():
+    # One object, whose string value holds an escaped quote followed by 40 [{ pairs. Correct
+    # escape handling keeps the whole thing at depth 1; handling that mistook \" for the end
+    # of the string would read 80 open containers and refuse a valid, shallow request.
+    payload = '{"s": "x\\"' + "[{" * 40 + '"}'
+    assert json.loads(payload) == {"s": 'x"' + "[{" * 40}  # it really is valid, shallow JSON
+    assert load_strict_json(payload) == {"s": 'x"' + "[{" * 40}
+    # A giant run of structural characters, all inside one string, is still depth 1.
+    big = '{"s": "' + "[{" * 2000 + '\\"' + "]}" * 2000 + '"}'
+    assert load_strict_json(big)["s"].startswith("[{")
+
+
+def test_a_parser_recursion_error_is_converted_to_a_frame_error(monkeypatch):
+    # Defence in depth: if any payload reached the parser and recursed, the RecursionError
+    # must come back as the same malformed-input error, never escape. The probe is shallow,
+    # so it clears the depth scan and the conversion is what is under test, not the scan.
+    real_loads = json.loads
+    probe = '{"x": 1}'
+
+    def fake_loads(text, *args, **kwargs):
+        if text == probe:
+            raise RecursionError("maximum recursion depth exceeded")
+        return real_loads(text, *args, **kwargs)
+
+    monkeypatch.setattr(owner_ipc.json, "loads", fake_loads)
+    with pytest.raises(FrameError, match="too deep for the parser"):
+        load_strict_json(probe)
 
 
 @pytest.mark.parametrize(
