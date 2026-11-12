@@ -15,6 +15,7 @@ from __future__ import annotations
 
 import argparse
 import json
+import math
 import sys
 from pathlib import Path
 from typing import Any
@@ -34,13 +35,40 @@ class VerificationError(ValueError):
     pass
 
 
+def _unique_object(pairs: list[tuple[str, Any]]) -> dict[str, Any]:
+    """Reject duplicate keys at every nesting level, before schema evaluation."""
+    obj: dict[str, Any] = {}
+    for key, value in pairs:
+        if key in obj:
+            raise ValueError(f"DUPLICATE_KEY:{key}")
+        obj[key] = value
+    return obj
+
+
+def _reject_nonfinite(token: str) -> Any:
+    """Python JSON accepts non-standard NaN/Infinity by default; refuse them."""
+    raise ValueError(f"NONFINITE_JSON_CONSTANT:{token}")
+
+
+def _finite_float(token: str) -> float:
+    value = float(token)
+    if not math.isfinite(value):
+        raise ValueError(f"NONFINITE_JSON_NUMBER:{token}")
+    return value
+
+
 def load_json(path: Path) -> Any:
     if not path.exists():
         raise VerificationError(f"MISSING_ARTIFACT:{path.name}")
     try:
-        return json.loads(path.read_text(encoding="utf-8"))
-    except json.JSONDecodeError as exc:
-        raise VerificationError(f"INVALID_JSON:{path.name}:{exc.msg}") from exc
+        return json.loads(
+            path.read_text(encoding="utf-8"),
+            object_pairs_hook=_unique_object,
+            parse_constant=_reject_nonfinite,
+            parse_float=_finite_float,
+        )
+    except (ValueError, UnicodeError) as exc:
+        raise VerificationError(f"INVALID_JSON:{path.name}:{exc}") from exc
 
 
 def compute_manifest_hash(manifest: dict[str, Any]) -> str:
