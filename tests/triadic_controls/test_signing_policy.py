@@ -2,10 +2,10 @@
 
 Two kinds of negative test live here.
 
-* Signature-verified rejection: the cross-domain, version-confusion and unknown-value tests.
-  Each envelope is signed over exactly the fields it declares, and the test asserts that the
-  signature verifies before it checks the refusal. The refusal therefore comes from the
-  allowlist, not from a bad signature.
+* Signature-verified rejection: the cross-domain, version-confusion, unknown-value and
+  correctly-signed-empty-field tests. Each envelope is signed over exactly the fields it
+  declares, and the test asserts that the signature verifies before it checks the refusal.
+  The refusal therefore comes from policy, not from a bad signature.
 * Structural rejection: the malformed-field test. Each envelope is edited after signing (a
   field deleted or replaced), so its signature no longer matches and the test says nothing
   about signatures. It shows that a missing or malformed field yields a refusal result with
@@ -344,6 +344,37 @@ def test_malformed_signing_fields_are_refused_with_a_result(signing_key, registr
             )
             assert not result.is_valid, (field, value)
             assert result.failure_codes == [MALFORMED_ENVELOPE], (field, value)
+
+
+# --- correctly signed empty fields: policy rejection, not a broken signature -----------
+
+
+@pytest.mark.parametrize(
+    "empty_field",
+    ["signing_domain", "payload_schema_version"],
+    ids=["empty-signing_domain", "empty-payload_schema_version"],
+)
+def test_correctly_signed_empty_field_is_refused_by_policy(signing_key, registry, empty_field):
+    """The empty value is set before signing, so the signature covers it and verifies.
+
+    Every other field is valid. A refusal here therefore comes from policy, not from a
+    broken signature, unlike the structural test above.
+    """
+    fields = {"signing_domain": AUTHORITY_V05, "payload_schema_version": "0.5.0"}
+    fields[empty_field] = ""
+    envelope = make_envelope(
+        signing_key,
+        payload_type="AUTHORITY_TOKEN",
+        nonce=f"n-signed-empty-{empty_field}",
+        **fields,
+    )
+    assert envelope[empty_field] == ""
+    assert _genuine(envelope, signing_key), "the signature must cover the empty value"
+    result = _verifier(registry).verify_authority_token(
+        envelope, requested_level=3, inner_payload=_payload()
+    )
+    assert result.is_valid is False
+    assert result.failure_codes == [MALFORMED_ENVELOPE]
 
 
 # --- the allowlist itself ----------------------------------------------------------
