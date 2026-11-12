@@ -541,6 +541,10 @@ def test_owner_refuses_a_data_directory_others_can_enter(dep):
     os.chmod(dep.data, 0o755)
     done = dep.refused_start()
     assert done.returncode == 2 and "mode" in done.stderr
+    # The launcher's own check must be the one that refuses. The edge-telemetry recorder
+    # also refuses a non-private directory, as a second layer; if the launcher's check were
+    # removed, that layer would still refuse and this test would pass without noticing.
+    assert "edge telemetry" not in done.stderr, done.stderr
 
 
 def test_owner_refuses_to_start_with_an_inherited_descriptor(dep):
