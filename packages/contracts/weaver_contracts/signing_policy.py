@@ -18,6 +18,7 @@ from __future__ import annotations
 
 from collections.abc import Mapping
 from types import MappingProxyType
+from typing import TypeGuard
 
 UNSUPPORTED_SIGNING_DOMAIN = "UNSUPPORTED_SIGNING_DOMAIN"
 UNSUPPORTED_PAYLOAD_SCHEMA_VERSION = "UNSUPPORTED_PAYLOAD_SCHEMA_VERSION"
@@ -42,6 +43,10 @@ SUPPORTED_SIGNING_POLICY: Mapping[str, Mapping[str, frozenset[str]]] = MappingPr
 )
 
 
+def _is_nonempty_str(value: object) -> TypeGuard[str]:
+    return isinstance(value, str) and bool(value)
+
+
 def check_signing_policy(
     payload_type: object,
     signing_domain: object,
@@ -55,9 +60,12 @@ def check_signing_policy(
     version, or version confusion) is ``UNSUPPORTED_PAYLOAD_SCHEMA_VERSION``.
     """
 
-    for value in (payload_type, signing_domain, payload_schema_version):
-        if not isinstance(value, str) or not value:
-            return MALFORMED_ENVELOPE
+    if not (
+        _is_nonempty_str(payload_type)
+        and _is_nonempty_str(signing_domain)
+        and _is_nonempty_str(payload_schema_version)
+    ):
+        return MALFORMED_ENVELOPE
     domains = SUPPORTED_SIGNING_POLICY.get(payload_type)
     if domains is None:
         return UNSUPPORTED_SIGNING_DOMAIN

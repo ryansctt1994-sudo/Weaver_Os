@@ -356,8 +356,8 @@ MUTATIONS = [
     (
         "signing-malformed-guard",
         "packages/contracts/weaver_contracts/signing_policy.py",
-        "        if not isinstance(value, str) or not value:",
-        "        if False:",
+        "    return isinstance(value, str) and bool(value)",
+        "    return True",
         "tests/triadic_controls/test_signing_policy.py"
         "::test_malformed_signing_fields_are_refused_with_a_result",
     ),
