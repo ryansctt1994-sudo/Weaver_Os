@@ -1,0 +1,49 @@
+name: v008-isolation
+
+# The V008 acceptance tests start the owner and attackers under distinct real uids, which
+# needs root. The ordinary `tests` workflow skips them, so a green run there says nothing
+# about them. This workflow runs them as root with WEAVER_REQUIRE_ISOLATION=1, which turns
+# a missing root context into a failure instead of a silent skip.
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+permissions:
+  contents: read
+
+jobs:
+  isolation:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Install package and test dependencies
+        run: |
+          python -m pip install --upgrade pip
+          python -m pip install -e ".[dev]"
+
+      - name: Isolation acceptance tests (as root, skipping is a failure)
+        run: >
+          sudo -E env "PATH=$PATH" WEAVER_REQUIRE_ISOLATION=1
+          python -m pytest -q -p no:cacheprovider tests/isolation tests/test_owner_ipc.py
+
+      - name: V008 control-removal check (as root)
+        run: >
+          sudo -E env "PATH=$PATH"
+          python -m tools.check_v008_mutations > v008-mutations.json
+
+      - name: Upload mutation report
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: v008-mutations
+          path: v008-mutations.json
+          if-no-files-found: ignore
