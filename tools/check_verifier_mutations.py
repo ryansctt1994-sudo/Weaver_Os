@@ -220,7 +220,8 @@ MUTATIONS = [
         "vertical-owner-resource-write-skipped",
         "packages/runtime/weaver_runtime/protected_write.py",
         '        conn.execute(\n            "INSERT INTO protected_kv',
-        '        return  # no protected resource effect\n        conn.execute(\n            "INSERT INTO protected_kv',
+        ('        return  # no protected resource effect\n'
+         '        conn.execute(\n            "INSERT INTO protected_kv'),
         "tests/vertical/test_protected_write.py::test_v001_valid_signed_bound_write_and_receipt",
     ),
     (
