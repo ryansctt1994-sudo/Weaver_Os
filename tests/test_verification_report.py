@@ -169,7 +169,6 @@ def test_fail_report_is_schema_valid_when_a_required_verifier_fails(schema):
     Draft202012Validator(schema).validate(report)
 
 
-
 def test_dirty_tree_cannot_claim_pass(schema):
     report = valid_report()
     report["dirty"] = True
@@ -195,5 +194,59 @@ def test_non_hex_wheel_digest_cannot_claim_pass():
 def test_unknown_top_level_field_rejected(schema):
     report = deepcopy(valid_report())
     report["authority"] = "production"
+    with pytest.raises(ValidationError):
+        Draft202012Validator(schema).validate(report)
+
+
+def test_duplicate_cannot_hide_failed_verifier():
+    report = valid_report()
+    failed = dict(report["verifiers"][0], status="FAIL", exit_code=3)
+    report["verifiers"].insert(0, failed)
+    assert not is_valid_verdict(
+        report["verifiers"], report["adversarial_results"], report["wheel_sha256"]
+    )
+
+
+@pytest.mark.parametrize(
+    "mutation", ["nonzero_step", "failed_step", "no_steps", "nonzero_verifier"]
+)
+def test_pass_label_cannot_hide_failed_execution(mutation):
+    report = valid_report()
+    item = report["verifiers"][0]
+    if mutation == "nonzero_step":
+        item["steps"][0]["exit_code"] = 3
+    elif mutation == "failed_step":
+        item["steps"][0]["status"] = "FAIL"
+    elif mutation == "no_steps":
+        item["steps"] = []
+    else:
+        item["exit_code"] = 3
+    assert not is_valid_verdict(
+        report["verifiers"], report["adversarial_results"], report["wheel_sha256"]
+    )
+
+
+def test_duplicate_adversarial_result_is_refused():
+    report = valid_report()
+    report["adversarial_results"].append(deepcopy(report["adversarial_results"][0]))
+    assert not is_valid_verdict(
+        report["verifiers"], report["adversarial_results"], report["wheel_sha256"]
+    )
+
+
+@pytest.mark.parametrize(
+    "updates",
+    [
+        {"observed_verdict": "UNEXPECTED_PASS", "exit_code": 0},
+        {"observed_verdict": "REJECT", "exit_code": 0},
+        {"observed_verdict": "REJECT", "exit_code": 1, "failure_code": ""},
+    ],
+)
+def test_adversarial_status_cannot_override_failed_rejection_evidence(schema, updates):
+    report = valid_report()
+    report["adversarial_results"][0].update(updates)
+    assert not is_valid_verdict(
+        report["verifiers"], report["adversarial_results"], report["wheel_sha256"]
+    )
     with pytest.raises(ValidationError):
         Draft202012Validator(schema).validate(report)
