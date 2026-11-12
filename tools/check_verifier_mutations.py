@@ -306,6 +306,23 @@ MUTATIONS = [
         "tests/custody/test_acceptance.py"
         "::test_a4_witness_refuses_a_forked_state_and_logs_the_refusal",
     ),
+    # WVR-009 registry rollback protection: the comparison and its wiring.
+    (
+        "registry-rollback-comparison",
+        "packages/contracts/weaver_contracts/registry_sequence.py",
+        "    if sequence < stored_sequence:",
+        "    if False:",
+        "tests/triadic_controls/test_registry_rollback.py"
+        "::test_rollback_cannot_reactivate_a_revoked_key[memory]",
+    ),
+    (
+        "registry-sequence-unwired",
+        "packages/verifier/weaver_verifier/crypto.py",
+        "            _advance_registry_sequence(key_registry, registry_sequence_store)",
+        "            pass",
+        "tests/triadic_controls/test_registry_rollback.py"
+        "::test_rollback_cannot_reactivate_a_revoked_key[sqlite]",
+    ),
 ]
 
 

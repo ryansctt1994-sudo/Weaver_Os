@@ -41,9 +41,9 @@ Constitutional rule: if a schema field is required or constraining, the runtime 
 
 | Field | Status | Runtime behavior |
 | --- | --- | --- |
-| `registry_id` | Schema enforced | Validated by production schema, not otherwise used at runtime. |
+| `registry_id` | Runtime enforced when a sequence store is supplied | Must be a non-empty string; names the trust domain whose sequence high-water mark is kept. Otherwise schema-validated only. |
 | `registry_version` | Schema enforced | Validated by production schema, not otherwise used at runtime. |
-| `registry_sequence` | Schema enforced | Validated by production schema, not yet used for monotonic registry update protection. |
+| `registry_sequence` | Runtime enforced when a sequence store is supplied | Must be an integer in [0, 2^63-1]. A root-signed registry with a lower sequence than the store's mark for its `registry_id` is refused (`REGISTRY_ROLLBACK`); the same sequence with different signed content is refused (`REGISTRY_SEQUENCE_CONFLICT`). A store requires `root_public_key_b64url`, and the mark moves only after the root signature verifies. Without a store, schema-validated only. |
 | `valid_from` | Runtime enforced | Registry is rejected before this timestamp. |
 | `valid_until` | Runtime enforced | Registry is rejected at or after this timestamp. |
 | `last_updated` | Schema enforced | Validated by production schema, not otherwise used at runtime. |
@@ -87,7 +87,13 @@ Constitutional rule: if a schema field is required or constraining, the runtime 
 
 ## Known intentional gaps
 
-1. `registry_sequence` is not yet used for monotonic registry rollback protection.
+1. `registry_sequence` rollback protection is enforced only when the caller supplies a
+   `registry_sequence_store` (`weaver_runtime.registry_sequence`). Callers that pass none keep the
+   old behaviour, and an older root-signed registry inside its window still verifies
+   (`test_known_limit_without_a_sequence_store_rollback_still_verifies`). The first registry a
+   store sees for a `registry_id` is trusted on first use. Protection covers verifiers that share
+   one store: `SQLiteRegistrySequenceStore` on one local file, or one in-memory store in one
+   process (lost on restart).
 2. `payload_schema_version` and `signing_domain` are cryptographically bound but not semantically allowlisted.
 3. `rotated_to_key_id`, `revoked_at`, and `revocation_reason` are retained for audit and future lifecycle logic but are not active policy gates.
 4. In-memory replay protection remains CI/local only. Production deployments require persistent atomic `check_and_record` semantics.
