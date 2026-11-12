@@ -21,6 +21,12 @@ same question for a proposal id alone, so a requester that lost a reply can find
 its proposal committed and get the original receipt, instead of guessing. Requests are
 served one at a time, so an ``outcome`` answer is never racing an attempt this owner is
 still executing.
+
+Deadlines: one connection may hold the owner only so long. A complete request must arrive
+within ``request_deadline`` seconds of the owner starting to read it, however its bytes are
+paced; an oversized request is refused from its 4-byte header; a reply is abandoned if the
+peer has not taken it within ``reply_deadline`` seconds. Neither deadline applies to
+execution: a complete request runs to the end.
 """
 from __future__ import annotations
 
@@ -30,6 +36,7 @@ import os
 import socket
 import stat
 import threading
+import time
 from collections.abc import Callable, Mapping
 from typing import Any
 
@@ -37,6 +44,7 @@ from weaver_contracts.gate import GateContractError, Proposal
 
 from .gate import COMMITTED as ATTEMPT_COMMITTED
 from .owner_ipc import (
+    DeadlineExceeded,
     FrameError,
     UntrustedPathError,
     assert_trusted_path,
@@ -48,6 +56,17 @@ from .owner_outcome import OutcomeError, lookup_outcome, proposal_digest
 from .protected_write import ProtectedWriteOwner
 
 _PROPOSAL_FIELDS = frozenset({"proposal_id", "actor_id", "action", "policy_version", "payload"})
+DEFAULT_DEADLINE_S = 5.0
+MAX_DEADLINE_S = 300.0
+
+
+def valid_deadline(value: Any) -> bool:
+    """A deadline is a real number of seconds in (0, MAX_DEADLINE_S]; booleans are not."""
+    return (
+        isinstance(value, (int, float))
+        and not isinstance(value, bool)
+        and 0 < value <= MAX_DEADLINE_S
+    )
 
 
 class FileVeto:
@@ -67,21 +86,28 @@ class OwnerService:
         owner: ProtectedWriteOwner,
         *,
         peers: Mapping[int, frozenset[str]],
-        io_timeout: float = 5.0,
+        request_deadline: float = DEFAULT_DEADLINE_S,
+        reply_deadline: float = DEFAULT_DEADLINE_S,
         after_commit: Callable[[], None] | None = None,
     ) -> None:
         if not peers:
             raise ValueError("peers must name at least one uid; the default is deny")
+        for name, value in (("request_deadline", request_deadline),
+                            ("reply_deadline", reply_deadline)):
+            if not valid_deadline(value):
+                raise ValueError(f"{name} must be a number of seconds in (0, {MAX_DEADLINE_S}]")
         self._path = os.fspath(socket_path)
         self._owner = owner
         self._peers = {int(uid): frozenset(actors) for uid, actors in peers.items()}
-        self._io_timeout = io_timeout
+        self._request_deadline = float(request_deadline)
+        self._reply_deadline = float(reply_deadline)
         # Fault injection only: owner_main installs this from the trusted launcher's
         # environment to kill the process after a commit and before the reply.
         self._after_commit = after_commit
         self._sock: socket.socket | None = None
         self.refused_peers = 0
         self.refused_actors = 0
+        self.deadline_cutoffs = 0
 
     def start(self) -> None:
         parent = os.path.dirname(os.path.abspath(self._path))
@@ -137,15 +163,28 @@ class OwnerService:
         if actors is None:
             self.refused_peers += 1
             return  # close without reading a byte
-        conn.settimeout(self._io_timeout)
+        # One complete request must arrive before an absolute deadline, however its bytes
+        # are paced. The deadline bounds input only: once a request is complete it executes
+        # to the end, and nothing here treats a timeout as evidence that nothing committed.
+        deadline = time.monotonic() + self._request_deadline
         try:
-            reply = self._dispatch(recv_frame(conn), actors)
+            request = recv_frame(conn, deadline=deadline)
+        except DeadlineExceeded:
+            self.deadline_cutoffs += 1
+            self._reply(conn, {"ok": False, "error": "request-deadline-exceeded"})
+            return
         except FrameError:
-            reply = {"ok": False, "error": "bad-frame"}
+            self._reply(conn, {"ok": False, "error": "bad-frame"})
+            return
         except OSError:
             return
+        self._reply(conn, self._dispatch(request, actors))
+
+    def _reply(self, conn: socket.socket, reply: dict[str, Any]) -> None:
+        # A peer that never reads its reply cannot hold the owner either. If this send is
+        # abandoned, the requester sees a lost reply (OutcomeUnknown), not a refusal.
         with contextlib.suppress(OSError, FrameError):
-            send_frame(conn, reply)
+            send_frame(conn, reply, deadline=time.monotonic() + self._reply_deadline)
 
     def _dispatch(self, request: Any, actors: frozenset[str]) -> dict[str, Any]:
         if not isinstance(request, dict) or not isinstance(request.get("op"), str):

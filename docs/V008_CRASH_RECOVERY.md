@@ -154,10 +154,11 @@ this slice, and all 26 are detected. Examples of the new ones:
 - **One owner, one request at a time.** Two owner processes on one store were exercised only in
   the two tests above (a true race and a queued original). A multi-owner deployment is not
   otherwise tested or claimed.
-- **Head-of-line blocking (availability, not integrity).** The owner serves one connection at a
-  time and waits up to 5 s for each read. A listed peer that connects and sends nothing stalls it
-  for 5 s; one that trickles a byte at a time can stall it indefinitely. No effect or receipt is
-  affected. A per-request deadline is a candidate follow-on.
+- **Head-of-line blocking (availability, not integrity): now bounded.** The owner serves one
+  connection at a time. An absolute request deadline and a reply deadline now limit how long one
+  connection can hold it, however its bytes are paced; see `docs/V008_REQUEST_DEADLINES.md`. A
+  listed peer can still delay others by queueing several connections. No effect or receipt is
+  affected either way.
 - **Outcome lookup scans the whole ledger** on each call. Fine for a research prototype, not
   for scale.
 - **Edge refusals still leave no receipt.** A request refused for its peer uid, actor id or a
