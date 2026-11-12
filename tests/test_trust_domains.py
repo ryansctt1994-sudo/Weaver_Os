@@ -70,6 +70,16 @@ def test_non_runtime_zone_import_is_rejected(tmp_path):
     assert _rules(check(tmp_path)[0]) == ["NON_RUNTIME_IMPORT"]
 
 
+def test_advisory_consolidation_tools_cannot_enter_the_runtime(tmp_path):
+    _tree(tmp_path)
+    _write(
+        tmp_path,
+        "packages/runtime/wx_runtime/bad.py",
+        "from tools.consolidation.findings import confirm_finding\n",
+    )
+    assert _rules(check(tmp_path)[0]) == ["NON_RUNTIME_IMPORT"]
+
+
 def test_unknown_domain_fails_closed(tmp_path):
     _tree(tmp_path)
     _write(tmp_path, "packages/sidecar/thing.py", "")
@@ -178,3 +188,21 @@ def test_allowlisted_legacy_canonicalizer_passes_and_stale_entry_fails(tmp_path)
     assert check(tmp_path)[0] == []
     _write(tmp_path, path, "x = 1\n")
     assert _rules(check(tmp_path)[0]) == ["STALE_ALLOWLIST"]
+
+
+# --- WF-001 fusion trust boundary ---------------------------------------------
+
+
+def test_fusion_may_only_import_contracts(tmp_path):
+    _tree(tmp_path)
+    _write(tmp_path, "packages/fusion/weaver_fusion/__init__.py", "import wx_contracts\n")
+    assert check(tmp_path)[0] == []
+    _write(tmp_path, "packages/fusion/weaver_fusion/__init__.py", "import wx_runtime\n")
+    assert _rules(check(tmp_path)[0]) == ["FORBIDDEN_DOMAIN_IMPORT"]
+
+
+def test_fusion_cannot_open_database_or_spawn_processes(tmp_path):
+    _tree(tmp_path)
+    path = "packages/fusion/weaver_fusion/__init__.py"
+    _write(tmp_path, path, "import sqlite3\nimport subprocess\n")
+    assert _rules(check(tmp_path)[0]) == ["IO_CAPABLE_IMPORT", "IO_CAPABLE_IMPORT"]

@@ -16,6 +16,16 @@ verify-spine:
 verify:
 	python -m tools.verify_all
 
+.PHONY: validate-consolidation test-hw-consolidation
+validate-consolidation:
+	python -m tools.consolidation.validate
+	python -m tools.check_trust_domains
+	python -m tools.claim_audit docs/consolidation --require-files
+	python -m pytest -q tests/consolidation
+
+test-hw-consolidation: test-hw test-hw-negative
+	python -m tools.consolidation.check_hardware
+
 .PHONY: check-frame
 check-frame:
 	python -m tools.check_evidence_crosswalk

@@ -1,0 +1,3 @@
+
+# Preserve the donor physical-measurement template bytes and packet digest.
+hardware/lucifer_latch/arty_a7/qualification/templates/physical-measurements.csv -text whitespace=cr-at-eol

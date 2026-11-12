@@ -1,0 +1,10 @@
+run_id,case_id,attempt_id,status,observed_at_utc,utc_uncertainty_s,ingress_observed,requested_pulse_ns,observed_pulse_ns,trigger_to_permit_ns,trigger_to_effect_ns,reset_assert_qualification_ns,reset_release_qualification_ns,duration_uncertainty_ns,trace_sha256,trace_sample_start,trace_sample_end,video_sha256,video_start_s,video_end_s,instrument_receipt_sha256,observer_noninterference_evidence_sha256,exploratory,notes
+,P00,,UNATTEMPTED,,,,,,,,,,,,,,,,,,,,"UNFILLED_TEMPLATE; blank measurement is unknown, never zero"
+,P01,,UNATTEMPTED,,,,,,,,,,,,,,,,,,,,"UNFILLED_TEMPLATE; blank measurement is unknown, never zero"
+,P02,,UNATTEMPTED,,,,,,,,,,,,,,,,,,,,"UNFILLED_TEMPLATE; blank measurement is unknown, never zero"
+,P03,,UNATTEMPTED,,,,,,,,,,,,,,,,,,,,"UNFILLED_TEMPLATE; blank measurement is unknown, never zero"
+,P04,,UNATTEMPTED,,,,,,,,,,,,,,,,,,,,"UNFILLED_TEMPLATE; blank measurement is unknown, never zero"
+,P05,,UNATTEMPTED,,,,,,,,,,,,,,,,,,,,"UNFILLED_TEMPLATE; blank measurement is unknown, never zero"
+,P06,,UNATTEMPTED,,,,,,,,,,,,,,,,,,,,"UNFILLED_TEMPLATE; blank measurement is unknown, never zero"
+,P07,,UNATTEMPTED,,,,,,,,,,,,,,,,,,,,"UNFILLED_TEMPLATE; blank measurement is unknown, never zero"
+,P08,,UNATTEMPTED,,,,,,,,,,,,,,,,,,,,"UNFILLED_TEMPLATE; blank measurement is unknown, never zero"

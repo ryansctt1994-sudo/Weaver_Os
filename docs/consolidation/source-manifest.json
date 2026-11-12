@@ -1,0 +1,452 @@
+{
+  "schema": "weaver-consolidation-sources-1",
+  "base_commit": "de15972b4fc29ec0a21f521ccf641946270ffcbf",
+  "fusion_commit": "bd4fa3a796cc2fcfb420942a3bba0da168cc0d70",
+  "activation": "none",
+  "authority": "O0",
+  "witness": "W0",
+  "hold": "V008 HOLD",
+  "entries": [
+    {
+      "source_repository": "https://github.com/ryansctt1994-sudo/Weaver--Cathedral-.git",
+      "source_commit": "912a388d47a9fce345163e858fe8a9f156c7ca41",
+      "source_path": "skills/governance/claim_audit/claim_audit.py",
+      "source_sha256": "16a3b888f6e9cb5988476455ee2d86e62efc64f83076b463aff2fd1ebc0bc979",
+      "target": "tools/claim_audit/claim_audit.py",
+      "disposition": "integrated-tooling",
+      "target_sha256": "8cd7978d52c4898217909ea957657a780b3b16765bc9bc1b48353c8aad103ac6"
+    },
+    {
+      "source_repository": "https://github.com/ryansctt1994-sudo/Weaver--Cathedral-.git",
+      "source_commit": "912a388d47a9fce345163e858fe8a9f156c7ca41",
+      "source_path": "skills/governance/claim_audit/inputs.schema.json",
+      "source_sha256": "b7362780ac6469d94452c24743ad2573a18af9412578b5656bea2e3efcc7b6eb",
+      "target": "tools/claim_audit/inputs.schema.json",
+      "disposition": "integrated-tooling",
+      "target_sha256": "b7362780ac6469d94452c24743ad2573a18af9412578b5656bea2e3efcc7b6eb"
+    },
+    {
+      "source_repository": "https://github.com/ryansctt1994-sudo/Weaver--Cathedral-.git",
+      "source_commit": "912a388d47a9fce345163e858fe8a9f156c7ca41",
+      "source_path": "skills/governance/claim_audit/outputs.schema.json",
+      "source_sha256": "81a541aa23a632730d97fa4f1ff0a392784ba47eca100cf5f50e00962ca2c983",
+      "target": "tools/claim_audit/outputs.schema.json",
+      "disposition": "integrated-tooling",
+      "target_sha256": "81a541aa23a632730d97fa4f1ff0a392784ba47eca100cf5f50e00962ca2c983"
+    },
+    {
+      "source_repository": "https://github.com/ryansctt1994-sudo/Weaver--Cathedral-.git",
+      "source_commit": "912a388d47a9fce345163e858fe8a9f156c7ca41",
+      "source_path": "skills/governance/claim_audit/manifest.json",
+      "source_sha256": "c0e109aa4042ed39e5248476b977b6131e0177fc3e3b1379bbf545d94d800b6b",
+      "target": "tools/claim_audit/manifest.json",
+      "disposition": "integrated-tooling",
+      "target_sha256": "c0e109aa4042ed39e5248476b977b6131e0177fc3e3b1379bbf545d94d800b6b"
+    },
+    {
+      "source_repository": "https://github.com/ryansctt1994-sudo/Weaver--Cathedral-.git",
+      "source_commit": "912a388d47a9fce345163e858fe8a9f156c7ca41",
+      "source_path": "skills/governance/claim_audit/risk.md",
+      "source_sha256": "ddbbbf5e5b20ecb541736c93f741cf5de032b97626a56b7d9dc0e7c2b183515a",
+      "target": "tools/claim_audit/risk.md",
+      "disposition": "integrated-tooling",
+      "target_sha256": "ddbbbf5e5b20ecb541736c93f741cf5de032b97626a56b7d9dc0e7c2b183515a"
+    },
+    {
+      "source_repository": "https://github.com/ryansctt1994-sudo/Weaver--Cathedral-.git",
+      "source_commit": "912a388d47a9fce345163e858fe8a9f156c7ca41",
+      "source_path": "skills/governance/claim_audit/receipts.md",
+      "source_sha256": "629351e6a05012fae196b6c30d79d6c59a27b0f74bd2e48f5a0e12049a0db79a",
+      "target": "tools/claim_audit/receipts.md",
+      "disposition": "integrated-tooling",
+      "target_sha256": "629351e6a05012fae196b6c30d79d6c59a27b0f74bd2e48f5a0e12049a0db79a"
+    },
+    {
+      "source_repository": "https://github.com/ryansctt1994-sudo/Weaver--Cathedral-.git",
+      "source_commit": "912a388d47a9fce345163e858fe8a9f156c7ca41",
+      "source_path": "core/authority/canonical.py",
+      "source_sha256": "ecfce20ad1814ab30ce6caa98a216b22a8de329e480e361e6caf8ad9384da20d",
+      "target": "tools/claim_audit/legacy_canonical.py",
+      "disposition": "legacy-report-profile-only",
+      "target_sha256": "3fb7284fc62dd15adef50277beb7b439b57c87b5598dca09a18a293d74d106ce"
+    },
+    {
+      "source_repository": "https://github.com/ryansctt1994-sudo/Weaver--Cathedral-.git",
+      "source_commit": "912a388d47a9fce345163e858fe8a9f156c7ca41",
+      "source_path": "skills/governance/claim_audit/tests/test_skill_contract.py",
+      "source_sha256": "9cbc4f60375843142f11ce05460d47a0949dd02d9317c593f247dfbdef528292",
+      "target": "tests/consolidation/test_claim_audit.py",
+      "disposition": "adapted-contract-tests",
+      "target_sha256": "958b1000d857895fc0eea033bfec566413e26dff11baf7a14c70f7116c076df8"
+    },
+    {
+      "source_repository": "https://github.com/ryansctt1994-sudo/Weaver--Cathedral-.git",
+      "source_commit": "bb17b6ae4caad61b62382815a514de46928944bf",
+      "source_path": "core/findings/confirmation.py",
+      "source_sha256": "99c98656e7709e1e312a838d68d7d63a6f7cb5e763e55c15edea6f0f703e0584",
+      "target": "tools/consolidation/findings.py",
+      "disposition": "integrated-evidence-analysis",
+      "target_sha256": "da4f028749b71a536776a03deac6a715b32c7e77ef1a0521b73155a8bde8ef30"
+    },
+    {
+      "source_repository": "https://github.com/ryansctt1994-sudo/Weaver--Cathedral-.git",
+      "source_commit": "bb17b6ae4caad61b62382815a514de46928944bf",
+      "source_path": "core/authority/tests/test_finding_confirmation.py",
+      "source_sha256": "8838b35e407055f391031c1558c793fa6180a61a420fcee015e20574f5b780e0",
+      "target": "tests/consolidation/test_findings.py",
+      "disposition": "adapted-contract-tests",
+      "target_sha256": "96c4c90b6cbce4bc9a8f16a833b7d3de0047d91fe5894a7288b4dc83af154823"
+    },
+    {
+      "source_repository": "https://github.com/ryansctt1994-sudo/cathedral-verified.git",
+      "source_commit": "e943fcaa73f9c2cd8f9aa471ce160cc24daddb9c",
+      "source_path": "chronicle/external_anchor.py",
+      "source_sha256": "d8a2f2eae6b85cd781b5aaec33d3d60abf7cb72c9b99f68777875b600ca6b995",
+      "target": "packages/verifier/weaver_verifier/public_log.py",
+      "disposition": "integrated-offline-proof-checking",
+      "target_sha256": "78c003809be60822575c42c834ed6fcced6903ed008ee9731da3149e3dbe8118"
+    },
+    {
+      "source_repository": "https://github.com/ryansctt1994-sudo/cathedral-verified.git",
+      "source_commit": "e943fcaa73f9c2cd8f9aa471ce160cc24daddb9c",
+      "source_path": "evidence/silicon/2026-11-06/checkpoint.json",
+      "source_sha256": "cfbc72137d476a7c89817ba5e12f0104aa3e3b5be35079f8be295743a83fbd78",
+      "target": "tests/fixtures/consolidation/rekor/checkpoint.json",
+      "disposition": "historical-publication-fixture",
+      "target_sha256": "cfbc72137d476a7c89817ba5e12f0104aa3e3b5be35079f8be295743a83fbd78"
+    },
+    {
+      "source_repository": "https://github.com/ryansctt1994-sudo/cathedral-verified.git",
+      "source_commit": "e943fcaa73f9c2cd8f9aa471ce160cc24daddb9c",
+      "source_path": "evidence/silicon/2026-11-06/rekor-entry.json",
+      "source_sha256": "7feae658065d177c73d9a45924a4295238390f1096bd83944a56e9363c6774bc",
+      "target": "tests/fixtures/consolidation/rekor/rekor-entry.json",
+      "disposition": "historical-publication-fixture",
+      "target_sha256": "7feae658065d177c73d9a45924a4295238390f1096bd83944a56e9363c6774bc"
+    },
+    {
+      "source_repository": "https://github.com/ryansctt1994-sudo/cathedral-verified.git",
+      "source_commit": "e943fcaa73f9c2cd8f9aa471ce160cc24daddb9c",
+      "source_path": "evidence/silicon/2026-11-06/rekor-public-key.pem",
+      "source_sha256": "dce5ef715502ec9f3cdfd11f8cc384b31a6141023d3e7595e9908a81cb6241bd",
+      "target": "tests/fixtures/consolidation/rekor/rekor-public-key.pem",
+      "disposition": "historical-publication-fixture",
+      "target_sha256": "dce5ef715502ec9f3cdfd11f8cc384b31a6141023d3e7595e9908a81cb6241bd"
+    },
+    {
+      "source_repository": "https://github.com/ryansctt1994-sudo/Weavers-Forge-.git",
+      "source_commit": "4df6b98cd5d5154cdeb98c9c779c212850c7d668",
+      "source_path": "RECEIPT_TEMPLATE.md",
+      "source_sha256": "ee06756f0f980d45bbf1f4e248defa5d7b394d50d3d7cbe9b6e6bbaf17237f41",
+      "target": "docs/consolidation/forge/RECEIPT_TEMPLATE.md",
+      "disposition": "contributor-reference",
+      "target_sha256": "b5c366f616b5caef2916e8ddb57fa7722ce6dfdc21c177ed640fa9100652f310"
+    },
+    {
+      "source_repository": "https://github.com/ryansctt1994-sudo/Weavers-Forge-.git",
+      "source_commit": "4df6b98cd5d5154cdeb98c9c779c212850c7d668",
+      "source_path": "WITNESS_REVIEW_TEMPLATE.md",
+      "source_sha256": "c5501b0ea1f2d41aea20b018c1e4229837c37c79af45a108b26e713c9bc49dfb",
+      "target": "docs/consolidation/forge/WITNESS_REVIEW_TEMPLATE.md",
+      "disposition": "contributor-reference",
+      "target_sha256": "c5501b0ea1f2d41aea20b018c1e4229837c37c79af45a108b26e713c9bc49dfb"
+    },
+    {
+      "source_repository": "https://github.com/ryansctt1994-sudo/Weavers-Forge-.git",
+      "source_commit": "4df6b98cd5d5154cdeb98c9c779c212850c7d668",
+      "source_path": "CONTRIBUTING.md",
+      "source_sha256": "e52fd74063fe902b206bd7ee8376f9e2820dd1c3df5db9e22ce545a2321ee392",
+      "target": "docs/consolidation/forge/CONTRIBUTING.md",
+      "disposition": "contributor-reference",
+      "target_sha256": "1b7ca79f3292d08e5f429c3f1a88fe785aae1f2e85fd2ce4fe0dc786d4c6a1fd"
+    },
+    {
+      "source_repository": "https://github.com/ryansctt1994-sudo/Weavers-Forge-.git",
+      "source_commit": "4df6b98cd5d5154cdeb98c9c779c212850c7d668",
+      "source_path": "RUNBOOK.md",
+      "source_sha256": "4c4978ac0f6e233db07c8c5c3bbd001ad88ac4183e5a5eaac894da8d7e203f19",
+      "target": "docs/consolidation/forge/RUNBOOK.md",
+      "disposition": "contributor-reference",
+      "target_sha256": "4c4978ac0f6e233db07c8c5c3bbd001ad88ac4183e5a5eaac894da8d7e203f19"
+    },
+    {
+      "source_repository": "https://github.com/ryansctt1994-sudo/cathedral-verified.git",
+      "source_commit": "e943fcaa73f9c2cd8f9aa471ce160cc24daddb9c",
+      "source_path": "hardware/lucifer_latch/arty_a7/README.md",
+      "source_sha256": "7226a71b57c22ef7c85f2ede8a5d1ee052fa32d086880ba955a002212c161438",
+      "target": "hardware/lucifer_latch/arty_a7/README.md",
+      "disposition": "hardware-candidate",
+      "target_sha256": "3074c45f622633a31133fa456ce2c3749ff59412002804b3c0607631f57689ed"
+    },
+    {
+      "source_repository": "https://github.com/ryansctt1994-sudo/cathedral-verified.git",
+      "source_commit": "e943fcaa73f9c2cd8f9aa471ce160cc24daddb9c",
+      "source_path": "hardware/lucifer_latch/arty_a7/arty_a7_35.xdc",
+      "source_sha256": "d29de2ce192028eaa25ee44c3b7a4a26cf7324cc116765a7b93dae450e5770c4",
+      "target": "hardware/lucifer_latch/arty_a7/arty_a7_35.xdc",
+      "disposition": "hardware-candidate",
+      "target_sha256": "d29de2ce192028eaa25ee44c3b7a4a26cf7324cc116765a7b93dae450e5770c4"
+    },
+    {
+      "source_repository": "https://github.com/ryansctt1994-sudo/cathedral-verified.git",
+      "source_commit": "e943fcaa73f9c2cd8f9aa471ce160cc24daddb9c",
+      "source_path": "hardware/lucifer_latch/arty_a7/build.tcl",
+      "source_sha256": "cf9041433b26c9e30c5c2e59f601feecc7aa565f5fe84d998971af4b250a6f4e",
+      "target": "hardware/lucifer_latch/arty_a7/build.tcl",
+      "disposition": "hardware-candidate",
+      "target_sha256": "cf9041433b26c9e30c5c2e59f601feecc7aa565f5fe84d998971af4b250a6f4e"
+    },
+    {
+      "source_repository": "https://github.com/ryansctt1994-sudo/cathedral-verified.git",
+      "source_commit": "e943fcaa73f9c2cd8f9aa471ce160cc24daddb9c",
+      "source_path": "hardware/lucifer_latch/arty_a7/lucifer_arty_a7.v",
+      "source_sha256": "b141eeb3a4b8705e6d6f0b840da6702498ba9b5d9d3e7f4194cc95aec34e8e4b",
+      "target": "hardware/lucifer_latch/arty_a7/lucifer_arty_a7.v",
+      "disposition": "hardware-candidate",
+      "target_sha256": "b141eeb3a4b8705e6d6f0b840da6702498ba9b5d9d3e7f4194cc95aec34e8e4b"
+    },
+    {
+      "source_repository": "https://github.com/ryansctt1994-sudo/cathedral-verified.git",
+      "source_commit": "e943fcaa73f9c2cd8f9aa471ce160cc24daddb9c",
+      "source_path": "hardware/lucifer_latch/arty_a7/program.tcl",
+      "source_sha256": "82a552cc64e6cb760ef74dfdb6350c74803e7cbb4c23bfde732a3603398a7b5e",
+      "target": "hardware/lucifer_latch/arty_a7/program.tcl",
+      "disposition": "hardware-candidate",
+      "target_sha256": "82a552cc64e6cb760ef74dfdb6350c74803e7cbb4c23bfde732a3603398a7b5e"
+    },
+    {
+      "source_repository": "https://github.com/ryansctt1994-sudo/cathedral-verified.git",
+      "source_commit": "e943fcaa73f9c2cd8f9aa471ce160cc24daddb9c",
+      "source_path": "hardware/lucifer_latch/arty_a7/qualification/PHYSICAL_RUN_PROTOCOL.md",
+      "source_sha256": "26acaf934cdda8a89c1de2c879a6d16d6d086dfbc89c211c460630653cb5604f",
+      "target": "hardware/lucifer_latch/arty_a7/qualification/PHYSICAL_RUN_PROTOCOL.md",
+      "disposition": "hardware-candidate",
+      "target_sha256": "26acaf934cdda8a89c1de2c879a6d16d6d086dfbc89c211c460630653cb5604f"
+    },
+    {
+      "source_repository": "https://github.com/ryansctt1994-sudo/cathedral-verified.git",
+      "source_commit": "e943fcaa73f9c2cd8f9aa471ce160cc24daddb9c",
+      "source_path": "hardware/lucifer_latch/arty_a7/qualification/PUBLIC_WITNESS_POLICY.md",
+      "source_sha256": "d3edeb737d88fbb3ae40851f23c0de407521c317bf93db5626c821a6d29d68e3",
+      "target": "hardware/lucifer_latch/arty_a7/qualification/PUBLIC_WITNESS_POLICY.md",
+      "disposition": "hardware-candidate",
+      "target_sha256": "d3edeb737d88fbb3ae40851f23c0de407521c317bf93db5626c821a6d29d68e3"
+    },
+    {
+      "source_repository": "https://github.com/ryansctt1994-sudo/cathedral-verified.git",
+      "source_commit": "e943fcaa73f9c2cd8f9aa471ce160cc24daddb9c",
+      "source_path": "hardware/lucifer_latch/arty_a7/qualification/README.md",
+      "source_sha256": "de9c78fc9e8261921112fff2efb9ebc0bb082b768a04108518ab56662260048c",
+      "target": "hardware/lucifer_latch/arty_a7/qualification/README.md",
+      "disposition": "hardware-candidate",
+      "target_sha256": "de9c78fc9e8261921112fff2efb9ebc0bb082b768a04108518ab56662260048c"
+    },
+    {
+      "source_repository": "https://github.com/ryansctt1994-sudo/cathedral-verified.git",
+      "source_commit": "e943fcaa73f9c2cd8f9aa471ce160cc24daddb9c",
+      "source_path": "hardware/lucifer_latch/arty_a7/qualification/SRAM_AND_PERMANENCE.md",
+      "source_sha256": "2f0d9a3488bb65e8d807e026ef871cabe5fd764633ca52a12686ec8d90116bbe",
+      "target": "hardware/lucifer_latch/arty_a7/qualification/SRAM_AND_PERMANENCE.md",
+      "disposition": "hardware-candidate",
+      "target_sha256": "2f0d9a3488bb65e8d807e026ef871cabe5fd764633ca52a12686ec8d90116bbe"
+    },
+    {
+      "source_repository": "https://github.com/ryansctt1994-sudo/cathedral-verified.git",
+      "source_commit": "e943fcaa73f9c2cd8f9aa471ce160cc24daddb9c",
+      "source_path": "hardware/lucifer_latch/arty_a7/qualification/packet.sha256",
+      "source_sha256": "d668739d2db6c219a7bb6373807254f800434195f8a835ba38e67aba53bea8bd",
+      "target": "hardware/lucifer_latch/arty_a7/qualification/packet.sha256",
+      "disposition": "hardware-candidate",
+      "target_sha256": "d668739d2db6c219a7bb6373807254f800434195f8a835ba38e67aba53bea8bd"
+    },
+    {
+      "source_repository": "https://github.com/ryansctt1994-sudo/cathedral-verified.git",
+      "source_commit": "e943fcaa73f9c2cd8f9aa471ce160cc24daddb9c",
+      "source_path": "hardware/lucifer_latch/arty_a7/qualification/templates/authority-roster.json",
+      "source_sha256": "496d997298454d32a2c7b69e2a461c8fa0a16cae70ac06cdbaa12c54c1c0f214",
+      "target": "hardware/lucifer_latch/arty_a7/qualification/templates/authority-roster.json",
+      "disposition": "hardware-candidate",
+      "target_sha256": "496d997298454d32a2c7b69e2a461c8fa0a16cae70ac06cdbaa12c54c1c0f214"
+    },
+    {
+      "source_repository": "https://github.com/ryansctt1994-sudo/cathedral-verified.git",
+      "source_commit": "e943fcaa73f9c2cd8f9aa471ce160cc24daddb9c",
+      "source_path": "hardware/lucifer_latch/arty_a7/qualification/templates/outside-reproduction-receipt.json",
+      "source_sha256": "cb453419db71b602fcbc20e0f9098131aeb3a1e2383c4533116555127b9d4a65",
+      "target": "hardware/lucifer_latch/arty_a7/qualification/templates/outside-reproduction-receipt.json",
+      "disposition": "hardware-candidate",
+      "target_sha256": "cb453419db71b602fcbc20e0f9098131aeb3a1e2383c4533116555127b9d4a65"
+    },
+    {
+      "source_repository": "https://github.com/ryansctt1994-sudo/cathedral-verified.git",
+      "source_commit": "e943fcaa73f9c2cd8f9aa471ce160cc24daddb9c",
+      "source_path": "hardware/lucifer_latch/arty_a7/qualification/templates/physical-measurements.csv",
+      "source_sha256": "ddbcb5435634d4457d4297b6b40bc59f1cd254e99dafd6e325ba818f38398042",
+      "target": "hardware/lucifer_latch/arty_a7/qualification/templates/physical-measurements.csv",
+      "disposition": "hardware-candidate",
+      "target_sha256": "ddbcb5435634d4457d4297b6b40bc59f1cd254e99dafd6e325ba818f38398042"
+    },
+    {
+      "source_repository": "https://github.com/ryansctt1994-sudo/cathedral-verified.git",
+      "source_commit": "e943fcaa73f9c2cd8f9aa471ce160cc24daddb9c",
+      "source_path": "hardware/lucifer_latch/arty_a7/qualification/templates/quorum-evaluation.json",
+      "source_sha256": "f445900ac396fe0e3d428b76633f4537901980764210087c0c313373a6a95308",
+      "target": "hardware/lucifer_latch/arty_a7/qualification/templates/quorum-evaluation.json",
+      "disposition": "hardware-candidate",
+      "target_sha256": "f445900ac396fe0e3d428b76633f4537901980764210087c0c313373a6a95308"
+    },
+    {
+      "source_repository": "https://github.com/ryansctt1994-sudo/cathedral-verified.git",
+      "source_commit": "e943fcaa73f9c2cd8f9aa471ce160cc24daddb9c",
+      "source_path": "hardware/lucifer_latch/arty_a7/qualification/templates/run-manifest.json",
+      "source_sha256": "356e9ee90b8e86dfcb4f5800940f6b0cb8165ebc0b5f0cbf2f4f4e4f139f63ee",
+      "target": "hardware/lucifer_latch/arty_a7/qualification/templates/run-manifest.json",
+      "disposition": "hardware-candidate",
+      "target_sha256": "356e9ee90b8e86dfcb4f5800940f6b0cb8165ebc0b5f0cbf2f4f4e4f139f63ee"
+    },
+    {
+      "source_repository": "https://github.com/ryansctt1994-sudo/cathedral-verified.git",
+      "source_commit": "e943fcaa73f9c2cd8f9aa471ce160cc24daddb9c",
+      "source_path": "hardware/lucifer_latch/arty_a7/qualification/templates/timing-receipt.json",
+      "source_sha256": "cfc0a1a5ade3cde2591db3adfe57f238560ba9d6967feb7df2663de8f9f92d14",
+      "target": "hardware/lucifer_latch/arty_a7/qualification/templates/timing-receipt.json",
+      "disposition": "hardware-candidate",
+      "target_sha256": "cfc0a1a5ade3cde2591db3adfe57f238560ba9d6967feb7df2663de8f9f92d14"
+    },
+    {
+      "source_repository": "https://github.com/ryansctt1994-sudo/cathedral-verified.git",
+      "source_commit": "e943fcaa73f9c2cd8f9aa471ce160cc24daddb9c",
+      "source_path": "hardware/lucifer_latch/arty_a7/sync_debounce.v",
+      "source_sha256": "68726d4a22e425940cbc693a0d5757c02d27a4bb17d520a2fa260efd686bd00f",
+      "target": "hardware/lucifer_latch/arty_a7/sync_debounce.v",
+      "disposition": "hardware-candidate",
+      "target_sha256": "68726d4a22e425940cbc693a0d5757c02d27a4bb17d520a2fa260efd686bd00f"
+    },
+    {
+      "source_repository": "https://github.com/ryansctt1994-sudo/cathedral-verified.git",
+      "source_commit": "e943fcaa73f9c2cd8f9aa471ce160cc24daddb9c",
+      "source_path": "hardware/lucifer_latch/arty_a7/tb_arty_a7.v",
+      "source_sha256": "f832fc2058d2ba68299913661aa707e8a7ccd46c91349bf4e1004b9a61641afd",
+      "target": "hardware/lucifer_latch/arty_a7/tb_arty_a7.v",
+      "disposition": "hardware-candidate",
+      "target_sha256": "f832fc2058d2ba68299913661aa707e8a7ccd46c91349bf4e1004b9a61641afd"
+    },
+    {
+      "source_repository": "https://github.com/ryansctt1994-sudo/cathedral-verified.git",
+      "source_commit": "e943fcaa73f9c2cd8f9aa471ce160cc24daddb9c",
+      "source_path": "hardware/lucifer_latch/arty_a7/tb_debounce_default.v",
+      "source_sha256": "e0374ff98c458942389d56dcf104d028484541fc81d093473efb13e0a8d56d39",
+      "target": "hardware/lucifer_latch/arty_a7/tb_debounce_default.v",
+      "disposition": "hardware-candidate",
+      "target_sha256": "e0374ff98c458942389d56dcf104d028484541fc81d093473efb13e0a8d56d39"
+    },
+    {
+      "source_repository": "https://github.com/ryansctt1994-sudo/cathedral-verified.git",
+      "source_commit": "e943fcaa73f9c2cd8f9aa471ce160cc24daddb9c",
+      "source_path": "hardware/lucifer_latch/arty_a7/tb_startup_reset.v",
+      "source_sha256": "b387e852fc6ce3e697b91d20c75d6299a0e42cb2c79331d03d27cf9e79bf9de9",
+      "target": "hardware/lucifer_latch/arty_a7/tb_startup_reset.v",
+      "disposition": "hardware-candidate",
+      "target_sha256": "b387e852fc6ce3e697b91d20c75d6299a0e42cb2c79331d03d27cf9e79bf9de9"
+    },
+    {
+      "source_repository": "https://github.com/ryansctt1994-sudo/cathedral-verified.git",
+      "source_commit": "db4d7c0fabfe79c5907b31f62bd35d991d366c3b",
+      "source_path": "git archive HEAD",
+      "source_sha256": "af66b36db0edff331f1a1edc0445a8e6a3dda68498be41b5388fa7f2cb24df58",
+      "target": "research/consolidation/snapshots/chronicle-hardening.zip",
+      "disposition": "reference-only-not-runtime",
+      "target_sha256": "af66b36db0edff331f1a1edc0445a8e6a3dda68498be41b5388fa7f2cb24df58"
+    },
+    {
+      "source_repository": "https://github.com/ryansctt1994-sudo/cathedral-verified.git",
+      "source_commit": "2a0852aedf01754252e549ddb48a017abce0d844",
+      "source_path": "git archive HEAD",
+      "source_sha256": "dca46e825ddc4f441c4ab5be8d1fcc9f1adad0094c7eb2ec7fa1c024a15ecd56",
+      "target": "research/consolidation/snapshots/cathedral-p0.zip",
+      "disposition": "reference-only-not-runtime",
+      "target_sha256": "dca46e825ddc4f441c4ab5be8d1fcc9f1adad0094c7eb2ec7fa1c024a15ecd56"
+    },
+    {
+      "source_repository": "https://github.com/ryansctt1994-sudo/Weaver--Cathedral-.git",
+      "source_commit": "912a388d47a9fce345163e858fe8a9f156c7ca41",
+      "source_path": "git archive HEAD",
+      "source_sha256": "878474f72c5ff77c0ed8b6d5859df09b8f1904c5bd7b6f6ef04db0e524274b43",
+      "target": "research/consolidation/snapshots/authority-staging.zip",
+      "disposition": "reference-only-not-runtime",
+      "target_sha256": "878474f72c5ff77c0ed8b6d5859df09b8f1904c5bd7b6f6ef04db0e524274b43"
+    },
+    {
+      "source_repository": "https://github.com/ryansctt1994-sudo/Weaver--Cathedral-.git",
+      "source_commit": "8e197701792f7a113f67d75832eea64468091cf4",
+      "source_path": "git archive HEAD",
+      "source_sha256": "c337fe7501fd42670d0cfb0122cd7fe90b0e72dd11f3c045f57fe9cd5a4c6a4a",
+      "target": "research/consolidation/snapshots/role-gate.zip",
+      "disposition": "reference-only-not-runtime",
+      "target_sha256": "c337fe7501fd42670d0cfb0122cd7fe90b0e72dd11f3c045f57fe9cd5a4c6a4a"
+    },
+    {
+      "source_repository": "https://github.com/ryansctt1994-sudo/Weaver--Cathedral-.git",
+      "source_commit": "c6ac6b3a3c57af0f6838092e856f9dc4b1b6f0bd",
+      "source_path": "git archive HEAD",
+      "source_sha256": "d863c6ccc5a2ba0ba8dd490115726d02174d01ad8c203657dda2be3ec370912c",
+      "target": "research/consolidation/snapshots/agent-orchestration.zip",
+      "disposition": "reference-only-not-runtime",
+      "target_sha256": "d863c6ccc5a2ba0ba8dd490115726d02174d01ad8c203657dda2be3ec370912c"
+    },
+    {
+      "source_repository": "https://github.com/ryansctt1994-sudo/Weaver--Cathedral-.git",
+      "source_commit": "bb17b6ae4caad61b62382815a514de46928944bf",
+      "source_path": "git archive HEAD",
+      "source_sha256": "9f2ec546e203554be9b134e8824965b04e3efb31e4ed33b557b644adbb8b29a4",
+      "target": "research/consolidation/snapshots/finding-confirmation.zip",
+      "disposition": "reference-only-not-runtime",
+      "target_sha256": "9f2ec546e203554be9b134e8824965b04e3efb31e4ed33b557b644adbb8b29a4"
+    },
+    {
+      "source_repository": "https://github.com/ryansctt1994-sudo/Weavers-Forge-.git",
+      "source_commit": "4df6b98cd5d5154cdeb98c9c779c212850c7d668",
+      "source_path": "git archive HEAD",
+      "source_sha256": "ecb94e8ff819048afe2663ca9ee0200aa7532c613861e51c00987b9f5b15b623",
+      "target": "research/consolidation/snapshots/forge-community.zip",
+      "disposition": "reference-only-not-runtime",
+      "target_sha256": "ecb94e8ff819048afe2663ca9ee0200aa7532c613861e51c00987b9f5b15b623"
+    },
+    {
+      "source_repository": "https://github.com/ryansctt1994-sudo/cathedral-verified.git",
+      "source_commit": "1c4181714b48dd9d9616a0bebbb4fef8532deff8",
+      "source_path": "LICENSE",
+      "source_sha256": "97b3af70c8e3e83d46dac823681f443b55456a30c3b0e63b6ada280bf31d7bac",
+      "target": "docs/consolidation/licenses/cathedral-verified.txt",
+      "disposition": "license-notice",
+      "target_sha256": "97b3af70c8e3e83d46dac823681f443b55456a30c3b0e63b6ada280bf31d7bac"
+    },
+    {
+      "source_repository": "https://github.com/ryansctt1994-sudo/Weaver--Cathedral-.git",
+      "source_commit": "2d905e6771cf0e5c6fbd4e289a8044b8fdfdf674",
+      "source_path": "LICENSE",
+      "source_sha256": "97b3af70c8e3e83d46dac823681f443b55456a30c3b0e63b6ada280bf31d7bac",
+      "target": "docs/consolidation/licenses/weaver-cathedral.txt",
+      "disposition": "license-notice",
+      "target_sha256": "97b3af70c8e3e83d46dac823681f443b55456a30c3b0e63b6ada280bf31d7bac"
+    },
+    {
+      "source_repository": "https://github.com/ryansctt1994-sudo/Weavers-Forge-.git",
+      "source_commit": "3585019f3ab8781b73a6bf856e2748e9c1ac6ed2",
+      "source_path": "LICENSE",
+      "source_sha256": "97b3af70c8e3e83d46dac823681f443b55456a30c3b0e63b6ada280bf31d7bac",
+      "target": "docs/consolidation/licenses/weavers-forge.txt",
+      "disposition": "license-notice",
+      "target_sha256": "97b3af70c8e3e83d46dac823681f443b55456a30c3b0e63b6ada280bf31d7bac"
+    },
+    {
+      "source_repository": "https://github.com/ryansctt1994-sudo/cathedral-verified.git",
+      "source_commit": "e943fcaa73f9c2cd8f9aa471ce160cc24daddb9c",
+      "source_path": "git archive HEAD",
+      "source_sha256": "620f0d511d54bafd5259b6914227a740104cbfbcfa09257c3e4fdf6afe4bb589",
+      "target": "research/consolidation/snapshots/arty-hardware.zip",
+      "disposition": "reference-only-not-runtime",
+      "target_sha256": "620f0d511d54bafd5259b6914227a740104cbfbcfa09257c3e4fdf6afe4bb589"
+    }
+  ]
+}

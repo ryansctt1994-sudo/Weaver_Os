@@ -1,0 +1,24 @@
+{
+  "schema": "lucifer-public-quorum-evaluation/1",
+  "record_kind": "UNFILLED_TEMPLATE",
+  "status": "NOT_READY",
+  "roster_sha256": null,
+  "results_checkpoint_sha256": null,
+  "adjudicator_principal": null,
+  "observed_at_utc": null,
+  "required_votes": 2,
+  "configured_outside_witnesses": 0,
+  "verified_direct_reproduction_votes": 0,
+  "public_votes": [],
+  "hash_recomputed_by": [],
+  "unresolved_findings": [
+    "No board programming evidence",
+    "No physical measurements or video",
+    "No independent timing receipt",
+    "No enrolled outside witness roster",
+    "No outside physical reproduction",
+    "No public witness quorum"
+  ],
+  "silicon_E3_1": "NOT_READY",
+  "production_authority_earned": false
+}

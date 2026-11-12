@@ -1,0 +1,55 @@
+{
+  "schema": "lucifer-public-witness-roster/1",
+  "record_kind": "UNFILLED_TEMPLATE",
+  "status": "NOT_READY",
+  "policy_sha256": null,
+  "roster_id": null,
+  "frozen_at_utc": null,
+  "public_anchor_url": null,
+  "author_principal": "ryansctt1994-sudo",
+  "required_affirmative_direct_reproductions": 2,
+  "roster_size": 3,
+  "witnesses": [
+    {
+      "slot": 1,
+      "principal": null,
+      "identity_evidence_url": null,
+      "ed25519_public_key_hex": null,
+      "custody_statement_sha256": null,
+      "custody_statement_url": null,
+      "conflicts": null,
+      "public_receipt_location": null,
+      "enrollment_signature_base64": null
+    },
+    {
+      "slot": 2,
+      "principal": null,
+      "identity_evidence_url": null,
+      "ed25519_public_key_hex": null,
+      "custody_statement_sha256": null,
+      "custody_statement_url": null,
+      "conflicts": null,
+      "public_receipt_location": null,
+      "enrollment_signature_base64": null
+    },
+    {
+      "slot": 3,
+      "principal": null,
+      "identity_evidence_url": null,
+      "ed25519_public_key_hex": null,
+      "custody_statement_sha256": null,
+      "custody_statement_url": null,
+      "conflicts": null,
+      "public_receipt_location": null,
+      "enrollment_signature_base64": null
+    }
+  ],
+  "adjudicator": {
+    "principal": null,
+    "conflicts": null,
+    "acceptance_statement_url": null
+  },
+  "revocation_policy": null,
+  "new_or_same_principal_agents_count_as_independent": false,
+  "byzantine_fork_immunity_claimed": false
+}
