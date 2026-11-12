@@ -36,6 +36,7 @@ from weaver_contracts.registry_sequence import (
     RegistrySequenceStoreProtocol,
 )
 from weaver_contracts.replay import ReplayCacheProtocol, generate_replay_key
+from weaver_contracts.signing_policy import check_signing_policy
 
 
 @dataclass
@@ -403,6 +404,27 @@ class CryptoVerifier:
                 now_iso,
                 verified_keys=[],
                 failure_details=schema_error,
+            )
+        # WVR-010: a valid signature proves only what the issuer signed. Refuse any
+        # signing domain or schema version this verifier does not allowlist for this
+        # payload type, before any field is read unguarded below.
+        policy_failure = check_signing_policy(
+            envelope.get("payload_type"),
+            envelope.get("signing_domain"),
+            envelope.get("payload_schema_version"),
+        )
+        if policy_failure is not None:
+            return VerificationResult(
+                False,
+                "SIGNATURE_VERIFICATION_FAILED",
+                [policy_failure],
+                [],
+                now_iso,
+                verified_keys=[],
+                failure_details=(
+                    "Signing domain or payload schema version is not allowlisted for this "
+                    "payload type."
+                ),
             )
         registry_valid, registry_failure = validate_registry_freshness(self.registry, now_ts)
         if not registry_valid:
