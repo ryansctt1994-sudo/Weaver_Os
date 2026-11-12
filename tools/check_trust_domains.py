@@ -47,7 +47,7 @@ ALLOWED: dict[str, frozenset[str]] = {
     # Proposal-only ZOREL/Delta bridge: no runtime, verifier, witness or ledger imports.
     "fusion": frozenset({"contracts"}),
 }
-NON_RUNTIME_ZONES = frozenset({"research", "archive", "legacy", "evidence"})
+NON_RUNTIME_ZONES = frozenset({"research", "archive", "legacy", "evidence", "tools"})
 STDLIB_ONLY = frozenset({"contracts"})
 NO_IO_DOMAINS = frozenset({"contracts", "verifier", "fusion"})
 IO_CAPABLE_MODULES = frozenset(
@@ -73,6 +73,9 @@ STDLIB = frozenset(sys.stdlib_module_names) | {"__future__"}
 
 # Paths relative to packages/. Each entry names why the legacy canonicalizer stays.
 LEGACY_CANONICALIZER_ALLOWLIST: dict[str, str] = {
+    "verifier/weaver_verifier/public_log.py": (
+        "Rekor hashedrekord SET signature profile: historical signed bytes; not authority JSON"
+    ),
     "verifier/weaver_verifier/crypto.py": (
         "C-CANON-001: triadic_controls canonicalize_json; signatures in fixtures depend on it"
     ),

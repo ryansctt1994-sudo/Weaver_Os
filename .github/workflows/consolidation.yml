@@ -1,0 +1,53 @@
+name: Consolidation acceptance
+on:
+  pull_request:
+  push:
+    branches: [main]
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  software:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 20
+    strategy:
+      fail-fast: false
+      matrix:
+        python: ['3.10', '3.11', '3.12', '3.13']
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: ${{ matrix.python }}
+      - run: python -m pip install -e '.[dev]'
+      - run: make validate-consolidation
+      - name: Independent evidence-tool control removals
+        run: python -m tools.consolidation.check_mutations
+      - run: python -m pytest -q --junitxml=consolidation-junit.xml
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: consolidation-python-${{ matrix.python }}
+          path: consolidation-junit.xml
+          if-no-files-found: error
+  hardware:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - run: python -m pip install -e '.[dev]'
+      - run: sudo apt-get update && sudo apt-get install -y iverilog
+      - name: Simulations and negative controls (no physical programming)
+        shell: bash
+        run: |
+          set -o pipefail
+          make test-hw-consolidation 2>&1 | tee consolidation-hardware.log
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: consolidation-hardware
+          path: consolidation-hardware.log
+          if-no-files-found: error

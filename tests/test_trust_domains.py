@@ -70,6 +70,16 @@ def test_non_runtime_zone_import_is_rejected(tmp_path):
     assert _rules(check(tmp_path)[0]) == ["NON_RUNTIME_IMPORT"]
 
 
+def test_advisory_consolidation_tools_cannot_enter_the_runtime(tmp_path):
+    _tree(tmp_path)
+    _write(
+        tmp_path,
+        "packages/runtime/wx_runtime/bad.py",
+        "from tools.consolidation.findings import confirm_finding\n",
+    )
+    assert _rules(check(tmp_path)[0]) == ["NON_RUNTIME_IMPORT"]
+
+
 def test_unknown_domain_fails_closed(tmp_path):
     _tree(tmp_path)
     _write(tmp_path, "packages/sidecar/thing.py", "")
