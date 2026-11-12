@@ -1,0 +1,26 @@
+{
+  "schema": "lucifer-physical-witness/1",
+  "record_kind": "UNFILLED_TEMPLATE",
+  "signature_domain": "LUCIFER-PHYSICAL-WITNESS-v1\n",
+  "signature_base64": null,
+  "payload": {
+    "status": "UNATTEMPTED",
+    "principal": null,
+    "public_key_hex": null,
+    "custody_statement_sha256": null,
+    "roster_sha256": null,
+    "results_checkpoint_sha256": null,
+    "own_run_id": null,
+    "own_build_checkpoint_sha256": null,
+    "own_bitstream_sha256": null,
+    "direct_rebuild_and_board_execution": null,
+    "separate_bench_control": null,
+    "timing_witness_receipt_sha256": null,
+    "raw_evidence_manifest_sha256": null,
+    "fixture_and_build_crosswalk_sha256": null,
+    "unresolved_findings": null,
+    "bounded_claim": null,
+    "permanent_irreversibility_observed": null,
+    "production_authority_earned": false
+  }
+}

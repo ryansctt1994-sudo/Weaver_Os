@@ -1,0 +1,32 @@
+{
+  "schema": "lucifer-timing-receipt/1",
+  "record_kind": "UNFILLED_TEMPLATE",
+  "signature_domain": "LUCIFER-TIMING-RECEIPT-v1\n",
+  "signature_base64": null,
+  "payload": {
+    "status": "UNATTEMPTED",
+    "principal": null,
+    "public_key_hex": null,
+    "custody_statement_sha256": null,
+    "run_id": null,
+    "protocol_sha256": null,
+    "roster_sha256": null,
+    "build_checkpoint_sha256": null,
+    "bitstream_sha256": null,
+    "challenge_sha256": null,
+    "direct_instrument_control": null,
+    "independence_disclosure_sha256": null,
+    "instrument_serial": null,
+    "calibration_sha256": null,
+    "timebase_source": null,
+    "started_at_utc": null,
+    "ended_at_utc": null,
+    "utc_uncertainty_s": null,
+    "duration_uncertainty_ns": null,
+    "raw_evidence_manifest_sha256": null,
+    "trace_video_marker_crosswalk_sha256": null,
+    "capture_gaps": null,
+    "observation_scope": null,
+    "coverage_exclusions": null
+  }
+}

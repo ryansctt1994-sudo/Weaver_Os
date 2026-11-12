@@ -1,0 +1,208 @@
+{
+  "schema": "lucifer-physical-run/1",
+  "record_kind": "UNFILLED_TEMPLATE",
+  "status": "NOT_READY",
+  "run_id": null,
+  "created_at_utc": null,
+  "protocol_sha256": null,
+  "roster_sha256": null,
+  "source": {
+    "commit": null,
+    "tree": null,
+    "dirty": null,
+    "file_manifest_sha256": null
+  },
+  "build": {
+    "vivado_version": null,
+    "installer_provenance": null,
+    "options_and_seeds": null,
+    "bitstream_sha256": null,
+    "reports_manifest_sha256": null,
+    "checkpoint_public_url": null,
+    "checkpoint_sha256": null
+  },
+  "board": {
+    "model": "Arty A7-35T",
+    "part": "xc7a35ticsg324-1L",
+    "revision": null,
+    "serial": null,
+    "configuration_binding_method": null,
+    "readback_evidence_sha256": null
+  },
+  "fixture": {
+    "wiring_sha256": null,
+    "stimulus_adapter_source_sha256": null,
+    "generator_model": null,
+    "actual_effect_sensor": null,
+    "probe_noninterference_evidence_sha256": null,
+    "positive_control_sha256": null,
+    "positive_control_status": "UNATTEMPTED",
+    "control_owners": {
+      "reset": null,
+      "power": null,
+      "clock": null,
+      "jtag": null,
+      "spi": null,
+      "effect_alternate_routes": null
+    }
+  },
+  "authority": {
+    "operator_principal": null,
+    "timing_witness_principal": null,
+    "adjudicator_principal": null,
+    "custody_disclosures_sha256": null
+  },
+  "challenge": {
+    "nonce_hex": null,
+    "issuer_principal": null,
+    "issued_at_utc": null,
+    "signature_base64": null,
+    "trace_marker": null,
+    "video_marker": null
+  },
+  "measurement_plan": {
+    "instrument_model": null,
+    "serial": null,
+    "calibration_sha256": null,
+    "sample_rate_hz": null,
+    "bandwidth_hz": null,
+    "voltage_thresholds": null,
+    "phase_grid_ns": null,
+    "pulse_widths_ns": null,
+    "repetitions_per_point": null,
+    "attack_duration_s": null,
+    "script_sha256": null,
+    "random_seed": null,
+    "minimum_capture_pulse_ns": 30,
+    "minimum_veto_floor_cycles": 68000,
+    "reset_qualification_cycles": 500000,
+    "maximum_effect_latency_ns": null,
+    "latency_limit_authority": null,
+    "duration_uncertainty_ns": null,
+    "utc_uncertainty_s": null,
+    "temperature_supply_load_ranges": null,
+    "capture_gap_detection_method": null
+  },
+  "cases": [
+    {
+      "case_id": "P00",
+      "status": "UNATTEMPTED",
+      "raw_manifest_sha256": null,
+      "requested_count": null,
+      "observed_ingress_count": null,
+      "effect_count": null,
+      "uncertain_count": null,
+      "fixture_differences": [],
+      "coverage_exclusions": [],
+      "exploratory": false
+    },
+    {
+      "case_id": "P01",
+      "status": "UNATTEMPTED",
+      "raw_manifest_sha256": null,
+      "requested_count": null,
+      "observed_ingress_count": null,
+      "effect_count": null,
+      "uncertain_count": null,
+      "fixture_differences": [],
+      "coverage_exclusions": [],
+      "exploratory": false
+    },
+    {
+      "case_id": "P02",
+      "status": "UNATTEMPTED",
+      "raw_manifest_sha256": null,
+      "requested_count": null,
+      "observed_ingress_count": null,
+      "effect_count": null,
+      "uncertain_count": null,
+      "fixture_differences": [],
+      "coverage_exclusions": [],
+      "exploratory": false
+    },
+    {
+      "case_id": "P03",
+      "status": "UNATTEMPTED",
+      "raw_manifest_sha256": null,
+      "requested_count": null,
+      "observed_ingress_count": null,
+      "effect_count": null,
+      "uncertain_count": null,
+      "fixture_differences": [],
+      "coverage_exclusions": [],
+      "exploratory": false
+    },
+    {
+      "case_id": "P04",
+      "status": "UNATTEMPTED",
+      "raw_manifest_sha256": null,
+      "requested_count": null,
+      "observed_ingress_count": null,
+      "effect_count": null,
+      "uncertain_count": null,
+      "fixture_differences": [],
+      "coverage_exclusions": [],
+      "exploratory": false
+    },
+    {
+      "case_id": "P05",
+      "status": "UNATTEMPTED",
+      "raw_manifest_sha256": null,
+      "requested_count": null,
+      "observed_ingress_count": null,
+      "effect_count": null,
+      "uncertain_count": null,
+      "fixture_differences": [],
+      "coverage_exclusions": [],
+      "exploratory": false
+    },
+    {
+      "case_id": "P06",
+      "status": "UNATTEMPTED",
+      "raw_manifest_sha256": null,
+      "requested_count": null,
+      "observed_ingress_count": null,
+      "effect_count": null,
+      "uncertain_count": null,
+      "fixture_differences": [],
+      "coverage_exclusions": [],
+      "exploratory": false
+    },
+    {
+      "case_id": "P07",
+      "status": "UNATTEMPTED",
+      "raw_manifest_sha256": null,
+      "requested_count": null,
+      "observed_ingress_count": null,
+      "effect_count": null,
+      "uncertain_count": null,
+      "fixture_differences": [],
+      "coverage_exclusions": [],
+      "exploratory": false
+    },
+    {
+      "case_id": "P08",
+      "status": "UNATTEMPTED",
+      "raw_manifest_sha256": null,
+      "requested_count": null,
+      "observed_ingress_count": null,
+      "effect_count": null,
+      "uncertain_count": null,
+      "fixture_differences": [],
+      "coverage_exclusions": [],
+      "exploratory": false
+    }
+  ],
+  "artifacts": {
+    "raw_traces": [],
+    "original_video_segments": [],
+    "measurement_csv_sha256": null,
+    "signed_timing_receipt_sha256": null,
+    "operator_receipt_sha256": null,
+    "public_raw_manifest_url": null
+  },
+  "physical_irreversibility_claim": "bounded powered/configured interval only; permanent mechanism absent",
+  "silicon_E3_1": "NOT_READY",
+  "permanent_irreversibility": "NOT_IMPLEMENTED",
+  "production_authority_earned": false
+}
