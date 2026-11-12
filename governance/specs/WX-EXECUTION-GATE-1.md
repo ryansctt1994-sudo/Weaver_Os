@@ -9,12 +9,13 @@
 
 | Stage | Check | Refusal (Rejection Root) |
 |---|---|---|
+| 0. Pin | the proposal canonicalizes and every field passes the contract; its canonical bytes are pinned before anyone else sees it | raises `GateContractError`, like a non-`Proposal` argument |
 | 1. Observe | veto source clear | `VETO_ACTIVE`; the authorizer is **not called** |
-| 2. Authorize | injected authorizer allows; a decision that is malformed or raises counts as a refusal | the authorizer's `reason_code`, or `AUTHORIZATION_ERROR` |
+| 2. Authorize | injected authorizer allows; a decision that is malformed or raises counts as a refusal; the proposal still matches the pin after the authorizer returns | the authorizer's `reason_code`, `AUTHORIZATION_ERROR`, or `PROPOSAL_MUTATED` |
 | | window = min(`valid_until`, now + `max_window`) is still open | `WINDOW_EXPIRED` |
 | 3. Reserve | proposal not already committed (early check against the ledger at startup) and not already running in this gate | `ALREADY_COMMITTED`, `ALREADY_RESERVED` |
-| 4. Execute | the action stages a result; `context.checkpoint()` rechecks the veto, the window, and **authority** (authorizer asked again) | aborted: `EXECUTION_FAILED`, `VETO_DURING_EXECUTION`, `WINDOW_EXPIRED`, `REVALIDATION_DENIED` |
-| 5. Revalidate | veto clear, window open, **authorizer asked again** still allows, with a decision that has not expired | aborted: `VETO_DURING_EXECUTION`, `WINDOW_EXPIRED`, `REVALIDATION_DENIED` |
+| 4. Execute | the action stages a result; `context.checkpoint()` rechecks the proposal against the pin, the veto, the window, and **authority** (authorizer asked again) | aborted: `EXECUTION_FAILED`, `PROPOSAL_MUTATED`, `VETO_DURING_EXECUTION`, `WINDOW_EXPIRED`, `REVALIDATION_DENIED` |
+| 5. Revalidate | proposal matches the pin (before and after the authorizer is asked again), veto clear, window open, **authorizer asked again** still allows, with a decision that has not expired | aborted: `PROPOSAL_MUTATED`, `VETO_DURING_EXECUTION`, `WINDOW_EXPIRED`, `REVALIDATION_DENIED` |
 | 6. Commit | result recorded on the Authority Root (`EXECUTION_COMMITTED`) with ledger `unique_key` `EXECUTION_COMMITTED:<proposal_id>`, enforced inside the append's transaction | aborted: `ALREADY_COMMITTED` (another gate won), `RESULT_NOT_RECORDABLE` |
 
 **Every call produces exactly one receipt, while the ledger can record.** A commit goes on the
@@ -43,6 +44,13 @@ failure is not implemented.
   adapter that verifies once and then answers revocation and expiry queries.
 - **Fail closed.** An authorizer exception, a non-decision return value, an unrecordable result, or an
   action exception all end in a Rejection Root receipt, never in a commit.
+- **What is recorded is what was submitted.** `Proposal.payload` is a deep read-only view of the
+  payload's canonical bytes, so in-place edits raise. Because `object.__setattr__` bypasses any frozen
+  dataclass, the gate also pins the proposal's canonical bytes on entry, takes every id from the pin,
+  and writes only the pinned copy into receipts. A proposal that no longer matches the pin aborts with
+  `PROPOSAL_MUTATED`, and a proposal poisoned with a non-canonical value still gets exactly one receipt
+  (`tests/gate/test_proposal_integrity.py`). Before this, an action could rewrite the payload and
+  commit it under the decision issued for the original, or leave no receipt at all.
 
 ## Tests and mutations
 
@@ -94,5 +102,9 @@ ledger-recorded form of the same-transaction direction chosen in GD-0003 (D8).
   (`test_two_gates_sharing_a_ledger_cannot_both_commit`). Live reservations are per gate, so two gates
   may both *run* the action for the same proposal. Only one commits, and the other aborts with
   `ALREADY_COMMITTED`.
+- **A decision is not bound to the proposal it was issued for.** `AuthorizationDecision` carries no
+  proposal id or digest, so the gate cannot tell a decision issued for this proposal from one issued
+  for another. That binding is the authorizer's responsibility. Closing it needs a proposal digest
+  in the decision contract, checked by the gate.
 - The veto source is the software twin. Wiring it to a real latch is outside this repository.
 - Windows use an injected integer clock. Clock trust is the deployer's problem.

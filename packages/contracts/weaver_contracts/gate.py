@@ -12,6 +12,7 @@ from __future__ import annotations
 import re
 from collections.abc import Mapping
 from dataclasses import dataclass, field
+from types import MappingProxyType
 from typing import Any
 
 from .canonical import CanonicalizationError, canonicalize, parse_strict
@@ -37,6 +38,15 @@ def _token(name: str, value: Any) -> str:
     return value
 
 
+def _read_only(value: Any) -> Any:
+    """Deep read-only view of a parsed WX-CJSON-1 tree: mapping proxies and tuples."""
+    if isinstance(value, dict):
+        return MappingProxyType({key: _read_only(item) for key, item in value.items()})
+    if isinstance(value, list):
+        return tuple(_read_only(item) for item in value)
+    return value
+
+
 @dataclass(frozen=True)
 class Proposal:
     """What cognition proposes. It carries no authority of its own."""
@@ -46,6 +56,7 @@ class Proposal:
     action: str
     policy_version: str
     payload: Mapping[str, Any] = field(default_factory=dict)
+    _payload_bytes: bytes = field(init=False, repr=False, compare=False, default=b"")
 
     def __post_init__(self) -> None:
         _identifier("proposal_id", self.proposal_id)
@@ -55,11 +66,15 @@ class Proposal:
         if not isinstance(self.payload, Mapping):
             raise GateContractError("payload must be an object")
         try:
-            frozen = parse_strict(canonicalize(dict(self.payload)))
+            canonical = canonicalize(dict(self.payload))
+            parsed = parse_strict(canonical)
         except CanonicalizationError as exc:
             raise GateContractError(f"payload is not WX-CJSON-1 canonicalizable: {exc}") from exc
-        # Store a private copy so later mutation of the caller's dict changes nothing.
-        object.__setattr__(self, "payload", frozen)
+        # The canonical bytes are the payload of record. ``payload`` is a deep read-only
+        # view of them: neither the caller's dict nor code holding this proposal (an
+        # action, an authorizer) can change what to_dict() reports.
+        object.__setattr__(self, "_payload_bytes", canonical)
+        object.__setattr__(self, "payload", _read_only(parsed))
 
     def to_dict(self) -> dict[str, Any]:
         return {
@@ -67,7 +82,7 @@ class Proposal:
             "actor_id": self.actor_id,
             "action": self.action,
             "policy_version": self.policy_version,
-            "payload": parse_strict(canonicalize(dict(self.payload))),
+            "payload": parse_strict(self._payload_bytes),
         }
 
 
