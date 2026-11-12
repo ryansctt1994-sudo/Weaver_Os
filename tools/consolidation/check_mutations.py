@@ -50,6 +50,21 @@ MUTANTS = [
         '"legacy", "evidence"',
         "tests/test_trust_domains.py::test_advisory_consolidation_tools_cannot_enter_the_runtime",
     ),
+    (
+        "claim-read-bound",
+        "tools/claim_audit/claim_audit.py",
+        "data = stream.read(MAX_BYTES + 1)",
+        "data = stream.read()",
+        "tests/consolidation/test_claim_audit.py::"
+        "test_text_read_has_a_bound_before_allocating_the_contents",
+    ),
+    (
+        "claim-root-path-screen",
+        "tools/claim_audit/claim_audit.py",
+        "if root is not None:",
+        "if False:",
+        "tests/consolidation/test_claim_audit.py::test_text_reader_refuses_a_symlinked_ancestor",
+    ),
 ]
 
 

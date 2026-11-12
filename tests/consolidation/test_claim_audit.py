@@ -394,3 +394,13 @@ def test_text_read_has_a_bound_before_allocating_the_contents(tmp_path, monkeypa
 
     monkeypatch.setattr(Path, "open", open_file)
     assert ca._read_text(target) == "A prototype.\n"
+
+
+def test_text_reader_refuses_a_symlinked_ancestor(tmp_path):
+    root = tmp_path / "repo"
+    root.mkdir()
+    outside = tmp_path / "outside"
+    outside.mkdir()
+    (outside / "file.md").write_text("private text\n")
+    (root / "linked").symlink_to(outside, target_is_directory=True)
+    assert ca._read_text(root / "linked" / "file.md", root) is None

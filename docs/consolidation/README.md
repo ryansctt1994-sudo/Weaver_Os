@@ -30,8 +30,9 @@ validation is claimed. A successful donor test does not promote a combined tree.
 `source-manifest.json` pins original commits, source bytes, transformed target
 bytes and disposition. `python -m tools.consolidation.validate` refuses drift,
 escaped paths, symlinked assets or activation through the manifest.
-Five independent control-removal checks cover the log SET signature, signed
-checkpoint, finding type distinctions, asset digests and advisory import boundary:
+Seven independent control-removal checks cover the log SET signature, signed
+checkpoint, finding type distinctions, asset digests, advisory import boundary,
+bounded claim reads and the root path screen:
 `python -m tools.consolidation.check_mutations`. A failed baseline refuses scoring.
 
 ## Preserved research, not enabled authority

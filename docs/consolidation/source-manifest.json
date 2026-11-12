@@ -77,7 +77,7 @@
       "source_sha256": "9cbc4f60375843142f11ce05460d47a0949dd02d9317c593f247dfbdef528292",
       "target": "tests/consolidation/test_claim_audit.py",
       "disposition": "adapted-contract-tests",
-      "target_sha256": "2669db8f470e51bf0a3550bda01f12a8e75042dee21deb2d9f66eae79fd7ef3f"
+      "target_sha256": "958b1000d857895fc0eea033bfec566413e26dff11baf7a14c70f7116c076df8"
     },
     {
       "source_repository": "https://github.com/ryansctt1994-sudo/Weaver--Cathedral-.git",
