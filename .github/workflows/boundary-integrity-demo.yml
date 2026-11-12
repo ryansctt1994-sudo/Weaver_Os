@@ -33,6 +33,7 @@ jobs:
 
       - name: Run demo suite
         run: |
+          set -euo pipefail
           chmod +x demo/run_demo.sh
           bash demo/run_demo.sh | tee receipts/demo/boundary_integrity_demo_v0_1_stdout.txt
 
