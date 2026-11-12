@@ -1,0 +1,6 @@
+name = "wns-kernel"
+version = "0.1.0"
+defaultTargets = ["WNSKernel"]
+
+[[lean_lib]]
+name = "WNSKernel"
