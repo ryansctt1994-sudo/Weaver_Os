@@ -193,5 +193,5 @@ def test_fusion_may_only_import_contracts(tmp_path):
 
 def test_fusion_cannot_open_database_or_spawn_processes(tmp_path):
     _tree(tmp_path)
-    _write(tmp_path, "packages/fusion/weaver_fusion/__init__.py", "import sqlite3\nimport subprocess\n")
+    _write(\n        tmp_path,\n        "packages/fusion/weaver_fusion/__init__.py",\n        "import sqlite3\nimport subprocess\n",\n    )
     assert _rules(check(tmp_path)[0]) == ["IO_CAPABLE_IMPORT", "IO_CAPABLE_IMPORT"]
