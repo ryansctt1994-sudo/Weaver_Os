@@ -2,7 +2,7 @@
 
 This checklist defines the minimum receipts required before Weaver OS can be labeled as a release candidate.
 
-Current posture: **DEVELOPMENT / VERIFICATION SPINE**. Release candidate: **NOT EARNED**. One required receipt is BLOCKED, and the production-blocking gaps below are open.
+Current posture: **DEVELOPMENT / VERIFICATION SPINE**. Release candidate: **NOT EARNED**. One required receipt is BLOCKED, and the remaining production-blocking gaps below are open.
 
 Do not mark this repository production-ready until every required receipt below is present and linked from the release notes.
 
@@ -109,7 +109,7 @@ So a rebuild from source does not reproduce a recorded digest, and nobody can co
 
 ## Gap status after PR #122
 
-At `7f839efad8c273b979678b0f94e5b1175136b0ab`, [PR #122](https://github.com/ryansctt1994-sudo/Weaver_Os/pull/122) is merged. Historical gaps #2 and #3 below are **CLOSED at the verifier-code level**: signing domains and payload schema versions are allowlisted together for each payload type, with fail-closed rejection of unsupported or malformed values. The combined pre-merge head `a5681c5` passed all 12 checks and 783 tests under Python 3.12; the merged commit has the same source tree.
+At `7f839efad8c273b979678b0f94e5b1175136b0ab`, [PR #122](https://github.com/ryansctt1994-sudo/Weaver_Os/pull/122) is merged. Historical gaps #2 and #3 below are **IMPLEMENTED and CI PASSED at `a5681c5`; no longer open gaps at the verifier-code level**: signing domains and payload schema versions are allowlisted together for each payload type, with fail-closed rejection of unsupported or malformed values. All 12 checks associated with the combined pre-merge head `a5681c5` passed. The Python 3.10, 3.11, and 3.12 test matrix each passed 783 tests on GitHub's test-merge commit `837bf975a9e29f59d91d66c0060ab0e028366d11`. The exact-commit rehearsal separately verified `a5681c588197180730e39d2c3807734389700c90` itself. Both that head and the landed main commit have the same source tree as the tested merge commit.
 
 This does not establish production integration. The allowlist remains a reviewed code constant with no deprecation or expiry mechanism, and no production caller is established. Other gaps and the blocked retained-artifact receipt remain unchanged. The receipts below and their raw evidence remain scoped to `c24f7cb`; they are not reissued for the newer commit. E2 / W0 / O0_WITHHELD is unchanged.
 
