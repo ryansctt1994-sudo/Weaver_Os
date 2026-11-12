@@ -2,14 +2,12 @@
 
 from __future__ import annotations
 
-import copy
-
 import pytest
 
 from weaver_contracts.canonical import canonicalize
 from weaver_contracts.gate import Proposal
 
-from weaver_fusion.action_bridge import ActionBridgeError, bridge_action, proposal_canonical_bytes
+from weaver_fusion.action_bridge import bridge_action, proposal_canonical_bytes
 
 
 def _valid_request() -> dict:
@@ -41,7 +39,6 @@ def test_valid_request_produces_expected_proposal():
 
 def test_output_is_wx_cjson_1_canonicalizable():
     proposal = bridge_action(_valid_request())
-    # Round-trip through Weaver's own canonicalization must succeed.
     raw = proposal_canonical_bytes(proposal)
     assert canonicalize(proposal.to_dict()) == raw
 
@@ -56,10 +53,22 @@ def test_mutable_input_cannot_change_constructed_proposal():
 
 
 def test_equivalent_encodings_produce_identical_canonical_bytes():
+    """Differing key order in the input payload still yields the same
+    canonical Proposal bytes after WX-CJSON-1 normalization.
+    """
     a = bridge_action(_valid_request())
-    # Different key order in the payload dict.
     request_b = _valid_request()
-    request_b["action_op"]["payload"] = {"value": "ready"}  # already single key
+    # Rebuild payload with keys in a different construction order.
+    request_b["action_op"]["payload"] = {"value": "ready"}
+    # Also reorder the action_op keys by reconstructing the dict.
+    op = request_b["action_op"]
+    request_b["action_op"] = {
+        "authority_required": op["authority_required"],
+        "payload": op["payload"],
+        "target": op["target"],
+        "actor": op["actor"],
+        "op_type": op["op_type"],
+    }
     b = bridge_action(request_b)
     assert proposal_canonical_bytes(a) == proposal_canonical_bytes(b)
 
