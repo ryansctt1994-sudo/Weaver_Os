@@ -44,3 +44,7 @@ python -m tools.verify_all
 Acceptance requires actual logs for this exact head, negative controls, and review of all active imports and license files. This branch intentionally does not carry unrelated tools or eight archival ZIP snapshots, which remain frozen in #135. Recheck on the final integrated tree; no source's previous CI results transfer to this SHA.
 
 **E2 · W0 · O0 WITHHELD · V008 HOLD · DO NOT MERGE · PRODUCTION PROHIBITED.**
+
+## Retained first-attempt failure
+
+On initial source `7581a109673dd94b75881c613d5becd0f60ef1d8`, the isolated simulation workflow executed and **passed** Arty startup, debounce and board-wrapper simulations, plus all five existing latch-negative controls. Its final `tools.gen_latch_vectors --check` step failed with `ModuleNotFoundError: weaver_runtime` because the workflow lacked a package-install step. The following corrective commit installs Weaver in editable mode before simulation. Preserve the original red workflow rather than treating it as a hardware failure or pass; the new exact-head hosted run must complete before declaring the full simulation job green.
