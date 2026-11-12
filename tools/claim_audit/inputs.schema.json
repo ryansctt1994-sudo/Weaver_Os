@@ -1,0 +1,13 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "governance.claim_audit input",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["root"],
+  "properties": {
+    "root": {"type": "string", "minLength": 1, "description": "Directory of the repository to audit."},
+    "config": {"type": ["string", "null"], "description": "Claims config. Default: governance/claims.json or claims.json under root."},
+    "json": {"type": ["string", "null"], "description": "Where to write the full JSON report."},
+    "show_info": {"type": "boolean", "default": false}
+  }
+}

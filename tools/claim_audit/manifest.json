@@ -1,0 +1,18 @@
+{
+  "id": "governance.claim_audit",
+  "name": "Claim Audit",
+  "version": "0.1.0",
+  "domain": "governance",
+  "evidence_level": "E1",
+  "allowed_agents": ["Verifier", "Sentinel", "Archivist"],
+  "requires_human_approval": false,
+  "network_access": "none",
+  "writes_files": true,
+  "executes_code": false,
+  "risk_level": "low",
+  "source_lineage": [
+    "Weaver--Cathedral-: governance/open_gap_ledger.md (Blocking Rule)",
+    "Weaver--Cathedral-: skills/SKILL_SPEC.md (First Skills To Implement)"
+  ],
+  "entrypoint": "claim_audit.py"
+}

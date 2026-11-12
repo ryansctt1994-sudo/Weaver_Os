@@ -1,0 +1,48 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "governance.claim_audit report",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "report_version", "skill_id", "skill_version", "root", "git_commit", "terms_source", "blocked_terms",
+    "watch_terms", "config", "config_sha256", "files_scanned", "counts", "errors", "warnings", "waiver_debt",
+    "passed", "findings", "hash_profile", "report_hash"
+  ],
+  "properties": {
+    "report_version": {"const": "weaver.skill.claim_audit.report.v1"},
+    "skill_id": {"const": "governance.claim_audit"},
+    "skill_version": {"type": "string"},
+    "root": {"type": "string"},
+    "git_commit": {"type": ["string", "null"]},
+    "terms_source": {"type": "string"},
+    "blocked_terms": {"type": "array", "items": {"type": "string"}, "minItems": 1},
+    "watch_terms": {"type": "array", "items": {"type": "string"}},
+    "config": {"type": ["string", "null"]},
+    "config_sha256": {"type": ["string", "null"], "pattern": "^[a-f0-9]{64}$"},
+    "files_scanned": {"type": "integer", "minimum": 0},
+    "counts": {"type": "object", "additionalProperties": {"type": "integer", "minimum": 1}},
+    "errors": {"type": "integer", "minimum": 0},
+    "warnings": {"type": "integer", "minimum": 0},
+    "waiver_debt": {"type": "integer", "minimum": 0},
+    "passed": {"type": "boolean"},
+    "findings": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["file", "line", "term", "severity", "category", "text", "rule"],
+        "properties": {
+          "file": {"type": "string"},
+          "line": {"type": "integer", "minimum": 0},
+          "term": {"type": "string"},
+          "severity": {"enum": ["error", "warning", "info"]},
+          "category": {"enum": ["claim", "path_claim", "denied", "backed", "waived", "evidence_missing", "stale_entry"]},
+          "text": {"type": "string"},
+          "rule": {"type": "string"}
+        }
+      }
+    },
+    "hash_profile": {"const": "jcs.rfc8785"},
+    "report_hash": {"type": "string", "pattern": "^[a-f0-9]{64}$"}
+  }
+}
