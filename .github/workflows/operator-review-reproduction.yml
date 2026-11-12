@@ -1,7 +1,19 @@
 name: Exact-commit operator rehearsal
 
+# Runs on every PR and every push to main. An operator can also rehearse any exact
+# commit on demand. The expected commit always comes from the event (or the
+# operator's input), never from the checkout under test, and the tool itself
+# strips GITHUB_SHA/GITHUB_REF before running the verifier.
 on:
   pull_request:
+  push:
+    branches: [main]
+  workflow_dispatch:
+    inputs:
+      expected_head:
+        description: "Full 40-hex commit SHA to rehearse"
+        required: true
+        type: string
 
 permissions:
   contents: read
@@ -9,16 +21,24 @@ permissions:
 jobs:
   source-replay:
     name: Detached source operator rehearsal
-    if: github.event.pull_request.head.ref == 'integration/p0-main-reland-20261111-v1'
     runs-on: ubuntu-24.04
     timeout-minutes: 25
     env:
-      EXPECTED_SOURCE_SHA: ${{ github.event.pull_request.head.sha }}
+      EXPECTED_SOURCE_SHA: ${{ inputs.expected_head || github.event.pull_request.head.sha || github.sha }}
     steps:
-      - name: Check out exact PR source commit detached
+      - name: Refuse a malformed expected commit before checkout
+        shell: bash
+        run: |
+          set -euo pipefail
+          if [[ ! "$EXPECTED_SOURCE_SHA" =~ ^[0-9a-f]{40}$ ]]; then
+            echo "REFUSED: expected head is not a full lowercase 40-hex SHA" >&2
+            exit 1
+          fi
+
+      - name: Check out exact source commit detached
         uses: actions/checkout@v4
         with:
-          ref: ${{ github.event.pull_request.head.sha }}
+          ref: ${{ env.EXPECTED_SOURCE_SHA }}
           persist-credentials: false
 
       - name: Set up locked Python
@@ -53,7 +73,7 @@ jobs:
         if: always()
         uses: actions/upload-artifact@v4
         with:
-          name: operator-rehearsal-${{ github.event.pull_request.head.sha }}
+          name: operator-rehearsal-${{ env.EXPECTED_SOURCE_SHA }}
           path: |
             ${{ runner.temp }}/operator-evidence/
             verification-output/
