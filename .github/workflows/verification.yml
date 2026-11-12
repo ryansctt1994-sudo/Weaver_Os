@@ -32,6 +32,8 @@ jobs:
           python -m pip install -r requirements-verification.lock 2>&1 | tee verification-output/install.log
       - name: Run complete fail-closed verification gate
         run: make verify
+      - name: Independently cross-check final evidence bundle bytes
+        run: python -m tools.verify_evidence_bundle --root . --output verification-output
       - name: Retain evidence even on failure
         if: always()
         uses: actions/upload-artifact@v4
