@@ -4,7 +4,6 @@ from __future__ import annotations
 
 from weaver_contracts.canonical import canonicalize
 from weaver_contracts.gate import Proposal
-
 from weaver_fusion.action_bridge import bridge_action, proposal_canonical_bytes
 
 

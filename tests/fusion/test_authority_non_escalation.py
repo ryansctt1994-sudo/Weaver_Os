@@ -8,7 +8,6 @@ separation only; they do not exercise an end-to-end owner refusal path.
 from __future__ import annotations
 
 import pytest
-
 from weaver_fusion.action_bridge import bridge_action
 
 
