@@ -44,10 +44,12 @@ ALLOWED: dict[str, frozenset[str]] = {
     "learning": frozenset({"contracts", "runtime"}),
     "release_guard": frozenset({"contracts"}),
     "adapters": frozenset({"contracts"}),
+    # Proposal-only ZOREL/Delta bridge: no runtime, verifier, witness or ledger imports.
+    "fusion": frozenset({"contracts"}),
 }
 NON_RUNTIME_ZONES = frozenset({"research", "archive", "legacy", "evidence"})
 STDLIB_ONLY = frozenset({"contracts"})
-NO_IO_DOMAINS = frozenset({"contracts", "verifier"})
+NO_IO_DOMAINS = frozenset({"contracts", "verifier", "fusion"})
 IO_CAPABLE_MODULES = frozenset(
     {
         "asyncio",
