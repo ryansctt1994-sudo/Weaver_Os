@@ -2,8 +2,6 @@
 
 from __future__ import annotations
 
-import pytest
-
 from weaver_contracts.canonical import canonicalize
 from weaver_contracts.gate import Proposal
 

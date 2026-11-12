@@ -12,7 +12,7 @@ from __future__ import annotations
 
 from typing import Any
 
-from weaver_contracts.canonical import CanonicalizationError, canonicalize, parse_strict
+from weaver_contracts.canonical import CanonicalizationError, canonicalize
 from weaver_contracts.gate import GateContractError, Proposal
 
 SCHEMA = "WF-ACTION-1"
