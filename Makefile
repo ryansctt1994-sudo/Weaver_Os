@@ -7,6 +7,11 @@ verify-e35:
 	fi
 	@python3 verify_attestations.py --scope e35
 
+.PHONY: verify-e35-runtime
+verify-e35-runtime:
+	@echo "🔍 Verifying E3.5 governance runtime admission..."
+	@python3 -m tools.e35_runtime_gate
+
 .PHONY: verify-spine
 verify-spine:
 	@echo "🔍 Verifying local deterministic spine..."
