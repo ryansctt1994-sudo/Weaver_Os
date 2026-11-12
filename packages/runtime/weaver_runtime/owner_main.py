@@ -25,8 +25,10 @@ Fault injection (crash-recovery tests only): if the launcher sets
 * ``inside-commit-transaction``: after the effect row is written, before SQLite commits;
 * ``after-commit-before-reply``: after the commit, before the reply is sent.
 
-Only the launcher's environment can arm it, never a request. An unknown value refuses to
-start, and an armed failpoint is announced on stderr.
+Arming needs two trusted inputs: the variable AND ``"test_failpoints": true`` in the
+owner-private config. A deployment config leaves ``test_failpoints`` out, and then the
+variable makes the owner refuse to start rather than arm anything. A request can never arm
+a failpoint. Unknown names refuse to start; an enabled config is announced on stderr.
 """
 from __future__ import annotations
 
@@ -52,7 +54,7 @@ _PR_SET_DUMPABLE = 4
 _REQUIRED = frozenset(
     {"data_dir", "socket_path", "issuer_id", "allowed_keys", "trusted_public_key_b64", "peers"}
 )
-_OPTIONAL = frozenset({"audience", "ledger_id"})
+_OPTIONAL = frozenset({"audience", "ledger_id", "test_failpoints"})
 _SIDECARS = ("", "-wal", "-shm", "-journal")
 FAILPOINT_ENV = "WEAVER_OWNER_FAILPOINT"
 _FAILPOINTS = frozenset({"inside-commit-transaction", "after-commit-before-reply"})
@@ -154,11 +156,19 @@ def run(config_path: str) -> int:
     os.umask(0o077)
     _set_non_dumpable()
     config = _load_config(config_path)
+    enabled = config.get("test_failpoints", False)
+    if not isinstance(enabled, bool):
+        raise StartupRefused("test_failpoints must be true or false")
     failpoint = os.environ.get(FAILPOINT_ENV, "")
+    if failpoint and not enabled:
+        raise StartupRefused(
+            f"{FAILPOINT_ENV} is set but this owner's config does not enable test_failpoints"
+        )
     if failpoint and failpoint not in _FAILPOINTS:
         raise StartupRefused(f"unknown failpoint {failpoint!r}")
-    if failpoint:
-        print(f"FAILPOINT ARMED: {failpoint}", file=sys.stderr, flush=True)
+    if enabled:
+        armed = f"; armed: {failpoint}" if failpoint else "; none armed"
+        print(f"TEST FAILPOINTS ENABLED{armed}", file=sys.stderr, flush=True)
 
     data_dir = Path(config["data_dir"])
     assert_trusted_path(data_dir, os.geteuid(), leaf="private_dir")

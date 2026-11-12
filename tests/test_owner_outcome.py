@@ -59,8 +59,15 @@ def owner_and_key(tmp_path):
     owner.close()
 
 
-def proposal(pid="p1", value="one"):
-    return Proposal(pid, "agent-a", "WRITE_KEY", "policy-v1", {"key": "alpha", "value": value})
+def proposal(pid="p1", value="one", actor="agent-a"):
+    return Proposal(pid, actor, "WRITE_KEY", "policy-v1", {"key": "alpha", "value": value})
+
+
+A = frozenset({"agent-a"})
+
+
+def look(snapshot, proposal_id, **kwargs):
+    return lookup_outcome(snapshot, proposal_id, actors=kwargs.pop("actors", A), **kwargs)
 
 
 def grant(key, p):
@@ -77,7 +84,7 @@ def grant(key, p):
 
 def test_unseen_proposal_is_unknown_not_refused(owner_and_key):
     owner, _key = owner_and_key
-    found = lookup_outcome(owner.snapshot(), "never-sent")
+    found = look(owner.snapshot(), "never-sent")
     assert (found["status"], found["final"], found["receipt"]) == (UNKNOWN, False, None)
 
 
@@ -86,7 +93,7 @@ def test_commit_is_reported_with_its_own_receipt(owner_and_key):
     p = proposal()
     attempt = owner.submit(p, grant(key, p))
     assert attempt.status == ATTEMPT_COMMITTED
-    found = lookup_outcome(owner.snapshot(), "p1")
+    found = look(owner.snapshot(), "p1")
     assert found["status"] == COMMITTED and found["final"] is True
     assert found["receipt"]["receipt_digest"] == attempt.receipt.receipt_digest
     assert found["proposal_sha256"] == proposal_digest(p.to_dict())
@@ -96,10 +103,10 @@ def test_refusal_is_reported_as_not_final_and_a_later_commit_wins(owner_and_key)
     owner, key = owner_and_key
     p = proposal()
     assert owner.submit(p, None).status != ATTEMPT_COMMITTED
-    refused = lookup_outcome(owner.snapshot(), "p1")
+    refused = look(owner.snapshot(), "p1")
     assert (refused["status"], refused["final"], refused["refused_attempts"]) == (REFUSED, False, 1)
     assert owner.submit(p, grant(key, p)).status == ATTEMPT_COMMITTED
-    found = lookup_outcome(owner.snapshot(), "p1")
+    found = look(owner.snapshot(), "p1")
     assert (found["status"], found["refused_attempts"]) == (COMMITTED, 1)
 
 
@@ -110,7 +117,7 @@ def test_duplicate_after_commit_keeps_the_original_receipt(owner_and_key):
     first = owner.submit(p, signed)
     second = owner.submit(p, signed)  # V009: refused and chronicled
     assert second.status != ATTEMPT_COMMITTED
-    found = lookup_outcome(owner.snapshot(), "p1")
+    found = look(owner.snapshot(), "p1")
     assert found["receipt"]["receipt_digest"] == first.receipt.receipt_digest
     assert found["refused_attempts"] == 1
     assert owner.rows() == {"alpha": "one"}
@@ -123,7 +130,43 @@ def test_two_commits_for_one_proposal_id_are_reported_as_inconsistent(owner_and_
     snapshot = owner.snapshot()
     snapshot["roots"]["AUTHORITY"].append(snapshot["roots"]["AUTHORITY"][-1])
     with pytest.raises(OutcomeError):
-        lookup_outcome(snapshot, "p1")
+        look(snapshot, "p1")
+
+
+def test_other_actors_records_are_invisible_but_still_count_for_integrity(owner_and_key):
+    owner, key = owner_and_key
+    theirs = proposal(actor="agent-b")
+    assert owner.submit(theirs, grant(key, theirs)).status == ATTEMPT_COMMITTED
+    assert look(owner.snapshot(), "p1")["status"] == UNKNOWN  # agent-a sees nothing
+    assert look(owner.snapshot(), "p1", actors=frozenset({"agent-b"}))["status"] == COMMITTED
+    snapshot = owner.snapshot()
+    snapshot["roots"]["AUTHORITY"].append(snapshot["roots"]["AUTHORITY"][-1])
+    with pytest.raises(OutcomeError):
+        look(snapshot, "p1")  # invisible to agent-a, yet counted by the integrity check
+
+
+def test_own_commit_of_other_content_is_a_conflict_not_a_commit(owner_and_key):
+    owner, key = owner_and_key
+    p = proposal()
+    owner.submit(p, grant(key, p))
+    other = proposal(value="two")
+    found = look(owner.snapshot(), "p1", submitted_sha256=proposal_digest(other.to_dict()))
+    assert (found["status"], found["receipt"]) == (CONFLICT, None)
+    same = look(owner.snapshot(), "p1", submitted_sha256=proposal_digest(p.to_dict()))
+    assert same["status"] == COMMITTED
+
+
+def test_only_an_authorised_attempt_learns_another_actor_took_the_id(owner_and_key):
+    owner, key = owner_and_key
+    theirs = proposal(actor="agent-b")
+    owner.submit(theirs, grant(key, theirs))
+    probe = proposal()  # agent-a, same id
+    assert owner.submit(probe, None).reason_code != "ALREADY_COMMITTED"
+    assert look(owner.snapshot(), "p1")["status"] == REFUSED
+    authorised = owner.submit(probe, grant(key, probe))
+    assert authorised.reason_code == "ALREADY_COMMITTED"
+    found = look(owner.snapshot(), "p1")
+    assert (found["status"], found["final"], found["receipt"]) == (CONFLICT, True, None)
 
 
 class FakeOwner:

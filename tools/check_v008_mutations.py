@@ -139,15 +139,16 @@ MUTATIONS = [
     (
         "v008r-multiple-commit-guard-removed",
         "packages/runtime/weaver_runtime/owner_outcome.py",
-        "    if len(commits) > 1:",
+        "    if commits_seen > 1:",
         "    if False:",
         f"{OUTCOME_UNIT}::test_two_commits_for_one_proposal_id_are_reported_as_inconsistent",
     ),
     (
-        "v008r-service-conflict-check-skipped",
-        "packages/runtime/weaver_runtime/owner_service.py",
-        '        if found["status"] == COMMITTED and found["proposal_sha256"] != proposal_digest(',
-        '        if False and found["proposal_sha256"] != proposal_digest(',
+        "v008r-digest-conflict-check-skipped",
+        "packages/runtime/weaver_runtime/owner_outcome.py",
+        "        if submitted_sha256 is not None"
+        " and proposal_digest(proposal) != submitted_sha256:",
+        "        if False:",
         f"{CRASH}::test_same_id_with_different_content_is_a_conflict_never_a_commit",
     ),
     (
@@ -173,11 +174,19 @@ MUTATIONS = [
         f"{CRASH}::test_owner_killed_inside_the_commit_transaction_leaves_no_effect",
     ),
     (
-        "v008r-outcome-actor-check-skipped",
-        "packages/runtime/weaver_runtime/owner_service.py",
-        '        if found["actor_id"] is not None and found["actor_id"] not in actors:',
-        "        if False:",
-        f"{CRASH}::test_outcome_of_another_actors_proposal_is_not_disclosed",
+        "v008r-outcome-not-actor-scoped",
+        "packages/runtime/weaver_runtime/owner_outcome.py",
+        '            if proposal.get("actor_id") not in actors:\n',
+        "            if False:\n",
+        f"{CRASH}::test_another_actors_later_refusal_neither_leaks_nor_hides_your_own_record",
+    ),
+    (
+        "v008r-authorised-conflict-signal-ignored",
+        "packages/runtime/weaver_runtime/owner_outcome.py",
+        '    if any(receipt.get("reason_code") == _TAKEN for _, receipt in refusals):',
+        "    if False:",
+        f"{CRASH}::"
+        "test_an_authorised_attempt_on_an_id_another_actor_committed_is_a_final_conflict",
     ),
     (
         "v008r-unknown-failpoint-accepted",
@@ -185,6 +194,22 @@ MUTATIONS = [
         "    if failpoint and failpoint not in _FAILPOINTS:",
         "    if False:",
         f"{CRASH}::test_unknown_failpoint_refuses_to_start",
+    ),
+    (
+        "v008r-failpoint-opt-in-skipped",
+        "packages/runtime/weaver_runtime/owner_main.py",
+        "    if failpoint and not enabled:",
+        "    if False:",
+        f"{CRASH}::test_a_failpoint_cannot_be_armed_unless_the_owner_config_opts_in",
+    ),
+    (
+        "v008r-ledger-unique-key-claim-removed",
+        "packages/runtime/weaver_runtime/ledger.py",
+        "                if unique_key is not None:\n"
+        "                    self._claim_unique_key(unique_key, receipt)",
+        "                if False:\n"
+        "                    self._claim_unique_key(unique_key, receipt)",
+        f"{CRASH}::test_a_true_race_between_two_owners_is_settled_by_the_ledger_unique_key",
     ),
 ]
 

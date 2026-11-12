@@ -17,9 +17,15 @@ Statuses:
   commit transaction completed (which rolls back). It is not a refusal, and a request still
   queued at the owner may yet commit. Retrying the same proposal is safe: the unique key
   allows at most one commit.
-* ``CONFLICT`` (computed by callers that know the submitted proposal): the id is committed,
-  but for different proposal content. Final, and never to be reported as this proposal's
-  commit.
+* ``CONFLICT``: the id can never commit for this caller. Either the caller's own actor
+  committed it with different content (``submitted_sha256`` differs), or one of the caller's
+  own attempts was refused with ``ALREADY_COMMITTED``, which the gate only reports after the
+  attempt passed authorization. Final, carries no receipt, and is never reported as a commit.
+
+Visibility: a lookup sees only records whose proposal ``actor_id`` is in ``actors`` (the
+actors the asking peer may speak for). Other actors' commits, refusals and counts are never
+disclosed, and another actor's activity under the same id cannot hide the caller's own
+records. The one-commit-per-id integrity check still counts every actor.
 """
 from __future__ import annotations
 
@@ -36,6 +42,8 @@ CONFLICT = "CONFLICT"
 
 _COMMIT_EVENT = "EXECUTION_COMMITTED"
 _REFUSAL_EVENTS = frozenset({"EXECUTION_REFUSED", "EXECUTION_ABORTED"})
+# The gate's reason code when an attempt that passed authorization finds the id committed.
+_TAKEN = "ALREADY_COMMITTED"
 
 
 class OutcomeError(Exception):
@@ -56,8 +64,15 @@ def _proposal_of(entry: Mapping[str, Any]) -> dict[str, Any] | None:
     return proposal if isinstance(proposal, dict) else None
 
 
-def lookup_outcome(snapshot: Mapping[str, Any], proposal_id: str) -> dict[str, Any]:
+def lookup_outcome(
+    snapshot: Mapping[str, Any],
+    proposal_id: str,
+    *,
+    actors: frozenset[str],
+    submitted_sha256: str | None = None,
+) -> dict[str, Any]:
     roots = snapshot["roots"]
+    commits_seen = 0
     commits: list[tuple[dict[str, Any], dict[str, Any]]] = []
     refusals: list[tuple[dict[str, Any], dict[str, Any]]] = []
     for root, wanted, bucket in (
@@ -68,12 +83,19 @@ def lookup_outcome(snapshot: Mapping[str, Any], proposal_id: str) -> dict[str, A
             if entry["receipt"].get("event_type") not in wanted:
                 continue
             proposal = _proposal_of(entry)
-            if proposal is not None and proposal.get("proposal_id") == proposal_id:
-                bucket.append((proposal, dict(entry["receipt"])))
-    if len(commits) > 1:
-        raise OutcomeError(f"ledger holds {len(commits)} commits for {proposal_id!r}")
+            if proposal is None or proposal.get("proposal_id") != proposal_id:
+                continue
+            if root == "AUTHORITY":
+                commits_seen += 1  # integrity is checked across every actor
+            if proposal.get("actor_id") not in actors:
+                continue  # other actors' records stay invisible
+            bucket.append((proposal, dict(entry["receipt"])))
+    if commits_seen > 1:
+        raise OutcomeError(f"ledger holds {commits_seen} commits for {proposal_id!r}")
     if commits:
         proposal, receipt = commits[0]
+        if submitted_sha256 is not None and proposal_digest(proposal) != submitted_sha256:
+            return conflict(proposal_id)
         return {
             "status": COMMITTED,
             "final": True,
@@ -83,6 +105,8 @@ def lookup_outcome(snapshot: Mapping[str, Any], proposal_id: str) -> dict[str, A
             "receipt": receipt,
             "refused_attempts": len(refusals),
         }
+    if any(receipt.get("reason_code") == _TAKEN for _, receipt in refusals):
+        return conflict(proposal_id)
     if refusals:
         proposal, receipt = refusals[-1]
         return {

@@ -44,7 +44,7 @@ from .owner_ipc import (
     recv_frame,
     send_frame,
 )
-from .owner_outcome import COMMITTED, OutcomeError, conflict, lookup_outcome, proposal_digest
+from .owner_outcome import OutcomeError, lookup_outcome, proposal_digest
 from .protected_write import ProtectedWriteOwner
 
 _PROPOSAL_FIELDS = frozenset({"proposal_id", "actor_id", "action", "policy_version", "payload"})
@@ -167,19 +167,17 @@ class OwnerService:
     def _outcome(self, proposal_id: Any, actors: frozenset[str]) -> dict[str, Any]:
         if not isinstance(proposal_id, str) or not proposal_id:
             return {"ok": False, "error": "bad-request"}
-        found = lookup_outcome(self._owner.snapshot(), proposal_id)
-        # A peer may learn about proposals only for actors it may speak for.
-        if found["actor_id"] is not None and found["actor_id"] not in actors:
-            return {"ok": False, "error": "actor-not-permitted"}
+        # Only records of the actors this peer may speak for are visible.
+        found = lookup_outcome(self._owner.snapshot(), proposal_id, actors=actors)
         return {"ok": True, "outcome": found}
 
     def _proposal_outcome(self, proposal: Proposal) -> dict[str, Any]:
-        found = lookup_outcome(self._owner.snapshot(), proposal.proposal_id)
-        if found["status"] == COMMITTED and found["proposal_sha256"] != proposal_digest(
-            proposal.to_dict()
-        ):
-            return conflict(proposal.proposal_id)
-        return found
+        return lookup_outcome(
+            self._owner.snapshot(),
+            proposal.proposal_id,
+            actors=frozenset({proposal.actor_id}),
+            submitted_sha256=proposal_digest(proposal.to_dict()),
+        )
 
     def _submit(
         self, raw: Any, signed_grant: Any, actors: frozenset[str]

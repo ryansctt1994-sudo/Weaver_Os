@@ -17,8 +17,12 @@ host: this is local crash-recovery evidence, not independent validation.
 from __future__ import annotations
 
 import json
+import os
+import signal
 import subprocess
 import sys
+import time
+from pathlib import Path
 
 import pytest
 from test_v008_isolated_owner import (
@@ -30,7 +34,9 @@ from test_v008_isolated_owner import (
     make_grant,
     make_proposal,
 )
+from weaver_runtime.gate import ABORTED as ATTEMPT_ABORTED
 from weaver_runtime.gate import COMMITTED as ATTEMPT_COMMITTED
+from weaver_runtime.owner_outcome import proposal_digest
 
 pytestmark = pytest.mark.skipif(
     not sys.platform.startswith("linux"), reason="Linux SO_PEERCRED and /proc"
@@ -76,6 +82,51 @@ os.kill(os.getpid(), signal.SIGKILL)  # die without reading any reply
 """
 
 
+HOLD_WRITE_LOCK = """
+import sqlite3, sys
+conn = sqlite3.connect(sys.argv[1], isolation_level=None, timeout=10)
+conn.execute("BEGIN IMMEDIATE")
+print("LOCKED", flush=True)
+sys.stdin.readline()  # hold the write lock until the test says release
+conn.execute("ROLLBACK")
+"""
+
+SEND_AND_REPORT = """
+import json, socket, sys
+from weaver_runtime.owner_ipc import encode_frame, peer_credentials, recv_frame
+req = json.loads(sys.argv[1])
+sock = socket.socket(socket.AF_UNIX, socket.SOCK_STREAM)
+sock.settimeout(30)
+sock.connect(req["socket"])
+assert peer_credentials(sock).uid == req["owner_uid"]
+sock.sendall(encode_frame(req["request"]))
+print("SENT", flush=True)
+print(json.dumps(recv_frame(sock)), flush=True)
+"""
+
+
+def popen_as(dep, uid: int, code: str, *args: str, stdin=subprocess.DEVNULL):
+    return subprocess.Popen(
+        [sys.executable, "-c", code, *args], user=uid, group=uid, extra_groups=[],
+        env=dep.env(), cwd="/", stdin=stdin, stdout=subprocess.PIPE, stderr=subprocess.PIPE,
+        text=True,
+    )
+
+
+def second_owner(dep) -> Path:
+    """Start owner B on the same store, serving its own socket; return that socket."""
+    sock_b = dep.run / "owner-b.sock"
+    config_b = dep.conf / "owner-b.json"
+    Deployment.write_config_file(config_b, dict(dep.config, socket_path=str(sock_b)))
+    dep.start_extra_owner(config_b)
+    return sock_b
+
+
+def enable_test_failpoints(dep) -> None:
+    dep.config["test_failpoints"] = True
+    dep.write_config()
+
+
 @pytest.fixture
 def dep():
     deployment = Deployment()
@@ -97,13 +148,13 @@ def facts(dep, proposal_id: str) -> dict:
     return json.loads(done.stdout)
 
 
-def submit(dep, proposal, signed_grant, uid=REQUESTER_UID) -> dict:
-    return dep.submit(uid, proposal, signed_grant)
+def submit(dep, proposal, signed_grant, uid=REQUESTER_UID, **kwargs) -> dict:
+    return dep.submit(uid, proposal, signed_grant, **kwargs)
 
 
-def outcome(dep, proposal, uid=REQUESTER_UID) -> dict:
+def outcome(dep, proposal, uid=REQUESTER_UID, **kwargs) -> dict:
     target = proposal if isinstance(proposal, str) else proposal.to_dict()
-    return dep.call(uid, "outcome", target)
+    return dep.call(uid, "outcome", target, **kwargs)
 
 
 def replays(dep, anchor) -> bool:
@@ -172,15 +223,55 @@ def test_same_id_with_different_content_is_a_conflict_never_a_commit(live):
     assert_single_commit(live, "p1", {"alpha": "one"})
 
 
-def test_outcome_of_another_actors_proposal_is_not_disclosed(live):
-    theirs = make_proposal(pid="pb", key="beta", actor="agent-b")
-    reply = submit(live, theirs, make_grant(live.key, theirs), uid=SECOND_PEER_UID)["reply"]
+def _commit_as_agent_b(dep, pid="pb"):
+    theirs = make_proposal(pid=pid, key="beta", actor="agent-b")
+    reply = submit(dep, theirs, make_grant(dep.key, theirs), uid=SECOND_PEER_UID)["reply"]
     assert reply["status"] == ATTEMPT_COMMITTED
-    assert outcome(live, "pb")["reply"] == {"ok": False, "error": "actor-not-permitted"}
+    return theirs
+
+
+def test_another_actors_records_are_invisible_to_outcome_queries(live):
+    _commit_as_agent_b(live)
+    reply = outcome(live, "pb")["reply"]  # asked by the agent-a peer, by id only
+    assert reply["ok"], reply
+    assert (reply["outcome"]["status"], reply["outcome"]["receipt"]) == ("UNKNOWN", None)
     assert outcome(live, "pb", uid=SECOND_PEER_UID)["reply"]["outcome"]["status"] == "COMMITTED"
 
 
+def test_another_actors_later_refusal_neither_leaks_nor_hides_your_own_record(live):
+    mine = make_proposal(pid="px", key="beta", actor="agent-b")
+    submit(live, mine, None, uid=SECOND_PEER_UID)  # refused: no grant
+    intruder = make_proposal(pid="px")  # agent-a reuses the id, also refused
+    first = submit(live, intruder, None)["reply"]
+    assert first["outcome"]["refused_attempts"] == 1, "counts only agent-a's own attempts"
+    own = outcome(live, "px", uid=SECOND_PEER_UID)["reply"]
+    assert own["ok"], own
+    assert (own["outcome"]["status"], own["outcome"]["refused_attempts"]) == ("REFUSED", 1)
+    assert own["outcome"]["proposal_sha256"] == proposal_digest(mine.to_dict())
+
+
+def test_a_probe_without_a_grant_cannot_learn_that_another_actor_committed_an_id(live):
+    _commit_as_agent_b(live)
+    probe = make_proposal(pid="pb")  # agent-a, no grant
+    reply = submit(live, probe, None)["reply"]
+    assert reply["reason_code"] != "ALREADY_COMMITTED"  # the gate authorises first
+    assert reply["outcome"]["status"] == "REFUSED", reply["outcome"]
+    assert outcome(live, "pb")["reply"]["outcome"]["status"] == "REFUSED"
+
+
+def test_an_authorised_attempt_on_an_id_another_actor_committed_is_a_final_conflict(live):
+    _commit_as_agent_b(live)
+    mine = make_proposal(pid="pb")  # agent-a holds a valid grant for its own content
+    reply = submit(live, mine, make_grant(live.key, mine))["reply"]
+    assert reply["reason_code"] == "ALREADY_COMMITTED"  # disclosed by the gate, as in #125
+    assert (reply["outcome"]["status"], reply["outcome"]["final"]) == ("CONFLICT", True)
+    assert reply["outcome"]["receipt"] is None
+    assert outcome(live, mine)["reply"]["outcome"]["status"] == "CONFLICT"
+    assert_single_commit(live, "pb", {"beta": "one"})
+
+
 def test_owner_killed_inside_the_commit_transaction_leaves_no_effect(dep):
+    enable_test_failpoints(dep)
     dep.start_owner(failpoint="inside-commit-transaction")
     p = make_proposal()
     signed = make_grant(dep.key, p)
@@ -202,6 +293,7 @@ def test_owner_killed_inside_the_commit_transaction_leaves_no_effect(dep):
 
 
 def test_owner_killed_after_commit_before_reply_keeps_one_effect_and_its_receipt(dep):
+    enable_test_failpoints(dep)
     dep.start_owner(failpoint="after-commit-before-reply")
     p = make_proposal()
     signed = make_grant(dep.key, p)
@@ -267,6 +359,66 @@ def test_concurrent_identical_submissions_from_two_processes_commit_once(live):
     assert_single_commit(live, "p1", {"alpha": "one"})
 
 
+def test_a_true_race_between_two_owners_is_settled_by_the_ledger_unique_key(live):
+    """Both owners pass every in-memory check before either commits; the ledger decides."""
+    sock_b = second_owner(live)
+    p = make_proposal()
+    request = {"op": "submit", "proposal": p.to_dict(), "signed_grant": make_grant(live.key, p)}
+    holder = popen_as(
+        live, OWNER_UID, HOLD_WRITE_LOCK, str(live.data / "owner.db"), stdin=subprocess.PIPE
+    )
+    assert holder.stdout is not None and holder.stdin is not None
+    assert holder.stdout.readline().strip() == "LOCKED"
+    racers = [
+        popen_as(live, REQUESTER_UID, SEND_AND_REPORT, json.dumps(
+            {"socket": str(sock), "owner_uid": OWNER_UID, "request": request}
+        ))
+        for sock in (live.sock, sock_b)
+    ]
+    for racer in racers:
+        assert racer.stdout is not None
+        assert racer.stdout.readline().strip() == "SENT"
+    time.sleep(1.0)  # both owners are now authorised and parked at BEGIN IMMEDIATE
+    holder.stdin.write("release\n")
+    holder.stdin.flush()
+    holder.communicate(timeout=10)
+    replies = [json.loads(racer.communicate(timeout=30)[0]) for racer in racers]
+    winners = [r for r in replies if r["status"] == ATTEMPT_COMMITTED]
+    losers = [r for r in replies if r["status"] != ATTEMPT_COMMITTED]
+    assert len(winners) == 1 and len(losers) == 1, replies
+    # ABORTED at COMMIT (not REJECTED at RESERVE): the unique key stopped it, inside the
+    # transaction, after its effect was written and then rolled back.
+    assert (losers[0]["status"], losers[0]["reason_code"]) == (ATTEMPT_ABORTED, "ALREADY_COMMITTED")
+    receipt = winners[0]["receipt"]["receipt_digest"]
+    assert {r["outcome"]["receipt"]["receipt_digest"] for r in replies} == {receipt}
+    assert_single_commit(live, "p1", {"alpha": "one"})
+
+
+def test_unknown_while_the_original_is_still_queued_then_both_execute_once(live):
+    """UNKNOWN is a statement about durable history now, not about requests in flight."""
+    sock_b = second_owner(live)
+    p = make_proposal()
+    signed = make_grant(live.key, p)
+    assert live.proc is not None
+    os.kill(live.proc.pid, signal.SIGSTOP)  # owner A hangs; its queue keeps filling
+    try:
+        original = submit(live, p, signed, timeout=1)
+        assert original["error"] == "OutcomeUnknown"  # delivered to A, no reply
+        seen = outcome(live, p, socket_path=sock_b)["reply"]["outcome"]
+        assert seen["status"] == "UNKNOWN"  # true of durable history at this moment
+        retried = submit(live, p, signed, socket_path=sock_b)["reply"]
+        assert retried["status"] == ATTEMPT_COMMITTED
+    finally:
+        os.kill(live.proc.pid, signal.SIGCONT)
+    receipt = retried["receipt"]["receipt_digest"]
+    # A resumes, executes the queued original (refused, no second effect), then answers.
+    late = outcome(live, p, timeout=20)["reply"]["outcome"]
+    assert (late["status"], late["receipt"]["receipt_digest"]) == ("COMMITTED", receipt)
+    found = facts(live, "p1")
+    assert (found["commit_keys"], found["authority"], found["rejection"]) == (1, 1, 1), found
+    assert found["rows"] == {"alpha": "one"}
+
+
 def test_clean_restart_keeps_receipt_identity_and_history_replays(live):
     p = make_proposal()
     first = submit(live, p, make_grant(live.key, p))["reply"]
@@ -279,5 +431,15 @@ def test_clean_restart_keeps_receipt_identity_and_history_replays(live):
 
 
 def test_unknown_failpoint_refuses_to_start(dep):
+    enable_test_failpoints(dep)
     done = dep.refused_start(failpoint="crash-somewhere-else")
     assert done.returncode == 2 and "unknown failpoint" in done.stderr
+
+
+def test_a_failpoint_cannot_be_armed_unless_the_owner_config_opts_in(dep):
+    done = dep.refused_start(failpoint="after-commit-before-reply")
+    assert done.returncode == 2 and "does not enable test_failpoints" in done.stderr
+    dep.config["test_failpoints"] = "yes"
+    dep.write_config()
+    done = dep.refused_start(failpoint="after-commit-before-reply")
+    assert done.returncode == 2 and "must be true or false" in done.stderr
