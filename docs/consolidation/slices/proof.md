@@ -28,3 +28,9 @@ python -m tools.verify_all
 Acceptance requires actual logs for this exact head, negative controls, and review of all active imports and license files. This branch intentionally does not carry unrelated tools or eight archival ZIP snapshots, which remain frozen in #135. Recheck on the final integrated tree; no source's previous CI results transfer to this SHA.
 
 **E2 · W0 · O0 WITHHELD · V008 HOLD · DO NOT MERGE · PRODUCTION PROHIBITED.**
+
+## Exact-scope canonicalizer compatibility exception
+
+The historical Rekor SET/checkpoint signature input is not encoded as WX-CJSON-1. The existing repository-wide `tools.check_trust_domains` rule therefore needs a **single named exception** for `verifier/weaver_verifier/public_log.py`, matching the already-tested combined #135 candidate. This exception is restricted to the retained Rekor signature-byte profile; no other verifier or authority module may opt into legacy `json.dumps(sort_keys=True)` hashing. The checker continues to reject new legacy canonicalizers and stale allowlist entries.
+
+The first extracted candidate `cc8212a171cad9130c84d1e4073005c9ab1da2fd` failed hosted `unit_and_integration` because this exception was missing. Its original red reports must be retained. The follow-up is a compatibility check fix, not an authority relaxation or a new cryptographic proof.

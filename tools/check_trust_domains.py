@@ -71,6 +71,9 @@ STDLIB = frozenset(sys.stdlib_module_names) | {"__future__"}
 
 # Paths relative to packages/. Each entry names why the legacy canonicalizer stays.
 LEGACY_CANONICALIZER_ALLOWLIST: dict[str, str] = {
+    "verifier/weaver_verifier/public_log.py": (
+        "Rekor hashedrekord SET signature profile: historical signed bytes; not authority JSON"
+    ),
     "verifier/weaver_verifier/crypto.py": (
         "C-CANON-001: triadic_controls canonicalize_json; signatures in fixtures depend on it"
     ),
