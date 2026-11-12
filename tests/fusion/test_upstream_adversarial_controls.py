@@ -15,11 +15,12 @@ from __future__ import annotations
 import json
 
 import pytest
-from tests.ledger.helpers import open_ledger
 from weaver_contracts.canonical import CanonicalizationError, canonicalize, parse_strict
 from weaver_contracts.gate import AuthorizationDecision, Proposal
 from weaver_fusion.action_bridge import ActionBridgeError, bridge_action, proposal_canonical_bytes
 from weaver_runtime.gate import REJECTED, ExecutionGate
+
+from tests.ledger.helpers import open_ledger
 
 
 def _zorel_style_request(

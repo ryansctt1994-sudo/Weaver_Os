@@ -3,7 +3,6 @@
 from __future__ import annotations
 
 import pytest
-
 from weaver_fusion.action_bridge import ActionBridgeError, bridge_action
 
 

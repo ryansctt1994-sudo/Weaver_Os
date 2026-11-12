@@ -1,7 +1,7 @@
 # WF-001X — Source-pinned upstream adversarial controls
 
 **State:** TEST-ONLY, REVIEW-ONLY, DO NOT MERGE. Parent WF-001 PR #130 remains blocked.
-**Assurance:** E2 ceiling / W0 / O0 / V008 HOLD unchanged. No production authorization.
+**Assurance:** E2 ceiling / W0 / O0 / V008 HOLD unchanged. No production authorization. Parent PR #130 corrective revision remains subject to exact-head CI.
 
 ## Frozen source selection
 
@@ -9,7 +9,8 @@
 |---|---|---|---|
 | ZOREL / Cathedral | `abd777e43906cd7bacbd210a5975665730446d2f` | `tests/test_actionops.py`, `tests/test_admissibility.py`, `tests/test_replay.py` | Input shape, actor and authority declaration refusal, operation narrowing, mutation isolation, canonicalization differential |
 | Delta-717 | `c0a84e44967f9206fecc601acd370b5d7642fa0a` | `tests/guide/test_guide.py` | Malformed JSON and nonfinite probability metadata refusal; approval-as-advisory cannot bypass a denying Weaver gate |
-| Weaver OS | `e090726a31490b8f5be9f73bad96280c10709c5a` | WF-001 bridge and execution gate contracts | Behavior tested on the actual Weaver modules in the CI checkout |
+| Weaver OS | `e090726a31490b8f5be9f73bad96280c10709c5a` | Original WF-001 bridge contract source |
+| Weaver OS | `fffd18989708486e1970c6fdaa0a5d60b83a6a37` | Corrective parent PR #130: restricted fusion trust-domain registration and lint fixes; acceptance pending | Behavior tested on the actual Weaver modules in the CI checkout |
 
 **Nature of the tests:** These are *scenario adaptations* referencing upstream test purposes, not copies of their entire test suites, and do not import the upstream modules into production. Upstream ZOREL semantics have no power to issue Weaver grants. Delta's `APPROVED` or `VETO` statuses remain advisory. Delta's entropy metric represents probability dispersion, **not independently validated epistemic uncertainty**.
 
@@ -30,7 +31,7 @@ The exact-source CI environment must install the locked verification dependencie
 - Does not exercise signed-grant crypto validation or revocation/commit transaction racing.
 - Does not imply upstream ZOREL receipt hashes are interoperable with `WX-CJSON-1`.
 - Does not grant a trusted Delta decision path, import Delta's forensic ledger, or modify its entropy algorithm.
-- Does not repair PR #130's pre-existing UADR-0001 trust-domain omission or Ruff I001 failures.
+- Parent PR #130's UADR-0001 and three I001 fixes are incorporated by a two-parent reconciliation commit; their effectiveness and this PR's import-order fix still require fresh hosted verification.
 - Does not promote E2, W0, O0; green tests do not authorize merge or release.
 
 ## Required evidence
