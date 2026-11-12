@@ -31,6 +31,10 @@ from cryptography.hazmat.primitives.asymmetric.ed25519 import Ed25519PublicKey
 from jsonschema.exceptions import ValidationError
 from referencing import Registry, Resource
 from referencing.jsonschema import DRAFT202012
+from weaver_contracts.registry_sequence import (
+    MAX_REGISTRY_SEQUENCE,
+    RegistrySequenceStoreProtocol,
+)
 from weaver_contracts.replay import ReplayCacheProtocol, generate_replay_key
 
 
@@ -228,6 +232,35 @@ def verify_registry_root_signature(registry: dict[str, Any], root_public_key_b64
     )
 
 
+def _registry_content_digest(registry: dict[str, Any]) -> str:
+    """SHA-256 of the canonical registry without ``registry_signature`` (the signed content)."""
+    content = copy.deepcopy(registry)
+    content.pop("registry_signature", None)
+    return hashlib.sha256(canonicalize_json(content)).hexdigest()
+
+
+def _advance_registry_sequence(
+    registry: dict[str, Any], store: RegistrySequenceStoreProtocol
+) -> None:
+    """Refuse a rolled-back or conflicting registry; raise ``ValueError`` on refusal."""
+    registry_id = registry.get("registry_id")
+    sequence = registry.get("registry_sequence")
+    if not isinstance(registry_id, str) or not registry_id:
+        raise ValueError("CRITICAL: Key registry has no registry_id for rollback protection.")
+    if type(sequence) is not int or not 0 <= sequence <= MAX_REGISTRY_SEQUENCE:
+        raise ValueError(
+            "CRITICAL: Key registry registry_sequence must be an integer in "
+            f"[0, {MAX_REGISTRY_SEQUENCE}] for rollback protection."
+        )
+    refusal = store.advance(registry_id, sequence, _registry_content_digest(registry))
+    if refusal is not None:
+        raise ValueError(
+            f"CRITICAL: {refusal}: key registry {registry_id} at sequence {sequence} is older "
+            "than, or conflicts with, a registry this verifier's sequence store already "
+            "accepted. Trust boundary compromised."
+        )
+
+
 def verify_role(
     issuer_record: dict[str, Any],
     role_policies: dict[str, dict[str, Any]],
@@ -280,7 +313,18 @@ class CryptoVerifier:
         replay_cache: ReplayCacheProtocol,
         schemas: dict[str, dict[str, Any]] | None = None,
         root_public_key_b64url: str | None = None,
+        registry_sequence_store: RegistrySequenceStoreProtocol | None = None,
     ):
+        if registry_sequence_store is not None and root_public_key_b64url is None:
+            # Advancing the mark for an unauthenticated registry would let anyone lock out
+            # the real one by presenting a huge sequence.
+            raise ValueError(
+                "CRITICAL: registry rollback protection requires a root-signed registry; "
+                "pass root_public_key_b64url together with registry_sequence_store."
+            )
+        # Work on a private copy: the registry checked below is the registry used, and
+        # later edits to the caller's dict cannot change either.
+        key_registry = copy.deepcopy(key_registry)
         self.schemas = schemas or {}
         self.schema_registry = build_schema_registry(self.schemas) if self.schemas else None
         if "key_registry" in self.schemas:
@@ -299,14 +343,31 @@ class CryptoVerifier:
                 "CRITICAL: Key registry failed root signature verification. "
                 "Trust boundary compromised."
             )
+        # Build every piece of verifier state before touching the sequence store, so a
+        # registry that cannot be used never moves the persistent high-water mark.
+        issuers = {
+            f"{issuer['issuer_id']}|{issuer['key_id']}": issuer
+            for issuer in key_registry.get("issuers", [])
+        }
+        issuer_ids = {issuer.get("issuer_id") for issuer in key_registry.get("issuers", [])}
+        roles = {role["role_id"]: role for role in key_registry.get("roles", [])}
+        if registry_sequence_store is not None:
+            # A signed registry outside its window (for example a future one presented
+            # early) would otherwise lock out the current registry until it became valid.
+            fresh, freshness_failure = validate_registry_freshness(key_registry)
+            if not fresh:
+                raise ValueError(
+                    f"CRITICAL: {freshness_failure}: key registry is outside its validity "
+                    "window and cannot advance the rollback high-water mark."
+                )
+            # Last fallible step, and only after the root signature has verified, so only
+            # authenticated, usable registries can move the mark.
+            _advance_registry_sequence(key_registry, registry_sequence_store)
         self.registry = key_registry
         self.replay_cache = replay_cache
-        self._issuers = {
-            f"{issuer['issuer_id']}|{issuer['key_id']}": issuer
-            for issuer in self.registry.get("issuers", [])
-        }
-        self._issuer_ids = {issuer.get("issuer_id") for issuer in self.registry.get("issuers", [])}
-        self._roles = {role["role_id"]: role for role in self.registry.get("roles", [])}
+        self._issuers = issuers
+        self._issuer_ids = issuer_ids
+        self._roles = roles
 
     def _get_iso_now(self) -> str:
         return datetime.now(timezone.utc).isoformat(timespec="seconds")
