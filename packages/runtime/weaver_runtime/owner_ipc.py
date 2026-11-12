@@ -1,0 +1,229 @@
+"""WEAVER-V008 (first slice): IPC primitives for a separately privileged resource owner.
+
+Research-only. This module gives a requester process and an owner process a small,
+strict wire format and two kernel-backed checks:
+
+* ``peer_credentials`` reads SO_PEERCRED, the pid/uid/gid the kernel recorded when the
+  peer connected. Neither side can forge it by sending bytes.
+* ``assert_trusted_path`` refuses a path whose chain of directories could be rewritten by
+  an unprivileged user (symlinks, wrong owner, group/other-writable without sticky root).
+
+What this does NOT do: it does not protect against root, a kernel bug, a compromised owner
+uid, or an attacker who already runs as the owner uid. It is Linux-only (SO_PEERCRED, /proc).
+"""
+from __future__ import annotations
+
+import json
+import os
+import socket
+import stat
+import struct
+from collections.abc import Mapping
+from dataclasses import dataclass
+from pathlib import Path
+from typing import Any
+
+MAX_FRAME_BYTES = 64 * 1024
+_HEADER = struct.Struct(">I")
+_PEERCRED = struct.Struct("3i")
+
+_LEAF_KINDS = frozenset({"socket", "public_dir", "private_dir", "private_file"})
+
+
+class IpcError(Exception):
+    """Base class for owner IPC failures."""
+
+
+class FrameError(IpcError):
+    """A frame was oversized, truncated, not UTF-8 JSON, or ambiguous."""
+
+
+class PeerIdentityError(IpcError):
+    """The kernel-reported peer uid is not the expected one."""
+
+
+class UntrustedPathError(IpcError):
+    """A path component could be replaced or rewritten by an unprivileged user."""
+
+
+@dataclass(frozen=True)
+class PeerCredentials:
+    pid: int
+    uid: int
+    gid: int
+
+
+def _no_duplicate_keys(pairs: list[tuple[str, Any]]) -> dict[str, Any]:
+    out: dict[str, Any] = {}
+    for key, value in pairs:
+        if key in out:
+            raise FrameError(f"duplicate key {key!r}")
+        out[key] = value
+    return out
+
+
+def _reject_constant(name: str) -> Any:
+    raise FrameError(f"non-finite number {name}")
+
+
+def load_strict_json(text: str) -> Any:
+    """Parse JSON, refusing duplicate object keys and NaN/Infinity."""
+    try:
+        return json.loads(
+            text, object_pairs_hook=_no_duplicate_keys, parse_constant=_reject_constant
+        )
+    except ValueError as exc:  # includes JSONDecodeError and int-digit-limit errors
+        raise FrameError(f"not valid JSON: {exc}") from exc
+
+
+def encode_frame(obj: Any) -> bytes:
+    try:
+        body = json.dumps(
+            obj, separators=(",", ":"), allow_nan=False, ensure_ascii=True
+        ).encode("ascii")
+    except (TypeError, ValueError) as exc:
+        raise FrameError(f"not encodable: {exc}") from exc
+    if len(body) > MAX_FRAME_BYTES:
+        raise FrameError("frame too large")
+    return _HEADER.pack(len(body)) + body
+
+
+def _recv_exact(sock: socket.socket, count: int) -> bytes:
+    chunks: list[bytes] = []
+    remaining = count
+    while remaining:
+        chunk = sock.recv(remaining)
+        if not chunk:
+            raise FrameError("connection closed mid-frame")
+        chunks.append(chunk)
+        remaining -= len(chunk)
+    return b"".join(chunks)
+
+
+def recv_frame(sock: socket.socket) -> Any:
+    (length,) = _HEADER.unpack(_recv_exact(sock, _HEADER.size))
+    if length == 0 or length > MAX_FRAME_BYTES:
+        raise FrameError("frame length out of range")
+    body = _recv_exact(sock, length)
+    try:
+        text = body.decode("utf-8")
+    except UnicodeDecodeError as exc:
+        raise FrameError("frame is not UTF-8") from exc
+    return load_strict_json(text)
+
+
+def send_frame(sock: socket.socket, obj: Any) -> None:
+    sock.sendall(encode_frame(obj))
+
+
+def peer_credentials(sock: socket.socket) -> PeerCredentials:
+    raw = sock.getsockopt(socket.SOL_SOCKET, socket.SO_PEERCRED, _PEERCRED.size)
+    pid, uid, gid = _PEERCRED.unpack(raw)
+    return PeerCredentials(pid, uid, gid)
+
+
+def assert_trusted_path(path: str | os.PathLike[str], owner_uid: int, *, leaf: str) -> None:
+    """Refuse ``path`` unless no unprivileged user could redirect or replace it.
+
+    The path is walked lexically (it is never resolved through symlinks). Every ancestor
+    must be a real directory owned by root or ``owner_uid``. An ancestor that group or
+    other can write to is accepted only if it is root-owned and sticky (like ``/tmp``),
+    where an unprivileged user cannot rename or delete entries they do not own.
+
+    ``leaf`` is one of:
+      socket        a socket owned by owner_uid (any mode; see the note at the check)
+      public_dir    a directory owned by owner_uid, not group/other writable
+      private_dir   a directory owned by owner_uid, no group/other access at all
+      private_file  a regular file owned by owner_uid, no group/other access at all
+    """
+    if leaf not in _LEAF_KINDS:
+        raise ValueError(f"unknown leaf kind {leaf!r}")
+    absolute = Path(os.path.abspath(os.fspath(path)))
+    parts = absolute.parts
+    for depth in range(1, len(parts) + 1):
+        current = Path(*parts[:depth])
+        try:
+            st = os.lstat(current)
+        except OSError as exc:
+            raise UntrustedPathError(f"cannot stat {current}: {exc.strerror}") from exc
+        if stat.S_ISLNK(st.st_mode):
+            raise UntrustedPathError(f"{current} is a symlink")
+        if depth < len(parts):
+            if not stat.S_ISDIR(st.st_mode):
+                raise UntrustedPathError(f"{current} is not a directory")
+            if st.st_uid not in (0, owner_uid):
+                raise UntrustedPathError(f"{current} is owned by uid {st.st_uid}")
+            if st.st_mode & 0o022 and not (st.st_mode & stat.S_ISVTX and st.st_uid == 0):
+                raise UntrustedPathError(f"{current} is group/other writable")
+            continue
+        if st.st_uid != owner_uid:
+            raise UntrustedPathError(f"{current} is owned by uid {st.st_uid}")
+        kind_ok = {
+            "socket": stat.S_ISSOCK,
+            "public_dir": stat.S_ISDIR,
+            "private_dir": stat.S_ISDIR,
+            "private_file": stat.S_ISREG,
+        }[leaf](st.st_mode)
+        if not kind_ok:
+            raise UntrustedPathError(f"{current} is not the expected kind ({leaf})")
+        # A socket's mode bits decide who may connect, not who may replace it: replacing
+        # is governed by the (already checked) parent directory, and who may talk to the
+        # owner is decided by the peer uid, so a socket leaf has no forbidden mode bits.
+        forbidden = {"socket": 0, "public_dir": 0o022}.get(leaf, 0o077)
+        if st.st_mode & forbidden:
+            raise UntrustedPathError(
+                f"{current} has mode {oct(st.st_mode & 0o777)}; "
+                f"bits {oct(forbidden)} must be clear"
+            )
+
+
+class OwnerClient:
+    """Requester-side client. It proves WHO it is talking to before it sends anything.
+
+    The order is deliberate: validate the path chain, connect, read the kernel-reported
+    uid of the server, and only then write the request. A process that is not running as
+    ``expected_owner_uid`` never receives the signed grant.
+    """
+
+    def __init__(
+        self,
+        socket_path: str | os.PathLike[str],
+        *,
+        expected_owner_uid: int,
+        timeout: float = 5.0,
+        verify_path: bool = True,
+    ) -> None:
+        self._path = os.fspath(socket_path)
+        self._owner_uid = expected_owner_uid
+        self._timeout = timeout
+        # verify_path=False exists only so tests can exercise the peer-uid check on its
+        # own. A deployment must leave it on.
+        self._verify_path = verify_path
+
+    def _call(self, request: Mapping[str, Any]) -> dict[str, Any]:
+        frame = encode_frame(request)
+        if self._verify_path:
+            assert_trusted_path(self._path, self._owner_uid, leaf="socket")
+        with socket.socket(socket.AF_UNIX, socket.SOCK_STREAM) as sock:
+            sock.settimeout(self._timeout)
+            sock.connect(self._path)
+            creds = peer_credentials(sock)
+            if creds.uid != self._owner_uid:
+                raise PeerIdentityError(
+                    f"server runs as uid {creds.uid}, expected {self._owner_uid}"
+                )
+            sock.sendall(frame)
+            reply = recv_frame(sock)
+        if not isinstance(reply, dict):
+            raise FrameError("reply is not an object")
+        return reply
+
+    def submit(self, proposal: Any, signed_grant: Mapping[str, Any] | None) -> dict[str, Any]:
+        body = proposal if isinstance(proposal, Mapping) else proposal.to_dict()
+        return self._call({"op": "submit", "proposal": dict(body), "signed_grant": signed_grant})
+
+    def rows(self) -> dict[str, Any]:
+        return self._call({"op": "rows"})
+
+    def anchor(self) -> dict[str, Any]:
+        return self._call({"op": "anchor"})
