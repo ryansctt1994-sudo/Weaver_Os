@@ -1,0 +1,29 @@
+name: Arty review simulations (no hardware programming)
+on:
+  pull_request:
+    paths:
+      - 'hardware/lucifer_latch/arty_a7/**'
+      - 'tools/consolidation/check_hardware.py'
+      - '.github/workflows/arty-review.yml'
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  simulate:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Install Weaver's Python package for vector-twin imports
+        run: python -m pip install -e .
+      - name: Install simulator
+        run: sudo apt-get update && sudo apt-get install -y iverilog
+      - name: Simulate Arty startup and debounce; never program a board
+        run: python -m tools.consolidation.check_hardware
+      - name: Existing latch negative controls
+        run: python tools/hw_negative_controls.py
+      - name: Verify committed differential vectors
+        run: python -m tools.gen_latch_vectors --check
