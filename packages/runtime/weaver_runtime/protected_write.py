@@ -18,7 +18,6 @@ from typing import Any
 
 from cryptography.exceptions import InvalidSignature
 from cryptography.hazmat.primitives.asymmetric.ed25519 import Ed25519PublicKey
-
 from weaver_contracts.canonical import canonicalize
 from weaver_contracts.gate import AuthorizationDecision, Proposal
 

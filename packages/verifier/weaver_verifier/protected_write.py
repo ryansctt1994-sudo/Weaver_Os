@@ -9,6 +9,7 @@ from dataclasses import dataclass
 from typing import Any
 
 from weaver_contracts.canonical import parse_strict
+
 from .ledger import verify_snapshot
 
 

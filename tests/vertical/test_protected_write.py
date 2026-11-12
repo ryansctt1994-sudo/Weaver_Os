@@ -19,7 +19,6 @@ from pathlib import Path
 import pytest
 from cryptography.hazmat.primitives import serialization
 from cryptography.hazmat.primitives.asymmetric.ed25519 import Ed25519PrivateKey
-
 from weaver_contracts.canonical import canonicalize
 from weaver_contracts.gate import Proposal
 from weaver_runtime.gate import ABORTED, COMMITTED, REJECTED
@@ -168,7 +167,11 @@ def test_v007_proposal_replacement_detected_before_effect(env):
     assert owner.rows() == {}
 
 
-@pytest.mark.xfail(strict=True, reason="HOLD: same-UID subprocess can directly edit SQLite; OS owner isolation absent")
+@pytest.mark.xfail(
+    strict=True,
+    reason="HOLD: same-UID subprocess can directly edit SQLite; "
+    "OS owner isolation absent",
+)
 def test_v008_direct_sqlite_bypass_must_be_denied_by_os(env):
     owner, *_rest = env
     db = _rest[1]
@@ -230,10 +233,14 @@ def test_v011_precommit_exception_leaves_no_resource_change(env):
     assert counts(owner) == (0, 1)
 
 
-@pytest.mark.xfail(strict=True, reason="HOLD: process-kill-after-commit and acknowledgment-loss injection not yet exercised")
+@pytest.mark.xfail(
+    strict=True,
+    reason="HOLD: process-kill-after-commit and acknowledgment-loss "
+    "injection not yet exercised",
+)
 def test_v012_real_process_kill_after_commit_recovery_required():
     # A normal close/reopen is covered elsewhere; it is not a kill at the commit boundary.
-    assert False, "separate-process crash injector required"
+    raise AssertionError("separate-process crash injector required")
 
 
 def test_v013_fresh_python_process_replays_history(env):
