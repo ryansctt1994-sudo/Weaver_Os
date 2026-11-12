@@ -1,9 +1,15 @@
 """WVR-010: signing domains and payload schema versions are allowlisted, fail closed.
 
-Every envelope here carries a genuine Ed25519 signature over the exact signing object it
-declares. A refusal therefore comes from the allowlist, not from a bad signature. Each
-negative test asserts that the signature verifies, so the test cannot pass for the wrong
-reason.
+Two kinds of negative test live here.
+
+* Signature-verified rejection: the cross-domain, version-confusion and unknown-value tests.
+  Each envelope is signed over exactly the fields it declares, and the test asserts that the
+  signature verifies before it checks the refusal. The refusal therefore comes from the
+  allowlist, not from a bad signature.
+* Structural rejection: the malformed-field test. Each envelope is edited after signing (a
+  field deleted or replaced), so its signature no longer matches and the test says nothing
+  about signatures. It shows that a missing or malformed field yields a refusal result with
+  a stable code instead of an exception.
 """
 
 import base64
@@ -289,6 +295,7 @@ def test_unknown_domain_and_unknown_version_are_refused(signing_key, registry):
         payload_schema_version="0.9.0",
         nonce="n-unknown-domain",
     )
+    assert _genuine(unknown_domain, signing_key)
     result = _verifier(registry).verify_authority_token(
         unknown_domain, requested_level=3, inner_payload=_payload()
     )
@@ -301,19 +308,23 @@ def test_unknown_domain_and_unknown_version_are_refused(signing_key, registry):
         payload_schema_version="0.9.0",
         nonce="n-unknown-version",
     )
+    assert _genuine(unknown_version, signing_key)
     result = _verifier(registry).verify_authority_token(
         unknown_version, requested_level=3, inner_payload=_payload()
     )
     assert result.failure_codes == [UNSUPPORTED_PAYLOAD_SCHEMA_VERSION]
 
 
-# --- malformed fields: a refusal result, never an exception ----------------------------
+# --- malformed fields (structural): a refusal result, never an exception ---------------
 
 _MISSING = object()
 
 
 def test_malformed_signing_fields_are_refused_with_a_result(signing_key, registry):
-    """No schema is supplied here, so the verifier's own check must catch these."""
+    """Structural rejection, not signature evidence: each envelope is edited after signing.
+
+    No schema is supplied here, so the verifier's own check must catch these.
+    """
     values = [_MISSING, None, 5, "", ["triadic-controls:v0.5.0:authority-token"]]
     for field in ("signing_domain", "payload_schema_version"):
         for value in values:

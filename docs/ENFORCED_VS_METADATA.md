@@ -72,6 +72,18 @@ Constitutional rule: if a schema field is required or constraining, the runtime 
 | `signatures[].nonce_or_sequence` | Runtime enforced | Included in signing object and replay key. |
 | `signatures[].signed_at` | Runtime enforced | Checked against issuer key lifecycle. |
 
+### Signing-policy allowlist and compatibility choices (WVR-010)
+
+`weaver_contracts.signing_policy` accepts exactly these triples:
+
+| `payload_type` | `signing_domain` | `payload_schema_version` | Choice |
+| --- | --- | --- | --- |
+| `AUTHORITY_TOKEN` | `triadic-controls:v0.4.0:authority-token` | `0.4.0` | **Compatibility choice: retained.** Existing tests sign with it, and the envelope schema uses it as its example. Retiring it is a reviewed change to the allowlist and its exact-allowlist test. |
+| `AUTHORITY_TOKEN` | `triadic-controls:v0.5.0:authority-token` | `0.5.0` | Current version. |
+| `REFUSAL_SIGNAL` | `triadic-controls:v0.5.0:refusal-signal` | `0.5.0` | **Compatibility choice: adopted name.** It follows the authority-token pattern `triadic-controls:<version>:<payload>`. No in-repo producer signs refusal signals yet, so producers must use this exact string. |
+
+Any other triple is refused, including the domains and versions of other payload types.
+
 ## verification_result.schema.json
 
 | Field | Status | Runtime behavior |

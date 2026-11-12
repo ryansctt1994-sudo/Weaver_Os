@@ -2,9 +2,9 @@
 
 A signature covers ``signing_domain`` and ``payload_schema_version``, so a valid signature
 proves only that the issuer signed those exact strings. It does not prove the pair is one
-this verifier should accept. Without this allowlist, a token an issuer signed for a refusal
-context could be presented as an authority token, and a token signed under a retired schema
-version could be accepted under the current one.
+this verifier should accept. Without this allowlist, a signature an issuer made in a refusal
+context could be presented as an authority token, and an envelope declaring a domain or
+schema version this verifier does not support would still be accepted.
 
 The rule is fail-closed. A ``(payload_type, signing_domain, payload_schema_version)``
 triple is accepted only when it appears in ``SUPPORTED_SIGNING_POLICY``. Adding a domain or
@@ -30,12 +30,18 @@ SUPPORTED_SIGNING_POLICY: Mapping[str, Mapping[str, frozenset[str]]] = MappingPr
     {
         "AUTHORITY_TOKEN": MappingProxyType(
             {
+                # Compatibility choice: v0.4.0 stays accepted. Existing tests sign with it,
+                # and the envelope schema uses it as its example. Retiring it is a reviewed
+                # change here and in test_allowlist_is_exactly_the_reviewed_pairs.
                 "triadic-controls:v0.4.0:authority-token": frozenset({"0.4.0"}),
                 "triadic-controls:v0.5.0:authority-token": frozenset({"0.5.0"}),
             }
         ),
         "REFUSAL_SIGNAL": MappingProxyType(
             {
+                # Compatibility choice: this name follows the authority-token pattern
+                # (triadic-controls:<version>:<payload>). No in-repo producer signs refusal
+                # signals yet, so producers must adopt this exact string.
                 "triadic-controls:v0.5.0:refusal-signal": frozenset({"0.5.0"}),
             }
         ),
