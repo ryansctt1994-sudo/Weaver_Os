@@ -20,9 +20,11 @@ from pathlib import Path
 ISOLATION = "tests/isolation/test_v008_isolated_owner.py"
 CRASH = "tests/isolation/test_v008_crash_recovery.py"
 DEADLINES = "tests/isolation/test_v008_request_deadlines.py"
+TELEMETRY = "tests/isolation/test_v008_edge_telemetry.py"
 UNIT = "tests/test_owner_ipc.py"
 OUTCOME_UNIT = "tests/test_owner_outcome.py"
 DEADLINE_UNIT = "tests/test_owner_deadlines.py"
+TELEMETRY_UNIT = "tests/test_owner_telemetry.py"
 
 MUTATIONS = [
     (
@@ -249,6 +251,137 @@ MUTATIONS = [
         "    if length == 0:",
         f"{DEADLINES}::test_an_oversized_request_is_refused_from_its_header_and_service_continues",
     ),
+    # Service-edge security telemetry: never part of a decision, bounded, kernel-attributed.
+    (
+        "v008t-telemetry-failure-propagates",
+        "packages/runtime/weaver_runtime/owner_service.py",
+        "        except Exception:\n            self.telemetry_errors += 1",
+        "        except ValueError:\n            self.telemetry_errors += 1",
+        f"{TELEMETRY}::test_e01_a_recorder_that_raises_never_stops_the_owner",
+    ),
+    (
+        "v008t-recorded-before-close",
+        "packages/runtime/weaver_runtime/owner_service.py",
+        "            conn.close()  # close without reading a byte\n"
+        "            self._note(PEER_DENIED, creds)",
+        "            self._note(PEER_DENIED, creds)\n"
+        "            conn.close()  # close without reading a byte",
+        f"{TELEMETRY_UNIT}::test_a_slow_recorder_never_delays_closing_on_an_unlisted_peer",
+    ),
+    (
+        "v008t-recorded-before-reply",
+        "packages/runtime/weaver_runtime/owner_service.py",
+        "        self._reply(conn, reply)\n        error = reply.get(\"error\")\n"
+        "        edge = _EDGE_REPLIES.get(error) if isinstance(error, str) else None\n"
+        "        if edge is not None:\n            self._note(edge, creds)",
+        "        error = reply.get(\"error\")\n"
+        "        edge = _EDGE_REPLIES.get(error) if isinstance(error, str) else None\n"
+        "        if edge is not None:\n            self._note(edge, creds)\n"
+        "        self._reply(conn, reply)",
+        f"{TELEMETRY_UNIT}::test_a_slow_recorder_never_delays_the_reply",
+    ),
+    (
+        "v008t-persistence-in-request-path",
+        "packages/runtime/weaver_runtime/owner_telemetry.py",
+        "        self._dirty.set()\n\n    def _bucket",
+        "        self._flush_once()\n\n    def _bucket",
+        f"{TELEMETRY}::test_e01_a_hung_telemetry_write_cannot_hold_the_owner",
+    ),
+    (
+        "v008t-uid-cap-removed",
+        "packages/runtime/weaver_runtime/owner_telemetry.py",
+        "        if len(self._retained) < self._max_uids:",
+        "        if True:",
+        f"{TELEMETRY_UNIT}::test_uid_cardinality_cap_is_deterministic_and_never_moves_counts",
+    ),
+    (
+        "v008t-recent-unbounded",
+        "packages/runtime/weaver_runtime/owner_telemetry.py",
+        "collections.deque(maxlen=max_recent)",
+        "collections.deque()",
+        f"{TELEMETRY_UNIT}::test_structures_stay_bounded_under_many_uids_and_events",
+    ),
+    (
+        "v008t-saturation-removed",
+        "packages/runtime/weaver_runtime/owner_telemetry.py",
+        "            if row.get(event_class, 0) >= self._max_count:",
+        "            if False:",
+        f"{TELEMETRY_UNIT}::test_counters_saturate_deterministically_and_say_so",
+    ),
+    (
+        "v008t-temp-file-follows-links",
+        "packages/runtime/weaver_runtime/owner_telemetry.py",
+        "        flags = os.O_WRONLY | os.O_CREAT | os.O_EXCL | os.O_NOFOLLOW | os.O_CLOEXEC",
+        "        flags = os.O_WRONLY | os.O_CREAT | os.O_TRUNC | os.O_CLOEXEC",
+        f"{TELEMETRY_UNIT}::test_a_planted_symlink_at_the_temp_path_is_never_followed",
+    ),
+    (
+        "v008t-file-checks-removed",
+        "packages/runtime/weaver_runtime/owner_telemetry.py",
+        "            or st.st_mode & 0o077\n            or st.st_nlink != 1\n",
+        "            or False\n",
+        f"{TELEMETRY_UNIT}::test_an_unsafe_existing_file_refuses_to_load",
+    ),
+    (
+        "v008t-fifo-open-blocks",
+        "packages/runtime/weaver_runtime/owner_telemetry.py",
+        "        flags = os.O_RDONLY | os.O_NOFOLLOW | os.O_NONBLOCK | os.O_CLOEXEC",
+        "        flags = os.O_RDONLY | os.O_NOFOLLOW | os.O_CLOEXEC",
+        f"{TELEMETRY_UNIT}::test_a_planted_fifo_is_refused_without_blocking",
+    ),
+    (
+        "v008t-reserved-uids-not-honoured",
+        "packages/runtime/weaver_runtime/owner_telemetry.py",
+        "        if uid in self._reserved:  # configured principals never compete for a slot",
+        "        if False:",
+        f"{TELEMETRY_UNIT}::test_reserved_uids_keep_dedicated_counters_when_the_cap_is_exhausted",
+    ),
+    (
+        "v008t-fold-on-load-removed",
+        "packages/runtime/weaver_runtime/owner_telemetry.py",
+        "            if key == OTHER or key not in keep:",
+        "            if key == OTHER:",
+        f"{TELEMETRY_UNIT}::test_load_folds_dropped_uids_into_other_exactly_once_and_keeps_totals",
+    ),
+    (
+        "v008t-degraded-not-persisted",
+        "packages/runtime/weaver_runtime/owner_telemetry.py",
+        '                "degraded": sorted(self._degraded),\n                "carried_over"',
+        '                "carried_over"',
+        f"{TELEMETRY_UNIT}::"
+        "test_a_failed_snapshot_is_not_evidence_and_degradation_rides_the_next_success",
+    ),
+    (
+        "v008t-dir-fsync-not-run",
+        "packages/runtime/weaver_runtime/owner_telemetry.py",
+        "            self._sync_dir()\n        except OSError:",
+        "            pass\n        except OSError:",
+        f"{TELEMETRY_UNIT}::test_a_failed_directory_sync_is_degraded_never_durable_success",
+    ),
+    (
+        "v008t-dir-fsync-failure-reported-ok",
+        "packages/runtime/weaver_runtime/owner_telemetry.py",
+        '                self._last_persist = "unsynced"\n'
+        "                self._degraded.add(DIR_FSYNC_FAILED)",
+        '                self._last_persist = "ok"',
+        f"{TELEMETRY_UNIT}::test_a_failed_directory_sync_is_degraded_never_durable_success",
+    ),
+    (
+        "v008t-replace-not-directory-relative",
+        "packages/runtime/weaver_runtime/owner_telemetry.py",
+        "                self._tmp_name, self._name,"
+        " src_dir_fd=self._dirfd, dst_dir_fd=self._dirfd\n"
+        "            )\n            replaced = True",
+        "                self._tmp_name, self._name\n            )\n            replaced = True",
+        f"{TELEMETRY_UNIT}::test_a_swapped_parent_path_cannot_redirect_later_writes",
+    ),
+    (
+        "v008t-identity-not-kernel",
+        "packages/runtime/weaver_runtime/owner_service.py",
+        "            self._telemetry.record(event_class, creds.uid, creds.pid)",
+        "            self._telemetry.record(event_class, 0, 0)",
+        f"{TELEMETRY}::test_e04_records_carry_the_kernel_uid_and_pid",
+    ),
 ]
 
 IGNORE = shutil.ignore_patterns(
@@ -269,7 +402,9 @@ def main() -> None:
     root = Path(__file__).resolve().parents[1]
     env = dict(os.environ, WEAVER_REQUIRE_ISOLATION="1")
     baseline = _pytest(
-        [ISOLATION, CRASH, DEADLINES, UNIT, OUTCOME_UNIT, DEADLINE_UNIT], root, env
+        [ISOLATION, CRASH, DEADLINES, TELEMETRY, UNIT, OUTCOME_UNIT, DEADLINE_UNIT,
+         TELEMETRY_UNIT],
+        root, env,
     )
     if baseline.returncode:
         print(baseline.stdout + baseline.stderr)

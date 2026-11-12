@@ -46,6 +46,7 @@ from .gate import COMMITTED as ATTEMPT_COMMITTED
 from .owner_ipc import (
     DeadlineExceeded,
     FrameError,
+    PeerCredentials,
     UntrustedPathError,
     assert_trusted_path,
     peer_credentials,
@@ -53,7 +54,18 @@ from .owner_ipc import (
     send_frame,
 )
 from .owner_outcome import OutcomeError, lookup_outcome, proposal_digest
+from .owner_telemetry import (
+    ACTOR_DENIED,
+    DEADLINE_EXCEEDED,
+    FRAME_REJECTED,
+    PEER_DENIED,
+    REQUEST_REJECTED,
+    EdgeTelemetry,
+)
 from .protected_write import ProtectedWriteOwner
+
+# Replies that end at the service edge, before the gate, and their telemetry class.
+_EDGE_REPLIES = {"bad-request": REQUEST_REJECTED, "actor-not-permitted": ACTOR_DENIED}
 
 _PROPOSAL_FIELDS = frozenset({"proposal_id", "actor_id", "action", "policy_version", "payload"})
 DEFAULT_DEADLINE_S = 5.0
@@ -89,6 +101,7 @@ class OwnerService:
         request_deadline: float = DEFAULT_DEADLINE_S,
         reply_deadline: float = DEFAULT_DEADLINE_S,
         after_commit: Callable[[], None] | None = None,
+        telemetry: EdgeTelemetry | None = None,
     ) -> None:
         if not peers:
             raise ValueError("peers must name at least one uid; the default is deny")
@@ -105,9 +118,11 @@ class OwnerService:
         # environment to kill the process after a commit and before the reply.
         self._after_commit = after_commit
         self._sock: socket.socket | None = None
+        self._telemetry = telemetry
         self.refused_peers = 0
         self.refused_actors = 0
         self.deadline_cutoffs = 0
+        self.telemetry_errors = 0
 
     def start(self) -> None:
         parent = os.path.dirname(os.path.abspath(self._path))
@@ -160,9 +175,12 @@ class OwnerService:
     def handle(self, conn: socket.socket) -> None:
         creds = peer_credentials(conn)
         actors = self._peers.get(creds.uid)
+        # Every edge path below runs DECIDE -> RESPOND OR CLOSE -> BEST-EFFORT TELEMETRY.
         if actors is None:
             self.refused_peers += 1
-            return  # close without reading a byte
+            conn.close()  # close without reading a byte
+            self._note(PEER_DENIED, creds)
+            return
         # One complete request must arrive before an absolute deadline, however its bytes
         # are paced. The deadline bounds input only: once a request is complete it executes
         # to the end, and nothing here treats a timeout as evidence that nothing committed.
@@ -172,13 +190,31 @@ class OwnerService:
         except DeadlineExceeded:
             self.deadline_cutoffs += 1
             self._reply(conn, {"ok": False, "error": "request-deadline-exceeded"})
+            self._note(DEADLINE_EXCEEDED, creds)
             return
         except FrameError:
             self._reply(conn, {"ok": False, "error": "bad-frame"})
+            self._note(FRAME_REJECTED, creds)
             return
         except OSError:
+            self._note(FRAME_REJECTED, creds)
             return
-        self._reply(conn, self._dispatch(request, actors))
+        reply = self._dispatch(request, actors)
+        self._reply(conn, reply)
+        error = reply.get("error")
+        edge = _EDGE_REPLIES.get(error) if isinstance(error, str) else None
+        if edge is not None:
+            self._note(edge, creds)
+
+    def _note(self, event_class: str, creds: PeerCredentials) -> None:
+        # Telemetry is never part of a decision: it runs after the reply, and if it fails
+        # the failure is counted and the owner carries on.
+        if self._telemetry is None:
+            return
+        try:
+            self._telemetry.record(event_class, creds.uid, creds.pid)
+        except Exception:
+            self.telemetry_errors += 1
 
     def _reply(self, conn: socket.socket, reply: dict[str, Any]) -> None:
         # A peer that never reads its reply cannot hold the owner either. If this send is
