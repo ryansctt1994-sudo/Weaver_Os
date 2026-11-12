@@ -233,33 +233,97 @@ def test_v011_precommit_exception_leaves_no_resource_change(env):
     assert counts(owner) == (0, 1)
 
 
-@pytest.mark.xfail(
-    strict=True,
-    reason="HOLD: process-kill-after-commit and acknowledgment-loss "
-    "injection not yet exercised",
+def test_v012_hard_exit_after_sqlite_commit_before_ack_recovers(env):
+    owner, key, db, _veto, _reopen = env
+    p = proposal("crash-post", value="durable")
+    signed = grant(key, p)
+    public = key.public_key().public_bytes(
+        encoding=serialization.Encoding.Raw,
+        format=serialization.PublicFormat.Raw,
+    )
+    child_input = json.dumps(
+        {"path": str(db), "public": public.hex(), "proposal": p.to_dict(), "grant": signed}
+    )
+    # The test child dies from os._exit immediately after the ledger commit
+    # returns, but BEFORE the gate produces an outcome or caller acknowledges it.
+    child_code = """
+import json
+import os
+import sys
+
+from weaver_contracts.gate import Proposal
+from weaver_runtime.protected_write import ProtectedWriteOwner
+
+class Clear:
+    def vetoed(self):
+        return False
+
+data = json.loads(sys.argv[1])
+owner = ProtectedWriteOwner(
+    data["path"], trusted_public_key=bytes.fromhex(data["public"]),
+    issuer_id="issuer-a", allowed_keys=frozenset({"alpha", "beta"}),
+    veto=Clear(), clock=lambda: 1000,
 )
-def test_v012_real_process_kill_after_commit_recovery_required():
-    # A normal close/reopen is covered elsewhere; it is not a kill at the commit boundary.
-    raise AssertionError("separate-process crash injector required")
+commit = owner._ledger._commit
+
+def kill_after_commit(*args, **kwargs):
+    receipt = commit(*args, **kwargs)
+    if kwargs["event_type"] == "EXECUTION_COMMITTED":
+        os._exit(73)
+    return receipt
+
+owner._ledger._commit = kill_after_commit
+owner.submit(Proposal(**data["proposal"]), data["grant"])
+os._exit(99)
+"""
+    root = Path(__file__).resolve().parents[2]
+    env_vars = dict(os.environ)
+    env_vars["PYTHONPATH"] = os.pathsep.join(
+        [str(root / "packages" / "contracts"), str(root / "packages" / "runtime")]
+    )
+    child = subprocess.run(
+        [sys.executable, "-c", child_code, child_input],
+        env=env_vars, capture_output=True, text=True, check=False,
+    )
+    assert child.returncode == 73, child.stderr
+    assert owner.rows() == {"alpha": "durable"}
+    assert counts(owner) == (1, 0)
+    assert verify_protected_write(
+        owner.snapshot(), owner.rows(), anchor=owner.anchor()
+    ).ok
+    # Lost acknowledgment is not permission to replay the effect.
+    assert owner.submit(p, signed).status != COMMITTED
+    assert owner.rows() == {"alpha": "durable"}
+    assert counts(owner) == (1, 1)
 
 
 def test_v013_fresh_python_process_replays_history(env):
     owner, key, _db, *_ = env
     p = proposal()
     assert owner.submit(p, grant(key, p)).status == COMMITTED
-    payload = json.dumps({
-        "snapshot": owner.snapshot(), "rows": owner.rows(), "anchor": owner.anchor()
-    })
-    code = (
-        "import json,sys; from weaver_verifier.protected_write import verify_protected_write;"
-        "d=json.loads(sys.argv[1]); x=verify_protected_write("
-        "d['snapshot'],d['rows'],anchor=d['anchor']);"
-        "print('PASS' if x.ok and x.anchored else x.reason);sys.exit(0 if x.ok else 1)"
-    )
+    payload = json.dumps({"path": str(_db), "anchor": owner.anchor()})
+    code = """
+import json
+import sqlite3
+import sys
+
+from weaver_runtime.ledger import ReceiptLedger
+from weaver_verifier.protected_write import verify_protected_write
+
+data = json.loads(sys.argv[1])
+with ReceiptLedger(data["path"], ledger_id="weaver-vertical-001") as ledger:
+    snapshot = ledger.snapshot()
+with sqlite3.connect(data["path"]) as conn:
+    rows = dict(conn.execute("SELECT key, value FROM protected_kv"))
+result = verify_protected_write(snapshot, rows, anchor=data["anchor"])
+print("PASS" if result.ok and result.anchored else result.reason)
+sys.exit(0 if result.ok and result.anchored else 1)
+"""
     root = Path(__file__).resolve().parents[2]
     env_vars = dict(os.environ)
     env_vars["PYTHONPATH"] = os.pathsep.join(
-        [str(root / "packages" / "contracts"), str(root / "packages" / "verifier")]
+        [str(root / "packages" / "contracts"), str(root / "packages" / "verifier"),
+         str(root / "packages" / "runtime")]
     )
     run = subprocess.run(
         [sys.executable, "-c", code, payload],

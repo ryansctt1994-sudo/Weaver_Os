@@ -32,14 +32,18 @@ V008, run the owner as a separately privileged process that alone owns the DB,
 with a minimal authenticated IPC boundary and denied direct requester FS access;
 then replace the XFAIL with a real negative-control test on a capable host.
 
-**HOLD V012:** Kill-after-commit/acknowledgment-loss requires a subprocess crash
-injector at the exact commit boundary. Normal restart testing does not prove
-this. It is an explicit XFAIL until performed and receipted.
+**V012 bounded test candidate:** A subprocess terminates with `os._exit(73)`
+immediately after `ReceiptLedger._commit` returns (SQLite commit completed),
+before `ExecutionGate` returns a result or the client receives an acknowledgment.
+The parent reads the durable effect/receipt and checks that a duplicate request
+cannot reapply it. This checks one subprocess hard-exit boundary, not every
+power-loss, filesystem, or network-acknowledgment failure.
 
-**HOLD mutation requirement:** The design decision requires three mutation
-kills (bypassed gate, substituted verifier, bypassed effect); the current suite
-contains direct negative cases but not a separately recorded mutant campaign.
-The review gate remains HOLD until all are exercised and produce expected red.
+**Mutation requirement:** The candidate extends the repository mutation runner
+with three named probes: disabled grant signature validation, unwired atomic effect
+hook, and omitted owner-resource write. The exact-head hosted mutation job must
+show that the matching tests fail under each mutation. OS bypass remains HOLD
+regardless of the software-mutant results.
 
 **Other boundaries:** The trust root is constructor-injected; an untrusted
 application caller able to instantiate an owner or replace its key defeats
@@ -66,7 +70,7 @@ without a separately governed trust anchor. No real-world effects are allowed.
 | V009 | Duplicate proposal idempotent | Test candidate |
 | V010 | Same-ID concurrent submissions | Test candidate |
 | V011 | Pre-commit injected failure rolls back | Partial: exception, not SIGKILL |
-| V012 | Kill after commit, replay after lost ACK | **HOLD / XFAIL** |
+| V012 | Subprocess hard exit after SQLite commit, before gate ACK | Test candidate |
 | V013 | Fresh-process read-only replay reconstructs state | Test candidate |
 | V014 | Tamper and anchor mismatch rejected | Test candidate; external anchor HOLD |
 | V015 | Recorded veto before commit blocks write | Test candidate |
@@ -78,7 +82,8 @@ without a separately governed trust anchor. No real-world effects are allowed.
 2. Compare PR to the exact base; inspect receipt/event digests and resource DB bytes.
 3. Run `pytest -q tests/vertical/test_protected_write.py`, then `pytest -q`.
 4. Run `ruff check .`, `mypy ...`, the trust-boundary checker, and wheel build.
-5. Add OS isolation, crash injection and named negative-control mutants before
+5. Require the three new mutation controls and the V012 hard-exit replay test.
+   Add **OS identity isolation** and a qualified cross-host reproduction before
    considering the protected-write claim closed.
 6. Carry E2 / W0 / O0; separate owner decision for merge or promotion.
 
