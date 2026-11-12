@@ -1,0 +1,128 @@
+{
+  "schema": "weaver-release-readiness-receipt-0 (informal; not a ratified schema)",
+  "commit": "c24f7cbadc3d1c9898cfaee6caf1b6b0590a8990",
+  "recorded_at": "2026-11-12",
+  "trust": {
+    "evidence_ceiling": "E2",
+    "witness": "W0",
+    "operational_authority": "O0_WITHHELD",
+    "production": "PROHIBITED",
+    "independent_host": false,
+    "signed": false,
+    "note": "Local receipts were produced in a Claude session cloud container (publisher-controlled). They are not independent reproduction."
+  },
+  "ci": {
+    "workflow": ".github/workflows/tests.yml",
+    "event": "push to main",
+    "run_id": 43157872210,
+    "run_url": "https://github.com/ryansctt1994-sudo/Weaver_Os/actions/runs/43157872210",
+    "jobs": [
+      {
+        "python": "3.10.22",
+        "job_id": 130981919296,
+        "conclusion": "success",
+        "pytest": "772 passed",
+        "build": "success",
+        "cli_smoke": "success",
+        "checked_out_sha": "c24f7cbadc3d1c9898cfaee6caf1b6b0590a8990"
+      },
+      {
+        "python": "3.11.18",
+        "job_id": 130981919371,
+        "conclusion": "success",
+        "pytest": "772 passed",
+        "build": "success",
+        "cli_smoke": "success",
+        "checked_out_sha": "c24f7cbadc3d1c9898cfaee6caf1b6b0590a8990"
+      },
+      {
+        "python": "3.12.16",
+        "job_id": 130981919007,
+        "conclusion": "success",
+        "pytest": "772 passed",
+        "build": "success",
+        "cli_smoke": "success",
+        "checked_out_sha": "c24f7cbadc3d1c9898cfaee6caf1b6b0590a8990"
+      }
+    ],
+    "built_artifact_names": [
+      "weaver_os-0.5.0.tar.gz",
+      "weaver_os-0.5.0-py3-none-any.whl"
+    ],
+    "built_artifact_sha256": null,
+    "built_artifact_sha256_reason": "tests.yml builds the wheel and sdist but neither hashes nor uploads them.",
+    "verification_evidence": {
+      "run_id": 43157872347,
+      "run_url": "https://github.com/ryansctt1994-sudo/Weaver_Os/actions/runs/43157872347",
+      "make_verify": "PASS",
+      "bundle_check": "BUNDLE_BYTES_CONSISTENT",
+      "bundle_assurance": "LOCAL_BYTES_ONLY_NO_AUTHENTICATED_ATTESTATION",
+      "bundle_manifest_sha256": "6e9d27b2ebf18a3d6d763cbbafb2d581a188334e538f98f758655be99eafbb2a",
+      "artifact_id": 13916054285,
+      "artifact_zip_sha256": "3b69e0b2259c2ce95b774781af04e0f11d7589b4f01fbd7ba7b82b9879d1feab",
+      "builds": "wheel only (tools/verify_all.py: python -m build --no-isolation --wheel)",
+      "report_records": "wheel_sha256 for that wheel; not read or confirmed from this session",
+      "artifact_contents": "verification-output/ (report and logs); the wheel itself is not retained"
+    },
+    "workflows_on_push": {
+      "ran_success": [
+        "CI",
+        "Cross-host spine receipt",
+        "Exact-commit operator rehearsal",
+        "Hardware simulation",
+        "Verification evidence",
+        "Witness TLA model",
+        "tests",
+        "triadic-controls CI"
+      ],
+      "not_triggered": {
+        "E3.5 hold gate": "pull_request and workflow_dispatch only",
+        "gate1": "push filtered to weaver_auth/** paths",
+        "boundary-integrity-demo": "push filtered to demo/** paths"
+      }
+    },
+    "built_artifacts_retained": false
+  },
+  "session_container": {
+    "platform": "Linux 6.18.44 x86_64",
+    "python": "3.13.18 (outside the CI matrix)",
+    "install_command": "python -m pip install -e \".[dev]\" (fresh venv, unpinned resolution; see pip-freeze.txt)",
+    "tracked_tree_clean_before_and_after": true,
+    "pytest": {
+      "command": "pytest",
+      "exit_code": 0,
+      "summary": "772 passed",
+      "output": "pytest.txt",
+      "output_sha256": "37c0615a047a5c33fdd42a8d4c8ed37b12dca84da588b43937a8d8ca926733be"
+    },
+    "build": {
+      "command": "python -m build (run twice)",
+      "exit_code": 0,
+      "byte_reproducible": false,
+      "member_contents_identical": true,
+      "output": "build-digests.txt",
+      "output_sha256": "112f70539ae613bebf92b4eeaf23c1c0e4cc6d67af576ca715de97fff20cf588",
+      "artifacts_retained": false,
+      "note": "Retention and reproducibility are separate. These digests identify the session-container artifacts in build-digests.txt; those artifacts were not retained, so the digests cannot now be checked against them. Separately, the two rebuilds differ (byte_reproducible: false), so a rebuild from source does not reproduce a recorded digest."
+    },
+    "cli_smoke": {
+      "commands": [
+        "weaver-release-guard --help",
+        "weaver-release-guard generate --help",
+        "weaver-release-guard verify --help"
+      ],
+      "exit_codes": [
+        0,
+        0,
+        0
+      ],
+      "output": "cli-smoke.txt",
+      "output_sha256": "b43d42b4cbc162065fb7b5eeb275638fa8c760e457c75b2b6a40e38f83e15cca"
+    },
+    "pip_freeze": {
+      "output": "pip-freeze.txt",
+      "output_sha256": "ee022e1a160c810fff4cf96a9eee5d0b3e4c9804223c6b000a20e7243b14d8ab"
+    },
+    "redactions": "The session's checkout path is replaced with <clean-checkout-of-c24f7cb> in pytest.txt (rootdir line) and pip-freeze.txt (editable install line)."
+  }
+}

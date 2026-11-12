@@ -1,0 +1,9 @@
+# python -m build, run twice in a clean checkout of c24f7cb (Python 3.13.18)
+# build 1
+0afadf5aa843ca9f0cab317a59436d696b485464d9335950b032a09910329026  weaver_os-0.5.0-py3-none-any.whl
+751be57e7300cced5232ee08b435f9c53c3933a091bb58e2eadee55b63bb19bf  weaver_os-0.5.0.tar.gz
+# build 2
+61127d523205b5b9074b9b3d4f8a3483aca929effc932eaa020ec36347a35cb1  weaver_os-0.5.0-py3-none-any.whl
+12c2856af16673314668f0de6ef257c09a1f062251d2f90880787eb87e8f1812  weaver_os-0.5.0.tar.gz
+# member contents identical between builds: wheel 49/49 members, sdist 108/108 members
+# member timestamps differ: wheel 6 members, sdist 27 members
