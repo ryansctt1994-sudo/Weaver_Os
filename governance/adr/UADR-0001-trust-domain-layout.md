@@ -27,6 +27,7 @@ Each directory directly under `packages/` is a trust domain:
 | `learning` | `contracts`, `runtime` | continual-learning pipeline; promotion goes through `verifier` decisions passed in as data |
 | `release_guard` | `contracts` | SLSA / OIDC provenance |
 | `adapters` | `contracts` | FreeLattice, provider mesh, skill manifests: may only build proposals |
+| `fusion` | `contracts` | WF-001 typed-action transformation; may construct proposals only, never grants or execution effects |
 
 Non-runtime zones at the repository root, `research/`, `archive/`, `legacy/` and
 `evidence/`, may never be imported from `packages/`.
@@ -42,13 +43,22 @@ The rules fail closed:
 Added in outline step 4 (same ratified layout, stricter enforcement; the checker also has its own CI step):
 
 - `contracts` may import only the Python standard library (`NON_STDLIB_IMPORT`);
-- `contracts` and `verifier` may not import process, network, or database modules such as
+- `contracts`, `verifier` and `fusion` may not import process, network, or database modules such as
   `sqlite3`, `subprocess`, `socket`, `urllib` (`IO_CAPABLE_IMPORT`);
 - no `json.dumps(..., sort_keys=True)` under `packages/` outside a named allowlist
   (`LEGACY_CANONICALIZER`), and an allowlist entry whose file no longer needs it fails (`STALE_ALLOWLIST`).
 
-Today `packages/` does not exist, and the checker reports that and passes. The rules apply
-as soon as the first package moves in (outline step 2).
+The checker enforces these rules against packages present in the checkout. A new
+unregistered domain is rejected, even when all its imports appear harmless.
+
+## Why `fusion` may import `contracts` only
+
+Fusion validates and translates untrusted external action descriptions to immutable Weaver
+proposals. It cannot import the `runtime`, `verifier` or `witness` domains, open network
+or database connections, or spawn processes. It must not create signed grants, issue
+execution decisions, append authoritative receipts or mutate the protected ledger.
+This is statically enforced for recognized imports, not an operating-system sandbox;
+computed imports and indirect effects remain outside the checker's guarantees.
 
 ## Why `verifier` may not import `runtime`
 
