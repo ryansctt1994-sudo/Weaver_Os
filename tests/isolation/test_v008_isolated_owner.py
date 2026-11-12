@@ -35,6 +35,7 @@ from weaver_runtime.owner_ipc import UntrustedPathError, assert_trusted_path
 from weaver_runtime.protected_write import GRANT_DOMAIN
 
 OWNER_UID, REQUESTER_UID, OTHER_UID = 61001, 61002, 61003
+SECOND_PEER_UID = 61004  # listed, but may speak only for agent-b
 REPO = Path(__file__).resolve().parents[2]
 
 pytestmark = pytest.mark.skipif(
@@ -112,7 +113,7 @@ class Deployment:
             "issuer_id": "issuer-a",
             "allowed_keys": ["alpha", "beta"],
             "trusted_public_key_b64": base64.b64encode(_public_raw(self.key)).decode(),
-            "peers": {str(REQUESTER_UID): ["agent-a"]},
+            "peers": {str(REQUESTER_UID): ["agent-a"], str(SECOND_PEER_UID): ["agent-b"]},
         }
         self.write_config()
         self.proc: subprocess.Popen[str] | None = None
@@ -142,17 +143,23 @@ class Deployment:
             "HOME": "/nonexistent",
         }
 
-    def popen_owner(self, *, uid: int | None = OWNER_UID, pass_fds=()):
+    def popen_owner(
+        self, *, uid: int | None = OWNER_UID, pass_fds=(), failpoint: str | None = None
+    ):
         # uid=None launches as the current user (root here), with no uid or group change.
+        env = self.env()
+        if failpoint is not None:
+            env["WEAVER_OWNER_FAILPOINT"] = failpoint
         return subprocess.Popen(
             [sys.executable, "-m", "weaver_runtime.owner_main", "--config", str(self.config_path)],
-            env=self.env(), cwd="/", stdin=subprocess.DEVNULL, stdout=subprocess.PIPE,
+            env=env, cwd="/", stdin=subprocess.DEVNULL, stdout=subprocess.PIPE,
             stderr=subprocess.PIPE, text=True, pass_fds=pass_fds,
             user=uid, group=uid, extra_groups=None if uid is None else [],
         )
 
-    def start_owner(self) -> int:
-        self.proc = proc = self.popen_owner()
+    def start_owner(self, failpoint: str | None = None) -> int:
+        self.stop()  # reap any earlier owner process before starting a new one
+        self.proc = proc = self.popen_owner(failpoint=failpoint)
         assert proc.stdout is not None and proc.stderr is not None
         deadline = time.time() + 15
         while time.time() < deadline:
@@ -197,6 +204,10 @@ class Deployment:
 
     def rows(self) -> dict:
         return self.call(REQUESTER_UID, "rows")["reply"]["rows"]
+
+    def wait_for_owner_exit(self, timeout: float = 15) -> int:
+        assert self.proc is not None
+        return self.proc.wait(timeout=timeout)
 
     def stop(self) -> None:
         if self.proc is not None and self.proc.poll() is None:

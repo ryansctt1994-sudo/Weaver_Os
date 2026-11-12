@@ -18,7 +18,9 @@ import tempfile
 from pathlib import Path
 
 ISOLATION = "tests/isolation/test_v008_isolated_owner.py"
+CRASH = "tests/isolation/test_v008_crash_recovery.py"
 UNIT = "tests/test_owner_ipc.py"
+OUTCOME_UNIT = "tests/test_owner_outcome.py"
 
 MUTATIONS = [
     (
@@ -126,6 +128,64 @@ MUTATIONS = [
         "            pass",
         f"{UNIT}::test_strict_json_refuses_ambiguous_or_invalid_text",
     ),
+    # Crash-recovery slice: outcome lookup, retry identity and ambiguity handling.
+    (
+        "v008r-outcome-ignores-commits",
+        "packages/runtime/weaver_runtime/owner_outcome.py",
+        "    if commits:\n",
+        "    if False:\n",
+        f"{CRASH}::test_owner_killed_after_commit_before_reply_keeps_one_effect_and_its_receipt",
+    ),
+    (
+        "v008r-multiple-commit-guard-removed",
+        "packages/runtime/weaver_runtime/owner_outcome.py",
+        "    if len(commits) > 1:",
+        "    if False:",
+        f"{OUTCOME_UNIT}::test_two_commits_for_one_proposal_id_are_reported_as_inconsistent",
+    ),
+    (
+        "v008r-service-conflict-check-skipped",
+        "packages/runtime/weaver_runtime/owner_service.py",
+        '        if found["status"] == COMMITTED and found["proposal_sha256"] != proposal_digest(',
+        '        if False and found["proposal_sha256"] != proposal_digest(',
+        f"{CRASH}::test_same_id_with_different_content_is_a_conflict_never_a_commit",
+    ),
+    (
+        "v008r-client-conflict-check-skipped",
+        "packages/runtime/weaver_runtime/owner_ipc.py",
+        '            and found.get("proposal_sha256") != proposal_digest(body)',
+        "            and False",
+        f"{OUTCOME_UNIT}::test_client_reports_a_commit_of_different_content_as_conflict",
+    ),
+    (
+        "v008r-lost-reply-reported-as-refusal",
+        "packages/runtime/weaver_runtime/owner_ipc.py",
+        '                    raise OutcomeUnknown(f"no reply after sending: {exc}") from exc',
+        '                    return {"ok": True, "status": "REJECTED",'
+        ' "outcome": {"status": "REFUSED"}}',
+        f"{OUTCOME_UNIT}::test_lost_reply_after_sending_is_outcome_unknown_not_refusal",
+    ),
+    (
+        "v008r-unreachable-owner-reported-as-unknown",
+        "packages/runtime/weaver_runtime/owner_ipc.py",
+        '                raise OwnerUnavailable(f"cannot connect to the owner: {exc}") from exc',
+        '                raise OutcomeUnknown(f"cannot connect to the owner: {exc}") from exc',
+        f"{CRASH}::test_owner_killed_inside_the_commit_transaction_leaves_no_effect",
+    ),
+    (
+        "v008r-outcome-actor-check-skipped",
+        "packages/runtime/weaver_runtime/owner_service.py",
+        '        if found["actor_id"] is not None and found["actor_id"] not in actors:',
+        "        if False:",
+        f"{CRASH}::test_outcome_of_another_actors_proposal_is_not_disclosed",
+    ),
+    (
+        "v008r-unknown-failpoint-accepted",
+        "packages/runtime/weaver_runtime/owner_main.py",
+        "    if failpoint and failpoint not in _FAILPOINTS:",
+        "    if False:",
+        f"{CRASH}::test_unknown_failpoint_refuses_to_start",
+    ),
 ]
 
 IGNORE = shutil.ignore_patterns(
@@ -145,7 +205,7 @@ def main() -> None:
         raise SystemExit("needs root: a skipped isolation test must not count as a detection")
     root = Path(__file__).resolve().parents[1]
     env = dict(os.environ, WEAVER_REQUIRE_ISOLATION="1")
-    baseline = _pytest([ISOLATION, UNIT], root, env)
+    baseline = _pytest([ISOLATION, CRASH, UNIT, OUTCOME_UNIT], root, env)
     if baseline.returncode:
         print(baseline.stdout + baseline.stderr)
         raise SystemExit("V008 mutation baseline failed")

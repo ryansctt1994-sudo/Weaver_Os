@@ -4,6 +4,9 @@ Status: research prototype on top of the PR #125 review baseline. HOLD is unchan
 slice adds a two-process topology and an adversarial acceptance suite. It does not close V008,
 promote any evidence class, or authorise any deployment.
 
+Weaver_Os is a Linux execution substrate with a protected-effect broker. It is not an
+operating system, and nothing here integrates it with zorel-kernel or Delta-717.
+
 ## What changed
 
 PR #125 proved a bounded signed write inside one process. Its strict `xfail`
@@ -63,9 +66,8 @@ a timeout. Detection shows these tests are not vacuous. It does not show the con
 - **Evidence class unchanged.** The runs were made by the same operator on one Linux container
   (kernel 6.18, as root, with real uids 61001 to 61003). That is not an independent witness.
 - **One process-level topology, one effect.** Only `WRITE_KEY`. Requests are served one at a
-  time. Distributed crash recovery for the two-process case (requester or owner crashing before
-  or after commit, lost acknowledgement, idempotent outcome query) is the next item and is not
-  done here. The V012 hard-exit test still covers only the in-process case.
+  time. Crash recovery for the two-process case is covered separately, with its own
+  limitations, in `docs/V008_CRASH_RECOVERY.md`.
 - **No receipt for refusals at the service edge.** A request refused for peer uid or actor id
   never reaches the gate, so it leaves no receipt. Only an in-memory counter moves.
 - **The socket file is mode 0666 on purpose.** Who may talk to the owner is decided by the
