@@ -13,9 +13,9 @@ import pytest
 from weaver_fusion.action_bridge import bridge_action
 
 from tests.isolation.test_v008_isolated_owner import (
-    Deployment,
     OTHER_UID,
     REQUESTER_UID,
+    Deployment,
     make_grant,
 )
 
