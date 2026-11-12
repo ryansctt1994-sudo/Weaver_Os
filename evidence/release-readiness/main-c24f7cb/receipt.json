@@ -50,7 +50,7 @@
       "weaver_os-0.5.0-py3-none-any.whl"
     ],
     "built_artifact_sha256": null,
-    "built_artifact_sha256_reason": "tests.yml does not hash dist/. The Verification evidence artifact holds a wheel hash in its report, but its storage host was not reachable from this session, and it records no sdist hash.",
+    "built_artifact_sha256_reason": "tests.yml builds the wheel and sdist but neither hashes nor uploads them.",
     "verification_evidence": {
       "run_id": 43157872347,
       "run_url": "https://github.com/ryansctt1994-sudo/Weaver_Os/actions/runs/43157872347",
@@ -59,7 +59,10 @@
       "bundle_assurance": "LOCAL_BYTES_ONLY_NO_AUTHENTICATED_ATTESTATION",
       "bundle_manifest_sha256": "6e9d27b2ebf18a3d6d763cbbafb2d581a188334e538f98f758655be99eafbb2a",
       "artifact_id": 13916054285,
-      "artifact_zip_sha256": "3b69e0b2259c2ce95b774781af04e0f11d7589b4f01fbd7ba7b82b9879d1feab"
+      "artifact_zip_sha256": "3b69e0b2259c2ce95b774781af04e0f11d7589b4f01fbd7ba7b82b9879d1feab",
+      "builds": "wheel only (tools/verify_all.py: python -m build --no-isolation --wheel)",
+      "report_records": "wheel_sha256 for that wheel; not read or confirmed from this session",
+      "artifact_contents": "verification-output/ (report and logs); the wheel itself is not retained"
     },
     "workflows_on_push": {
       "ran_success": [
@@ -77,7 +80,8 @@
         "gate1": "push filtered to weaver_auth/** paths",
         "boundary-integrity-demo": "push filtered to demo/** paths"
       }
-    }
+    },
+    "built_artifacts_retained": false
   },
   "session_container": {
     "platform": "Linux 6.18.44 x86_64",
@@ -97,7 +101,9 @@
       "byte_reproducible": false,
       "member_contents_identical": true,
       "output": "build-digests.txt",
-      "output_sha256": "112f70539ae613bebf92b4eeaf23c1c0e4cc6d67af576ca715de97fff20cf588"
+      "output_sha256": "112f70539ae613bebf92b4eeaf23c1c0e4cc6d67af576ca715de97fff20cf588",
+      "artifacts_retained": false,
+      "note": "Retention and reproducibility are separate. These digests identify the session-container artifacts in build-digests.txt; those artifacts were not retained, so the digests cannot now be checked against them. Separately, the two rebuilds differ (byte_reproducible: false), so a rebuild from source does not reproduce a recorded digest."
     },
     "cli_smoke": {
       "commands": [

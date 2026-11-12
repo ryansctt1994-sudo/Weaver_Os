@@ -67,17 +67,19 @@ python -m build
 | Successful wheel build | **PASS** | The CI build step succeeded on 3.10, 3.11, and 3.12 (run 43157872210), and in the session container |
 | Successful sdist build | **PASS** | Same runs |
 | Built artifact names | **PASS** | `weaver_os-0.5.0-py3-none-any.whl`, `weaver_os-0.5.0.tar.gz` |
-| SHA-256 digests | **BLOCKED** | See below |
+| SHA-256 digests of retained artifacts | **BLOCKED** | No wheel or sdist built from `c24f7cb` was retained together with its digest. See below. |
 
-Status: **BLOCKED**, on digests.
+Status: **BLOCKED**, on retained-artifact digests.
 
-Why the digests are blocked:
+Why retained-artifact digests are blocked:
 
-- `tests.yml` does not hash `dist/`.
-- The Verification evidence artifact (ID 13916054285) records a wheel hash inside its report, but its storage host was not reachable from the session that wrote this, and it records no sdist hash.
-- Builds are not byte-reproducible. In the session container, two consecutive builds of clean `c24f7cb` produced different digests for both artifacts. The member contents were identical; only member timestamps differed ([`build-digests.txt`](../evidence/release-readiness/main-c24f7cb/build-digests.txt)).
+- **`tests.yml`** builds the wheel and sdist but neither hashes nor uploads them, so they are discarded with the runner.
+- **Verification evidence** (run 43157872347) builds a wheel only, no sdist. `tools/verify_all.py` writes that wheel's digest into its report as `wheel_sha256`. The workflow retains `verification-output/` as artifact 13916054285, which holds the report but not the wheel. So a digest was kept for a wheel that was not. The artifact's storage host is outside this session's network allowlist, so that digest was not read or confirmed here.
+- **Session-container builds** were hashed ([`build-digests.txt`](../evidence/release-readiness/main-c24f7cb/build-digests.txt)), but the artifacts were not retained; they existed only in an ephemeral container.
 
-A digest therefore identifies one build, not the commit, and nobody can recompute it. Two changes, neither made here, would unblock this: hash `dist/` in CI, and make builds reproducible (for example, set `SOURCE_DATE_EPOCH`).
+A digest identifies one specific artifact, and anyone holding that artifact can recompute it. What is missing is a retained artifact paired with its recorded digest. Uploading `dist/` together with its SHA-256 from CI would unblock this; that change is not made here.
+
+Whether a rebuild from source reproduces a recorded digest is a separate question, tracked under [Reproducible builds](#reproducible-builds).
 
 ### 4. CLI smoke receipt
 
@@ -94,6 +96,16 @@ weaver-release-guard verify --help
 | Successful output for all three commands | **PASS** | The CI step "Run CLI smoke checks" succeeded on 3.10, 3.11, and 3.12. In the session container, all three exited 0: [`cli-smoke.txt`](../evidence/release-readiness/main-c24f7cb/cli-smoke.txt) |
 
 Status: **PASS**. These commands show only that the CLI loads and prints help. They do not exercise `generate` or `verify`.
+
+## Tracked separately
+
+### Reproducible builds
+
+This is not a required receipt in this checklist. Status: **NOT ESTABLISHED**.
+
+In the session container, two consecutive `python -m build` runs on clean `c24f7cb` produced different SHA-256 digests for both the wheel and the sdist. Member contents were identical (wheel 49 of 49 members, sdist 108 of 108); only member timestamps differed (6 wheel members, 27 sdist members). See [`build-digests.txt`](../evidence/release-readiness/main-c24f7cb/build-digests.txt).
+
+So a rebuild from source does not reproduce a recorded digest, and nobody can confirm by rebuilding that a given artifact came from this commit. That is separate from checking an artifact you hold against its recorded digest, which non-reproducibility does not prevent. Pinning build timestamps, for example with `SOURCE_DATE_EPOCH`, is a candidate fix; it has not been tried.
 
 ## Remaining open gaps
 
@@ -112,6 +124,7 @@ This section is reconciled against the merged code at `c24f7cb`. It does not cou
 ## Status vocabulary
 
 - **PASS / BLOCKED / NOT RUN:** status of a required receipt, defined above.
+- **NOT ESTABLISHED:** a property that was checked and does not hold. Used for items tracked outside the required receipts.
 - **IMPLEMENTED:** code or documentation exists in the repository.
 - **TESTED:** local command output proves behavior at a specific commit.
 - **CI PASSED:** GitHub Actions passed at a specific commit.
