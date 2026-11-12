@@ -1,0 +1,65 @@
+$ weaver-release-guard --help
+usage: weaver-release-guard [-h] {generate,verify} ...
+
+positional arguments:
+  {generate,verify}
+    generate         Generate Weaver provenance JSON
+    verify           Verify Weaver provenance
+
+options:
+  -h, --help         show this help message and exit
+[exit 0]
+$ weaver-release-guard generate --help
+usage: weaver-release-guard generate [-h] [--dist-dir DIST_DIR]
+                                     [--manifest MANIFEST] [--slsa SLSA]
+                                     [--out OUT] [--version VERSION]
+                                     [--build-id BUILD_ID]
+                                     [--workflow WORKFLOW] [--runner RUNNER]
+                                     [--started-at STARTED_AT]
+                                     [--finished-at FINISHED_AT] [--repo REPO]
+                                     [--ref REF] [--sha SHA]
+                                     [--python-version PYTHON_VERSION]
+                                     [--policy-version POLICY_VERSION]
+                                     [--lease-id LEASE_ID]
+                                     [--authority-level AUTHORITY_LEVEL]
+                                     [--reviewer REVIEWER]
+                                     [--approval-ref APPROVAL_REF]
+                                     [--signature-key-id SIGNATURE_KEY_ID]
+
+options:
+  -h, --help            show this help message and exit
+  --dist-dir DIST_DIR
+  --manifest MANIFEST
+  --slsa SLSA
+  --out OUT
+  --version VERSION
+  --build-id BUILD_ID
+  --workflow WORKFLOW
+  --runner RUNNER
+  --started-at STARTED_AT
+  --finished-at FINISHED_AT
+  --repo REPO
+  --ref REF
+  --sha SHA
+  --python-version PYTHON_VERSION
+  --policy-version POLICY_VERSION
+  --lease-id LEASE_ID
+  --authority-level AUTHORITY_LEVEL
+  --reviewer REVIEWER
+  --approval-ref APPROVAL_REF
+  --signature-key-id SIGNATURE_KEY_ID
+[exit 0]
+$ weaver-release-guard verify --help
+usage: weaver-release-guard verify [-h] [--slsa SLSA] [--jwt JWT]
+                                   artifact manifest weaver
+
+positional arguments:
+  artifact
+  manifest
+  weaver
+
+options:
+  -h, --help   show this help message and exit
+  --slsa SLSA
+  --jwt JWT
+[exit 0]
