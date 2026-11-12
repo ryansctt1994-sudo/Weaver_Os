@@ -25,7 +25,7 @@ Thank you for contributing to Weaver Forge.
 Use GitHub Discussions or the appropriate Discord channels. Always include context, code, errors, and what you have already tried.
 
 ### Code of Conduct
-See [CODE_OF_CONDUCT.md](CODE_OF_CONDUCT.md).
+See [CODE_OF_CONDUCT.md](https://github.com/ryansctt1994-sudo/Weavers-Forge-/blob/4df6b98cd5d5154cdeb98c9c779c212850c7d668/CODE_OF_CONDUCT.md).
 
 ---
 
