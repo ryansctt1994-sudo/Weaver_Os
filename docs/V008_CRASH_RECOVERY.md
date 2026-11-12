@@ -57,6 +57,25 @@ The only cross-actor signal is `CONFLICT` after an *authorised* attempt finds th
 the gate in #125 already reveals through its `ALREADY_COMMITTED` reason. A probe without a valid
 grant learns nothing. The one-commit-per-id integrity check still counts every actor.
 
+### Proposal-id invariant (unchanged from #125)
+
+> A proposal ID identifies one proposed execution globally, regardless of actor. Once
+> committed, that ID cannot commit again under another actor.
+
+This PR keeps that contract deliberately. Moving to actor-scoped ids would change replay
+protection, how grants are interpreted, and existing commit semantics. That is too large a
+semantic change for a crash-recovery slice.
+
+Two situations are kept apart:
+
+- **An unauthorised query or probe learns nothing.** This covers an `outcome` query, or a
+  `submit` without a valid grant, for an id another actor used or committed. The caller sees only
+  its own records: `UNKNOWN`, or `REFUSED` for its own refused attempts.
+- **An authorised attempt that meets a committed id learns of the conflict.** This is a submit
+  carrying a valid grant for that id. Under the existing contract this disclosure is legitimate:
+  the gate refuses with `ALREADY_COMMITTED` only after authorization has passed, and the outcome
+  is `CONFLICT`, final, with no receipt and no detail about the other actor.
+
 ### Requester protocol
 
 ```
@@ -144,12 +163,10 @@ this slice, and all 26 are detected. Examples of the new ones:
 - **Edge refusals still leave no receipt.** A request refused for its peer uid, actor id or a
   bad frame never reaches the gate. Its outcome stays `UNKNOWN`, and a retry is refused again
   the same way. Recording these is the planned follow-on.
-- **Proposal ids are one namespace across actors** (inherited from #125's unique key
-  `EXECUTION_COMMITTED:<proposal_id>`). Once one actor commits an id, no other actor can. A
-  requester holding a valid grant for that id learns it is taken: the gate's `ALREADY_COMMITTED`
-  reason, reported as `CONFLICT`. Taking an id needs a valid issuer grant, so the issuer must not
-  grant colliding ids across actors. Namespacing ids per actor would change #125's semantics and
-  is left as a decision for the owner.
+- **Proposal ids are one global namespace, by decision** (see *Proposal-id invariant*). Once one
+  actor commits an id, no other actor can. Taking an id needs a valid issuer grant, so the issuer
+  must not grant the same id to different actors for different executions. That is an issuer
+  responsibility, not something the owner enforces.
 - **Grant windows still apply.** A retry after the grant expires is refused as an attempt.
   `outcome` still reports a commit if one exists.
 - **Failpoint code ships in the launcher.** Arming it needs both the launcher's environment
