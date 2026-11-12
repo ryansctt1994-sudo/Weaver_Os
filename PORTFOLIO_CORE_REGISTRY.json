@@ -1,0 +1,73 @@
+{
+  "schema_version": "1.0",
+  "baseline_date": "2026-10-06",
+  "canonical_anchor": {
+    "repository": "ryansctt1994-sudo/Weaver_Os",
+    "branch": "main",
+    "commit": "ee725f7cf923d86d915900fc93ef2e3f6e5eef1c",
+    "classification": "CANONICAL_VERIFICATION_SPINE"
+  },
+  "governance": {
+    "witness": "W0",
+    "operational_authority": "O0_WITHHELD",
+    "production": "PROHIBITED",
+    "authority_source": "HUMAN_GOVERNANCE_ONLY"
+  },
+  "evidence_rules": [
+    "local_test != independent_reproduction",
+    "ci_success != production_readiness",
+    "formal_model_property != whole_system_verification",
+    "candidate_pr_state != canonical_main_state",
+    "evidence_does_not_transfer_by_neighborhood"
+  ],
+  "core_repositories": [
+    {
+      "repository": "ryansctt1994-sudo/Weaver_Os",
+      "role": "canonical verification and governance spine",
+      "state": "MAINLINE_CANONICAL",
+      "next_gate": "server-side Gate Zero enforcement and independent reproduction of one frozen artifact"
+    },
+    {
+      "repository": "ryansctt1994-sudo/Alpha-OmegaLeanTeam",
+      "role": "formal methods and Lean theorem concentration",
+      "state": "SPECIALIST_FORMAL_REPOSITORY",
+      "next_gate": "runtime-to-model refinement closure on named frozen contracts"
+    },
+    {
+      "repository": "ryansctt1994-sudo/cathedral-verified",
+      "role": "bounded verification demonstrations",
+      "state": "BOUNDED_EVIDENCE_COMPANION",
+      "next_gate": "stronger persistence/concurrency and independent reproduction"
+    },
+    {
+      "repository": "ryansctt1994-sudo/Lumen-Nexus",
+      "role": "governed evidence-first promotion architecture",
+      "state": "GOVERNED_EVIDENCE_REPOSITORY",
+      "next_gate": "clean-room promotion evidence without cross-ladder inheritance"
+    },
+    {
+      "repository": "ryansctt1994-sudo/introspection-twin",
+      "role": "Lean introspection receipt lattice and read-only authority gate",
+      "state": "SPECIALIST_BOUNDARY_REPOSITORY",
+      "next_gate": "preserve replay-fail-closed behavior under independent rerun"
+    }
+  ],
+  "candidate_prs": [
+    {
+      "repository": "ryansctt1994-sudo/Weaver_Os",
+      "number": 65,
+      "head": "8db6965aa6341a07828f17bdd0d30ca11caf545b",
+      "state": "OPEN_NON_DRAFT",
+      "classification": "CANDIDATE_NOT_MAINLINE",
+      "summary": "activation runtime with bounded runtime-model correspondence"
+    },
+    {
+      "repository": "ryansctt1994-sudo/Weaver_Os",
+      "number": 66,
+      "head": "b162a7cea43959214bd9e928ea6c9965976cdcc2",
+      "state": "OPEN_DRAFT",
+      "classification": "CANDIDATE_NOT_MAINLINE",
+      "summary": "recovery specification and Lean lattice core"
+    }
+  ]
+}
