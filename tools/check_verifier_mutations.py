@@ -338,6 +338,29 @@ MUTATIONS = [
         "tests/triadic_controls/test_registry_rollback.py"
         "::test_rollback_cannot_reactivate_a_revoked_key[sqlite]",
     ),
+    (
+        "signing-policy-unwired",
+        "packages/verifier/weaver_verifier/crypto.py",
+        "        if policy_failure is not None:",
+        "        if False:",
+        "tests/triadic_controls/test_signing_policy.py"
+        "::test_authority_token_signed_under_the_refusal_domain_is_refused",
+    ),
+    (
+        "signing-version-pairing",
+        "packages/contracts/weaver_contracts/signing_policy.py",
+        "    if payload_schema_version not in versions:",
+        "    if False:",
+        "tests/triadic_controls/test_signing_policy.py::test_version_confusion_is_refused",
+    ),
+    (
+        "signing-malformed-guard",
+        "packages/contracts/weaver_contracts/signing_policy.py",
+        "    return isinstance(value, str) and bool(value)",
+        "    return True",
+        "tests/triadic_controls/test_signing_policy.py"
+        "::test_malformed_signing_fields_are_refused_with_a_result",
+    ),
 ]
 
 

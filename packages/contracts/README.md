@@ -14,6 +14,7 @@ Contracts define data rules only. They grant no authority and create no evidence
 | `weaver_contracts.ledger` | Root heads, Chronicle Root, `wx-chronicle-anchor-1` | [`WX-RECEIPT-LEDGER-1`](../../governance/specs/WX-RECEIPT-LEDGER-1.md) | R2[self] |
 | `weaver_contracts.gate` | `Proposal`, `AuthorizationDecision` | [`WX-EXECUTION-GATE-1`](../../governance/specs/WX-EXECUTION-GATE-1.md) | R2[self] |
 | `weaver_contracts.replay` | `ReplayCacheProtocol`, `generate_replay_key` | `docs/triadic-controls/ARCHITECTURE.md` | R2[self]; moved from `triadic_controls/crypto/replay.py` |
+| `weaver_contracts.signing_policy` | Allowlist of `(payload_type, signing_domain, payload_schema_version)` triples and `check_signing_policy` (WVR-010) | `docs/ENFORCED_VS_METADATA.md` | R2[self]: positive and negative tests, 3 mutations |
 
 ## Provenance: `pg001r.py`
 

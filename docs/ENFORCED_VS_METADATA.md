@@ -56,10 +56,10 @@ Constitutional rule: if a schema field is required or constraining, the runtime 
 | Field | Status | Runtime behavior |
 | --- | --- | --- |
 | `payload_type` | Runtime enforced | Must match `AUTHORITY_TOKEN` or `REFUSAL_SIGNAL` verifier entry point. |
-| `payload_schema_version` | Runtime included | Included in signing object; not semantically version-gated yet. |
+| `payload_schema_version` | Runtime enforced | Signed, and must be allowlisted together with `signing_domain` for this `payload_type` (`weaver_contracts.signing_policy`). Unknown or mismatched versions are refused `UNSUPPORTED_PAYLOAD_SCHEMA_VERSION`; missing, non-string, or empty values are refused `MALFORMED_ENVELOPE`. |
 | `payload_hash_alg` | Runtime enforced | Must be `sha256`. |
 | `payload_hash` | Runtime enforced | Compared against canonical SHA-256 of supplied inner payload. |
-| `signing_domain` | Runtime included | Included in signing object; not semantically allowlisted yet. |
+| `signing_domain` | Runtime enforced | Signed, and must be allowlisted for this `payload_type` (`weaver_contracts.signing_policy`). A domain that is unknown, or allowed only for another payload type (cross-domain reuse), is refused `UNSUPPORTED_SIGNING_DOMAIN`; missing, non-string, or empty values are refused `MALFORMED_ENVELOPE`. The check runs before any signature is read. |
 | `replay_domain.system_id` | Runtime enforced | Used in replay key and role `allowed_scopes.systems`. |
 | `replay_domain.scope_hash` | Runtime enforced | Used in replay key and schema-validated when production schemas are supplied. |
 | `replay_domain.valid_from` | Runtime enforced | Replay window must be active and used for duration policy. |
@@ -71,6 +71,18 @@ Constitutional rule: if a schema field is required or constraining, the runtime 
 | `signatures[].signature` | Runtime enforced | Verified against signing object. |
 | `signatures[].nonce_or_sequence` | Runtime enforced | Included in signing object and replay key. |
 | `signatures[].signed_at` | Runtime enforced | Checked against issuer key lifecycle. |
+
+### Signing-policy allowlist and compatibility choices (WVR-010)
+
+`weaver_contracts.signing_policy` accepts exactly these triples:
+
+| `payload_type` | `signing_domain` | `payload_schema_version` | Choice |
+| --- | --- | --- | --- |
+| `AUTHORITY_TOKEN` | `triadic-controls:v0.4.0:authority-token` | `0.4.0` | **Compatibility choice: retained.** Existing tests sign with it, and the envelope schema uses it as its example. Retiring it is a reviewed change to the allowlist and its exact-allowlist test. |
+| `AUTHORITY_TOKEN` | `triadic-controls:v0.5.0:authority-token` | `0.5.0` | Current version. |
+| `REFUSAL_SIGNAL` | `triadic-controls:v0.5.0:refusal-signal` | `0.5.0` | **Compatibility choice: adopted name.** It follows the authority-token pattern `triadic-controls:<version>:<payload>`. No in-repo producer signs refusal signals yet, so producers must use this exact string. |
+
+Any other triple is refused, including the domains and versions of other payload types.
 
 ## verification_result.schema.json
 
@@ -94,6 +106,6 @@ Constitutional rule: if a schema field is required or constraining, the runtime 
    store sees for a `registry_id` is trusted on first use. Protection covers verifiers that share
    one store: `SQLiteRegistrySequenceStore` on one local file, or one in-memory store in one
    process (lost on restart).
-2. `payload_schema_version` and `signing_domain` are cryptographically bound but not semantically allowlisted.
+2. The signing-domain and schema-version allowlist is a reviewed code constant. A version stays accepted until the code changes: there is no deprecation or expiry mechanism, and no runtime configuration can add or remove an entry. The allowlist is tested exactly (`test_allowlist_is_exactly_the_reviewed_pairs`), so any change to it is visible in review.
 3. `rotated_to_key_id`, `revoked_at`, and `revocation_reason` are retained for audit and future lifecycle logic but are not active policy gates.
 4. In-memory replay protection remains CI/local only. Production deployments require persistent atomic `check_and_record` semantics.
