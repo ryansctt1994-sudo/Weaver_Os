@@ -386,6 +386,8 @@ class EdgeTelemetry:
     def _restore(self, data: Any) -> None:
         if not isinstance(data, dict) or data.get("schema") != SCHEMA:
             raise ValueError("not an edge telemetry file")
+        if not isinstance(data["counters"], dict):
+            raise ValueError("bad counters container")
         stored: dict[str, dict[str, int]] = {}
         for key, row in data["counters"].items():
             if key != OTHER and (not key.isdecimal() or int(key) >= _ID_LIMIT):

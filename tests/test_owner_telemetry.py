@@ -169,6 +169,30 @@ def test_a_valid_file_is_carried_over(path):
     assert snap["events_observed"] == 5
 
 
+@pytest.mark.parametrize("counters", [[], None, "invalid", True, 1.5])
+def test_invalid_counter_container_is_recovered_and_new_events_persist(path, counters):
+    original = make(path)
+    original.record(PEER_DENIED, 61003, 11)
+    original.close()
+    data = json.loads(path.read_text())
+    data["counters"] = counters
+    corrupted = json.dumps(data)
+    path.write_text(corrupted)
+
+    restored = make(path)
+    try:
+        snap = restored.snapshot()
+        assert snap["corrupt_recovered"] is True
+        assert snap["events_observed"] == 0
+        assert snap["counters"] == {}
+        assert path.with_name(path.name + ".corrupt").read_text() == corrupted
+        restored.record(FRAME_REJECTED, 61002, 12)
+    finally:
+        summary = restored.close()
+    assert summary["last_persist"] == "ok"
+    assert json.loads(path.read_text())["counters"] == {"61002": {FRAME_REJECTED: 1}}
+
+
 def test_a_corrupt_file_is_set_aside_and_counting_restarts(path):
     path.write_text("{not json")
     os.chmod(path, 0o600)

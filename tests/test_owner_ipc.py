@@ -139,6 +139,7 @@ def test_trusted_path_refuses_wrong_kind_wrong_owner_and_loose_modes(tmp_path):
     uid = os.geteuid()
     loose = base / "loose"
     loose.mkdir(mode=0o755)
+    loose.chmod(0o755)  # mkdir's requested mode is filtered by the process umask.
     with pytest.raises(UntrustedPathError, match="mode"):
         assert_trusted_path(loose, uid, leaf="private_dir")
     plain = base / "plain"
