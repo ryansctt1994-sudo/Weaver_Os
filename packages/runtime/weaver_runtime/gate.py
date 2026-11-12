@@ -28,6 +28,11 @@ needs an adapter that verifies once and then answers revocation and expiry queri
 
 Every call produces exactly one receipt (REJECTIONS_MUST_BE_CHRONICLED).
 
+The gate pins the proposal's canonical form on entry, before the authorizer or the action
+runs, and records only that pinned copy. Code holding the proposal object cannot change
+what is recorded. If the live proposal no longer matches the pin at a checkpoint or at
+revalidation, the run aborts with ``PROPOSAL_MUTATED``.
+
 Veto policy: a latch in EVALUATING counts as vetoed. The RTL only asserts
 ``veto_signal`` 68,001 cycles after the trigger, but by then it is already committed to
 TRIGGERED, so the gate refuses from the first cycle.
@@ -44,7 +49,7 @@ from collections.abc import Callable, Mapping
 from dataclasses import dataclass
 from typing import Any, Protocol
 
-from weaver_contracts.canonical import CanonicalizationError, parse_strict
+from weaver_contracts.canonical import CanonicalizationError, canonicalize, parse_strict
 from weaver_contracts.gate import AuthorizationDecision, GateContractError, Proposal
 from weaver_contracts.receipt import Receipt
 
@@ -99,18 +104,52 @@ Authorizer = Callable[[Proposal], AuthorizationDecision]
 Action = Callable[["ExecutionContext"], Mapping[str, Any]]
 
 
+@dataclass(frozen=True)
+class _Pinned:
+    """The proposal as submitted: its canonical bytes and its validated id."""
+
+    canonical: bytes
+    proposal_id: str
+
+    def record(self) -> dict[str, Any]:
+        """A new plain copy for a ledger event; nothing downstream can alias the pin."""
+        copy: dict[str, Any] = parse_strict(self.canonical)
+        return copy
+
+
+def _pin(proposal: Proposal) -> _Pinned:
+    """Canonicalize the proposal once and re-check every field against the contract."""
+    try:
+        checked = Proposal(**parse_strict(canonicalize(proposal.to_dict())))
+    except (CanonicalizationError, TypeError, ValueError, KeyError) as exc:
+        raise GateContractError(f"proposal is outside the contract on entry: {exc}") from exc
+    return _Pinned(canonical=canonicalize(checked.to_dict()), proposal_id=checked.proposal_id)
+
+
+def _canonical_or_none(proposal: Proposal) -> bytes | None:
+    try:
+        return canonicalize(proposal.to_dict())
+    except Exception:  # any failure means it no longer matches the pin
+        return None
+
+
 class ExecutionContext:
     """Handed to a running action so it can revalidate at checkpoints."""
 
-    def __init__(self, gate: ExecutionGate, proposal: Proposal, expires_at: int) -> None:
+    def __init__(
+        self, gate: ExecutionGate, proposal: Proposal, expires_at: int, pinned: _Pinned
+    ) -> None:
         self._gate = gate
         self.proposal = proposal
         self.expires_at = expires_at
+        self._pinned = pinned
 
     def checkpoint(self) -> None:
-        """Recheck the veto, the window, and authority; raise ``GateAbort`` if any failed."""
+        """Recheck the proposal, the veto, the window, and authority; raise ``GateAbort``."""
+        self._gate._check_unchanged(self.proposal, self._pinned, stage="CHECKPOINT")
         self._gate._check_live(self.expires_at, stage="CHECKPOINT")
         self._gate._check_still_authorized(self.proposal, stage="CHECKPOINT")
+        self._gate._check_unchanged(self.proposal, self._pinned, stage="CHECKPOINT")
 
 
 class ExecutionGate:
@@ -147,11 +186,11 @@ class ExecutionGate:
     # ----------------------------------------------------------------- records
 
     def _reject(
-        self, proposal: Proposal, stage: str, reason_code: str, detail: str, status: str
+        self, pinned: _Pinned, stage: str, reason_code: str, detail: str, status: str
     ) -> GateOutcome:
         receipt = self._ledger.reject(
             "EXECUTION_REFUSED" if status == REJECTED else "EXECUTION_ABORTED",
-            {"proposal": proposal.to_dict(), "stage": stage, "detail": detail},
+            {"proposal": pinned.record(), "stage": stage, "detail": detail},
             actor_id=self._gate_id,
             policy_version=self._policy_version,
             reason_code=reason_code,
@@ -160,7 +199,7 @@ class ExecutionGate:
 
     # ------------------------------------------------------------------ checks
 
-    def _ledger_guard(self, proposal: Proposal) -> Callable[[sqlite3.Connection], None]:
+    def _ledger_guard(self, proposal_id: str) -> Callable[[sqlite3.Connection], None]:
         """Authoritative veto and revocation check, run inside the commit transaction.
 
         It reads ledger-recorded controls after ``BEGIN IMMEDIATE`` and before the append,
@@ -168,7 +207,7 @@ class ExecutionGate:
         waits for it (and is ordered after the commit). The in-memory veto source is not
         consulted here. Only what the ledger records counts.
         """
-        revocation = revocation_control(proposal.proposal_id)
+        revocation = revocation_control(proposal_id)
 
         def guard(conn: sqlite3.Connection) -> None:
             for name, refused_value, reason in (
@@ -180,6 +219,10 @@ class ExecutionGate:
                     raise CommitRefused(reason, f"control {name} is {refused_value} in the ledger")
 
         return guard
+
+    def _check_unchanged(self, proposal: Proposal, pinned: _Pinned, *, stage: str) -> None:
+        if _canonical_or_none(proposal) != pinned.canonical:
+            raise GateAbort("PROPOSAL_MUTATED", f"proposal changed after entry, seen at {stage}")
 
     def _check_live(self, expires_at: int, *, stage: str) -> None:
         if self._veto.vetoed():
@@ -210,63 +253,74 @@ class ExecutionGate:
     def execute(self, proposal: Proposal, action: Action) -> GateOutcome:
         if not isinstance(proposal, Proposal):
             raise GateContractError("execute() takes a Proposal")
+        # 0. Pin the proposal before the authorizer or the action sees it. Every receipt
+        #    records this copy, and every id below comes from it, not the live object.
+        pinned = _pin(proposal)
+        pid = pinned.proposal_id
 
         # 1. Observe
         if self._veto.vetoed():
-            return self._reject(proposal, "OBSERVE", "VETO_ACTIVE", "veto active", REJECTED)
+            return self._reject(pinned, "OBSERVE", "VETO_ACTIVE", "veto active", REJECTED)
 
         # 2. Authorize
         decision = self._ask(proposal)
         if isinstance(decision, str):
-            return self._reject(proposal, "AUTHORIZE", "AUTHORIZATION_ERROR", decision, REJECTED)
+            return self._reject(pinned, "AUTHORIZE", "AUTHORIZATION_ERROR", decision, REJECTED)
+        try:
+            self._check_unchanged(proposal, pinned, stage="AUTHORIZE")
+        except GateAbort as abort:
+            return self._reject(pinned, "AUTHORIZE", abort.reason_code, abort.detail, REJECTED)
         if not decision.allowed:
             assert decision.reason_code is not None
             return self._reject(
-                proposal, "AUTHORIZE", decision.reason_code, decision.decision_id, REJECTED
+                pinned, "AUTHORIZE", decision.reason_code, decision.decision_id, REJECTED
             )
         now = self._clock()
         expires_at = min(decision.valid_until, now + self._max_window)
         if expires_at <= now:
             return self._reject(
-                proposal, "AUTHORIZE", "WINDOW_EXPIRED", "decision already expired", REJECTED
+                pinned, "AUTHORIZE", "WINDOW_EXPIRED", "decision already expired", REJECTED
             )
 
         # 3. Reserve
         with self._lock:
-            if proposal.proposal_id in self._committed:
+            if pid in self._committed:
                 refused = "ALREADY_COMMITTED"
-            elif proposal.proposal_id in self._reserved:
+            elif pid in self._reserved:
                 refused = "ALREADY_RESERVED"
             else:
                 refused = ""
-                self._reserved.add(proposal.proposal_id)
+                self._reserved.add(pid)
         if refused:
-            return self._reject(proposal, "RESERVE", refused, proposal.proposal_id, REJECTED)
+            return self._reject(pinned, "RESERVE", refused, pid, REJECTED)
 
         try:
             # 4. Execute
-            context = ExecutionContext(self, proposal, expires_at)
+            context = ExecutionContext(self, proposal, expires_at, pinned)
             try:
                 result = action(context)
             except GateAbort as abort:
-                return self._reject(proposal, "EXECUTE", abort.reason_code, abort.detail, ABORTED)
+                return self._reject(pinned, "EXECUTE", abort.reason_code, abort.detail, ABORTED)
             except Exception as exc:
                 return self._reject(
-                    proposal, "EXECUTE", "EXECUTION_FAILED", type(exc).__name__, ABORTED
+                    pinned, "EXECUTE", "EXECUTION_FAILED", type(exc).__name__, ABORTED
                 )
             if not isinstance(result, Mapping):
                 return self._reject(
-                    proposal, "EXECUTE", "EXECUTION_FAILED", "action result is not an object",
+                    pinned, "EXECUTE", "EXECUTION_FAILED", "action result is not an object",
                     ABORTED,
                 )
 
-            # 5. Revalidate before the irreversible step
+            # 5. Revalidate before the irreversible step. The proposal is checked against
+            #    the pin before the authorizer is asked again and after it answers.
             try:
+                self._check_unchanged(proposal, pinned, stage="REVALIDATE")
                 self._check_live(expires_at, stage="REVALIDATE")
                 again = self._check_still_authorized(proposal, stage="REVALIDATE")
+                self._check_unchanged(proposal, pinned, stage="REVALIDATE")
             except GateAbort as abort:
                 return self._reject(
-                    proposal, "REVALIDATE", abort.reason_code, abort.detail, ABORTED
+                    pinned, "REVALIDATE", abort.reason_code, abort.detail, ABORTED
                 )
 
             # 6. Commit
@@ -274,33 +328,33 @@ class ExecutionGate:
                 receipt = self._ledger.admit(
                     "EXECUTION_COMMITTED",
                     {
-                        "proposal": proposal.to_dict(),
+                        "proposal": pinned.record(),
                         "decision_id": decision.decision_id,
                         "revalidation_decision_id": again.decision_id,
                         "result": dict(result),
                     },
                     actor_id=self._gate_id,
                     policy_version=self._policy_version,
-                    unique_key=f"EXECUTION_COMMITTED:{proposal.proposal_id}",
-                    guard=self._ledger_guard(proposal),
+                    unique_key=f"EXECUTION_COMMITTED:{pid}",
+                    guard=self._ledger_guard(pid),
                 )
             except CommitRefused as exc:
                 # A veto or revocation recorded in the ledger before the commit's
                 # serialization point. Nothing was written.
-                return self._reject(proposal, "COMMIT", exc.reason_code, exc.detail, ABORTED)
+                return self._reject(pinned, "COMMIT", exc.reason_code, exc.detail, ABORTED)
             except LedgerDuplicate as exc:
                 # Another gate (or process) committed this proposal first.
                 with self._lock:
-                    self._committed.add(proposal.proposal_id)
-                return self._reject(proposal, "COMMIT", "ALREADY_COMMITTED", str(exc), ABORTED)
+                    self._committed.add(pid)
+                return self._reject(pinned, "COMMIT", "ALREADY_COMMITTED", str(exc), ABORTED)
             except AdmissionError as exc:
-                return self._reject(proposal, "COMMIT", "RESULT_NOT_RECORDABLE", str(exc), ABORTED)
+                return self._reject(pinned, "COMMIT", "RESULT_NOT_RECORDABLE", str(exc), ABORTED)
             with self._lock:
-                self._committed.add(proposal.proposal_id)
+                self._committed.add(pid)
             return GateOutcome(status=COMMITTED, reason_code=None, receipt=receipt, result=result)
         finally:
             with self._lock:
-                self._reserved.discard(proposal.proposal_id)
+                self._reserved.discard(pid)
 
 
 def _proposal_id_of(event_text: str) -> str | None:
