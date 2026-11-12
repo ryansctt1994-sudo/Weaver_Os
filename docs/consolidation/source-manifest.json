@@ -14,7 +14,7 @@
       "source_sha256": "16a3b888f6e9cb5988476455ee2d86e62efc64f83076b463aff2fd1ebc0bc979",
       "target": "tools/claim_audit/claim_audit.py",
       "disposition": "integrated-tooling",
-      "target_sha256": "831d60561089e008813bb5dedf6faf2fb48cfcdddc433af91d9631a86100b5d3"
+      "target_sha256": "8cd7978d52c4898217909ea957657a780b3b16765bc9bc1b48353c8aad103ac6"
     },
     {
       "source_repository": "https://github.com/ryansctt1994-sudo/Weaver--Cathedral-.git",
@@ -77,7 +77,7 @@
       "source_sha256": "9cbc4f60375843142f11ce05460d47a0949dd02d9317c593f247dfbdef528292",
       "target": "tests/consolidation/test_claim_audit.py",
       "disposition": "adapted-contract-tests",
-      "target_sha256": "729ae271f5295097c848b0607045a4c59b594894a8ca5e93b245c8115b40ae5b"
+      "target_sha256": "2669db8f470e51bf0a3550bda01f12a8e75042dee21deb2d9f66eae79fd7ef3f"
     },
     {
       "source_repository": "https://github.com/ryansctt1994-sudo/Weaver--Cathedral-.git",

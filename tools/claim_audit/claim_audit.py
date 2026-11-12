@@ -141,7 +141,10 @@ def blocked_terms_from_ledger(root: Path) -> list[str] | None:
     path = root / LEDGER
     if not path.is_file():
         return None
-    lines = path.read_text(encoding="utf-8").splitlines()
+    text = _read_text(path, root)
+    if text is None:
+        raise Refusal("ledger is not a bounded local text file")
+    lines = text.splitlines()
     for i, line in enumerate(lines):
         if re.match(r"^#{1,6}\s+Blocking Rule\s*$", line.strip()):
             for j in range(i + 1, len(lines)):
@@ -169,8 +172,11 @@ def load_config(root: Path, explicit: Path | None) -> tuple[dict, str | None]:
     if path is None:
         return {"exclude": [], "backed_claims": [], "waivers": []}, None
     try:
-        config = json.loads(Path(path).read_text(encoding="utf-8"))
-    except (OSError, json.JSONDecodeError) as exc:
+        text = _read_text(Path(path), root if explicit is None else None)
+        if text is None:
+            raise Refusal("claims config is not a bounded regular text file")
+        config = json.loads(text)
+    except (OSError, json.JSONDecodeError, RecursionError) as exc:
         raise Refusal(f"claims config {path} unreadable: {exc}") from exc
     _validate_config(config, path)
     config.setdefault("exclude", [])
@@ -250,10 +256,23 @@ def _excluded(rel: str, globs: list[str]) -> bool:
     return any(fnmatch.fnmatch(rel, g) or fnmatch.fnmatch("/" + rel, g) for g in globs)
 
 
-def _read_text(path: Path) -> str | None:
+def _read_text(path: Path, root: Path | None = None) -> str | None:
     try:
-        data = path.read_bytes()
-    except OSError:
+        if not path.is_file() or path.is_symlink():
+            return None
+        if root is not None:
+            base = root.resolve()
+            relative = path.absolute().relative_to(base)
+            current = base
+            for part in relative.parts:
+                current = current / part
+                if current.is_symlink():
+                    return None
+            if not path.resolve().is_relative_to(base):
+                return None
+        with path.open("rb") as stream:
+            data = stream.read(MAX_BYTES + 1)
+    except (OSError, ValueError, RuntimeError):
         return None
     if len(data) > MAX_BYTES or b"\0" in data[:8192]:
         return None
@@ -470,7 +489,7 @@ def audit(root: Path, config_path: Path | None = None) -> dict[str, Any]:
                 findings.append(
                     resolve(Finding(rel, 0, term, severity, "path_claim", rel, "term in file path"))
                 )
-        text = _read_text(root / rel)
+        text = _read_text(root / rel, root)
         if text is None:
             continue
         scanned += 1

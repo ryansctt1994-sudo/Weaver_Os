@@ -6,6 +6,7 @@ deliberately overclaiming fixture files are committed anywhere.
 
 from __future__ import annotations
 
+import io
 import json
 import subprocess
 import sys
@@ -364,3 +365,32 @@ def test_this_repository_passes_its_own_claim_audit():
 def test_empty_scan_cannot_be_counted_as_acceptance(tmp_path, capsys):
     assert ca.main([str(tmp_path), "--require-files"]) == 2
     assert "no tracked text files" in capsys.readouterr().err
+
+
+def test_audit_does_not_read_a_symlinked_file_outside_its_checkout(tmp_path):
+    root = make_repo(tmp_path / "local", {"README.md": "A prototype.\n"}, ledger=False)
+    outside = tmp_path / "private.md"
+    outside.write_text("SECRET production-ready\n")
+    (root / "linked.md").symlink_to(outside)
+    report = ca.audit(root)
+    assert report["passed"]
+    assert not any("SECRET" in item["text"] for item in report["findings"])
+
+
+def test_text_read_has_a_bound_before_allocating_the_contents(tmp_path, monkeypatch):
+    target = tmp_path / "file.md"
+    target.write_text("A prototype.\n")
+    original = Path.open
+
+    class BoundedStream(io.BytesIO):
+        def read(self, size=-1):
+            assert 0 <= size <= ca.MAX_BYTES + 1, "unbounded source read"
+            return super().read(size)
+
+    def open_file(path, *args, **kwargs):
+        if path == target:
+            return BoundedStream(b"A prototype.\n")
+        return original(path, *args, **kwargs)
+
+    monkeypatch.setattr(Path, "open", open_file)
+    assert ca._read_text(target) == "A prototype.\n"

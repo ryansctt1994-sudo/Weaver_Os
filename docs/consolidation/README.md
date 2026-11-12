@@ -12,6 +12,8 @@ validation is claimed. A successful donor test does not promote a combined tree.
 - `python -m tools.claim_audit ROOT --json REPORT`: advisory claim analysis.
   The CLI and legacy JCS report profile are retained; existing Zorel/Delta pins
   remain valid in the donor repository. This tool does not grant execution rights.
+  Scans are bounded and skip symlinked paths. These are read-only path checks,
+  not a sandbox or protection against concurrent mutation of an untrusted checkout.
 - `tools.consolidation.findings`: repeated-observation comparison and duplicate
   suppression. Results remain EVIDENCE_ONLY / O0. Observations are supplied by the
   caller and do not establish reviewer independence or authenticated ground truth.
