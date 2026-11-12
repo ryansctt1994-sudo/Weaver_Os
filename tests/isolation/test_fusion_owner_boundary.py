@@ -13,15 +13,25 @@ import pytest
 from weaver_fusion.action_bridge import bridge_action
 
 from tests.isolation.test_v008_isolated_owner import (
+    Deployment,
     OTHER_UID,
     REQUESTER_UID,
-    live,
     make_grant,
 )
 
 pytestmark = pytest.mark.skipif(
     not sys.platform.startswith("linux"), reason="requires Linux SO_PEERCRED and /proc"
 )
+
+
+@pytest.fixture
+def live():
+    deployment = Deployment()
+    try:
+        deployment.pid = deployment.start_owner()
+        yield deployment
+    finally:
+        deployment.cleanup()
 
 
 def _bridged(*, proposal_id: str = "wf-real-owner-1", actor: str = "agent-a", value: str = "one"):
