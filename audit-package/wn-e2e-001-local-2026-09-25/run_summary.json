@@ -1,0 +1,1 @@
+{"authority":"O0_UNCHANGED","fresh_process_byte_equality":true,"independent_reproduction":false,"protected_state":"ef5ce835860c60a95f0bfd69eedd4c642d97866d20176c03ce99b142d3907f86","python":"3.12.14","status":"PASS_LOCAL_FIXTURE","tamper_probes":{"chronicle.jsonl":"DETECTED","receipts.json":"DETECTED"},"verdicts":["ACCEPT","REJECT"]}

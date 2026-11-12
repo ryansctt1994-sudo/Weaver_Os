@@ -1,0 +1,20 @@
+{
+  "scope": "local synthetic fixture only",
+  "base_commit": "7a8ebb5db788c6921863d26c4986324d77a984c1",
+  "recorded_at_utc": "2026-09-26T00:01:39.446136+00:00",
+  "tests": {
+    "passed": 63,
+    "failed": 0,
+    "new_cases": 8
+  },
+  "hash_gate_mutant": "KILLED: expected ledger rejection no longer raised",
+  "independent_reproduction": false,
+  "authority": "O0_UNCHANGED",
+  "production": "PROHIBITED",
+  "source_sha256": {
+    "demo/e2e_transaction.py": "71c482cc01103a0e860180e4cdd1dc77697c88a39a1bdba1e1eb53194d7b885b",
+    "tests/test_e2e_transaction.py": "6a9556fb5648ab1c91251e23e2f6c39b6d2804aea20f43dfe2ea883218c061eb",
+    "demo/WN-E2E-001.md": "225bdc502b97086e31ba88bc24eb9a5b025c94a3f0b33a629b2ba501b9111f68",
+    ".github/workflows/tests.yml": "c83db88f9495f079a90f76af63316ffde05803b49d4c592465a651ad19823a1c"
+  }
+}
