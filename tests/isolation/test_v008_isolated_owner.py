@@ -143,24 +143,26 @@ class Deployment:
         }
 
     def popen_owner(self, *, uid: int | None = OWNER_UID, pass_fds=()):
-        extra = {} if uid is None else {"user": uid, "group": uid, "extra_groups": []}
+        # uid=None launches as the current user (root here), with no uid or group change.
         return subprocess.Popen(
             [sys.executable, "-m", "weaver_runtime.owner_main", "--config", str(self.config_path)],
             env=self.env(), cwd="/", stdin=subprocess.DEVNULL, stdout=subprocess.PIPE,
-            stderr=subprocess.PIPE, text=True, pass_fds=pass_fds, **extra,
+            stderr=subprocess.PIPE, text=True, pass_fds=pass_fds,
+            user=uid, group=uid, extra_groups=None if uid is None else [],
         )
 
     def start_owner(self) -> int:
-        self.proc = self.popen_owner()
+        self.proc = proc = self.popen_owner()
+        assert proc.stdout is not None and proc.stderr is not None
         deadline = time.time() + 15
         while time.time() < deadline:
-            ready, _, _ = select.select([self.proc.stdout], [], [], 0.2)
+            ready, _, _ = select.select([proc.stdout], [], [], 0.2)
             if ready:
-                line = self.proc.stdout.readline().strip()
+                line = proc.stdout.readline().strip()
                 assert line == "READY", line
-                return self.proc.pid
-            if self.proc.poll() is not None:
-                raise AssertionError(f"owner exited early: {self.proc.stderr.read()}")
+                return proc.pid
+            if proc.poll() is not None:
+                raise AssertionError(f"owner exited early: {proc.stderr.read()}")
         raise AssertionError("owner did not become ready")
 
     def refused_start(self, **kwargs) -> subprocess.CompletedProcess:
@@ -393,6 +395,7 @@ def _start_attacker(dep, directory: Path):
         user=OTHER_UID, group=OTHER_UID, extra_groups=[], env=dep.env(), cwd="/",
         stdin=subprocess.DEVNULL, stdout=subprocess.PIPE, stderr=subprocess.PIPE, text=True,
     )
+    assert proc.stdout is not None and proc.stderr is not None
     assert proc.stdout.readline().strip() == "READY", proc.stderr.read()
     return proc, record
 
