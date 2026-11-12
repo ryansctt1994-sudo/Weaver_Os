@@ -21,6 +21,7 @@ ISOLATION = "tests/isolation/test_v008_isolated_owner.py"
 CRASH = "tests/isolation/test_v008_crash_recovery.py"
 DEADLINES = "tests/isolation/test_v008_request_deadlines.py"
 TELEMETRY = "tests/isolation/test_v008_edge_telemetry.py"
+JSON_DEPTH = "tests/isolation/test_v008_json_depth.py"
 UNIT = "tests/test_owner_ipc.py"
 OUTCOME_UNIT = "tests/test_owner_outcome.py"
 DEADLINE_UNIT = "tests/test_owner_deadlines.py"
@@ -382,6 +383,28 @@ MUTATIONS = [
         "            self._telemetry.record(event_class, 0, 0)",
         f"{TELEMETRY}::test_e04_records_carry_the_kernel_uid_and_pid",
     ),
+    # JSON nesting bound: a deep request cannot recurse the parser into crashing the owner.
+    # The depth scan and the RecursionError backstop are tested apart on purpose. A single
+    # very deep payload cannot tell them apart, because either control alone would refuse it;
+    # so the scan is removed against a depth-33 payload (shallow enough that the parser never
+    # recurses, so only the scan can catch it), and the backstop is removed against an
+    # injected RecursionError on a shallow payload (which the scan admits either way).
+    (
+        "v008n-depth-scan-removed",
+        "packages/runtime/weaver_runtime/owner_ipc.py",
+        "            if depth > MAX_JSON_DEPTH:\n",
+        "            if False:\n",
+        f"{UNIT}::test_json_nesting_depth_32_is_accepted_and_33_is_refused",
+    ),
+    (
+        "v008n-recursion-backstop-removed",
+        "packages/runtime/weaver_runtime/owner_ipc.py",
+        "    except RecursionError as exc:  # backstop if a pathological payload slips past"
+        " the scan\n"
+        '        raise FrameError("JSON nesting is too deep for the parser") from exc\n',
+        "",
+        f"{UNIT}::test_a_parser_recursion_error_is_converted_to_a_frame_error",
+    ),
 ]
 
 IGNORE = shutil.ignore_patterns(
@@ -402,8 +425,8 @@ def main() -> None:
     root = Path(__file__).resolve().parents[1]
     env = dict(os.environ, WEAVER_REQUIRE_ISOLATION="1")
     baseline = _pytest(
-        [ISOLATION, CRASH, DEADLINES, TELEMETRY, UNIT, OUTCOME_UNIT, DEADLINE_UNIT,
-         TELEMETRY_UNIT],
+        [ISOLATION, CRASH, DEADLINES, TELEMETRY, JSON_DEPTH, UNIT, OUTCOME_UNIT,
+         DEADLINE_UNIT, TELEMETRY_UNIT],
         root, env,
     )
     if baseline.returncode:

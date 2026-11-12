@@ -203,6 +203,23 @@ def test_a_corrupt_file_is_set_aside_and_counting_restarts(path):
     assert os.path.exists(f"{path}.corrupt")
 
 
+def test_a_deeply_nested_telemetry_file_is_set_aside_not_a_startup_crash(path):
+    # The telemetry file shares the owner's strict JSON loader. A file nested far past the
+    # depth bound used to recurse and raise during construction, taking the owner down at
+    # start-up; only root or the owner uid can write this file. It must now be set aside like
+    # any other unreadable file, with counting restarting from empty.
+    deep = "[" * 20000 + "]" * 20000
+    path.write_text(deep)
+    os.chmod(path, 0o600)
+    t = make(path)
+    snap = t.snapshot()
+    t.record(PEER_DENIED, 61002, 11)
+    summary = t.close()
+    assert snap["corrupt_recovered"] is True and snap["events_observed"] == 0
+    assert path.with_name(path.name + ".corrupt").read_text() == deep
+    assert summary["last_persist"] == "ok"  # a fresh, valid file is written over the set-aside
+
+
 def test_a_planted_fifo_is_refused_without_blocking(path):
     import threading
 

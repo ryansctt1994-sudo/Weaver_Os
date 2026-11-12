@@ -27,6 +27,7 @@ from typing import Any
 from .owner_outcome import COMMITTED, conflict, proposal_digest
 
 MAX_FRAME_BYTES = 64 * 1024
+MAX_JSON_DEPTH = 32  # nested arrays/objects; real requests, configs and snapshots are shallow
 _HEADER = struct.Struct(">I")
 _PEERCRED = struct.Struct("3i")
 
@@ -90,12 +91,46 @@ def _reject_constant(name: str) -> Any:
     raise FrameError(f"non-finite number {name}")
 
 
+def _reject_deep_nesting(text: str) -> None:
+    """Refuse JSON nested past ``MAX_JSON_DEPTH`` before it reaches the recursive parser.
+
+    ``json.loads`` recurses once per nested array or object, so a deeply nested payload would
+    raise ``RecursionError`` -- an unexpected internal error, not a clean refusal, and on the
+    owner's single-request socket that error would end the process. This scans the raw text
+    iteratively (so the scan itself never recurses), counting ``[`` and ``{`` that open
+    outside string literals, with backslash-escape handling so structural characters inside a
+    string never count. It refuses as soon as a container opens past the limit.
+    """
+    depth = 0
+    in_string = False
+    escaped = False
+    for ch in text:
+        if in_string:
+            if escaped:
+                escaped = False
+            elif ch == "\\":
+                escaped = True
+            elif ch == '"':
+                in_string = False
+        elif ch == '"':
+            in_string = True
+        elif ch in "[{":
+            depth += 1
+            if depth > MAX_JSON_DEPTH:
+                raise FrameError(f"JSON nested deeper than {MAX_JSON_DEPTH}")
+        elif ch in "]}":
+            depth -= 1
+
+
 def load_strict_json(text: str) -> Any:
-    """Parse JSON, refusing duplicate object keys and NaN/Infinity."""
+    """Parse JSON, refusing duplicate keys, NaN/Infinity, and nesting past MAX_JSON_DEPTH."""
+    _reject_deep_nesting(text)
     try:
         return json.loads(
             text, object_pairs_hook=_no_duplicate_keys, parse_constant=_reject_constant
         )
+    except RecursionError as exc:  # backstop if a pathological payload slips past the scan
+        raise FrameError("JSON nesting is too deep for the parser") from exc
     except ValueError as exc:  # includes JSONDecodeError and int-digit-limit errors
         raise FrameError(f"not valid JSON: {exc}") from exc
 
