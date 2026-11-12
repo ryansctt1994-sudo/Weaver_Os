@@ -2,7 +2,7 @@
 
 The tests prove bounded application/SQLite atomicity, NOT OS confinement,
 independent signing authority, physical veto, or qualified external witnessing.
-V008/V012 remain explicit expected failures instead of false-green tests.
+V008 remains XFAIL; V012 checks a hard exit after commit and before acknowledgment.
 """
 from __future__ import annotations
 
