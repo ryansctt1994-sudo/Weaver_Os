@@ -47,14 +47,22 @@ from pathlib import Path
 from typing import Any
 
 from .owner_ipc import IpcError, UntrustedPathError, assert_trusted_path, load_strict_json
-from .owner_service import FileVeto, OwnerService
+from .owner_service import (
+    DEFAULT_DEADLINE_S,
+    MAX_DEADLINE_S,
+    FileVeto,
+    OwnerService,
+    valid_deadline,
+)
 from .protected_write import ProtectedWriteOwner
 
 _PR_SET_DUMPABLE = 4
 _REQUIRED = frozenset(
     {"data_dir", "socket_path", "issuer_id", "allowed_keys", "trusted_public_key_b64", "peers"}
 )
-_OPTIONAL = frozenset({"audience", "ledger_id", "test_failpoints"})
+_OPTIONAL = frozenset(
+    {"audience", "ledger_id", "test_failpoints", "request_deadline_s", "reply_deadline_s"}
+)
 _SIDECARS = ("", "-wal", "-shm", "-journal")
 FAILPOINT_ENV = "WEAVER_OWNER_FAILPOINT"
 _FAILPOINTS = frozenset({"inside-commit-transaction", "after-commit-before-reply"})
@@ -136,6 +144,13 @@ def _check_existing_db(db_path: Path) -> None:
             raise StartupRefused(f"{candidate} is not a private regular file owned by us")
 
 
+def _deadline(config: dict[str, Any], field: str) -> float:
+    value = config.get(field, DEFAULT_DEADLINE_S)
+    if not valid_deadline(value):
+        raise StartupRefused(f"{field} must be a number of seconds in (0, {MAX_DEADLINE_S}]")
+    return float(value)
+
+
 def _parse_peers(raw: Any) -> dict[int, frozenset[str]]:
     if not isinstance(raw, dict) or not raw:
         raise StartupRefused("peers must be a nonempty object")
@@ -198,6 +213,8 @@ def run(config_path: str) -> int:
         config["socket_path"],
         owner,
         peers=_parse_peers(config["peers"]),
+        request_deadline=_deadline(config, "request_deadline_s"),
+        reply_deadline=_deadline(config, "reply_deadline_s"),
         after_commit=_die if failpoint == "after-commit-before-reply" else None,
     )
     stop = threading.Event()

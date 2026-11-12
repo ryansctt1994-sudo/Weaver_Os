@@ -19,8 +19,10 @@ from pathlib import Path
 
 ISOLATION = "tests/isolation/test_v008_isolated_owner.py"
 CRASH = "tests/isolation/test_v008_crash_recovery.py"
+DEADLINES = "tests/isolation/test_v008_request_deadlines.py"
 UNIT = "tests/test_owner_ipc.py"
 OUTCOME_UNIT = "tests/test_owner_outcome.py"
+DEADLINE_UNIT = "tests/test_owner_deadlines.py"
 
 MUTATIONS = [
     (
@@ -211,6 +213,42 @@ MUTATIONS = [
         "                    self._claim_unique_key(unique_key, receipt)",
         f"{CRASH}::test_a_true_race_between_two_owners_is_settled_by_the_ledger_unique_key",
     ),
+    # Request deadlines: one connection may hold the single-request owner only so long.
+    (
+        "v008d-receive-deadline-not-applied",
+        "packages/runtime/weaver_runtime/owner_ipc.py",
+        "            sock.settimeout(_time_left(deadline))  # absolute: progress never extends it",
+        "            pass",
+        f"{DEADLINE_UNIT}::test_a_trickling_sender_hits_the_deadline_despite_steady_progress",
+    ),
+    (
+        "v008d-send-deadline-not-applied",
+        "packages/runtime/weaver_runtime/owner_ipc.py",
+        "        sock.settimeout(_time_left(deadline))  # sendall: total time, not per chunk",
+        "        pass",
+        f"{DEADLINE_UNIT}::test_a_peer_that_never_reads_cannot_hold_send_frame_past_its_deadline",
+    ),
+    (
+        "v008d-service-ignores-request-deadline",
+        "packages/runtime/weaver_runtime/owner_service.py",
+        "            request = recv_frame(conn, deadline=deadline)",
+        "            request = recv_frame(conn)",
+        f"{DEADLINES}::test_a_trickling_listed_peer_cannot_hold_the_owner_beyond_the_deadline",
+    ),
+    (
+        "v008d-service-ignores-reply-deadline",
+        "packages/runtime/weaver_runtime/owner_service.py",
+        "            send_frame(conn, reply, deadline=time.monotonic() + self._reply_deadline)",
+        "            send_frame(conn, reply)",
+        f"{DEADLINE_UNIT}::test_the_service_abandons_a_reply_its_peer_never_reads",
+    ),
+    (
+        "v008d-size-cap-from-header-removed",
+        "packages/runtime/weaver_runtime/owner_ipc.py",
+        "    if length == 0 or length > MAX_FRAME_BYTES:",
+        "    if length == 0:",
+        f"{DEADLINES}::test_an_oversized_request_is_refused_from_its_header_and_service_continues",
+    ),
 ]
 
 IGNORE = shutil.ignore_patterns(
@@ -230,7 +268,9 @@ def main() -> None:
         raise SystemExit("needs root: a skipped isolation test must not count as a detection")
     root = Path(__file__).resolve().parents[1]
     env = dict(os.environ, WEAVER_REQUIRE_ISOLATION="1")
-    baseline = _pytest([ISOLATION, CRASH, UNIT, OUTCOME_UNIT], root, env)
+    baseline = _pytest(
+        [ISOLATION, CRASH, DEADLINES, UNIT, OUTCOME_UNIT, DEADLINE_UNIT], root, env
+    )
     if baseline.returncode:
         print(baseline.stdout + baseline.stderr)
         raise SystemExit("V008 mutation baseline failed")

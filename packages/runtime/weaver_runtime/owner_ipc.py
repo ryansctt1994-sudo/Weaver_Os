@@ -18,6 +18,7 @@ import os
 import socket
 import stat
 import struct
+import time
 from collections.abc import Mapping
 from dataclasses import dataclass
 from pathlib import Path
@@ -38,6 +39,10 @@ class IpcError(Exception):
 
 class FrameError(IpcError):
     """A frame was oversized, truncated, not UTF-8 JSON, or ambiguous."""
+
+
+class DeadlineExceeded(FrameError):
+    """A peer did not finish sending a request, or accepting a reply, before the deadline."""
 
 
 class PeerIdentityError(IpcError):
@@ -107,11 +112,25 @@ def encode_frame(obj: Any) -> bytes:
     return _HEADER.pack(len(body)) + body
 
 
-def _recv_exact(sock: socket.socket, count: int) -> bytes:
+def _time_left(deadline: float) -> float:
+    left = deadline - time.monotonic()
+    if left <= 0:
+        raise DeadlineExceeded("deadline exceeded")
+    return left
+
+
+def _recv_exact(sock: socket.socket, count: int, deadline: float | None = None) -> bytes:
     chunks: list[bytes] = []
     remaining = count
     while remaining:
-        chunk = sock.recv(remaining)
+        if deadline is not None:
+            sock.settimeout(_time_left(deadline))  # absolute: progress never extends it
+        try:
+            chunk = sock.recv(remaining)
+        except TimeoutError as exc:
+            if deadline is None:
+                raise
+            raise DeadlineExceeded("deadline exceeded while receiving") from exc
         if not chunk:
             raise FrameError("connection closed mid-frame")
         chunks.append(chunk)
@@ -119,11 +138,17 @@ def _recv_exact(sock: socket.socket, count: int) -> bytes:
     return b"".join(chunks)
 
 
-def recv_frame(sock: socket.socket) -> Any:
-    (length,) = _HEADER.unpack(_recv_exact(sock, _HEADER.size))
+def recv_frame(sock: socket.socket, *, deadline: float | None = None) -> Any:
+    """Read one frame.
+
+    With ``deadline`` (a ``time.monotonic()`` value) the whole frame must arrive before it,
+    however its bytes are paced. The size cap is checked from the 4-byte header, before any
+    of the body is read. Without ``deadline`` the socket's own timeout applies per read.
+    """
+    (length,) = _HEADER.unpack(_recv_exact(sock, _HEADER.size, deadline))
     if length == 0 or length > MAX_FRAME_BYTES:
         raise FrameError("frame length out of range")
-    body = _recv_exact(sock, length)
+    body = _recv_exact(sock, length, deadline)
     try:
         text = body.decode("utf-8")
     except UnicodeDecodeError as exc:
@@ -131,8 +156,17 @@ def recv_frame(sock: socket.socket) -> Any:
     return load_strict_json(text)
 
 
-def send_frame(sock: socket.socket, obj: Any) -> None:
-    sock.sendall(encode_frame(obj))
+def send_frame(sock: socket.socket, obj: Any, *, deadline: float | None = None) -> None:
+    """Send one frame; with ``deadline`` the whole send must finish before it."""
+    frame = encode_frame(obj)
+    if deadline is not None:
+        sock.settimeout(_time_left(deadline))  # sendall: total time, not per chunk
+    try:
+        sock.sendall(frame)
+    except TimeoutError as exc:
+        if deadline is None:
+            raise
+        raise DeadlineExceeded("deadline exceeded while sending") from exc
 
 
 def peer_credentials(sock: socket.socket) -> PeerCredentials:
