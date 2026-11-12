@@ -69,7 +69,8 @@ a timeout. Detection shows these tests are not vacuous. It does not show the con
   time. Crash recovery for the two-process case is covered separately, with its own
   limitations, in `docs/V008_CRASH_RECOVERY.md`.
 - **No receipt for refusals at the service edge.** A request refused for peer uid or actor id
-  never reaches the gate, so it leaves no receipt. Only an in-memory counter moves.
+  never reaches the gate, so it leaves no receipt. It is counted as private service-edge
+  security telemetry instead (`docs/V008_EDGE_TELEMETRY.md`), which is not a receipt.
 - **The socket file is mode 0666 on purpose.** Who may talk to the owner is decided by the
   kernel-reported peer uid, not by file mode.
 - **Ptrace results depend on the host.** This container has no Yama LSM, so denial rests on the

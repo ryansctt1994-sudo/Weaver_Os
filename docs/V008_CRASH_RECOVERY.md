@@ -163,7 +163,9 @@ this slice, and all 26 are detected. Examples of the new ones:
   for scale.
 - **Edge refusals still leave no receipt.** A request refused for its peer uid, actor id or a
   bad frame never reaches the gate. Its outcome stays `UNKNOWN`, and a retry is refused again
-  the same way. Recording these is the planned follow-on.
+  the same way. Such refusals are now counted as private, bounded security telemetry
+  (`docs/V008_EDGE_TELEMETRY.md`), which is deliberately not a receipt and never enters the
+  outcome protocol.
 - **Proposal ids are one global namespace, by decision** (see *Proposal-id invariant*). Once one
   actor commits an id, no other actor can. Taking an id needs a valid issuer grant, so the issuer
   must not grant the same id to different actors for different executions. That is an issuer

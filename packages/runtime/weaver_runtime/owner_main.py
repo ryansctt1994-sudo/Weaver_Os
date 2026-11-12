@@ -25,6 +25,11 @@ Fault injection (crash-recovery tests only): if the launcher sets
 * ``inside-commit-transaction``: after the effect row is written, before SQLite commits;
 * ``after-commit-before-reply``: after the commit, before the reply is sent.
 
+Five more failpoints exercise service-edge telemetry: ``telemetry-persist-fails`` (every
+write fails), ``telemetry-persist-fails-once`` (only the first), ``telemetry-persist-hangs``
+(a write never returns), ``telemetry-dir-fsync-fails`` (the directory sync after a rename
+fails) and ``telemetry-record-fails`` (recording raises). None of them may change a decision.
+
 Arming needs two trusted inputs: the variable AND ``"test_failpoints": true`` in the
 owner-private config. A deployment config leaves ``test_failpoints`` out, and then the
 variable makes the owner refuse to start rather than arm anything. A request can never arm
@@ -54,6 +59,7 @@ from .owner_service import (
     OwnerService,
     valid_deadline,
 )
+from .owner_telemetry import EdgeTelemetry, TelemetryUnsafe
 from .protected_write import ProtectedWriteOwner
 
 _PR_SET_DUMPABLE = 4
@@ -65,7 +71,17 @@ _OPTIONAL = frozenset(
 )
 _SIDECARS = ("", "-wal", "-shm", "-journal")
 FAILPOINT_ENV = "WEAVER_OWNER_FAILPOINT"
-_FAILPOINTS = frozenset({"inside-commit-transaction", "after-commit-before-reply"})
+_TELEMETRY_FAULTS = {
+    "telemetry-persist-fails": "persist-fails",
+    "telemetry-persist-fails-once": "persist-fails-once",
+    "telemetry-persist-hangs": "persist-hangs",
+    "telemetry-dir-fsync-fails": "dir-fsync-fails",
+    "telemetry-record-fails": "record-fails",
+}
+_FAILPOINTS = frozenset(
+    {"inside-commit-transaction", "after-commit-before-reply", *_TELEMETRY_FAULTS}
+)
+TELEMETRY_FILE = "edge-telemetry.json"
 
 
 class StartupRefused(Exception):
@@ -189,6 +205,15 @@ def run(config_path: str) -> int:
     assert_trusted_path(data_dir, os.geteuid(), leaf="private_dir")
     db_path = data_dir / "owner.db"
     _check_existing_db(db_path)
+    peers = _parse_peers(config["peers"])
+    try:
+        telemetry = EdgeTelemetry(
+            data_dir / TELEMETRY_FILE,
+            reserved_uids=frozenset(peers),  # configured principals never lose attribution
+            fault=_TELEMETRY_FAULTS.get(failpoint),
+        )
+    except TelemetryUnsafe as exc:
+        raise StartupRefused(str(exc)) from exc
     try:
         key = base64.b64decode(config["trusted_public_key_b64"], validate=True)
     except (binascii.Error, TypeError) as exc:
@@ -212,10 +237,11 @@ def run(config_path: str) -> int:
     service = OwnerService(
         config["socket_path"],
         owner,
-        peers=_parse_peers(config["peers"]),
+        peers=peers,
         request_deadline=_deadline(config, "request_deadline_s"),
         reply_deadline=_deadline(config, "reply_deadline_s"),
         after_commit=_die if failpoint == "after-commit-before-reply" else None,
+        telemetry=telemetry,
     )
     stop = threading.Event()
     for signum in (signal.SIGTERM, signal.SIGINT):
@@ -227,6 +253,19 @@ def run(config_path: str) -> int:
     finally:
         service.close()
         owner.close()
+        # Bounded final flush; a hung write cannot hold shutdown. Degradation is reported.
+        summary = telemetry.close(timeout=2.0)
+        print(
+            "edge telemetry:"
+            f" events_observed={summary['events_observed']}"
+            f" persist_failures={summary['persist_failures']}"
+            f" last_persist={summary['last_persist']}"
+            f" shutdown_flush={summary['shutdown_flush']}"
+            f" degraded={','.join(summary['degraded']) or 'none'}"
+            f" record_errors={service.telemetry_errors}",
+            file=sys.stderr,
+            flush=True,
+        )
     return 0
 
 
