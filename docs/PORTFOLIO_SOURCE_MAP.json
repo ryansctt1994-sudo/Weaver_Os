@@ -1,0 +1,87 @@
+{
+  "schema": "weaver-portfolio-source-map/1",
+  "observed_at": "2026-10-08",
+  "portfolio_state": {
+    "evidence_ceiling": "E2",
+    "witness": "W0",
+    "authority": "O0_WITHHELD",
+    "production": "PROHIBITED",
+    "portfolio_e4": "NOT_EARNED"
+  },
+  "precedence": [
+    {
+      "rank": 1,
+      "source": "github_admitted_main_and_explicit_governance_records",
+      "role": "canonical implementation/governance state",
+      "may_promote_claims": false,
+      "notes": "Promotion still requires the applicable evidence and witness admission gates."
+    },
+    {
+      "rank": 2,
+      "source": "github_review_branches_and_pull_requests",
+      "role": "candidate repository state",
+      "may_promote_claims": false,
+      "notes": "Open or draft PRs do not become canonical merely by passing CI."
+    },
+    {
+      "rank": 3,
+      "source": "exact_frozen_artifacts_and_bound_receipts",
+      "role": "artifact-scoped evidence",
+      "may_promote_claims": false,
+      "notes": "Evidence remains local to the exact artifact/property/environment and needs explicit admission."
+    },
+    {
+      "rank": 4,
+      "source": "chatgpt_library",
+      "role": "integration and staging workspace",
+      "may_promote_claims": false,
+      "notes": "Generated packages and local receipts are useful inputs, not self-ratifying governance."
+    },
+    {
+      "rank": 5,
+      "source": "google_drive",
+      "role": "research, documents, source archive, and preserved artifact lineage",
+      "may_promote_claims": false,
+      "notes": "Presence in Drive establishes availability/provenance, not current execution."
+    },
+    {
+      "rank": 6,
+      "source": "dropbox",
+      "role": "historical and frozen artifact vault",
+      "may_promote_claims": false,
+      "notes": "Older packages do not silently override newer admitted state."
+    },
+    {
+      "rank": 7,
+      "source": "gmail",
+      "role": "outside-contact and notification record",
+      "may_promote_claims": false,
+      "notes": "CI notification email is historical evidence; current GitHub run state controls current CI claims."
+    },
+    {
+      "rank": 8,
+      "source": "google_calendar",
+      "role": "scheduled real-world activity record",
+      "may_promote_claims": false,
+      "notes": "A scheduled event is not evidence that the event occurred or passed."
+    },
+    {
+      "rank": 9,
+      "source": "chat_and_summary_documents",
+      "role": "reasoning, reconstruction, and narrative handoff",
+      "may_promote_claims": false,
+      "notes": "A well-written status report is not a source of authority."
+    }
+  ],
+  "non_collapse_laws": [
+    "source_presence != execution",
+    "notification != current_ci_state",
+    "library_artifact != canonical_repository_state",
+    "historical_archive != current_admission",
+    "scheduled_event != completed_event",
+    "documented_claim != admitted_claim",
+    "signature != truth",
+    "evidence != authority",
+    "witness != evidence"
+  ]
+}

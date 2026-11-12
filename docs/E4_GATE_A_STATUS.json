@@ -1,0 +1,38 @@
+{
+  "schema": "weaver-e4-gate-a-status/1",
+  "observed_at": "2026-10-08",
+  "gate": "FIRST_INDEPENDENT_SOFTWARE_WITNESS_TARGET",
+  "state": "UNRATIFIED",
+  "portfolio_state": {
+    "evidence_ceiling": "E2",
+    "n_independent": 0,
+    "witness": "W0",
+    "authority": "O0_WITHHELD",
+    "production": "PROHIBITED",
+    "portfolio_e4": "NOT_EARNED"
+  },
+  "candidate_targets": [
+    {
+      "id": "CALL-004",
+      "status": "CANDIDATE_ONLY",
+      "known_readiness": "historically reported 16/17 pre-dispatch gates; human cold-usability gate remains material",
+      "ratified_first_target": false
+    },
+    {
+      "id": "WN-RECEIPT-CORE-1.0",
+      "status": "BLOCKED_PRE_FREEZE_ASSEMBLY",
+      "target_zip_sha256": "e5cb3af872b42bef93ae284875a8416eb814d02132f8f66265f3fc661cb81ffb",
+      "known_progress": [
+        "recovered target archive reported identity-passing",
+        "E4-001-MUT locally qualified 8/8 targeted kills",
+        "stable_result_sha256 present in output-invariance material",
+        "5/5 wrapper negative controls required"
+      ],
+      "blocking_condition": "Assemble one-digest freeze bundle and mechanically verify the wrapper/stable_result correction in that exact target before external assignment.",
+      "ratified_first_target": false
+    }
+  ],
+  "selection_rule": "A steward decision must name exactly one target version and full artifact/bundle digest, record rationale and exclusions, and cannot be inferred from prose, chronology, local test strength, or packet readiness.",
+  "operator_rule": "Publisher, Operator, and Adjudicator roles must be disjoint for qualifying independent reproduction.",
+  "automatic_promotion": false
+}
