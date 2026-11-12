@@ -25,6 +25,7 @@ from weaver_verifier.crypto import CryptoVerifier
 from tests.triadic_controls.test_crypto_verifier import authority_payload, signed_envelope
 from tests.triadic_controls.test_registry_root_signature import (
     generate_keypair,
+    iso_offset,
     sign_registry,
     unsigned_registry,
 )
@@ -168,6 +169,49 @@ def test_malformed_identity_is_refused(keys, store, field, value):
     reg[field] = value
     with pytest.raises(ValueError, match="rollback protection"):
         verifier(keys, sign_registry(reg, keys[0]), store)
+
+
+def _signed_at_sequence_50(keys, edit) -> dict:
+    reg = unsigned_registry(keys[3])
+    reg["registry_sequence"] = 50
+    edit(reg)
+    return sign_registry(reg, keys[0])
+
+
+@pytest.mark.parametrize(
+    "break_it",
+    [
+        lambda r: r["issuers"][0].pop("issuer_id"),
+        lambda r: r["issuers"][0].pop("key_id"),
+        lambda r: r["roles"][0].pop("role_id"),
+        lambda r: r.__setitem__("issuers", [None]),
+        lambda r: r.__setitem__("roles", "not-a-list-of-roles"),
+    ],
+    ids=["no-issuer_id", "no-key_id", "no-role_id", "issuer-not-object", "roles-not-list"],
+)
+def test_signed_but_unusable_registry_does_not_move_the_mark(keys, store, break_it):
+    """Review on #119: a failed construction must leave the high-water mark where it was."""
+    verifier(keys, registry_at(keys, 2), store)
+    with pytest.raises((ValueError, KeyError, TypeError, AttributeError)):
+        verifier(keys, _signed_at_sequence_50(keys, break_it), store)
+    verifier(keys, registry_at(keys, 3), store)  # the repaired registry, below 50
+
+
+@pytest.mark.parametrize(
+    "window",
+    [(3600, 7200), (-7200, -3600)],
+    ids=["not-yet-valid", "expired"],
+)
+def test_registry_outside_its_window_does_not_move_the_mark(keys, store, window):
+    """A signed future registry presented early must not lock out the current one."""
+    verifier(keys, registry_at(keys, 2), store)
+
+    def shift(reg: dict) -> None:
+        reg["valid_from"], reg["valid_until"] = iso_offset(window[0]), iso_offset(window[1])
+
+    with pytest.raises(ValueError, match="REGISTRY_EXPIRED"):
+        verifier(keys, _signed_at_sequence_50(keys, shift), store)
+    verifier(keys, registry_at(keys, 3), store)
 
 
 def test_caller_edits_after_construction_do_not_reach_the_verifier(keys, store):

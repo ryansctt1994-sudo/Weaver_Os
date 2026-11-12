@@ -343,18 +343,31 @@ class CryptoVerifier:
                 "CRITICAL: Key registry failed root signature verification. "
                 "Trust boundary compromised."
             )
+        # Build every piece of verifier state before touching the sequence store, so a
+        # registry that cannot be used never moves the persistent high-water mark.
+        issuers = {
+            f"{issuer['issuer_id']}|{issuer['key_id']}": issuer
+            for issuer in key_registry.get("issuers", [])
+        }
+        issuer_ids = {issuer.get("issuer_id") for issuer in key_registry.get("issuers", [])}
+        roles = {role["role_id"]: role for role in key_registry.get("roles", [])}
         if registry_sequence_store is not None:
-            # Only after the root signature has verified, so only authenticated
-            # registries can move the high-water mark.
+            # A signed registry outside its window (for example a future one presented
+            # early) would otherwise lock out the current registry until it became valid.
+            fresh, freshness_failure = validate_registry_freshness(key_registry)
+            if not fresh:
+                raise ValueError(
+                    f"CRITICAL: {freshness_failure}: key registry is outside its validity "
+                    "window and cannot advance the rollback high-water mark."
+                )
+            # Last fallible step, and only after the root signature has verified, so only
+            # authenticated, usable registries can move the mark.
             _advance_registry_sequence(key_registry, registry_sequence_store)
         self.registry = key_registry
         self.replay_cache = replay_cache
-        self._issuers = {
-            f"{issuer['issuer_id']}|{issuer['key_id']}": issuer
-            for issuer in self.registry.get("issuers", [])
-        }
-        self._issuer_ids = {issuer.get("issuer_id") for issuer in self.registry.get("issuers", [])}
-        self._roles = {role["role_id"]: role for role in self.registry.get("roles", [])}
+        self._issuers = issuers
+        self._issuer_ids = issuer_ids
+        self._roles = roles
 
     def _get_iso_now(self) -> str:
         return datetime.now(timezone.utc).isoformat(timespec="seconds")
