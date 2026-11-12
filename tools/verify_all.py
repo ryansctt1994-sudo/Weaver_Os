@@ -417,11 +417,39 @@ def is_valid_verdict(
     )
 
 
+def prepare_output_workspace(output: Path) -> bool:
+    """Admit a fresh evidence directory or CI's single dependency-install log.
+
+    Previously generated receipts/logs must never be mixed with a new run.
+    This does not authenticate the dependency-install log or the host.
+    """
+    if output.is_symlink():
+        return False
+    try:
+        if output.exists():
+            if not output.is_dir():
+                return False
+            for entry in output.iterdir():
+                if entry.name != "install.log" or not entry.is_file() or entry.is_symlink():
+                    return False
+        else:
+            output.mkdir(parents=True)
+        return True
+    except OSError:
+        return False
+
+
 def main() -> int:
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--output", type=Path, default=ROOT / "verification-output")
     args = parser.parse_args()
-    args.output.mkdir(parents=True, exist_ok=True)
+    if not prepare_output_workspace(args.output):
+        print(
+            "verification output refused: use an empty directory "
+            "or one containing only a regular install.log",
+            file=sys.stderr,
+        )
+        return 1
 
     dirty_at_start = bool(git("status", "--porcelain", default=""))
     verified_commit = git("rev-parse", "HEAD")

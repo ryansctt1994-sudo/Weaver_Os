@@ -9,7 +9,7 @@ permissions:
 jobs:
   source-replay:
     name: Detached source operator rehearsal
-    if: github.event.pull_request.head.ref == 'integration/p0-009-reconcile-88-90'
+    if: github.event.pull_request.head.ref == 'integration/p0-main-reland-20261111-v1'
     runs-on: ubuntu-24.04
     timeout-minutes: 25
     env:
