@@ -18,6 +18,17 @@ the socket is listening.
 
 The trusted configuration (issuer key, allowed keys, peer-uid table) comes only from the
 config file. A requester can supply a proposal and a signed grant, never configuration.
+
+Fault injection (crash-recovery tests only): if the launcher sets
+``WEAVER_OWNER_FAILPOINT``, the owner kills itself with SIGKILL at that point:
+
+* ``inside-commit-transaction``: after the effect row is written, before SQLite commits;
+* ``after-commit-before-reply``: after the commit, before the reply is sent.
+
+Arming needs two trusted inputs: the variable AND ``"test_failpoints": true`` in the
+owner-private config. A deployment config leaves ``test_failpoints`` out, and then the
+variable makes the owner refuse to start rather than arm anything. A request can never arm
+a failpoint. Unknown names refuse to start; an enabled config is announced on stderr.
 """
 from __future__ import annotations
 
@@ -27,9 +38,11 @@ import binascii
 import ctypes
 import os
 import signal
+import sqlite3
 import stat
 import sys
 import threading
+from collections.abc import Mapping
 from pathlib import Path
 from typing import Any
 
@@ -41,12 +54,31 @@ _PR_SET_DUMPABLE = 4
 _REQUIRED = frozenset(
     {"data_dir", "socket_path", "issuer_id", "allowed_keys", "trusted_public_key_b64", "peers"}
 )
-_OPTIONAL = frozenset({"audience", "ledger_id"})
+_OPTIONAL = frozenset({"audience", "ledger_id", "test_failpoints"})
 _SIDECARS = ("", "-wal", "-shm", "-journal")
+FAILPOINT_ENV = "WEAVER_OWNER_FAILPOINT"
+_FAILPOINTS = frozenset({"inside-commit-transaction", "after-commit-before-reply"})
 
 
 class StartupRefused(Exception):
     pass
+
+
+def _die() -> None:
+    os.kill(os.getpid(), signal.SIGKILL)
+
+
+class _CrashInsideCommit(ProtectedWriteOwner):
+    """Fault injection: write the effect, then die before the transaction commits."""
+
+    def _effect(
+        self,
+        conn: sqlite3.Connection,
+        proposal: Mapping[str, Any],
+        result: Mapping[str, Any],
+    ) -> None:
+        super()._effect(conn, proposal, result)
+        _die()
 
 
 def _open_descriptors() -> list[int]:
@@ -124,6 +156,19 @@ def run(config_path: str) -> int:
     os.umask(0o077)
     _set_non_dumpable()
     config = _load_config(config_path)
+    enabled = config.get("test_failpoints", False)
+    if not isinstance(enabled, bool):
+        raise StartupRefused("test_failpoints must be true or false")
+    failpoint = os.environ.get(FAILPOINT_ENV, "")
+    if failpoint and not enabled:
+        raise StartupRefused(
+            f"{FAILPOINT_ENV} is set but this owner's config does not enable test_failpoints"
+        )
+    if failpoint and failpoint not in _FAILPOINTS:
+        raise StartupRefused(f"unknown failpoint {failpoint!r}")
+    if enabled:
+        armed = f"; armed: {failpoint}" if failpoint else "; none armed"
+        print(f"TEST FAILPOINTS ENABLED{armed}", file=sys.stderr, flush=True)
 
     data_dir = Path(config["data_dir"])
     assert_trusted_path(data_dir, os.geteuid(), leaf="private_dir")
@@ -137,7 +182,10 @@ def run(config_path: str) -> int:
     if not isinstance(allowed, list):
         raise StartupRefused("allowed_keys must be a list")
 
-    owner = ProtectedWriteOwner(
+    owner_class = (
+        _CrashInsideCommit if failpoint == "inside-commit-transaction" else ProtectedWriteOwner
+    )
+    owner = owner_class(
         db_path,
         trusted_public_key=key,
         issuer_id=config["issuer_id"],
@@ -146,7 +194,12 @@ def run(config_path: str) -> int:
         audience=config.get("audience", "weaver-vertical-001"),
         ledger_id=config.get("ledger_id", "weaver-vertical-001"),
     )
-    service = OwnerService(config["socket_path"], owner, peers=_parse_peers(config["peers"]))
+    service = OwnerService(
+        config["socket_path"],
+        owner,
+        peers=_parse_peers(config["peers"]),
+        after_commit=_die if failpoint == "after-commit-before-reply" else None,
+    )
     stop = threading.Event()
     for signum in (signal.SIGTERM, signal.SIGINT):
         signal.signal(signum, lambda *_: stop.set())

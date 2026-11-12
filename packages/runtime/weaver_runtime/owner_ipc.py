@@ -23,6 +23,8 @@ from dataclasses import dataclass
 from pathlib import Path
 from typing import Any
 
+from .owner_outcome import COMMITTED, conflict, proposal_digest
+
 MAX_FRAME_BYTES = 64 * 1024
 _HEADER = struct.Struct(">I")
 _PEERCRED = struct.Struct("3i")
@@ -44,6 +46,23 @@ class PeerIdentityError(IpcError):
 
 class UntrustedPathError(IpcError):
     """A path component could be replaced or rewritten by an unprivileged user."""
+
+
+class MissingPathError(UntrustedPathError):
+    """The path does not exist (for a socket: the owner is not serving)."""
+
+
+class OwnerUnavailable(IpcError):
+    """The request was NOT delivered: there was no owner to connect to. Nothing happened."""
+
+
+class OutcomeUnknown(IpcError):
+    """The request may have reached the owner, but no reply came back.
+
+    This is not a refusal and not a failure. Ask the owner for the proposal's ``outcome``;
+    resubmitting the same proposal is safe because at most one commit per proposal id is
+    possible.
+    """
 
 
 @dataclass(frozen=True)
@@ -144,6 +163,8 @@ def assert_trusted_path(path: str | os.PathLike[str], owner_uid: int, *, leaf: s
         current = Path(*parts[:depth])
         try:
             st = os.lstat(current)
+        except FileNotFoundError as exc:
+            raise MissingPathError(f"cannot stat {current}: {exc.strerror}") from exc
         except OSError as exc:
             raise UntrustedPathError(f"cannot stat {current}: {exc.strerror}") from exc
         if stat.S_ISLNK(st.st_mode):
@@ -200,27 +221,62 @@ class OwnerClient:
         # own. A deployment must leave it on.
         self._verify_path = verify_path
 
-    def _call(self, request: Mapping[str, Any]) -> dict[str, Any]:
+    def _call(self, request: Mapping[str, Any], *, mutating: bool = False) -> dict[str, Any]:
         frame = encode_frame(request)
         if self._verify_path:
-            assert_trusted_path(self._path, self._owner_uid, leaf="socket")
+            try:
+                assert_trusted_path(self._path, self._owner_uid, leaf="socket")
+            except MissingPathError as exc:
+                raise OwnerUnavailable(f"no owner socket at {self._path}") from exc
         with socket.socket(socket.AF_UNIX, socket.SOCK_STREAM) as sock:
             sock.settimeout(self._timeout)
-            sock.connect(self._path)
+            try:
+                sock.connect(self._path)
+            except OSError as exc:
+                raise OwnerUnavailable(f"cannot connect to the owner: {exc}") from exc
             creds = peer_credentials(sock)
             if creds.uid != self._owner_uid:
                 raise PeerIdentityError(
                     f"server runs as uid {creds.uid}, expected {self._owner_uid}"
                 )
-            sock.sendall(frame)
-            reply = recv_frame(sock)
+            # From the first byte sent, the owner may act on the request. A missing,
+            # truncated or late reply after this point is NOT evidence of failure.
+            try:
+                sock.sendall(frame)
+                reply = recv_frame(sock)
+            except (OSError, FrameError) as exc:
+                if mutating:
+                    raise OutcomeUnknown(f"no reply after sending: {exc}") from exc
+                raise IpcError(f"no reply: {exc}") from exc
         if not isinstance(reply, dict):
             raise FrameError("reply is not an object")
         return reply
 
     def submit(self, proposal: Any, signed_grant: Mapping[str, Any] | None) -> dict[str, Any]:
+        """Submit once. Raises OutcomeUnknown if the reply is lost; see ``outcome``."""
         body = proposal if isinstance(proposal, Mapping) else proposal.to_dict()
-        return self._call({"op": "submit", "proposal": dict(body), "signed_grant": signed_grant})
+        request = {"op": "submit", "proposal": dict(body), "signed_grant": signed_grant}
+        return self._call(request, mutating=True)
+
+    def outcome(self, proposal: Any) -> dict[str, Any]:
+        """What durable history says about a proposal: COMMITTED, REFUSED, UNKNOWN or CONFLICT.
+
+        Pass the proposal itself (not just its id) whenever you have it: a commit recorded
+        for the same id but different content is then reported as CONFLICT, never as yours.
+        """
+        if isinstance(proposal, str):
+            return self._call({"op": "outcome", "proposal_id": proposal})
+        body = dict(proposal if isinstance(proposal, Mapping) else proposal.to_dict())
+        reply = self._call({"op": "outcome", "proposal_id": body["proposal_id"]})
+        found = reply.get("outcome")
+        if (
+            reply.get("ok")
+            and isinstance(found, dict)
+            and found.get("status") == COMMITTED
+            and found.get("proposal_sha256") != proposal_digest(body)
+        ):
+            reply = dict(reply, outcome=conflict(body["proposal_id"]))
+        return reply
 
     def rows(self) -> dict[str, Any]:
         return self._call({"op": "rows"})

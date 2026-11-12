@@ -35,6 +35,7 @@ from weaver_runtime.owner_ipc import UntrustedPathError, assert_trusted_path
 from weaver_runtime.protected_write import GRANT_DOMAIN
 
 OWNER_UID, REQUESTER_UID, OTHER_UID = 61001, 61002, 61003
+SECOND_PEER_UID = 61004  # listed, but may speak only for agent-b
 REPO = Path(__file__).resolve().parents[2]
 
 pytestmark = pytest.mark.skipif(
@@ -74,7 +75,8 @@ import json, sys
 from weaver_runtime.owner_ipc import OwnerClient
 req = json.loads(sys.argv[1])
 client = OwnerClient(req["socket"], expected_owner_uid=req["owner_uid"],
-                     verify_path=req.get("verify_path", True))
+                     verify_path=req.get("verify_path", True),
+                     timeout=req.get("timeout", 5.0))
 try:
     reply = getattr(client, req["op"])(*req.get("args", []))
     print(json.dumps({"reply": reply}))
@@ -112,10 +114,11 @@ class Deployment:
             "issuer_id": "issuer-a",
             "allowed_keys": ["alpha", "beta"],
             "trusted_public_key_b64": base64.b64encode(_public_raw(self.key)).decode(),
-            "peers": {str(REQUESTER_UID): ["agent-a"]},
+            "peers": {str(REQUESTER_UID): ["agent-a"], str(SECOND_PEER_UID): ["agent-b"]},
         }
         self.write_config()
         self.proc: subprocess.Popen[str] | None = None
+        self.extra: list[subprocess.Popen[str]] = []  # further owners on the same store
         self.leaks: list[int] = []
 
     def _run_chmod(self, path: Path, mode: str) -> None:
@@ -129,9 +132,13 @@ class Deployment:
         return path
 
     def write_config(self, *, mode: int = 0o600, uid: int = OWNER_UID) -> None:
-        self.config_path.write_text(json.dumps(self.config))
-        os.chown(self.config_path, uid, uid)
-        os.chmod(self.config_path, mode)
+        self.write_config_file(self.config_path, self.config, mode=mode, uid=uid)
+
+    @staticmethod
+    def write_config_file(path: Path, config: dict, *, mode: int = 0o600, uid: int = OWNER_UID):
+        path.write_text(json.dumps(config))
+        os.chown(path, uid, uid)
+        os.chmod(path, mode)
 
     def env(self) -> dict[str, str]:
         roots = [self.code / name for name in ("contracts", "runtime", "verifier")]
@@ -142,17 +149,28 @@ class Deployment:
             "HOME": "/nonexistent",
         }
 
-    def popen_owner(self, *, uid: int | None = OWNER_UID, pass_fds=()):
+    def popen_owner(
+        self,
+        *,
+        uid: int | None = OWNER_UID,
+        pass_fds=(),
+        failpoint: str | None = None,
+        config_path: Path | None = None,
+    ):
         # uid=None launches as the current user (root here), with no uid or group change.
+        env = self.env()
+        if failpoint is not None:
+            env["WEAVER_OWNER_FAILPOINT"] = failpoint
+        config = str(config_path or self.config_path)
         return subprocess.Popen(
-            [sys.executable, "-m", "weaver_runtime.owner_main", "--config", str(self.config_path)],
-            env=self.env(), cwd="/", stdin=subprocess.DEVNULL, stdout=subprocess.PIPE,
+            [sys.executable, "-m", "weaver_runtime.owner_main", "--config", config],
+            env=env, cwd="/", stdin=subprocess.DEVNULL, stdout=subprocess.PIPE,
             stderr=subprocess.PIPE, text=True, pass_fds=pass_fds,
             user=uid, group=uid, extra_groups=None if uid is None else [],
         )
 
-    def start_owner(self) -> int:
-        self.proc = proc = self.popen_owner()
+    @staticmethod
+    def await_ready(proc: subprocess.Popen[str]) -> int:
         assert proc.stdout is not None and proc.stderr is not None
         deadline = time.time() + 15
         while time.time() < deadline:
@@ -164,6 +182,18 @@ class Deployment:
             if proc.poll() is not None:
                 raise AssertionError(f"owner exited early: {proc.stderr.read()}")
         raise AssertionError("owner did not become ready")
+
+    def start_owner(self, failpoint: str | None = None) -> int:
+        self.stop()  # reap any earlier owner process before starting a new one
+        self.proc = self.popen_owner(failpoint=failpoint)
+        return self.await_ready(self.proc)
+
+    def start_extra_owner(self, config_path: Path) -> subprocess.Popen[str]:
+        """A further owner process on the SAME store, serving its own socket."""
+        proc = self.popen_owner(config_path=config_path)
+        self.extra.append(proc)
+        self.await_ready(proc)
+        return proc
 
     def refused_start(self, **kwargs) -> subprocess.CompletedProcess:
         proc = self.popen_owner(**kwargs)
@@ -183,10 +213,12 @@ class Deployment:
             check=False,
         )
 
-    def call(self, uid: int, op: str, *args, socket_path=None, verify_path=True) -> dict:
+    def call(
+        self, uid: int, op: str, *args, socket_path=None, verify_path=True, timeout=5.0
+    ) -> dict:
         request = {
             "socket": str(socket_path or self.sock), "owner_uid": OWNER_UID, "op": op,
-            "args": list(args), "verify_path": verify_path,
+            "args": list(args), "verify_path": verify_path, "timeout": timeout,
         }
         done = self.run_as(uid, SUBMIT, json.dumps(request))
         assert done.returncode == 0, done.stderr
@@ -198,21 +230,31 @@ class Deployment:
     def rows(self) -> dict:
         return self.call(REQUESTER_UID, "rows")["reply"]["rows"]
 
-    def stop(self) -> None:
-        if self.proc is not None and self.proc.poll() is None:
-            self.proc.send_signal(signal.SIGTERM)
+    def wait_for_owner_exit(self, timeout: float = 15) -> int:
+        assert self.proc is not None
+        return self.proc.wait(timeout=timeout)
+
+    @staticmethod
+    def terminate(proc: subprocess.Popen[str] | None) -> None:
+        if proc is not None and proc.poll() is None:
+            proc.send_signal(signal.SIGTERM)
             try:
-                self.proc.wait(timeout=10)
+                proc.wait(timeout=10)
             except subprocess.TimeoutExpired:
-                self.proc.kill()
-                self.proc.wait()
-        if self.proc is not None:
-            for stream in (self.proc.stdout, self.proc.stderr):
+                proc.kill()
+                proc.wait()
+        if proc is not None:
+            for stream in (proc.stdout, proc.stderr):
                 if stream:
                     stream.close()
 
+    def stop(self) -> None:
+        self.terminate(self.proc)
+
     def cleanup(self) -> None:
         self.stop()
+        for proc in self.extra:
+            self.terminate(proc)
         shutil.rmtree(self.base, ignore_errors=True)
 
 

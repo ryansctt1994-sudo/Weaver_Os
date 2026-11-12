@@ -34,6 +34,7 @@ jobs:
         run: >
           sudo -E env "PATH=$PATH" WEAVER_REQUIRE_ISOLATION=1
           python -m pytest -q -p no:cacheprovider tests/isolation tests/test_owner_ipc.py
+          tests/test_owner_outcome.py
 
       - name: V008 control-removal check (as root)
         run: >
