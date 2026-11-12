@@ -1,3 +1,8 @@
+> Weaver import: simulation candidate only. Historical packet checksums and commands
+> below apply to the original source tree preserved in
+> `research/consolidation/snapshots/arty-hardware.zip`, not the combined Weaver tree.
+> Use `make test-hw-consolidation` for the host simulation gate.
+
 # Arty A7-35T bench interlock candidate
 
 **2026-11-06 follow-up:** the [physical reproduction packet](qualification/README.md)
@@ -151,7 +156,7 @@ The **earlier candidate's** Chronicle checkpoint digest is
 It is publicly included in Rekor at index **3719860200**:
 [entry and signed proof](https://rekor.sigstore.dev/api/v1/log/entries/108e9186e8c5677a94273e14be960ad44a21d0a146c2013b824b6e4209bcd8a87d1f7c08e56c03d3).
 
-The [public evidence bundle](../../../evidence/silicon/2026-11-06/) contains the
+The [public evidence bundle](https://github.com/ryansctt1994-sudo/cathedral-verified/tree/e943fcaa73f9c2cd8f9aa471ce160cc24daddb9c/evidence/silicon/2026-11-06/) contains the
 exact checkpoint, chain, source files, mapped netlists, logs, and proof. Extract
 `candidate-bundle.zip` into a new directory, then from repository root run:
 

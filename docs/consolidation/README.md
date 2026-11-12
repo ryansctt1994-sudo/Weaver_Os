@@ -34,7 +34,7 @@ checkpoint, finding type distinctions, asset digests and advisory import boundar
 
 ## Preserved research, not enabled authority
 
-`research/consolidation/snapshots/` contains seven original source snapshots,
+`research/consolidation/snapshots/` contains eight original source snapshots,
 including their licenses, tests and limitations. They preserve Chronicle,
 the Cathedral P0 recognizer, the staging authority spine, the Ed25519 role gate,
 Agent OS, finding confirmation and Forge. No runtime module imports these sources.

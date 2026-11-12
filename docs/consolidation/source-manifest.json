@@ -176,7 +176,7 @@
       "source_sha256": "7226a71b57c22ef7c85f2ede8a5d1ee052fa32d086880ba955a002212c161438",
       "target": "hardware/lucifer_latch/arty_a7/README.md",
       "disposition": "hardware-candidate",
-      "target_sha256": "7226a71b57c22ef7c85f2ede8a5d1ee052fa32d086880ba955a002212c161438"
+      "target_sha256": "3074c45f622633a31133fa456ce2c3749ff59412002804b3c0607631f57689ed"
     },
     {
       "source_repository": "https://github.com/ryansctt1994-sudo/cathedral-verified.git",
@@ -438,6 +438,15 @@
       "target": "docs/consolidation/licenses/weavers-forge.txt",
       "disposition": "license-notice",
       "target_sha256": "97b3af70c8e3e83d46dac823681f443b55456a30c3b0e63b6ada280bf31d7bac"
+    },
+    {
+      "source_repository": "https://github.com/ryansctt1994-sudo/cathedral-verified.git",
+      "source_commit": "e943fcaa73f9c2cd8f9aa471ce160cc24daddb9c",
+      "source_path": "git archive HEAD",
+      "source_sha256": "620f0d511d54bafd5259b6914227a740104cbfbcfa09257c3e4fdf6afe4bb589",
+      "target": "research/consolidation/snapshots/arty-hardware.zip",
+      "disposition": "reference-only-not-runtime",
+      "target_sha256": "620f0d511d54bafd5259b6914227a740104cbfbcfa09257c3e4fdf6afe4bb589"
     }
   ]
 }

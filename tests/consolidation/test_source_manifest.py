@@ -35,7 +35,7 @@ def fixture_root(tmp_path):
 
 
 def test_committed_assets_match_pinned_manifest():
-    assert validate(ROOT)["reference_archives"] == 7
+    assert validate(ROOT)["reference_archives"] == 8
 
 
 def test_modified_asset_is_refused(tmp_path):
