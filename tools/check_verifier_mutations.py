@@ -198,7 +198,7 @@ MUTATIONS = [
     (
         "commit-boundary-gate-guard-unwired",
         "packages/runtime/weaver_runtime/gate.py",
-        "                    guard=self._ledger_guard(proposal),",
+        "                    guard=self._ledger_guard(pid),",
         "                    guard=None,",
         "tests/gate/test_commit_boundary.py::test_veto_recorded_in_the_ledger_before_commit_aborts",
     ),
@@ -255,9 +255,24 @@ MUTATIONS = [
     (
         "gate-replay-guard",
         "packages/runtime/weaver_runtime/gate.py",
-        "            if proposal.proposal_id in self._committed:",
+        "            if pid in self._committed:",
         "            if False:",
         "tests/gate/test_execution_gate.py::test_committed_proposal_cannot_run_again_even_after_restart",
+    ),
+    (
+        "gate-proposal-pin-check",
+        "packages/runtime/weaver_runtime/gate.py",
+        "        if _canonical_or_none(proposal) != pinned.canonical:",
+        "        if False:",
+        "tests/gate/test_proposal_integrity.py::"
+        "test_frozen_field_bypass_by_the_action_aborts_and_records_the_submitted_proposal[action]",
+    ),
+    (
+        "proposal-payload-read-only",
+        "packages/contracts/weaver_contracts/gate.py",
+        '        object.__setattr__(self, "payload", _read_only(parsed))',
+        '        object.__setattr__(self, "payload", parsed)',
+        "tests/gate/test_proposal_integrity.py::test_proposal_payload_cannot_be_mutated_in_place[set-top]",
     ),
     # Step 7 custody (wx-checkpoint-1): prefix check, pinned keys, signatures, split
     # view, and the witness's refusal path.
