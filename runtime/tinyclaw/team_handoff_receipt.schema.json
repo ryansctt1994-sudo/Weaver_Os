@@ -1,0 +1,32 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://weaver-os.local/schemas/team_handoff_receipt.schema.json",
+  "title": "TeamHandoffReceipt",
+  "type": "object",
+  "required": [
+    "receipt_version",
+    "receipt_type",
+    "runtime",
+    "authority_id",
+    "team_id",
+    "from_agent",
+    "to_agent_or_team",
+    "handoff_hash",
+    "decision",
+    "receipt_hash"
+  ],
+  "properties": {
+    "receipt_version": { "const": "0.1" },
+    "receipt_type": { "const": "TeamHandoffReceipt" },
+    "runtime": { "const": "tinyclaw" },
+    "authority_id": { "type": "string", "minLength": 1 },
+    "team_id": { "type": "string", "minLength": 1 },
+    "from_agent": { "type": "string", "minLength": 1 },
+    "to_agent_or_team": { "type": "string", "minLength": 1 },
+    "handoff_hash": { "type": "string" },
+    "decision": { "enum": ["allow", "block", "escalate"] },
+    "previous_receipt_hash": { "type": ["string", "null"] },
+    "receipt_hash": { "type": "string" }
+  },
+  "additionalProperties": false
+}

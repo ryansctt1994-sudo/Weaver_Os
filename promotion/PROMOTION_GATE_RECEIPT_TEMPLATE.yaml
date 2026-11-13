@@ -1,0 +1,13 @@
+schema_version: "0.1"
+receipt_type: "PromotionGateReceipt"
+build_id: "B_MASTER_BUILD_V0_1_TINYCLAW_FIRST_RUNTIME"
+component: "component_name"
+requested_level: "E3_candidate"
+current_level: "E1_or_E2"
+decision: "hold"
+required_evidence:
+  - "ci_receipt"
+  - "replay_receipt"
+  - "strix_scan_receipt"
+  - "authority_lease_update"
+receipt_hash: "sha256"

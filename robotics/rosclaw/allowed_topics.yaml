@@ -1,0 +1,31 @@
+schema_version: "0.1"
+default: "deny"
+mode: "simulation_only"
+
+topics:
+  publish:
+    allowed:
+      - name: "/cmd_vel"
+        max_linear_x: 0.25
+        max_angular_z: 0.5
+        simulation_only: true
+    denied:
+      - "*"
+
+  subscribe:
+    allowed:
+      - "/battery_state"
+      - "/camera/image_raw"
+      - "/odom"
+    denied:
+      - "*"
+
+services:
+  allowed: []
+  denied:
+    - "*"
+
+actions:
+  allowed: []
+  denied:
+    - "*"
