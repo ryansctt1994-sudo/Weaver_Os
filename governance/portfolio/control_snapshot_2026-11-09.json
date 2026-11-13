@@ -1,0 +1,762 @@
+{
+  "schema_version": "weaver.portfolio-control.v0.1",
+  "status": "PROPOSED_UNRATIFIED",
+  "review": {
+    "reviewer": "OpenAI GPT-6 AI-assisted review, origin controlled",
+    "independent": false,
+    "date_utc": "2026-11-10",
+    "method": [
+      "Connected GitHub repository metadata and selected file reads",
+      "Source-file inspection and historical authored evidence",
+      "Limited public prior-art search"
+    ],
+    "exclusions": [
+      "No clean-room full source checkout",
+      "No independent operator",
+      "No external root-of-trust witness",
+      "No complete review of all listed repositories"
+    ]
+  },
+  "inventory": {
+    "account": "ryansctt1994-sudo",
+    "observation_type": "ACCOUNT_ACCESSIBLE_GITHUB_LIST",
+    "observed_date_utc": "2026-11-10",
+    "observed_count": 75,
+    "live_inventory_enforced": false,
+    "repositories": [
+      {
+        "repository": "ryansctt1994-sudo/A.G.I-Seed-",
+        "inventory_classification": "INVENTORIED_ONLY",
+        "claim_coverage": "NOT_AUDITED",
+        "auto_promotion": false
+      },
+      {
+        "repository": "ryansctt1994-sudo/agency-agents6",
+        "inventory_classification": "INVENTORIED_ONLY",
+        "claim_coverage": "NOT_AUDITED",
+        "auto_promotion": false
+      },
+      {
+        "repository": "ryansctt1994-sudo/AGI-to-ASI-TRANSITION-PROOF-LAYER",
+        "inventory_classification": "INVENTORIED_ONLY",
+        "claim_coverage": "NOT_AUDITED",
+        "auto_promotion": false
+      },
+      {
+        "repository": "ryansctt1994-sudo/ai-agent-terraform",
+        "inventory_classification": "INVENTORIED_ONLY",
+        "claim_coverage": "NOT_AUDITED",
+        "auto_promotion": false
+      },
+      {
+        "repository": "ryansctt1994-sudo/AI-Research-SKILLs",
+        "inventory_classification": "INVENTORIED_ONLY",
+        "claim_coverage": "NOT_AUDITED",
+        "auto_promotion": false
+      },
+      {
+        "repository": "ryansctt1994-sudo/ai-ticket",
+        "inventory_classification": "INVENTORIED_ONLY",
+        "claim_coverage": "NOT_AUDITED",
+        "auto_promotion": false
+      },
+      {
+        "repository": "ryansctt1994-sudo/Alpha-OmegaLeanTeam",
+        "inventory_classification": "INVENTORIED_ONLY",
+        "claim_coverage": "NOT_AUDITED",
+        "auto_promotion": false
+      },
+      {
+        "repository": "ryansctt1994-sudo/ANGELA",
+        "inventory_classification": "INVENTORIED_ONLY",
+        "claim_coverage": "NOT_AUDITED",
+        "auto_promotion": false
+      },
+      {
+        "repository": "ryansctt1994-sudo/Assurance-Lab",
+        "inventory_classification": "INVENTORIED_ONLY",
+        "claim_coverage": "NOT_AUDITED",
+        "auto_promotion": false
+      },
+      {
+        "repository": "ryansctt1994-sudo/astryx",
+        "inventory_classification": "INVENTORIED_ONLY",
+        "claim_coverage": "NOT_AUDITED",
+        "auto_promotion": false
+      },
+      {
+        "repository": "ryansctt1994-sudo/AutoProof",
+        "inventory_classification": "INVENTORIED_ONLY",
+        "claim_coverage": "NOT_AUDITED",
+        "auto_promotion": false
+      },
+      {
+        "repository": "ryansctt1994-sudo/Awesome_Math_Books",
+        "inventory_classification": "INVENTORIED_ONLY",
+        "claim_coverage": "NOT_AUDITED",
+        "auto_promotion": false
+      },
+      {
+        "repository": "ryansctt1994-sudo/awesome-agent-skills",
+        "inventory_classification": "INVENTORIED_ONLY",
+        "claim_coverage": "NOT_AUDITED",
+        "auto_promotion": false
+      },
+      {
+        "repository": "ryansctt1994-sudo/cathedral-verified",
+        "inventory_classification": "INVENTORIED_ONLY",
+        "claim_coverage": "NOT_AUDITED",
+        "auto_promotion": false
+      },
+      {
+        "repository": "ryansctt1994-sudo/claude-code-best-practice-Codex-",
+        "inventory_classification": "INVENTORIED_ONLY",
+        "claim_coverage": "NOT_AUDITED",
+        "auto_promotion": false
+      },
+      {
+        "repository": "ryansctt1994-sudo/computer",
+        "inventory_classification": "INVENTORIED_ONLY",
+        "claim_coverage": "NOT_AUDITED",
+        "auto_promotion": false
+      },
+      {
+        "repository": "ryansctt1994-sudo/Cortex",
+        "inventory_classification": "INVENTORIED_ONLY",
+        "claim_coverage": "NOT_AUDITED",
+        "auto_promotion": false
+      },
+      {
+        "repository": "ryansctt1994-sudo/CyberStrike",
+        "inventory_classification": "INVENTORIED_ONLY",
+        "claim_coverage": "NOT_AUDITED",
+        "auto_promotion": false
+      },
+      {
+        "repository": "ryansctt1994-sudo/Delta-717",
+        "inventory_classification": "INVENTORIED_ONLY",
+        "claim_coverage": "NOT_AUDITED",
+        "auto_promotion": false
+      },
+      {
+        "repository": "ryansctt1994-sudo/Delta-RPM-Protocol",
+        "inventory_classification": "INVENTORIED_ONLY",
+        "claim_coverage": "NOT_AUDITED",
+        "auto_promotion": false
+      },
+      {
+        "repository": "ryansctt1994-sudo/duotronic-computing",
+        "inventory_classification": "INVENTORIED_ONLY",
+        "claim_coverage": "NOT_AUDITED",
+        "auto_promotion": false
+      },
+      {
+        "repository": "ryansctt1994-sudo/Echo-Root-Ve-Protocol",
+        "inventory_classification": "INVENTORIED_ONLY",
+        "claim_coverage": "NOT_AUDITED",
+        "auto_promotion": false
+      },
+      {
+        "repository": "ryansctt1994-sudo/FreeLattice",
+        "inventory_classification": "INVENTORIED_ONLY",
+        "claim_coverage": "NOT_AUDITED",
+        "auto_promotion": false
+      },
+      {
+        "repository": "ryansctt1994-sudo/Gbrain-Reinforced",
+        "inventory_classification": "INVENTORIED_ONLY",
+        "claim_coverage": "NOT_AUDITED",
+        "auto_promotion": false
+      },
+      {
+        "repository": "ryansctt1994-sudo/hermes-agent-self-evolution",
+        "inventory_classification": "INVENTORIED_ONLY",
+        "claim_coverage": "NOT_AUDITED",
+        "auto_promotion": false
+      },
+      {
+        "repository": "ryansctt1994-sudo/introspection-twin",
+        "inventory_classification": "INVENTORIED_ONLY",
+        "claim_coverage": "NOT_AUDITED",
+        "auto_promotion": false
+      },
+      {
+        "repository": "ryansctt1994-sudo/kant-zk-pastebin",
+        "inventory_classification": "INVENTORIED_ONLY",
+        "claim_coverage": "NOT_AUDITED",
+        "auto_promotion": false
+      },
+      {
+        "repository": "ryansctt1994-sudo/lean-workers-union",
+        "inventory_classification": "INVENTORIED_ONLY",
+        "claim_coverage": "NOT_AUDITED",
+        "auto_promotion": false
+      },
+      {
+        "repository": "ryansctt1994-sudo/LogOS",
+        "inventory_classification": "INVENTORIED_ONLY",
+        "claim_coverage": "NOT_AUDITED",
+        "auto_promotion": false
+      },
+      {
+        "repository": "ryansctt1994-sudo/Lumen",
+        "inventory_classification": "INVENTORIED_ONLY",
+        "claim_coverage": "NOT_AUDITED",
+        "auto_promotion": false
+      },
+      {
+        "repository": "ryansctt1994-sudo/Lumen-Elpis",
+        "inventory_classification": "INVENTORIED_ONLY",
+        "claim_coverage": "NOT_AUDITED",
+        "auto_promotion": false
+      },
+      {
+        "repository": "ryansctt1994-sudo/Lumen-Nexus",
+        "inventory_classification": "INVENTORIED_ONLY",
+        "claim_coverage": "NOT_AUDITED",
+        "auto_promotion": false
+      },
+      {
+        "repository": "ryansctt1994-sudo/Math_Build1994",
+        "inventory_classification": "INVENTORIED_ONLY",
+        "claim_coverage": "NOT_AUDITED",
+        "auto_promotion": false
+      },
+      {
+        "repository": "ryansctt1994-sudo/meta-meme",
+        "inventory_classification": "INVENTORIED_ONLY",
+        "claim_coverage": "NOT_AUDITED",
+        "auto_promotion": false
+      },
+      {
+        "repository": "ryansctt1994-sudo/n00b",
+        "inventory_classification": "INVENTORIED_ONLY",
+        "claim_coverage": "NOT_AUDITED",
+        "auto_promotion": false
+      },
+      {
+        "repository": "ryansctt1994-sudo/NexusGate",
+        "inventory_classification": "INVENTORIED_ONLY",
+        "claim_coverage": "NOT_AUDITED",
+        "auto_promotion": false
+      },
+      {
+        "repository": "ryansctt1994-sudo/offensive-maldev",
+        "inventory_classification": "INVENTORIED_ONLY",
+        "claim_coverage": "NOT_AUDITED",
+        "auto_promotion": false
+      },
+      {
+        "repository": "ryansctt1994-sudo/OpenMythos",
+        "inventory_classification": "INVENTORIED_ONLY",
+        "claim_coverage": "NOT_AUDITED",
+        "auto_promotion": false
+      },
+      {
+        "repository": "ryansctt1994-sudo/Ouroboros",
+        "inventory_classification": "INVENTORIED_ONLY",
+        "claim_coverage": "NOT_AUDITED",
+        "auto_promotion": false
+      },
+      {
+        "repository": "ryansctt1994-sudo/owl",
+        "inventory_classification": "INVENTORIED_ONLY",
+        "claim_coverage": "NOT_AUDITED",
+        "auto_promotion": false
+      },
+      {
+        "repository": "ryansctt1994-sudo/Pandora",
+        "inventory_classification": "INVENTORIED_ONLY",
+        "claim_coverage": "NOT_AUDITED",
+        "auto_promotion": false
+      },
+      {
+        "repository": "ryansctt1994-sudo/Perci",
+        "inventory_classification": "INVENTORIED_ONLY",
+        "claim_coverage": "NOT_AUDITED",
+        "auto_promotion": false
+      },
+      {
+        "repository": "ryansctt1994-sudo/polyclaude",
+        "inventory_classification": "INVENTORIED_ONLY",
+        "claim_coverage": "NOT_AUDITED",
+        "auto_promotion": false
+      },
+      {
+        "repository": "ryansctt1994-sudo/Quillan-",
+        "inventory_classification": "INVENTORIED_ONLY",
+        "claim_coverage": "NOT_AUDITED",
+        "auto_promotion": false
+      },
+      {
+        "repository": "ryansctt1994-sudo/Quillan-v4.2-repo",
+        "inventory_classification": "INVENTORIED_ONLY",
+        "claim_coverage": "NOT_AUDITED",
+        "auto_promotion": false
+      },
+      {
+        "repository": "ryansctt1994-sudo/reson8-Labs",
+        "inventory_classification": "INVENTORIED_ONLY",
+        "claim_coverage": "NOT_AUDITED",
+        "auto_promotion": false
+      },
+      {
+        "repository": "ryansctt1994-sudo/rosclaw",
+        "inventory_classification": "INVENTORIED_ONLY",
+        "claim_coverage": "NOT_AUDITED",
+        "auto_promotion": false
+      },
+      {
+        "repository": "ryansctt1994-sudo/ruflo",
+        "inventory_classification": "INVENTORIED_ONLY",
+        "claim_coverage": "NOT_AUDITED",
+        "auto_promotion": false
+      },
+      {
+        "repository": "ryansctt1994-sudo/skills",
+        "inventory_classification": "INVENTORIED_ONLY",
+        "claim_coverage": "NOT_AUDITED",
+        "auto_promotion": false
+      },
+      {
+        "repository": "ryansctt1994-sudo/solfunmeme",
+        "inventory_classification": "INVENTORIED_ONLY",
+        "claim_coverage": "NOT_AUDITED",
+        "auto_promotion": false
+      },
+      {
+        "repository": "ryansctt1994-sudo/SpiralSafe",
+        "inventory_classification": "INVENTORIED_ONLY",
+        "claim_coverage": "NOT_AUDITED",
+        "auto_promotion": false
+      },
+      {
+        "repository": "ryansctt1994-sudo/spiralsafe-mono",
+        "inventory_classification": "INVENTORIED_ONLY",
+        "claim_coverage": "NOT_AUDITED",
+        "auto_promotion": false
+      },
+      {
+        "repository": "ryansctt1994-sudo/strix",
+        "inventory_classification": "INVENTORIED_ONLY",
+        "claim_coverage": "NOT_AUDITED",
+        "auto_promotion": false
+      },
+      {
+        "repository": "ryansctt1994-sudo/SuperAGI",
+        "inventory_classification": "INVENTORIED_ONLY",
+        "claim_coverage": "NOT_AUDITED",
+        "auto_promotion": false
+      },
+      {
+        "repository": "ryansctt1994-sudo/swarms",
+        "inventory_classification": "INVENTORIED_ONLY",
+        "claim_coverage": "NOT_AUDITED",
+        "auto_promotion": false
+      },
+      {
+        "repository": "ryansctt1994-sudo/Sym-Chaos-",
+        "inventory_classification": "INVENTORIED_ONLY",
+        "claim_coverage": "NOT_AUDITED",
+        "auto_promotion": false
+      },
+      {
+        "repository": "ryansctt1994-sudo/Symmind-Protocol",
+        "inventory_classification": "INVENTORIED_ONLY",
+        "claim_coverage": "NOT_AUDITED",
+        "auto_promotion": false
+      },
+      {
+        "repository": "ryansctt1994-sudo/SynthaMed",
+        "inventory_classification": "INVENTORIED_ONLY",
+        "claim_coverage": "NOT_AUDITED",
+        "auto_promotion": false
+      },
+      {
+        "repository": "ryansctt1994-sudo/system-prompts-and-models-of-ai-tools",
+        "inventory_classification": "INVENTORIED_ONLY",
+        "claim_coverage": "NOT_AUDITED",
+        "auto_promotion": false
+      },
+      {
+        "repository": "ryansctt1994-sudo/t81-benchmarks",
+        "inventory_classification": "INVENTORIED_ONLY",
+        "claim_coverage": "NOT_AUDITED",
+        "auto_promotion": false
+      },
+      {
+        "repository": "ryansctt1994-sudo/t81-docs",
+        "inventory_classification": "INVENTORIED_ONLY",
+        "claim_coverage": "NOT_AUDITED",
+        "auto_promotion": false
+      },
+      {
+        "repository": "ryansctt1994-sudo/t81-foundation",
+        "inventory_classification": "INVENTORIED_ONLY",
+        "claim_coverage": "NOT_AUDITED",
+        "auto_promotion": false
+      },
+      {
+        "repository": "ryansctt1994-sudo/t81-hardware",
+        "inventory_classification": "INVENTORIED_ONLY",
+        "claim_coverage": "NOT_AUDITED",
+        "auto_promotion": false
+      },
+      {
+        "repository": "ryansctt1994-sudo/t81-roadmap",
+        "inventory_classification": "INVENTORIED_ONLY",
+        "claim_coverage": "NOT_AUDITED",
+        "auto_promotion": false
+      },
+      {
+        "repository": "ryansctt1994-sudo/t81lib",
+        "inventory_classification": "INVENTORIED_ONLY",
+        "claim_coverage": "NOT_AUDITED",
+        "auto_promotion": false
+      },
+      {
+        "repository": "ryansctt1994-sudo/ternary",
+        "inventory_classification": "INVENTORIED_ONLY",
+        "claim_coverage": "NOT_AUDITED",
+        "auto_promotion": false
+      },
+      {
+        "repository": "ryansctt1994-sudo/ternary-tools",
+        "inventory_classification": "INVENTORIED_ONLY",
+        "claim_coverage": "NOT_AUDITED",
+        "auto_promotion": false
+      },
+      {
+        "repository": "ryansctt1994-sudo/tinyclaw",
+        "inventory_classification": "INVENTORIED_ONLY",
+        "claim_coverage": "NOT_AUDITED",
+        "auto_promotion": false
+      },
+      {
+        "repository": "ryansctt1994-sudo/trinity",
+        "inventory_classification": "INVENTORIED_ONLY",
+        "claim_coverage": "NOT_AUDITED",
+        "auto_promotion": false
+      },
+      {
+        "repository": "ryansctt1994-sudo/trinity-pow",
+        "inventory_classification": "INVENTORIED_ONLY",
+        "claim_coverage": "NOT_AUDITED",
+        "auto_promotion": false
+      },
+      {
+        "repository": "ryansctt1994-sudo/Weaver_Os",
+        "inventory_classification": "INVENTORIED_ONLY",
+        "claim_coverage": "NOT_AUDITED",
+        "auto_promotion": false
+      },
+      {
+        "repository": "ryansctt1994-sudo/Weaver--Cathedral-",
+        "inventory_classification": "INVENTORIED_ONLY",
+        "claim_coverage": "NOT_AUDITED",
+        "auto_promotion": false
+      },
+      {
+        "repository": "ryansctt1994-sudo/Weaver-Governed-RSI",
+        "inventory_classification": "INVENTORIED_ONLY",
+        "claim_coverage": "NOT_AUDITED",
+        "auto_promotion": false
+      },
+      {
+        "repository": "ryansctt1994-sudo/Weavers-Forge-",
+        "inventory_classification": "INVENTORIED_ONLY",
+        "claim_coverage": "NOT_AUDITED",
+        "auto_promotion": false
+      },
+      {
+        "repository": "ryansctt1994-sudo/zorel-kernel",
+        "inventory_classification": "INVENTORIED_ONLY",
+        "claim_coverage": "NOT_AUDITED",
+        "auto_promotion": false
+      }
+    ]
+  },
+  "subjects": [
+    {
+      "repository": "ryansctt1994-sudo/Weaver_Os",
+      "ref": "main",
+      "commit": "55bdfb9fce42065a0c97b3249e9887454b58a23b",
+      "source": "GITHUB_BRANCH_READ"
+    },
+    {
+      "repository": "ryansctt1994-sudo/Assurance-Lab",
+      "ref": "main",
+      "commit": "ba10a0c3d58e9ea2663e6b73dc763bee4bc29404",
+      "source": "GITHUB_BRANCH_READ"
+    },
+    {
+      "repository": "ryansctt1994-sudo/Assurance-Lab",
+      "ref": "pull/2/head",
+      "commit": "80dac3b6d67ca0e0305c8d27c2a073413715b002",
+      "source": "GITHUB_PR_READ"
+    },
+    {
+      "repository": "ryansctt1994-sudo/Weaver--Cathedral-",
+      "ref": "main",
+      "commit": "2d905e6771cf0e5c6fbd4e289a8044b8fdfdf674",
+      "source": "GITHUB_BRANCH_READ"
+    },
+    {
+      "repository": "ryansctt1994-sudo/cathedral-verified",
+      "ref": "main",
+      "commit": "1c4181714b48dd9d9616a0bebbb4fef8532deff8",
+      "source": "GITHUB_BRANCH_READ"
+    },
+    {
+      "repository": "ryansctt1994-sudo/Lumen-Nexus",
+      "ref": "main",
+      "commit": "93689d76431e796a63379a7019e4528d384a87be",
+      "source": "GITHUB_BRANCH_READ"
+    }
+  ],
+  "portfolio_ceiling": {
+    "evidence": "E2",
+    "witness": "W0",
+    "authority": "O0",
+    "production": false,
+    "effective_basis": "Weaver_Os/PORTFOLIO_STATUS.md at 55bdfb9fce42065a0c97b3249e9887454b58a23b",
+    "promotion_gate": "HOLD",
+    "signoff_ref": null
+  },
+  "claim_register": [
+    {
+      "id": "WNS-PORT-001",
+      "assertion": "The pinned Weaver OS status document declares E2/W0/O0 and prohibits production",
+      "kind": "DOCUMENTED_POLICY",
+      "basis": "SOURCE_READ",
+      "subject_sha": "55bdfb9fce42065a0c97b3249e9887454b58a23b",
+      "disposition": "SUPPORTED_AS_DOCUMENTED_POLICY",
+      "evidence_refs": [
+        "PORTFOLIO_STATUS.md"
+      ],
+      "does_not_establish": [
+        "Independent attestation",
+        "Production safety"
+      ]
+    },
+    {
+      "id": "WNS-PORT-002",
+      "assertion": "The linked GitHub account returned 75 accessible repositories on the recorded inventory snapshot",
+      "kind": "INVENTORY_OBSERVATION",
+      "basis": "CONNECTED_GITHUB_METADATA",
+      "subject_sha": null,
+      "disposition": "BOUNDED_METADATA_OBSERVATION",
+      "evidence_refs": [
+        "inventory.repositories"
+      ],
+      "denominator_scope": "Accessible repositories returned in one paginated call with page size 100",
+      "does_not_establish": [
+        "Completeness of user's full project portfolio",
+        "Authorship or originality of listed repositories",
+        "Independent verification of listed repositories"
+      ]
+    },
+    {
+      "id": "WNS-PORT-003",
+      "assertion": "AIX-001 protected-resource authority invariance remains the central hypothesis, not an established integrated proof",
+      "kind": "RESEARCH_HYPOTHESIS",
+      "basis": "DOCUMENTED_RESEARCH_QUESTION",
+      "subject_sha": null,
+      "disposition": "UNTESTED_AS_PORTFOLIO_WIDE_CLAIM",
+      "evidence_refs": [
+        "governance/portfolio/REVIEW.md"
+      ],
+      "does_not_establish": [
+        "Runtime enforcement",
+        "Independent falsification",
+        "Production authority"
+      ]
+    }
+  ],
+  "gates": [
+    {
+      "id": "G0",
+      "status": "HOLD",
+      "closure_authority": "repository_owner",
+      "closure_evidence": [],
+      "does_not_establish": [
+        "Independent witness"
+      ]
+    },
+    {
+      "id": "G1",
+      "status": "HOLD",
+      "closure_authority": "independent_adjudicator",
+      "closure_evidence": [],
+      "does_not_establish": [
+        "Model adequacy"
+      ]
+    },
+    {
+      "id": "G2",
+      "status": "HOLD",
+      "closure_authority": "independent_formal_reviewer",
+      "closure_evidence": [],
+      "does_not_establish": [
+        "Unbounded safety"
+      ]
+    },
+    {
+      "id": "G3",
+      "status": "HOLD",
+      "closure_authority": "independent_requirements_reviewer",
+      "closure_evidence": [],
+      "does_not_establish": [
+        "Production safety"
+      ]
+    },
+    {
+      "id": "G4",
+      "status": "HOLD",
+      "closure_authority": "independent_adversarial_reviewer",
+      "closure_evidence": [],
+      "does_not_establish": [
+        "Zero residual risk"
+      ]
+    },
+    {
+      "id": "G5",
+      "status": "NOT_EVALUATED",
+      "closure_authority": "repository_owner_after_independent_gates",
+      "closure_evidence": [],
+      "does_not_establish": [
+        "Deployment approval"
+      ]
+    }
+  ],
+  "risk_register": [
+    {
+      "id": "PORT-RISK-001",
+      "title": "Single-operator account, key and signing compromise or loss",
+      "severity": "CRITICAL",
+      "status": "OPEN",
+      "owner": "ryansctt1994-sudo",
+      "proposed_checkpoint": "2026-11-18",
+      "failure_mode": "Loss, takeover or incapacitation may suppress control and evidence continuity",
+      "mitigation_state": "NOT_ENFORCED",
+      "required_evidence": [
+        "Independent retained checkpoint",
+        "Recovery custody protocol",
+        "Separate reviewer or custodian",
+        "Tested account-loss drill"
+      ]
+    },
+    {
+      "id": "PORT-RISK-002",
+      "title": "No entire-portfolio claim/promotion enforcement across live repos",
+      "severity": "HIGH",
+      "status": "OPEN",
+      "owner": "ryansctt1994-sudo",
+      "proposed_checkpoint": "2026-11-18",
+      "failure_mode": "Repo-specific status drift and undocumented promotion",
+      "mitigation_state": "SNAPSHOT_ONLY",
+      "required_evidence": [
+        "Authenticated live inventory refresh",
+        "Repository-scoped source and claims",
+        "Non-compensating external release gate"
+      ]
+    },
+    {
+      "id": "PORT-RISK-003",
+      "title": "Unverified cognition-to-protected-resource integration",
+      "severity": "CRITICAL",
+      "status": "OPEN",
+      "owner": "ryansctt1994-sudo",
+      "proposed_checkpoint": "2026-11-18",
+      "failure_mode": "Two research streams share terminology but do not demonstrate structural enforcement",
+      "mitigation_state": "NOT_INTEGRATED",
+      "required_evidence": [
+        "Pinned proposer and verifier",
+        "Resource-observed adversarial experiment",
+        "External run and raw receipts"
+      ]
+    },
+    {
+      "id": "PORT-RISK-004",
+      "title": "Chronicle canonical contract and external head custody unratified",
+      "severity": "HIGH",
+      "status": "OPEN",
+      "owner": "ryansctt1994-sudo",
+      "proposed_decision_deadline": "2026-11-16",
+      "decision_status": "PROPOSED_NOT_SIGNED",
+      "mitigation_state": "HOLD",
+      "required_evidence": [
+        "Selected profile and version",
+        "Compatibility/difference matrix",
+        "Independent retained checkpoint protocol",
+        "Owner-signed decision"
+      ]
+    }
+  ],
+  "falsification": {
+    "experiment": "AIX-001",
+    "status": "NOT_EXECUTED_FOR_THIS_REVIEW",
+    "protected_effect_observer": "INDEPENDENT_RESOURCE_STATE",
+    "minimum_positive_control": "An authorized unrevoked request must cause the expected protected state change",
+    "kill_conditions": [
+      "Any untrusted proposer causes the protected effect without an independently authorized grant",
+      "A revoked grant nevertheless reaches commit",
+      "A vetoed operation modifies the protected resource",
+      "A proposer is able to alter policy, revocation, or witness record to grant itself effect",
+      "An observer detects a protected effect that the trusted receipt falsely denies"
+    ],
+    "uninformative_conditions": [
+      "Deny-all implementation prevents the valid positive control",
+      "Only gate return values are inspected, without observing resource state",
+      "Missing raw execution trace or source identity",
+      "Operator-controlled history is the only retained evidence"
+    ],
+    "outcome": "HOLD"
+  },
+  "invalidation": {
+    "rule": "Any subject, policy, toolchain, witness trust root or expected-value change reopens dependent active gates while preserving historical decisions",
+    "dependencies": [
+      {
+        "artifact": "subject_commit",
+        "gates": [
+          "G0",
+          "G1",
+          "G2",
+          "G3",
+          "G4",
+          "G5"
+        ]
+      },
+      {
+        "artifact": "adjudication_protocol",
+        "gates": [
+          "G1",
+          "G3",
+          "G5"
+        ]
+      },
+      {
+        "artifact": "formal_toolchain",
+        "gates": [
+          "G2",
+          "G5"
+        ]
+      },
+      {
+        "artifact": "protected_resource_adapter",
+        "gates": [
+          "G4",
+          "G5"
+        ]
+      },
+      {
+        "artifact": "external_checkpoint_trust",
+        "gates": [
+          "G1",
+          "G4",
+          "G5"
+        ]
+      }
+    ]
+  }
+}
