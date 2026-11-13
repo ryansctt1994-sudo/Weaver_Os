@@ -11,6 +11,7 @@ reach runtime code to append, latch, or repair anything. `tools/check_trust_doma
 | `weaver_verifier.claim_transition` | A1 claim-state transition rule | `docs/A1_TRANSITION_INVARIANT.md` | R2[self]; moved from `policy/claim_transition.py` |
 | `weaver_verifier.state` | Rebuilds `wx-runtime-state-1` from a verified ReceiptLedger snapshot; `wx-state-digest-1`; fresh-process CLI | [`WX-STATE-DIGEST-1`](../../governance/specs/WX-STATE-DIGEST-1.md) | R2[self]; custody and authenticity not established |
 | `weaver_verifier.pg001r` | PG-001R promotion-gate evaluator | Lumen-Nexus `governance/specs/PG-001R.md` | R2[self] here: 19-test conformance suite passes in this repository |
+| `weaver_verifier.pg001r_request` | Supported PG-001R entry point: reads a request with WX-CJSON-1's strict reader, then the unchanged contract and evaluator; exit 0 eligible, 1 blocked, 2 rejected | Lumen-Nexus `governance/specs/PG-001R.md` | R2[self]; the moved module's own `main()` keeps the last of a duplicated key and is kept only for byte identity |
 
 ## Effects
 
