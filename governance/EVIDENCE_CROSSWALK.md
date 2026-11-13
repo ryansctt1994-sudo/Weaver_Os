@@ -75,3 +75,21 @@ Status is written as a tuple: `R2[self] · W0 · O0`.
   stewards) or `SINGLE_STEWARD` (exactly one, plus a limitation naming `C-DUAL-001`).
 
 It does not judge whether a mapping is *correct*. That is the stewards' call.
+
+
+## Ratification text-binding check (integrity only)
+
+Run `python -m tools.check_ratification_binding` or `make check-frame`.
+The additional checker fails if a RATIFIED crosswalk references a missing
+`GD-NNNN` decision record, or if its decision ID, date, mode, or named
+stewards disagree with the corresponding committed decision text. It also
+requires W0 and O0 to be the only currently defined witness/operational
+authority rungs, consistent with GD-0001 D2. Adding higher rungs requires
+an explicit reviewed change to the checker and the governing decision.
+
+**This compares editable text only.** It cannot authenticate a person's
+signature or consent, grant repository access, require two approving
+stewards, verify branch protection, or establish independent reproduction.
+C-DUAL-001 remains OPEN; the RATIFIED label remains single-steward and does
+not imply cryptographic or dual-steward ratification. The checker has
+negative controls for mismatched decisions and invented W1/O1 rungs.
