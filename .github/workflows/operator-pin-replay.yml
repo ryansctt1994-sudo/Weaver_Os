@@ -1,0 +1,39 @@
+name: Operator-pinned local replay research tests
+
+on:
+  push:
+    paths:
+      - "weaver_auth/bedrock/operator_pinned_replay.py"
+      - "weaver_auth/bedrock/tests/test_operator_pinned_replay.py"
+      - "weaver_auth/bedrock/OPERATOR_PIN_REPLAY_REVIEW.md"
+      - ".github/workflows/operator-pin-replay.yml"
+  pull_request:
+    branches:
+      - main
+      - integration/gate1-142-144-20261112
+    paths:
+      - "weaver_auth/bedrock/operator_pinned_replay.py"
+      - "weaver_auth/bedrock/tests/test_operator_pinned_replay.py"
+      - ".github/workflows/operator-pin-replay.yml"
+
+permissions:
+  contents: read
+
+jobs:
+  operator-pin-local-test:
+    runs-on: ubuntu-latest
+    timeout-minutes: 8
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+
+      - name: Install bounded test dependency
+        run: python -m pip install "pytest>=8,<9"
+
+      - name: Run operator-pin controls (local fixtures, NO external witness)
+        run: python -m pytest -q weaver_auth/bedrock/tests/test_operator_pinned_replay.py
