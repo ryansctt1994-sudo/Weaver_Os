@@ -17,3 +17,5 @@ jobs:
           python-version: "3.11"
       - run: python governance/consolidation-v0.1/ledger.py --self-test
       - run: python governance/consolidation-v0.1/ledger.py
+      - run: python governance/consolidation-v0.1/ledger_v02.py --self-test
+      - run: python governance/consolidation-v0.1/ledger_v02.py
