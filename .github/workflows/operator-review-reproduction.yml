@@ -34,6 +34,10 @@ jobs:
             echo "REFUSED: expected head is not a full lowercase 40-hex SHA" >&2
             exit 1
           fi
+          if [[ "$EXPECTED_SOURCE_SHA" == 0000000000000000000000000000000000000000 ]]; then
+            echo "REFUSED: the all-zero SHA does not identify a commit" >&2
+            exit 1
+          fi
 
       - name: Check out exact source commit detached
         uses: actions/checkout@v4
@@ -53,6 +57,7 @@ jobs:
           java-version: "17"
 
       - name: Install pinned verifier dependencies
+        id: install-verifier
         shell: bash
         run: |
           set -euo pipefail
@@ -70,7 +75,7 @@ jobs:
             2>&1 | tee "$RUNNER_TEMP/operator-evidence/local-result.json"
 
       - name: Retain local result and raw verifier files even on failure
-        if: always()
+        if: always() && (steps.install-verifier.outcome == 'success' || steps.install-verifier.outcome == 'failure')
         uses: actions/upload-artifact@v4
         with:
           name: operator-rehearsal-${{ env.EXPECTED_SOURCE_SHA }}
