@@ -72,8 +72,16 @@ def verify_operator_pin(
     if pin_digest != expected_pin_sha256:
         raise ValueError("pin digest differs from externally supplied commitment")
     pin = _strict_json(pin_raw)
-    required = {"schema_version", "source_commit", "entry_count", "terminal_hash", "chronicle_sha256"}
-    if not isinstance(pin, dict) or set(pin) != required or type(pin["schema_version"]) is not int or pin["schema_version"] != 1:
+    required = {
+        "schema_version", "source_commit", "entry_count",
+        "terminal_hash", "chronicle_sha256",
+    }
+    if (
+        not isinstance(pin, dict)
+        or set(pin) != required
+        or type(pin["schema_version"]) is not int
+        or pin["schema_version"] != 1
+    ):
         raise ValueError("invalid pin schema or version")
     if not _is_hex(pin["source_commit"], 40) or pin["source_commit"] != expected_source_commit:
         raise ValueError("source commit not bound to operator expectation")
@@ -125,7 +133,9 @@ def verify_operator_pin(
 
 
 def main(argv: list[str] | None = None) -> int:
-    parser = argparse.ArgumentParser(description="Bounded local replay against operator-supplied pin")
+    parser = argparse.ArgumentParser(
+        description="Bounded local replay against operator-supplied pin"
+    )
     parser.add_argument("--chronicle", type=Path, required=True)
     parser.add_argument("--pin", type=Path, required=True)
     parser.add_argument("--expected-pin-sha256", required=True)
