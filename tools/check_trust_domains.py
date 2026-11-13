@@ -12,6 +12,16 @@ Each directory directly under ``packages/`` is a trust domain. The checker enfor
     ``contracts`` or ``verifier`` imports a module that runs processes, opens network
     connections, or writes databases (``sqlite3``, ``subprocess``, ``socket``, ...).
     Verification stays read-only, and effects reach it only through injected objects.
+``IO_CAPABLE_CALL``
+    ``contracts`` or ``verifier`` reaches process execution or filesystem mutation through
+    ``os`` (``system``, ``exec*``, ``spawn*``, ``fork``, ``unlink``, ``replace``, ...).
+    ``os.path`` and other read-only ``os`` use stay allowed.
+``DYNAMIC_IMPORT``
+    Any domain imports a module whose name is only known at run time
+    (``import_module(name)``, ``__import__(name)``), which no static rule can check; and
+    ``contracts`` or ``verifier`` imports ``importlib`` at all. Literal names are resolved
+    and checked as ordinary imports. A static check: aliasing the import function, or
+    ``exec``, still escapes it.
 ``LEGACY_CANONICALIZER``
     Code under ``packages/`` hashes ``json.dumps(..., sort_keys=True)`` output outside the
     named allowlist. New code uses WX-CJSON-1 (``weaver_contracts.canonical``); see C-CANON-001.
@@ -67,6 +77,19 @@ IO_CAPABLE_MODULES = frozenset(
         "xmlrpc",
     }
 )
+# ``os`` functions that start processes or change the filesystem. ``os`` itself stays
+# importable in read-only domains: ``os.path`` and ``os.fspath`` are not effects.
+OS_EFFECT_FUNCTIONS = frozenset(
+    {
+        "chmod", "chown", "fchmod", "fchown", "fork", "forkpty", "ftruncate", "kill",
+        "killpg", "lchown", "link", "makedirs", "mkdir", "mkfifo", "mknod", "popen",
+        "putenv", "pwrite", "remove", "removedirs", "rename", "renames", "replace",
+        "rmdir", "startfile", "symlink", "system", "truncate", "unlink", "unsetenv",
+        "write", "writev",
+    }
+)
+OS_EFFECT_PREFIXES = ("exec", "spawn", "posix_spawn")
+DYNAMIC_IMPORT_FUNCTIONS = frozenset({"import_module", "__import__"})
 STDLIB = frozenset(sys.stdlib_module_names) | {"__future__"}
 
 # Paths relative to packages/. Each entry names why the legacy canonicalizer stays.
@@ -129,6 +152,52 @@ def _imported_modules(tree: ast.AST) -> Iterable[tuple[int, str]]:
                 and isinstance(node.args[0].value, str)
             ):
                 yield node.lineno, node.args[0].value
+
+
+def _run_time_named_imports(tree: ast.AST) -> Iterable[int]:
+    """Lines calling import_module/__import__ with anything but a string literal."""
+    for node in ast.walk(tree):
+        if not isinstance(node, ast.Call):
+            continue
+        func = node.func
+        name = func.attr if isinstance(func, ast.Attribute) else getattr(func, "id", None)
+        if name not in DYNAMIC_IMPORT_FUNCTIONS:
+            continue
+        literal = (
+            bool(node.args)
+            and isinstance(node.args[0], ast.Constant)
+            and isinstance(node.args[0].value, str)
+        )
+        if not literal:
+            yield node.lineno
+
+
+def _is_os_effect(name: str) -> bool:
+    return name in OS_EFFECT_FUNCTIONS or name.startswith(OS_EFFECT_PREFIXES)
+
+
+def _os_effects(tree: ast.AST) -> Iterable[tuple[int, str]]:
+    """Process-starting or filesystem-mutating ``os`` functions, imported or called."""
+    os_names: set[str] = set()
+    for node in ast.walk(tree):
+        if isinstance(node, ast.Import):
+            for alias in node.names:
+                if alias.name == "os":
+                    os_names.add(alias.asname or "os")
+                elif alias.name.startswith("os.") and alias.asname is None:
+                    os_names.add("os")  # ``import os.path`` binds ``os``
+    for node in ast.walk(tree):
+        if isinstance(node, ast.ImportFrom) and node.module == "os" and node.level == 0:
+            for alias in node.names:
+                if _is_os_effect(alias.name):
+                    yield node.lineno, alias.name
+        elif (
+            isinstance(node, ast.Attribute)
+            and isinstance(node.value, ast.Name)
+            and node.value.id in os_names
+            and _is_os_effect(node.attr)
+        ):
+            yield node.lineno, node.attr
 
 
 def _json_dump_aliases(tree: ast.AST) -> set[str]:
@@ -207,10 +276,23 @@ def _check_file(
             violations.append(
                 Violation(path, line, "IO_CAPABLE_IMPORT", f"{domain} imports {module}")
             )
+        if domain in NO_IO_DOMAINS and top == "importlib":
+            violations.append(
+                Violation(path, line, "DYNAMIC_IMPORT", f"{domain} imports {module}")
+            )
         if domain in STDLIB_ONLY and top not in STDLIB:
             violations.append(
                 Violation(path, line, "NON_STDLIB_IMPORT", f"{domain} imports {module}")
             )
+    violations.extend(
+        Violation(path, line, "DYNAMIC_IMPORT", f"{domain} imports a module named at run time")
+        for line in _run_time_named_imports(tree)
+    )
+    if domain in NO_IO_DOMAINS:
+        violations.extend(
+            Violation(path, line, "IO_CAPABLE_CALL", f"{domain} uses os.{name}")
+            for line, name in _os_effects(tree)
+        )
     legacy = _legacy_canonicalizer_lines(tree)
     if relative in LEGACY_CANONICALIZER_ALLOWLIST:
         if not legacy:

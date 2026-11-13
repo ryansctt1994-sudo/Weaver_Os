@@ -361,6 +361,63 @@ MUTATIONS = [
         "tests/triadic_controls/test_signing_policy.py"
         "::test_malformed_signing_fields_are_refused_with_a_result",
     ),
+    # WX-CJSON-1 nesting (Lumen-family review). Three guards, removed one at a time; a
+    # single very deep payload would be refused by either of the other two and so could
+    # not tell which one was removed.
+    (
+        "canonical-nesting-prescan",
+        "packages/contracts/weaver_contracts/canonical.py",
+        "            if depth > MAX_DEPTH + 1:",
+        "            if False:",
+        "tests/contracts/test_canonical_nesting.py"
+        "::test_overdeep_input_never_reaches_the_recursive_parser",
+    ),
+    (
+        "canonical-recursion-backstop",
+        "packages/contracts/weaver_contracts/canonical.py",
+        "    except RecursionError as exc:  # backstop: recursion the pre-scan did not prevent\n"
+        '        raise CanonicalizationError("JSON nesting is too deep for the parser") from exc\n',
+        "",
+        "tests/contracts/test_canonical_nesting.py"
+        "::test_a_parser_recursion_error_is_the_ordinary_refusal",
+    ),
+    (
+        "canonical-tree-depth",
+        "packages/contracts/weaver_contracts/canonical.py",
+        '        raise CanonicalizationError(f"value nested deeper than {MAX_DEPTH} levels")',
+        "        pass",
+        "tests/contracts/test_canonical_nesting.py"
+        "::test_exact_boundary_matches_the_encoder_for_a_scalar_leaf",
+    ),
+    (
+        "pg001r-request-strict-reader",
+        "packages/verifier/weaver_verifier/pg001r_request.py",
+        "        payload = parse_strict(data)",
+        '        payload = __import__("json").loads(data)',
+        "tests/verifier/test_pg001r_request.py::test_a_duplicated_key_is_refused_not_resolved",
+    ),
+    (
+        "trust-domain-importlib",
+        "tools/check_trust_domains.py",
+        '        if domain in NO_IO_DOMAINS and top == "importlib":',
+        "        if False:",
+        "tests/test_trust_domains.py::test_read_only_domains_may_not_import_importlib",
+    ),
+    (
+        "trust-domain-run-time-named-import",
+        "tools/check_trust_domains.py",
+        "        for line in _run_time_named_imports(tree)",
+        "        for line in ()",
+        "tests/test_trust_domains.py::test_a_run_time_named_import_is_rejected_in_every_domain",
+    ),
+    (
+        "trust-domain-os-effects",
+        "tools/check_trust_domains.py",
+        "            for line, name in _os_effects(tree)",
+        "            for line, name in ()",
+        "tests/test_trust_domains.py"
+        "::test_read_only_domains_may_not_start_processes_or_mutate_files_through_os",
+    ),
 ]
 
 
@@ -381,6 +438,9 @@ def main() -> None:
             "tests/gate",
             "tests/state",
             "tests/custody",
+            "tests/contracts/test_canonical_nesting.py",
+            "tests/verifier/test_pg001r_request.py",
+            "tests/test_trust_domains.py",
         ],
         cwd=root,
         capture_output=True,
