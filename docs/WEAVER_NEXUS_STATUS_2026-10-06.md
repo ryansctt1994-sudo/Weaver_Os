@@ -12,8 +12,9 @@
 The public spine now has corrected manifest semantics, derived ledger/head
 verification, an executable A1 transition invariant, a deterministic local
 authority-state reducer, generic runtime-state observation mechanics, one
-bounded real-runtime adapter for Witness RC1, and an artifact-bound successful
-same-origin remote CI replay of the bounded spine on canonical main.
+bounded real-runtime adapter for Witness RC1, an artifact-bound successful
+same-origin remote CI replay of the bounded spine on canonical main, and a
+fail-closed E3.5 runtime-admission gate whose checked-in SUT remains UNBOUND.
 
 The remaining E3.5 gap is specific: the actual E3.5 runtime/SUT has not replayed
 the frozen authority ledger under the qualification protocol, no released E3.5
@@ -30,16 +31,25 @@ result.
 - PR #74 — bounded Witness RC1 real-runtime state adapter.
 - PR #75 — conflicting remote-receipt candidate; closed and superseded.
 - PR #76 — reconciled remote CI spine receipt; merged to main.
+- PR #77 — artifact-bound mainline remote CI receipt preserved on main.
+- Candidate branch — E3.5 runtime-admission gate; governance SUT remains UNBOUND.
 
 ## Canonical mainline receipt
 
-Main commit:
+Carry-forward main commit:
+
+```text
+6926dc263a39da152c2808a6c10cb98509b4938d
+```
+
+The successful same-origin receipt remains anchored to source commit:
 
 ```text
 b8719c35f2970b5169d42d4ac6fa2c60e3f4952d
 ```
 
-The main push triggered six workflows and all six completed successfully:
+That source commit's push triggered six workflows and all six completed
+successfully:
 
 ```text
 CI                       run 37511431229  PASS
@@ -98,6 +108,8 @@ RemoteCIReplay != WitnessPromotion
 - Runtime-state observer: `tools/runtime_state_digest.py`.
 - Witness RC1 adapter: `tools/witness_rc1_state_adapter.py`.
 - Remote receipt emitter: `tools/emit_spine_receipt.py`.
+- E3.5 runtime admission gate: `tools/e35_runtime_gate.py`.
+- E3.5 runtime SUT record: `evidence/e35-runtime-sut.json` (currently UNBOUND).
 
 Bound local values:
 
@@ -162,6 +174,8 @@ WitnessRC1RuntimeAdapter            = ESTABLISHED_WITHIN_BOUNDED_RC1_SCOPE
 WitnessRC1E35Equivalence            = NOT_CLAIMED
 RemoteCISpineReceipt                = ESTABLISHED_WITHIN_SAME_ORIGIN_CI_SCOPE
 CrossHostMechanicsReplay            = ESTABLISHED_WITHIN_SAME_ORIGIN_CI_SCOPE
+E35RuntimeAdmissionGate             = HARDENED_CANDIDATE_THIS_BRANCH
+E35RuntimeSUT                       = UNBOUND
 E35RuntimeReplay                    = NOT_ESTABLISHED
 ReleasedArtifactReplayForE35        = NOT_ESTABLISHED
 IndependentOperatorReproduction     = NOT_ESTABLISHED
@@ -183,18 +197,23 @@ Reproduction != Scope
 ScopeCoverage != EvidentialSupport
 RemoteCIReplay != IndependentOperatorReproduction
 MutationIntent != MutationOccurred
+InjectionClient != GovernanceRuntime
+AttestationSnippet != RunnableSUT
+DirectPathExecPrePostHash != AtomicByteToProcessIdentity
 CandidatePRState != CanonicalMainState
 DeclaredGovernance != ServerEnforcedGovernance
 ```
 
 ## Immediate sequence
 
-1. Identify the actual E3.5 runtime/SUT for `authority_ledger.json`.
-2. Build an adapter for that exact runtime and exact replay input.
-3. Bind runtime source, release identity, and replay input independently.
-4. Compare only semantically equivalent state projections.
-5. Freeze and replay a released E3.5 artifact.
-6. Obtain independent operator reproduction separately.
-7. Enforce Gate Zero server-side.
+1. Admit the actual E3.5 governance runtime artifact; do not substitute the
+   injection client, attestation snippet, local reducer, or Witness RC1 runtime.
+2. Pin that artifact's exact SHA-256 in `evidence/e35-runtime-sut.json`.
+3. Run `tools.e35_runtime_gate` against frozen `authority_ledger.json`.
+4. Preserve the local reducer and RC1 projections as separate coordinates.
+5. Harden path-based pre/post hashing toward atomic byte-to-process identity.
+6. Freeze and replay a released E3.5 artifact.
+7. Obtain independent operator reproduction separately.
+8. Enforce Gate Zero server-side.
 
 No item above changes W0, O0, or production status.
