@@ -2,7 +2,7 @@
 
 This checklist defines the minimum receipts required before Weaver OS can be labeled as a release candidate.
 
-Current posture: **DEVELOPMENT / VERIFICATION SPINE**. Release candidate: **NOT EARNED**. One required receipt is BLOCKED, and the production-blocking gaps below are open.
+Current posture: **DEVELOPMENT / VERIFICATION SPINE**. Release candidate: **NOT EARNED**. One required receipt is BLOCKED, and the remaining production-blocking gaps below are open.
 
 Do not mark this repository production-ready until every required receipt below is present and linked from the release notes.
 
@@ -107,15 +107,21 @@ In the session container, two consecutive `python -m build` runs on clean `c24f7
 
 So a rebuild from source does not reproduce a recorded digest, and nobody can confirm by rebuilding that a given artifact came from this commit. That is separate from checking an artifact you hold against its recorded digest, which non-reproducibility does not prevent. Pinning build timestamps, for example with `SOURCE_DATE_EPOCH`, is a candidate fix; it has not been tried.
 
-## Remaining open gaps
+## Gap status after PR #122
+
+At `7f839efad8c273b979678b0f94e5b1175136b0ab`, [PR #122](https://github.com/ryansctt1994-sudo/Weaver_Os/pull/122) is merged. Historical gaps #2 and #3 below are **IMPLEMENTED and CI PASSED at `a5681c5`; no longer open gaps at the verifier-code level**: signing domains and payload schema versions are allowlisted together for each payload type, with fail-closed rejection of unsupported or malformed values. All 12 checks associated with the combined pre-merge head `a5681c5` passed. The Python 3.10, 3.11, and 3.12 test matrix each passed 783 tests on GitHub's test-merge commit `837bf975a9e29f59d91d66c0060ab0e028366d11`. The exact-commit rehearsal separately verified `a5681c588197180730e39d2c3807734389700c90` itself. Both that head and the landed main commit have the same source tree as the tested merge commit.
+
+This does not establish production integration. The allowlist remains a reviewed code constant with no deprecation or expiry mechanism, and no production caller is established. Other gaps and the blocked retained-artifact receipt remain unchanged. The receipts below and their raw evidence remain scoped to `c24f7cb`; they are not reissued for the newer commit. E2 / W0 / O0_WITHHELD is unchanged.
+
+## Historical gap snapshot at c24f7cb
 
 This section is reconciled against the merged code at `c24f7cb`. It does not count a backlog item as complete because a PR exists. These gaps do not block local verification, but they block production readiness.
 
 | # | Gap | State on `main` at `c24f7cb` |
 | --- | --- | --- |
 | 1 | `registry_sequence` rollback protection | **OPEN, narrowed.** PR #119 enforces it only when a caller supplies a `registry_sequence_store`. The first registry seen for an ID is trusted on first use. No non-test code constructs `CryptoVerifier`, so nothing in production uses it yet. Schema requirements are undecided (#121). See `docs/ENFORCED_VS_METADATA.md`, known gap #1. |
-| 2 | `signing_domain` semantic allowlist | **OPEN.** Signed but not allowlisted on `main`. A candidate fix is in draft PR #122, unmerged. |
-| 3 | `payload_schema_version` semantic allowlist | **OPEN.** Same as gap #2; draft PR #122. |
+| 2 | `signing_domain` semantic allowlist | **OPEN.** Signed but not allowlisted at this snapshot. PR #122 was then an unmerged draft; see the post-merge update above. |
+| 3 | `payload_schema_version` semantic allowlist | **OPEN.** Same as gap #2 at this snapshot; see the post-merge update above. |
 | 4 | Production-grade persistent replay cache with atomic multi-process `check_and_record` | **OPEN.** `SQLiteReplayCache` is tested with 32 threads against one cache object (`test_sqlite_cache_concurrent_check_and_record_is_atomic`). No test covers multiple processes or a crash. |
 | 5 | Release-guard negative-path tests | **OPEN, wider than "expansion".** No test in the pytest paths imports `weaver_release_guard`. The only coverage is the `--help` smoke step. |
 | 6 | Commit boundary atomic with veto and revocation | **OPEN.** C-GATE-001 in `governance/CONTRADICTIONS.yaml`. |
