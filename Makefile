@@ -19,6 +19,7 @@ verify:
 .PHONY: check-frame
 check-frame:
 	python -m tools.check_evidence_crosswalk
+	python -m tools.check_ratification_binding
 	python -m tools.check_trust_domains
 
 .PHONY: test-hw
