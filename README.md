@@ -1,5 +1,8 @@
 # Weaver OS
 
+> **Joint reproduction candidate:** The [offline Weaver + Cathedral kit](reproduction-kit/README.md) freezes candidate source snapshots and an exported userspace, retains raw logs, and supplies an unexecuted external operator receipt template. [Verification routing](docs/VERIFICATION_CORE_BOUNDARY.md) records the shared core boundary. Independent witnessing and silicon validation remain open; production authority remains O0.
+
+
 **Deterministic verification and replay substrate for bounded probabilistic cognition.**
 
 Weaver OS is a compact verification spine for checking authority claims, replay protection, schema alignment, and release provenance. The repository is intentionally kept small: useful code, tests, schemas, and promotion rules stay; speculative or non-executable material belongs in external research notes until it has implementation evidence.
