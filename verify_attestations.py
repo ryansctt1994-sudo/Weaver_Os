@@ -14,7 +14,6 @@ import sys
 from pathlib import Path
 from typing import Any
 
-
 MANIFEST_PATH = Path("published_manifest.json")
 LEDGER_PATH = Path("authority_ledger.json")
 

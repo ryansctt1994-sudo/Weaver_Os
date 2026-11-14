@@ -29,7 +29,10 @@ def build_attestation(
         "sequence_number": sequence_number,
         "head_hash": head_hash,
         "state_digest": state_digest,
-        "timestamp": datetime.now(timezone.utc).replace(microsecond=0).isoformat().replace("+00:00", "Z"),
+        "timestamp": datetime.now(timezone.utc)
+        .replace(microsecond=0)
+        .isoformat()
+        .replace("+00:00", "Z"),
     }
 
 
