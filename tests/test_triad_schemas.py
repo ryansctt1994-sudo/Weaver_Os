@@ -5,7 +5,6 @@ from pathlib import Path
 import pytest
 from jsonschema import Draft202012Validator, ValidationError
 
-
 ROOT = Path(__file__).resolve().parents[1]
 EVENT_SCHEMA_PATH = ROOT / "schemas" / "triad_event.schema.json"
 RECEIPT_SCHEMA_PATH = ROOT / "schemas" / "triad_receipt.schema.json"
