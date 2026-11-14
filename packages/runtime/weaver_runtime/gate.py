@@ -163,6 +163,9 @@ class ExecutionGate:
         policy_version: str = "gate-policy-v1",
         max_window: int = 300,
         clock: Callable[[], int] = lambda: int(time.time()),
+        atomic_effect: Callable[
+            [sqlite3.Connection, Mapping[str, Any], Mapping[str, Any]], None
+        ] | None = None,
     ) -> None:
         if not isinstance(max_window, int) or max_window < 1:
             raise ValueError("max_window must be a positive integer")
@@ -173,6 +176,8 @@ class ExecutionGate:
         self._policy_version = policy_version
         self._max_window = max_window
         self._clock = clock
+        # Installed by a trusted resource owner, never accepted per execute() call.
+        self._atomic_effect = atomic_effect
         self._lock = threading.Lock()
         self._reserved: set[str] = set()
         # Proposals already committed in this ledger may not run again, even across restarts.
@@ -323,7 +328,30 @@ class ExecutionGate:
                     pinned, "REVALIDATE", abort.reason_code, abort.detail, ABORTED
                 )
 
-            # 6. Commit
+            # 6. Commit. If a trusted owner installed an effect callback, the
+            # resource effect and receipt must both commit in ONE SQLite transaction.
+            # This is an application-side atomicity property, not OS confinement.
+            try:
+                committed_result = parse_strict(canonicalize(dict(result)))
+            except (CanonicalizationError, ValueError, TypeError) as exc:
+                return self._reject(
+                    pinned, "COMMIT", "RESULT_NOT_RECORDABLE", type(exc).__name__, ABORTED
+                )
+
+            def commit_guard(conn: sqlite3.Connection) -> None:
+                self._ledger_guard(pid)(conn)
+                if self._atomic_effect is not None:
+                    try:
+                        # Detached canonical copies avoid handing owner code the live
+                        # proposal object or a mutable uncommitted event alias.
+                        self._atomic_effect(
+                            conn, pinned.record(), parse_strict(canonicalize(committed_result))
+                        )
+                    except CommitRefused:
+                        raise
+                    except Exception as exc:
+                        raise CommitRefused("EFFECT_WRITE_FAILED", type(exc).__name__) from exc
+
             try:
                 receipt = self._ledger.admit(
                     "EXECUTION_COMMITTED",
@@ -331,12 +359,12 @@ class ExecutionGate:
                         "proposal": pinned.record(),
                         "decision_id": decision.decision_id,
                         "revalidation_decision_id": again.decision_id,
-                        "result": dict(result),
+                        "result": committed_result,
                     },
                     actor_id=self._gate_id,
                     policy_version=self._policy_version,
                     unique_key=f"EXECUTION_COMMITTED:{pid}",
-                    guard=self._ledger_guard(pid),
+                    guard=commit_guard,
                 )
             except CommitRefused as exc:
                 # A veto or revocation recorded in the ledger before the commit's
@@ -351,7 +379,9 @@ class ExecutionGate:
                 return self._reject(pinned, "COMMIT", "RESULT_NOT_RECORDABLE", str(exc), ABORTED)
             with self._lock:
                 self._committed.add(pid)
-            return GateOutcome(status=COMMITTED, reason_code=None, receipt=receipt, result=result)
+            return GateOutcome(
+                status=COMMITTED, reason_code=None, receipt=receipt, result=committed_result
+            )
         finally:
             with self._lock:
                 self._reserved.discard(pid)

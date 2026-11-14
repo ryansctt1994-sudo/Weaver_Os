@@ -198,9 +198,31 @@ MUTATIONS = [
     (
         "commit-boundary-gate-guard-unwired",
         "packages/runtime/weaver_runtime/gate.py",
-        "                    guard=self._ledger_guard(pid),",
+        "                    guard=commit_guard,",
         "                    guard=None,",
         "tests/gate/test_commit_boundary.py::test_veto_recorded_in_the_ledger_before_commit_aborts",
+    ),
+    (
+        "vertical-signer-check-unwired",
+        "packages/runtime/weaver_runtime/protected_write.py",
+        "            self._public_key.verify(signature_bytes, GRANT_DOMAIN + canonicalize(grant))",
+        "            pass  # signature check deliberately bypassed",
+        "tests/vertical/test_protected_write.py::test_v003_untrusted_issuer_key_is_refused",
+    ),
+    (
+        "vertical-atomic-effect-unwired",
+        "packages/runtime/weaver_runtime/gate.py",
+        "                if self._atomic_effect is not None:",
+        "                if False and self._atomic_effect is not None:",
+        "tests/vertical/test_protected_write.py::test_v001_valid_signed_bound_write_and_receipt",
+    ),
+    (
+        "vertical-owner-resource-write-skipped",
+        "packages/runtime/weaver_runtime/protected_write.py",
+        '        conn.execute(\n            "INSERT INTO protected_kv',
+        ('        return  # no protected resource effect\n'
+         '        conn.execute(\n            "INSERT INTO protected_kv'),
+        "tests/vertical/test_protected_write.py::test_v001_valid_signed_bound_write_and_receipt",
     ),
     (
         "commit-boundary-ledger-guard-skipped",
