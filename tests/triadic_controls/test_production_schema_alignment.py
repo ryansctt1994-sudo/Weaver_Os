@@ -137,11 +137,13 @@ def authority_payload(level: int = 3) -> dict:
 
 def signed_production_envelope(signing_key, inner_payload: dict, nonce: str = "seq-prod-0001") -> dict:
     payload_hash = compute_payload_hash(inner_payload)
+    window_start = datetime.now(timezone.utc) - timedelta(seconds=60)
+    window_end = window_start + timedelta(seconds=3600)
     replay_domain = {
         "system_id": "rover-7",
         "scope_hash": "b" * 64,
-        "valid_from": iso_offset(-60),
-        "valid_until": iso_offset(3600),
+        "valid_from": window_start.isoformat(timespec="seconds").replace("+00:00", "Z"),
+        "valid_until": window_end.isoformat(timespec="seconds").replace("+00:00", "Z"),
     }
     envelope = {
         "payload_type": "AUTHORITY_TOKEN",
