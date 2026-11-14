@@ -13,17 +13,19 @@ from __future__ import annotations
 
 import hashlib
 import json
+from collections.abc import Iterable
 from pathlib import Path
-from typing import Any, Iterable
+from typing import Any
 
 from cryptography.exceptions import InvalidSignature
 from cryptography.hazmat.primitives.asymmetric.ed25519 import Ed25519PublicKey
 from jsonschema import Draft202012Validator
 from jsonschema.exceptions import ValidationError
 
-
 GENESIS_PREV_HASH = "genesis"
-DEFAULT_EVENT_SCHEMA_PATH = Path(__file__).resolve().parents[1] / "schemas" / "triad_event.schema.json"
+DEFAULT_EVENT_SCHEMA_PATH = (
+    Path(__file__).resolve().parents[1] / "schemas" / "triad_event.schema.json"
+)
 
 
 class LedgerValidationError(ValueError):
@@ -77,7 +79,9 @@ def build_event_validator(schema_path: Path = DEFAULT_EVENT_SCHEMA_PATH) -> Draf
     return Draft202012Validator(schema)
 
 
-def validate_event_schema(event: dict[str, Any], validator: Draft202012Validator | None = None) -> None:
+def validate_event_schema(
+    event: dict[str, Any], validator: Draft202012Validator | None = None
+) -> None:
     """Validate an event against the Triad event JSON Schema."""
 
     active_validator = validator or build_event_validator()
@@ -119,7 +123,9 @@ def verify_event_signature(event: dict[str, Any]) -> None:
         raise LedgerValidationError("event signature verification failed") from exc
 
 
-def validate_event_integrity(event: dict[str, Any], validator: Draft202012Validator | None = None) -> None:
+def validate_event_integrity(
+    event: dict[str, Any], validator: Draft202012Validator | None = None
+) -> None:
     """Validate schema, hash binding, and optional signature binding."""
 
     validate_event_schema(event, validator=validator)
@@ -127,7 +133,9 @@ def validate_event_integrity(event: dict[str, Any], validator: Draft202012Valida
     verify_event_signature(event)
 
 
-def verify_chain(events: Iterable[dict[str, Any]], validator: Draft202012Validator | None = None) -> list[dict[str, Any]]:
+def verify_chain(
+    events: Iterable[dict[str, Any]], validator: Draft202012Validator | None = None
+) -> list[dict[str, Any]]:
     """Validate an event sequence and return it as a list.
 
     The chain fails closed when an event index is out of sequence, the genesis
@@ -148,7 +156,8 @@ def verify_chain(events: Iterable[dict[str, Any]], validator: Draft202012Validat
             )
         if event["prev_hash"] != previous_hash:
             raise LedgerChainError(
-                f"prev_hash mismatch at index {expected_index}: claimed={event['prev_hash']!r} expected={previous_hash!r}"
+                f"prev_hash mismatch at index {expected_index}: "
+                f"claimed={event['prev_hash']!r} expected={previous_hash!r}"
             )
         previous_hash = event["event_hash"]
 
@@ -175,7 +184,9 @@ class TriadLedger:
                 try:
                     event = json.loads(stripped)
                 except json.JSONDecodeError as exc:
-                    raise LedgerValidationError(f"invalid JSON on ledger line {line_number}") from exc
+                    raise LedgerValidationError(
+                        f"invalid JSON on ledger line {line_number}"
+                    ) from exc
                 if not isinstance(event, dict):
                     raise LedgerValidationError(f"ledger line {line_number} is not an object")
                 events.append(event)
@@ -193,14 +204,17 @@ class TriadLedger:
             )
         if event.get("prev_hash") != expected_prev_hash:
             raise LedgerChainError(
-                f"prev_hash mismatch: got {event.get('prev_hash')!r} expected {expected_prev_hash!r}"
+                f"prev_hash mismatch: got {event.get('prev_hash')!r} "
+                f"expected {expected_prev_hash!r}"
             )
 
         validate_event_integrity(event, validator=self.validator)
 
         self.path.parent.mkdir(parents=True, exist_ok=True)
         with self.path.open("a", encoding="utf-8") as handle:
-            handle.write(json.dumps(event, ensure_ascii=False, sort_keys=True, separators=(",", ":")))
+            handle.write(
+                json.dumps(event, ensure_ascii=False, sort_keys=True, separators=(",", ":"))
+            )
             handle.write("\n")
 
         return event
