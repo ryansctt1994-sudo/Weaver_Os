@@ -97,6 +97,16 @@ weaver-release-guard verify \
   --slsa provenance.json
 ```
 
+## Triad assurance and review documents
+
+- [Evidence labels](docs/triad/EVIDENCE_LABELS.md) and [validation/label assignment procedure](docs/triad/VALIDATION_AND_LABELS.md)
+- [Explicit non-claims](docs/triad/NON_CLAIMS.md)
+- [Single-writer and distributed boundary](docs/triad/DISTRIBUTED_BOUNDARY.md)
+- [Independent-review checklist](docs/triad/EXTERNAL_AUDIT_CHECKLIST.md)
+- [P12 negative-control rule](docs/triad/P12_SELF_FALSIFICATION.md)
+
+These pages set review expectations only; they do not establish verified enforcement, independent witnessing, or production authority. See [Gate Zero issue #29](https://github.com/ryansctt1994-sudo/Weaver_Os/issues/29) for the active integration hold.
+
 ## Security Boundary
 
 This package verifies cryptographic authorization claims. It does not prove human legitimacy, moral legitimacy, operational safety, or production readiness. Those require higher-level governance, Chronicle/replay evidence, deployment policy, and independent receipts.
