@@ -368,11 +368,23 @@ class CryptoVerifier:
         return VerificationResult(True, "REFUSAL_SIGNATURE_VALIDATED" if is_refusal else "TOKEN_SIGNATURE_VALIDATED", [], verified_issuers, now_iso, requested_level, verified_keys=verified_keys)
 
     def verify_authority_token(self, envelope: Dict[str, Any], requested_level: int, inner_payload: Optional[Dict[str, Any]] = None) -> VerificationResult:
+        schema_valid, schema_error = self._validate_envelope_schema(envelope)
+        if not schema_valid:
+            return VerificationResult(
+                False, "SIGNATURE_VERIFICATION_FAILED", ["MALFORMED_ENVELOPE"], [],
+                self._get_iso_now(), verified_keys=[], failure_details=schema_error,
+            )
         if envelope.get("payload_type") != "AUTHORITY_TOKEN":
             return VerificationResult(False, "SIGNATURE_VERIFICATION_FAILED", ["SYSTEM_SCOPE_MISMATCH"], [], self._get_iso_now(), verified_keys=[])
         return self._verify_envelope(envelope, requested_level, False, inner_payload)
 
     def verify_refusal_signal(self, envelope: Dict[str, Any], requested_cap_level: int, inner_payload: Optional[Dict[str, Any]] = None) -> VerificationResult:
+        schema_valid, schema_error = self._validate_envelope_schema(envelope)
+        if not schema_valid:
+            return VerificationResult(
+                False, "SIGNATURE_VERIFICATION_FAILED", ["MALFORMED_ENVELOPE"], [],
+                self._get_iso_now(), verified_keys=[], failure_details=schema_error,
+            )
         if envelope.get("payload_type") != "REFUSAL_SIGNAL":
             return VerificationResult(False, "SIGNATURE_VERIFICATION_FAILED", ["SYSTEM_SCOPE_MISMATCH"], [], self._get_iso_now(), verified_keys=[])
         return self._verify_envelope(envelope, requested_cap_level, True, inner_payload)
