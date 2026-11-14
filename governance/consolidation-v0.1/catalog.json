@@ -1,0 +1,183 @@
+{
+  "schema": "weaver-consolidation-catalog/v0.1",
+  "created_utc": "2026-11-13",
+  "status": "PROPOSAL_ONLY",
+  "authority": "O0_WITHHELD",
+  "production": "PROHIBITED",
+  "source_pins": {
+    "ryansctt1994-sudo/Weaver_Os": "2be6e4bd18068070be00f2f415dd802602b1335f",
+    "ryansctt1994-sudo/Assurance-Lab": "cf6fbf447476847b232b18d24c69c9332d4709c2",
+    "ryansctt1994-sudo/Alpha-OmegaLeanTeam": "c315f8470152b9ef9ff779ec7a170c5befd9c6c1",
+    "ryansctt1994-sudo/Weaver--Cathedral-": "2d905e6771cf0e5c6fbd4e289a8044b8fdfdf674"
+  },
+  "owners": {
+    "core": "ryansctt1994-sudo/Weaver_Os",
+    "assurance": "ryansctt1994-sudo/Assurance-Lab",
+    "formal": "ryansctt1994-sudo/Alpha-OmegaLeanTeam",
+    "integration": "ryansctt1994-sudo/Weaver--Cathedral-"
+  },
+  "candidates": [
+    {
+      "id": "WX-CJSON-STRICT",
+      "owner": "ryansctt1994-sudo/Weaver_Os",
+      "source": "Weaver_Os",
+      "goal": "strict canonicalization and duplicate-key/nesting refusal",
+      "reference": "Weaver_Os #141",
+      "disposition": "CANDIDATE_NOT_IMPORTED",
+      "fresh_result": "NOT_RUN"
+    },
+    {
+      "id": "AUTH-REPLAY",
+      "owner": "ryansctt1994-sudo/Weaver_Os",
+      "source": "Weaver_Os",
+      "goal": "capability replay rejection and fail-closed authority",
+      "reference": "Weaver_Os main / #145/#146",
+      "disposition": "CANDIDATE_NOT_IMPORTED",
+      "fresh_result": "NOT_RUN"
+    },
+    {
+      "id": "RECEIPT-LEDGER",
+      "owner": "ryansctt1994-sudo/Weaver_Os",
+      "source": "Lumen;zorel-kernel;Weaver_Os",
+      "goal": "receipt integrity, chain and replay comparators",
+      "reference": "historical repos",
+      "disposition": "CANDIDATE_NOT_IMPORTED",
+      "fresh_result": "NOT_RUN"
+    },
+    {
+      "id": "PG001R-CONFORMANCE",
+      "owner": "ryansctt1994-sudo/Weaver_Os",
+      "source": "Lumen-Nexus",
+      "goal": "promotion gate canonical conformance and malformed import refusal",
+      "reference": "Lumen-Nexus README / #32",
+      "disposition": "CANDIDATE_NOT_IMPORTED",
+      "fresh_result": "NOT_RUN"
+    },
+    {
+      "id": "AL-MODEL",
+      "owner": "ryansctt1994-sudo/Assurance-Lab",
+      "source": "Assurance-Lab",
+      "goal": "finite-state reachable and inductive invariant campaigns",
+      "reference": "Assurance-Lab docs/RESULTS.md @ c175fbd",
+      "disposition": "CANDIDATE_NOT_IMPORTED",
+      "fresh_result": "NOT_RUN"
+    },
+    {
+      "id": "AL-MUTANTS",
+      "owner": "ryansctt1994-sudo/Assurance-Lab",
+      "source": "Assurance-Lab",
+      "goal": "mutation kills and negative controls with valid oracle",
+      "reference": "Assurance-Lab docs/RESULTS.md @ c175fbd",
+      "disposition": "CANDIDATE_NOT_IMPORTED",
+      "fresh_result": "NOT_RUN"
+    },
+    {
+      "id": "AL-SNAPSHOT",
+      "owner": "ryansctt1994-sudo/Assurance-Lab",
+      "source": "Assurance-Lab",
+      "goal": "dangling snapshot and omission/authenticity regressions",
+      "reference": "Assurance-Lab #2/#3",
+      "disposition": "CANDIDATE_NOT_IMPORTED",
+      "fresh_result": "NOT_RUN"
+    },
+    {
+      "id": "DELTA-NEGATIVE",
+      "owner": "ryansctt1994-sudo/Assurance-Lab",
+      "source": "Delta-717",
+      "goal": "sentinel fail-closed validation and atomic ledger stress",
+      "reference": "Delta-717 #3-#9",
+      "disposition": "CANDIDATE_NOT_IMPORTED",
+      "fresh_result": "NOT_RUN"
+    },
+    {
+      "id": "AO-ROOT",
+      "owner": "ryansctt1994-sudo/Alpha-OmegaLeanTeam",
+      "source": "Alpha-OmegaLeanTeam",
+      "goal": "root theorem build and axiom audit",
+      "reference": "Alpha-OmegaLeanTeam main",
+      "disposition": "CANDIDATE_NOT_IMPORTED",
+      "fresh_result": "NOT_RUN"
+    },
+    {
+      "id": "INTROSPECT-REPLAY",
+      "owner": "ryansctt1994-sudo/Alpha-OmegaLeanTeam",
+      "source": "introspection-twin",
+      "goal": "kernel replay and fake-witness rejection",
+      "reference": "introspection-twin main / #13",
+      "disposition": "CANDIDATE_NOT_IMPORTED",
+      "fresh_result": "NOT_RUN"
+    },
+    {
+      "id": "AO-MUT-ORACLE",
+      "owner": "ryansctt1994-sudo/Alpha-OmegaLeanTeam",
+      "source": "Alpha-OmegaLeanTeam",
+      "goal": "proof mutation positive baseline and localized failures",
+      "reference": "Alpha-OmegaLeanTeam main / review PRs",
+      "disposition": "CANDIDATE_NOT_IMPORTED",
+      "fresh_result": "NOT_RUN"
+    },
+    {
+      "id": "MATH-ISOLATED",
+      "owner": "ryansctt1994-sudo/Alpha-OmegaLeanTeam",
+      "source": "Math_Build1994;Alpha-OmegaLeanTeam",
+      "goal": "isolated sqrt2 theorem and Mathlib build",
+      "reference": "Math_Build1994 main / Alpha-Omega track",
+      "disposition": "CANDIDATE_NOT_IMPORTED",
+      "fresh_result": "NOT_RUN"
+    },
+    {
+      "id": "CATHEDRAL-GATE",
+      "owner": "ryansctt1994-sudo/Weaver--Cathedral-",
+      "source": "Weaver--Cathedral-",
+      "goal": "protected-path veto cannot be overridden",
+      "reference": "Weaver--Cathedral- #16",
+      "disposition": "CANDIDATE_NOT_IMPORTED",
+      "fresh_result": "NOT_RUN"
+    },
+    {
+      "id": "CATHEDRAL-JSON",
+      "owner": "ryansctt1994-sudo/Weaver--Cathedral-",
+      "source": "Weaver--Cathedral-",
+      "goal": "malformed JSON and Chronicle type refusal",
+      "reference": "Weaver--Cathedral- #17/#18",
+      "disposition": "CANDIDATE_NOT_IMPORTED",
+      "fresh_result": "NOT_RUN"
+    },
+    {
+      "id": "HARDWARE-VETO",
+      "owner": "ryansctt1994-sudo/Weaver--Cathedral-",
+      "source": "cathedral-verified;Sym-Chaos-",
+      "goal": "RTL simulated latch / startup tests (no silicon claim)",
+      "reference": "cathedral-verified #14 / Sym-Chaos- #2",
+      "disposition": "CANDIDATE_NOT_IMPORTED",
+      "fresh_result": "NOT_RUN"
+    },
+    {
+      "id": "SYM-ROLE-LINEAGE",
+      "owner": "ryansctt1994-sudo/Weaver--Cathedral-",
+      "source": "Symmind-Protocol",
+      "goal": "cross-model lineage separation and view log",
+      "reference": "Symmind-Protocol #2",
+      "disposition": "CANDIDATE_NOT_IMPORTED",
+      "fresh_result": "NOT_RUN"
+    },
+    {
+      "id": "M1-EXEC-REPLACE",
+      "owner": "ryansctt1994-sudo/Weaver--Cathedral-",
+      "source": "VGI-M1 design",
+      "goal": "single-object atomic replacement adversarial 12-scenario suite",
+      "reference": "VGI-M1-SPEC-v0.1",
+      "disposition": "CANDIDATE_NOT_IMPORTED",
+      "fresh_result": "NOT_RUN"
+    },
+    {
+      "id": "AGI-SEED-TRIAL",
+      "owner": "ryansctt1994-sudo/Weaver--Cathedral-",
+      "source": "A.G.I-Seed-;Weaver-Governed-RSI",
+      "goal": "bounded patch proposal and observed gain",
+      "reference": "AGI-Seed README / WGRSI concept",
+      "disposition": "CANDIDATE_NOT_IMPORTED",
+      "fresh_result": "NOT_RUN"
+    }
+  ]
+}
