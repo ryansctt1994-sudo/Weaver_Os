@@ -10,7 +10,7 @@ from __future__ import annotations
 
 import hashlib
 import time
-from typing import Optional, Protocol
+from typing import Protocol
 
 
 class ReplayCacheProtocol(Protocol):
@@ -19,7 +19,7 @@ class ReplayCacheProtocol(Protocol):
     Production implementations must guarantee atomic check_and_record.
     """
 
-    def seen(self, replay_key: str, now: Optional[float] = None) -> bool:
+    def seen(self, replay_key: str, now: float | None = None) -> bool:
         """Return True if replay_key is already present and unexpired."""
         ...
 
@@ -31,7 +31,7 @@ class ReplayCacheProtocol(Protocol):
         self,
         replay_key: str,
         expires_at: float,
-        now: Optional[float] = None,
+        now: float | None = None,
     ) -> bool:
         """Atomically check whether replay_key exists, then record it if new.
 
@@ -55,9 +55,7 @@ def generate_replay_key(
     issuer="A", key="BC" versus issuer="AB", key="C".
     """
 
-    raw = "|".join(
-        [issuer_id, key_id, nonce_or_sequence, payload_type, system_id, scope_hash]
-    )
+    raw = "|".join([issuer_id, key_id, nonce_or_sequence, payload_type, system_id, scope_hash])
     return hashlib.sha256(raw.encode("utf-8")).hexdigest()
 
 
@@ -72,7 +70,7 @@ class InMemoryReplayCache:
     def __init__(self) -> None:
         self._entries: dict[str, float] = {}
 
-    def seen(self, replay_key: str, now: Optional[float] = None) -> bool:
+    def seen(self, replay_key: str, now: float | None = None) -> bool:
         now = now or time.time()
         self._prune(now)
         return replay_key in self._entries
@@ -84,7 +82,7 @@ class InMemoryReplayCache:
         self,
         replay_key: str,
         expires_at: float,
-        now: Optional[float] = None,
+        now: float | None = None,
     ) -> bool:
         now = now or time.time()
         self._prune(now)

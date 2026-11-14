@@ -15,10 +15,10 @@ This is a dependency-free demo. It performs local predicate validation only.
 Full JSON Schema validation remains in the PR-001 -> PR-005 stack.
 """
 
-import sys
-import json
 import hashlib
-from typing import Any, Dict, Tuple
+import json
+import sys
+from typing import Any
 
 STACK_LAYERS = [
     "REALITY",
@@ -42,7 +42,11 @@ class EpistemicKernelValidator:
 
     def render_waterfall(self, highlighted_layer: str, verdict: str) -> None:
         """Visualize the architectural layer where the transaction terminated."""
-        color = "\033[93m" if verdict == "REJECT" else ("\033[92m" if verdict == "ACCEPT" else "\033[94m")
+        color = (
+            "\033[93m"
+            if verdict == "REJECT"
+            else ("\033[92m" if verdict == "ACCEPT" else "\033[94m")
+        )
         reset = "\033[0m"
 
         print("\n--- SYSTEM TOPOLOGY WATERFALL ---")
@@ -58,7 +62,7 @@ class EpistemicKernelValidator:
         """Deterministic JSON normalization for invariant hashing."""
         return json.dumps(obj, sort_keys=True, separators=(",", ":"))
 
-    def evaluate_transaction(self, tx: Dict[str, Any]) -> Tuple[str, str, str, int]:
+    def evaluate_transaction(self, tx: dict[str, Any]) -> tuple[str, str, str, int]:
         """Compute a demo TransitionRecord verdict from a raw proposal or record audit."""
         if "id" not in tx or "transition_type" not in tx:
             return "DEFER", "PARSE_FAILURE", "ADMISSIBILITY", 0
@@ -129,7 +133,7 @@ class EpistemicKernelValidator:
 
 def run_suite(target_file: str) -> int:
     try:
-        with open(target_file, "r", encoding="utf-8") as handle:
+        with open(target_file, encoding="utf-8") as handle:
             data = json.load(handle)
     except Exception as exc:
         print(f"CRITICAL: IO processing failed for file trace: {exc}")
