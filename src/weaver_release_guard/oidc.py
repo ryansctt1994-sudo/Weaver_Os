@@ -31,7 +31,7 @@ def verify_oidc_token(token_or_path: str) -> dict:
     header, _ = decode_jwt_unverified(token)
 
     alg = header.get("alg")
-    if alg not in {"RS256", "ES256"}:
+    if not isinstance(alg, str) or alg not in {"RS256", "ES256"}:
         fail(f"Unexpected JWT alg: {alg}")
 
     jwks_client = PyJWKClient(EXPECTED["jwks_url"])
@@ -40,7 +40,7 @@ def verify_oidc_token(token_or_path: str) -> dict:
     claims = jwt.decode(
         token,
         signing_key.key,
-        algorithms=[alg],
+        algorithms=[str(alg)],
         audience=EXPECTED["audience"],
         issuer=EXPECTED["issuer"],
         options={"require": ["exp", "iat", "iss", "aud", "sub"]},
