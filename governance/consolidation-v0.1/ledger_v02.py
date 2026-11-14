@@ -22,11 +22,14 @@ ZERO = "0" * 64
 
 
 def canonical(obj):
-    return json.dumps(obj, sort_keys=True, separators=(",", ":"), allow_nan=False, ensure_ascii=True)
+    return json.dumps(
+        obj, sort_keys=True, separators=(",", ":"), allow_nan=False, ensure_ascii=True
+    )
 
 
 def commit_hash(event):
-    return hashlib.sha256(canonical({k: v for k, v in event.items() if k != "event_hash"}).encode()).hexdigest()
+    body = {k: v for k, v in event.items() if k != "event_hash"}
+    return hashlib.sha256(canonical(body).encode()).hexdigest()
 
 
 def require(cond, message):
@@ -54,8 +57,12 @@ def records(path):
     for line_no, line in enumerate(path.read_text(encoding="utf-8").splitlines(), 1):
         if line.strip():
             try:
-                out.append(json.loads(line, object_pairs_hook=no_duplicates,
-                                      parse_constant=lambda x: (_ for _ in ()).throw(ValueError(x))))
+                out.append(
+                    json.loads(
+                        line, object_pairs_hook=no_duplicates,
+                        parse_constant=lambda x: (_ for _ in ()).throw(ValueError(x)),
+                    )
+                )
             except (ValueError, json.JSONDecodeError) as e:
                 raise ValueError(f"{path.name}:{line_no}: {e}") from e
     return out
@@ -81,8 +88,10 @@ def validate_tests(catalog, events):
     by_id = {}
     fingerprints = {}
     for e in events:
-        for key in ("candidate_id", "source_sha", "target_sha", "environment",
-                    "test_selector", "outcome", "evidence_status", "independence_class", "receipt_url"):
+        for key in (
+            "candidate_id", "source_sha", "target_sha", "environment", "test_selector",
+            "outcome", "evidence_status", "independence_class", "receipt_url",
+        ):
             valstr(e, key)
         require(e["candidate_id"] in ids, "unknown test candidate")
         require(sha(e["source_sha"], 40) and sha(e["target_sha"], 40), "invalid source/target SHA")
@@ -149,8 +158,11 @@ def validate_defects(catalog, defects, tests):
             baseline = tests.get(e.get("baseline_event_id"))
             fixed = tests.get(e.get("repair_event_id"))
             require(baseline is not None and fixed is not None, "missing regression pair")
-            require(baseline["outcome"] == "FAIL" and fixed["outcome"] == "PASS" and
-                    fixed.get("repair_of") == baseline["event_id"], "regression fail/pass link invalid")
+            require(
+                baseline["outcome"] == "FAIL" and fixed["outcome"] == "PASS" and
+                fixed.get("repair_of") == baseline["event_id"],
+                "regression fail/pass link invalid",
+            )
             require(baseline["candidate_id"] == e["candidate_id"] and
                     fixed["candidate_id"] == e["candidate_id"] and
                     baseline["source_sha"] == e["source_sha"] and
@@ -238,10 +250,14 @@ def self_test(catalog):
     rejected(lambda: validate_tests(catalog, [first, {**second, "source_sha": "c" * 40}]))
     rejected(lambda: validate_tests(catalog, [first, {**second, "target_sha": base}]))
     rejected(lambda: validate_tests(catalog, [first, {**second, "evidence_status": "COMPLETE"}]))
-    rejected(lambda: validate_tests(catalog, [first, {**second, "independence_class": "INDEPENDENT_WITNESS"}]))
+    rejected(lambda: validate_tests(
+        catalog, [first, {**second, "independence_class": "INDEPENDENT_WITNESS"}]
+    ))
     rejected(lambda: validate_defects(catalog, stages[:-2] + [stages[-1]], tests))
     rejected(lambda: validate_defects(catalog, [stages[1]], tests))
-    rejected(lambda: validate_defects(catalog, stages[:3] + [{**stages[3], "repair_event_id": "run-base"}], tests))
+    rejected(lambda: validate_defects(
+        catalog, stages[:3] + [{**stages[3], "repair_event_id": "run-base"}], tests
+    ))
     print("PASS: WC-4R-001 v0.2 chains, evidence axes, repair and lifecycle negative controls")
 
 
@@ -251,9 +267,14 @@ def main():
     args = p.parse_args()
     catalog = json.loads((ROOT / "catalog.json").read_text(encoding="utf-8"))
     require(catalog.get("status") == "PROPOSAL_ONLY", "catalog must remain proposed")
-    require(len(set(catalog["owners"].values())) == 4, "owner registry must have four distinct repos")
-    require(len({x["id"] for x in catalog["candidates"]}) == len(catalog["candidates"]),
-            "duplicate candidate IDs")
+    require(
+        len(set(catalog["owners"].values())) == 4,
+        "owner registry must have four distinct repos",
+    )
+    require(
+        len({x["id"] for x in catalog["candidates"]}) == len(catalog["candidates"]),
+        "duplicate candidate IDs",
+    )
     if args.self_test:
         self_test(catalog)
         return

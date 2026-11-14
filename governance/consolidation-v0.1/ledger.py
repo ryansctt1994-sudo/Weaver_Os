@@ -116,12 +116,13 @@ def main():
         return
     catalog = json.loads((ROOT / "catalog.json").read_text(encoding="utf-8"))
     events = []
-    for line_number, line in enumerate((ROOT / "events.jsonl").read_text(encoding="utf-8").splitlines(), 1):
+    lines = (ROOT / "events.jsonl").read_text(encoding="utf-8").splitlines()
+    for line_number, line in enumerate(lines, 1):
         if line.strip():
             try:
                 events.append(json.loads(line))
             except json.JSONDecodeError as error:
-                raise SystemExit(f"invalid JSON at events line {line_number}: {error}")
+                raise SystemExit(f"invalid JSON at events line {line_number}: {error}") from error
     print(json.dumps(verify(catalog, events), indent=2, sort_keys=True))
 
 

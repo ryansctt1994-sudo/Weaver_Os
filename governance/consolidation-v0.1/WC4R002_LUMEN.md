@@ -44,3 +44,17 @@ The stored events use `source_sha` as the original code revision and `target_sha
 - Retention of GitHub Actions artifacts is limited; the recorded digest is **not** itself independent artifact custody.
 
 **Current authority:** O0 WITHHELD · **production:** PROHIBITED · portfolio evidence ceiling unchanged.
+# 2026-11-14 packet-integrity amendment
+
+Review of run `43528808402` confirmed that the downloaded archive matches GitHub's
+reported digest. Its final `metadata.txt` does not match the corresponding entry
+in `file-hashes.sha256`: the original workflow hashed metadata before appending
+the final exit-status fields. The archived test logs and original receipts are
+retained; their historical outcomes are not reissued or erased. The original
+packet remains OWNER_CI / INCOMPLETE. A repaired workflow must finalize metadata
+first and verify its entire final eleven-file hash manifest on a new source pin.
+No execution or defect-stream entries are rewritten by this amendment, and no
+defect advances to REVIEWED or CLOSED. The ledger-source lint repair changes
+line wrapping and exception chaining only; it does not change ledger bytes,
+canonical serialization, admission policy or authority.
+
