@@ -1,0 +1,18 @@
+F                                                                        [100%]
+=================================== FAILURES ===================================
+_______ test_stale_payload_rejected_by_ledger_even_if_file_hash_rebound ________
+
+tmp_path = PosixPath('/tmp/pytest-of-root/pytest-2/test_stale_payload_rejected_by0')
+
+    def test_stale_payload_rejected_by_ledger_even_if_file_hash_rebound(tmp_path):
+        out = tmp_path / "run"
+        demo.produce(out)
+        stale_payload(out)
+>       with pytest.raises(ledger.LedgerValidationError, match="event_hash mismatch"):
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E       Failed: DID NOT RAISE LedgerValidationError
+
+tests/test_e2e_transaction.py:35: Failed
+=========================== short test summary info ============================
+FAILED tests/test_e2e_transaction.py::test_stale_payload_rejected_by_ledger_even_if_file_hash_rebound
+1 failed in 0.09s
