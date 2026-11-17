@@ -31,6 +31,10 @@ jobs:
       - name: Install pytest
         run: python -m pip install --upgrade pip pytest
 
+      - name: Assert replay verifier fails closed on missing evidence
+        working-directory: weaver_auth/bedrock/tests
+        run: python -m pytest -q test_gate1_replay_failclosed.py
+
       - name: Run Gate 1 harness
         working-directory: weaver_auth/bedrock/tests
         run: python test_all_harnesses.py
