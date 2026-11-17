@@ -46,12 +46,12 @@ def _hash_payload(prev_hash: str, entry: dict[str, Any]) -> str:
 def replay_verify(chronicle_path: Path) -> bool:
     """Verify a minimal chronicle hash chain."""
     if not chronicle_path.exists():
-        return True
+        return False
 
     lines = [line.strip() for line in chronicle_path.read_text(encoding="utf-8").splitlines()]
     lines = [line for line in lines if line]
     if not lines:
-        return True
+        return False
 
     prev_hash = "GENESIS"
     for line in lines:
