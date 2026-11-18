@@ -6,6 +6,11 @@ on:
     paths:
       - "weaver_auth/**"
       - ".github/workflows/gate1.yml"
+  pull_request:
+    branches: [main]
+    paths:
+      - "weaver_auth/**"
+      - ".github/workflows/gate1.yml"
 
 permissions:
   contents: read
