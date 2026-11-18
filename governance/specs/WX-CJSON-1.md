@@ -18,9 +18,14 @@ Scheme) restricted so that independent implementations cannot disagree on number
 | Object keys sorted by UTF-16 code units | RFC 8785 §3.2.3 |
 | String escaping exactly as RFC 8785 §3.2.2.2 | `\"`, `\\`, `\b \f \n \r \t`, other controls as lowercase `\u00xx`; all else literal UTF-8 |
 | No whitespace | RFC 8785 |
+| No value nested deeper than 256 levels (the top-level value is depth 0) | Bounds the work a reader does and keeps recursive parsers from failing outside the profile's own errors |
 
 The strict reader (`parse_strict`) additionally rejects duplicate keys, a byte-order mark,
-invalid UTF-8, exponents, `NaN`/`Infinity`, and trailing data.
+invalid UTF-8, exponents, `NaN`/`Infinity`, and trailing data. It applies the same nesting
+limit as the encoder, so it accepts exactly the nesting `canonicalize` can produce. Over-deep
+text is refused by a non-recursive scan before the recursive JSON parser runs, and a parser
+`RecursionError` is reported as the profile's ordinary error, so the outcome never depends on
+an interpreter's recursion limit.
 
 A digest under this profile is `sha256(canonicalize(value))`, written as 64 lowercase hex digits.
 

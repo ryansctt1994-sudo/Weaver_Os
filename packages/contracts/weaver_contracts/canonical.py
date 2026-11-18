@@ -13,8 +13,10 @@ floating-point formatting:
   RFC 8785 specifies.
 
 ``parse_strict`` is the matching reader. It rejects duplicate keys, floats and
-exponents, ``NaN``/``Infinity``, a byte-order mark, invalid UTF-8, and lone
-surrogate escapes.
+exponents, ``NaN``/``Infinity``, a byte-order mark, invalid UTF-8, lone surrogate
+escapes, and any value nested deeper than ``MAX_DEPTH``: it accepts exactly the
+nesting the encoder can produce. Over-deep text is refused before the recursive JSON
+parser sees it, so refusal never depends on an interpreter's recursion limit.
 
 This module defines data rules only. It grants no authority and creates no
 evidence.
@@ -29,6 +31,9 @@ from typing import Any
 
 PROFILE_ID = "WX-CJSON-1"
 MAX_SAFE_INTEGER = 2**53 - 1
+# The deepest a value may sit: the top-level value is depth 0, its members depth 1, and
+# so on. The encoder and the strict reader share this one limit.
+MAX_DEPTH = 256
 
 _ESCAPES = {
     '"': '\\"',
@@ -71,8 +76,8 @@ def _utf16_key(key: str) -> bytes:
 
 
 def _encode(value: Any, depth: int) -> str:
-    if depth > 256:
-        raise CanonicalizationError("nesting deeper than 256 levels")
+    if depth > MAX_DEPTH:
+        raise CanonicalizationError(f"nesting deeper than {MAX_DEPTH} levels")
     if value is None:
         return "null"
     if value is True:
@@ -133,16 +138,48 @@ def _unique_object(pairs: list[tuple[str, Any]]) -> dict[str, Any]:
     return out
 
 
-def _check_tree(value: Any) -> None:
+def _check_nesting(text: str) -> None:
+    """Refuse text nested past what the encoder can produce, without recursing.
+
+    Counts ``[`` and ``{`` that open outside string literals, with backslash escapes
+    handled so structural characters inside a string never count. The deepest container
+    the encoder can emit is an empty one at depth ``MAX_DEPTH``, the ``MAX_DEPTH + 1``-th
+    open container; one more is refused here, before the recursive parser runs.
+    """
+    depth = 0
+    in_string = False
+    escaped = False
+    for char in text:
+        if in_string:
+            if escaped:
+                escaped = False
+            elif char == "\\":
+                escaped = True
+            elif char == '"':
+                in_string = False
+        elif char == '"':
+            in_string = True
+        elif char in "[{":
+            depth += 1
+            if depth > MAX_DEPTH + 1:
+                raise CanonicalizationError(f"nested deeper than {MAX_DEPTH} levels")
+        elif char in "]}":
+            depth -= 1
+
+
+def _check_tree(value: Any, depth: int = 0) -> None:
+    # The same rule the encoder applies: no value deeper than MAX_DEPTH.
+    if depth > MAX_DEPTH:
+        raise CanonicalizationError(f"value nested deeper than {MAX_DEPTH} levels")
     if isinstance(value, str):
         _check_string(value)
     elif isinstance(value, dict):
         for key, item in value.items():
             _check_string(key)
-            _check_tree(item)
+            _check_tree(item, depth + 1)
     elif isinstance(value, list):
         for item in value:
-            _check_tree(item)
+            _check_tree(item, depth + 1)
 
 
 def parse_strict(data: bytes) -> Any:
@@ -155,6 +192,7 @@ def parse_strict(data: bytes) -> Any:
         text = bytes(data).decode("utf-8")
     except UnicodeDecodeError as exc:
         raise CanonicalizationError("input is not valid UTF-8") from exc
+    _check_nesting(text)
     try:
         value = json.loads(
             text,
@@ -163,6 +201,8 @@ def parse_strict(data: bytes) -> Any:
             parse_int=_bounded_int,
             parse_constant=_reject_constant,
         )
+    except RecursionError as exc:  # backstop: recursion the pre-scan did not prevent
+        raise CanonicalizationError("JSON nesting is too deep for the parser") from exc
     except json.JSONDecodeError as exc:
         raise CanonicalizationError(f"invalid JSON: {exc.msg}") from exc
     _check_tree(value)
