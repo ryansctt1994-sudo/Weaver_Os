@@ -16,6 +16,7 @@ from __future__ import annotations
 
 import sqlite3
 import time
+from contextlib import closing
 from pathlib import Path
 
 from weaver_contracts.replay import ReplayCacheProtocol
@@ -35,12 +36,16 @@ class SQLiteReplayCache(ReplayCacheProtocol):
 
     def _get_connection(self) -> sqlite3.Connection:
         conn = sqlite3.connect(self.db_path, isolation_level=None)
-        conn.execute("PRAGMA journal_mode=WAL;")
-        conn.execute("PRAGMA busy_timeout=5000;")
+        try:
+            conn.execute("PRAGMA busy_timeout=5000;")
+            conn.execute("PRAGMA journal_mode=WAL;")
+        except BaseException:
+            conn.close()
+            raise
         return conn
 
     def _init_db(self) -> None:
-        with self._get_connection() as conn:
+        with closing(self._get_connection()) as conn:
             conn.execute(
                 """
                 CREATE TABLE IF NOT EXISTS replay_state (
@@ -59,7 +64,7 @@ class SQLiteReplayCache(ReplayCacheProtocol):
     def seen(self, replay_key: str, now: float | None = None) -> bool:
         current_time = now if now is not None else time.time()
         self._prune(current_time)
-        with self._get_connection() as conn:
+        with closing(self._get_connection()) as conn:
             cursor = conn.execute(
                 "SELECT 1 FROM replay_state WHERE replay_key = ?",
                 (replay_key,),
@@ -67,7 +72,7 @@ class SQLiteReplayCache(ReplayCacheProtocol):
             return cursor.fetchone() is not None
 
     def record(self, replay_key: str, expires_at: float) -> None:
-        with self._get_connection() as conn:
+        with closing(self._get_connection()) as conn:
             conn.execute(
                 """
                 INSERT OR REPLACE INTO replay_state (replay_key, expires_at)
@@ -84,7 +89,7 @@ class SQLiteReplayCache(ReplayCacheProtocol):
     ) -> bool:
         current_time = now if now is not None else time.time()
         self._prune(current_time)
-        with self._get_connection() as conn:
+        with closing(self._get_connection()) as conn:
             cursor = conn.execute(
                 """
                 INSERT INTO replay_state (replay_key, expires_at)
@@ -96,7 +101,7 @@ class SQLiteReplayCache(ReplayCacheProtocol):
             return cursor.rowcount == 1
 
     def _prune(self, now: float) -> None:
-        with self._get_connection() as conn:
+        with closing(self._get_connection()) as conn:
             conn.execute(
                 "DELETE FROM replay_state WHERE expires_at <= ?",
                 (now,),

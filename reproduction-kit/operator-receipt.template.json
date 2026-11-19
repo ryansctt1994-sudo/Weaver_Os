@@ -1,0 +1,18 @@
+{
+  "status": "UNEXECUTED_TEMPLATE_NOT_EVIDENCE",
+  "operator_identity": null,
+  "independence_disclosure": null,
+  "identity_authentication_reference": null,
+  "machine_and_infrastructure_owner": null,
+  "execution_started_utc": null,
+  "execution_finished_utc": null,
+  "kit_manifest_sha256": null,
+  "results_manifest_sha256": null,
+  "observed_exit_code": null,
+  "deviations_and_failures": null,
+  "custody_record": null,
+  "signature_tool_and_key_fingerprint": null,
+  "review_decision": "PENDING_EXTERNAL_REVIEW",
+  "authority": "O0",
+  "production": "PROHIBITED"
+}

@@ -24,3 +24,5 @@ ruff==0.16.10
 setuptools==84.0.0
 typing_extensions==4.16.0
 wheel==0.48.0
+hypothesis==6.170.15
+sortedcontainers==2.4.0
